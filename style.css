@@ -35,8 +35,8 @@ body {
 }
 
 .logo {
-    width: 80px;
-    height: 80px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid #ff6600;
@@ -82,7 +82,7 @@ body {
     position: absolute;
     bottom: 20px; /* Espaciado desde la parte inferior */
     left: 50%;
-    transform: translateX(-50%); /* Centra el reproductor horizontalmente */
+    transform: translateX(-90%); /* Centra el reproductor horizontalmente */
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.5)); /* Agrega un fondo semi-transparente */
     padding: 20px;
 }

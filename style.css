@@ -72,14 +72,14 @@ body {
 .player-overlay {
     position: absolute;
     bottom: 20px; /* Espaciado desde la parte inferior */
-    left: 50%;
-    transform: translateX(-20%); /* Centra el reproductor horizontalmente */
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.5)); /* Agrega un fondo semi-transparente */
+    left: 20%;
+    transform: translateX(50%); /* Centra el reproductor horizontalmente */
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.5)); /* Agrega un fondo transparente */
     padding: 20px;
 }
 
 .custom-player {
-    background: rgba(255, 255, 255, 0.8); /* Establece un fondo blanco con transparencia */
+    background: rgba(255, 255, 255, 0.8); /* Establece un fondo negro con transparencia */
     border-radius: 15px;
     padding: 20px;
     border: 2px solid #ff6600;

@@ -35,12 +35,12 @@ body {
 }
 
 .logo {
-    width: 200px; /* Ajusta el tamaño del logo a tu preferencia */
+    width: 150px; /* Ajusta el tamaño del logo a tu preferencia */
     height: auto; /* Mantiene la proporción del logo */
 }
 
 .title-section h1 {
-    font-size: 3.0em; /* Aumenta el tamaño del encabezado */
+    font-size: 2.5em; /* Aumenta el tamaño del encabezado */
     margin: 0; /* Elimina el margen inferior */
 }
 
@@ -73,7 +73,7 @@ body {
     position: absolute;
     bottom: 20px; /* Espaciado desde la parte inferior */
     left: 50%;
-    transform: translateX(-90%); /* Centra el reproductor horizontalmente */
+    transform: translateX(-50%); /* Centra el reproductor horizontalmente */
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.5)); /* Agrega un fondo transparente */
     padding: 20px;
 }

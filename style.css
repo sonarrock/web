@@ -78,7 +78,24 @@ body {
     display: block;
 }
 
-
+<!-- BEGINS: AUTO-GENERATED MUSES RADIO PLAYER CODE -->
+<script type="text/javascript" src="https://hosted.muses.org/mrp.js"></script>
+<script type="text/javascript">
+MRP.insert({
+'url':'https://stream.zeno.fm/ezq3fcuf5ehvv',
+'volume':100,
+'autoplay':true,
+'forceHTML5':true,
+'jsevents':true,
+'buffering':0,
+'title':'SONAR ROCK',
+'wmode':'transparent',
+'skin':'radiovoz',
+'width':230,
+'height':65
+});
+</script>
+<!-- ENDS: AUTO-GENERATED MUSES RADIO PLAYER CODE -->
 }
 
 /* Social Media */

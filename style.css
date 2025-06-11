@@ -162,7 +162,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: end;
-    gap: 3px;
+    gap: 10px;
     height: 60px;
 }
 

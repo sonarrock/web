@@ -35,8 +35,8 @@ body {
 }
 
 .logo {
-    width: 140px;
-    height: 140px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid #ff6600;
@@ -66,35 +66,39 @@ body {
 
 .main-image-container {
     position: relative;
-    width: 100%;
-    height: 600px; /* Aumenta la altura de la imagen de fondo */
-    overflow: hidden; /* Asegúrate de que no se salga del contenedor */
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .main-image {
     width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ajusta la imagen para cubrir el área */
+    height: 500px;
+    object-fit: contain;
     display: block;
+    background: #000;
 }
 
 .player-overlay {
     position: absolute;
-    bottom: 20px; /* Espaciado desde la parte inferior */
-    left: 70%;
-    transform: translateX(-90%); /* Centra el reproductor horizontalmente */
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.5)); /* Agrega un fondo transparente */
-    padding: 10px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
+    padding: 40px 20px 20px;
 }
 
 .custom-player {
-    background: rgba(255, 255, 255, 0.8); /* Establece un fondo blanco con transparencia */
+    background: rgba(26, 26, 26, 0.7);
     border-radius: 15px;
     padding: 20px;
     border: 2px solid #ff6600;
     box-shadow: 0 0 30px rgba(255, 102, 0, 0.3);
-    backdrop-filter: blur(5px); /* Aplica un transparencia al fondo */
-}}
+    backdrop-filter: blur(5px);
+}
+
 .player-header h2 {
     text-align: center;
     color: #ff6600;
@@ -112,9 +116,9 @@ body {
 }
 
 .play-btn {
-    width: 120px;
+    width: 60px;
     height: 60px;
-    border-radius: 70%;
+    border-radius: 50%;
     background: linear-gradient(45deg, #ff6600, #ff8833);
     border: none;
     color: white;
@@ -126,7 +130,7 @@ body {
 
 .play-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 10px rgba(255, 102, 0, 0.6);
+    box-shadow: 0 6px 20px rgba(255, 102, 0, 0.6);
 }
 
 .volume-control {
@@ -162,8 +166,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: end;
-    gap: 10px;
-    height: 60px;
+    gap: 3px;
+    height: 40px;
 }
 
 .bar {
@@ -184,24 +188,7 @@ body {
 
 @keyframes pulse {
     0% { height: 5px; }
-    100% { height: 35px; }<!-- BEGINS: AUTO-GENERATED MUSES RADIO PLAYER CODE -->
-<script type="text/javascript" src="https://hosted.muses.org/mrp.js"></script>
-<script type="text/javascript">
-MRP.insert({
-'url':'https://stream.zeno.fm/ezq3fcuf5ehvv',
-'volume':100,
-'autoplay':true,
-'forceHTML5':true,
-'jsevents':true,
-'buffering':0,
-'title':'SONAR ROCK',
-'wmode':'transparent',
-'skin':'radiovoz',
-'width':230,
-'height':65
-});
-</script>
-<!-- ENDS: AUTO-GENERATED MUSES RADIO PLAYER CODE -->
+    100% { height: 35px; }
 }
 
 /* Social Media */

@@ -75,12 +75,11 @@ body {
 
 .main-image {
     width: 100%;
-    height: 500px;
+    height: 1200px;
     object-fit: contain;
     display: block;
     background: #000;
 }
-
 .player-overlay {
     position: absolute;
     bottom: 0;

@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -13,6 +12,7 @@ body {
     min-height: 100vh;
 }
 
+/* Container */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -32,21 +32,19 @@ body {
     align-items: center;
     justify-content: center;
     gap: 20px;
+    flex-wrap: wrap;
 }
 
 .logo {
-    width: 200px; /* Ajusta el tamaño del logo a tu preferencia */
-    height: auto; /* Mantiene la proporción del logo */
+    width: 200px;
+    height: auto;
 }
 
-.title-section h1 {
-    font-size: 2.5em; /* Aumenta el tamaño del encabezado */
-    margin: 0; /* Elimina el margen inferior */
-}
-
+.title-section h1,
 .title-section .subtitle {
-    font-size: 2.5em; /* Aumenta el tamaño del subtítulo si deseas */
-    margin-top: 5px; /* Espaciado entre título y subtítulo */
+    font-size: 2.5em;
+    margin: 0;
+    text-align: center;
 }
 
 /* Main Section */
@@ -58,33 +56,33 @@ body {
 .main-image-container {
     position: relative;
     width: 100%;
-    height: 600px; /* Aumenta la altura de la imagen de fondo */
-    overflow: hidden; /* Asegúrate de que no se salga del contenedor */
+    height: 600px;
+    overflow: hidden;
 }
 
 .main-image {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ajusta la imagen para cubrir el área */
+    object-fit: cover;
     display: block;
 }
 
 .player-overlay {
     position: relative;
-    bottom: 20px; /* Espaciado desde la parte inferior */
+    bottom: 20px;
     left: 50%;
-    transform: translateX(-50%); /* Centra el reproductor horizontalmente */
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.5)); /* Agrega un fondo transparente */
+    transform: translateX(-50%);
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
     padding: 20px;
 }
 
 .custom-player {
-    background: transparent; /* Establece un fondo negro con transparencia */
+    background: transparent;
     border-radius: 15px;
     padding: 20px;
     border: 2px solid #ff6600;
     box-shadow: 0 0 30px rgba(255, 102, 0, 0.3);
-    backdrop-filter: blur(5px); /* Aplica un desenfoque al fondo */
+    backdrop-filter: blur(5px);
 }
 
 .player-header h2 {
@@ -150,6 +148,7 @@ body {
     cursor: pointer;
 }
 
+/* Visualizer */
 .visualizer {
     display: flex;
     justify-content: center;
@@ -217,7 +216,7 @@ body {
 .spotify { background: linear-gradient(45deg, #1db954, #1ed760); }
 .ivoox { background: linear-gradient(45deg, #ff6600, #ff8833); }
 
-/* Embed Sections */
+/* Embed */
 .embed-section {
     padding: 40px 0;
 }
@@ -244,7 +243,7 @@ body {
     justify-content: center;
 }
 
-/* Staff Section */
+/* Staff */
 .staff-section {
     padding: 60px 0;
     background: rgba(0, 0, 0, 0.2);
@@ -288,7 +287,7 @@ body {
     text-shadow: 0 0 5px rgba(255, 102, 0, 0.3);
 }
 
-/* About Sections */
+/* About */
 .about-section {
     padding: 60px 0;
 }
@@ -306,13 +305,13 @@ body {
     margin-top: 20px;
 }
 
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 768px) {
     .title-section h1 {
         font-size: 2rem;
     }
     
-    .subtitle {
+    .title-section .subtitle {
         font-size: 1rem;
     }
     
@@ -321,7 +320,7 @@ body {
         gap: 15px;
     }
     
-    .main-image {
+    .main-image-container {
         height: 300px;
     }
     
@@ -344,18 +343,5 @@ body {
 @media (max-width: 480px) {
     .container {
         padding: 0 15px;
-    }
-    
-    .title-section h1 {
-        font-size: 1.5rem;
-    }
-    
-    .section-title {
-        font-size: 2rem;
-    }
-    
-    .player-controls {
-        flex-direction: column;
-        gap: 15px;
     }
 }

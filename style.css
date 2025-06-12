@@ -45,7 +45,7 @@ body {
 }
 
 .title-section .subtitle {
-    font-size: 1.5em; /* Aumenta el tamaño del subtítulo si deseas */
+    font-size: 2.5em; /* Aumenta el tamaño del subtítulo si deseas */
     margin-top: 5px; /* Espaciado entre título y subtítulo */
 }
 
@@ -79,7 +79,7 @@ body {
 }
 
 .custom-player {
-    background: rgba(255, 255, 255, 0.8); /* Establece un fondo negro con transparencia */
+    background: transparent; /* Establece un fondo negro con transparencia */
     border-radius: 15px;
     padding: 20px;
     border: 2px solid #ff6600;

@@ -70,10 +70,10 @@ body {
 }
 
 .player-overlay {
-    position: absolute;
+    position: relative;
     bottom: 20px; /* Espaciado desde la parte inferior */
     left: 50%;
-    transform: translateX(50%); /* Centra el reproductor horizontalmente */
+    transform: translateX(-50%); /* Centra el reproductor horizontalmente */
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.5)); /* Agrega un fondo transparente */
     padding: 20px;
 }

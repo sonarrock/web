@@ -1,319 +1,174 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Sonar Rock - Reproductor Mejorado</title>
-<style>
-  /* Fondo negro y full screen con imagen de fondo */
-  html, body {
-    margin: 0; padding: 0; height: 100%;
-    background: #000 url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
-    background-size: cover;
-    color: #ff6600;
-    font-family: Arial, sans-serif;
-  }
-  body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    backdrop-filter: brightness(0.4);
-  }
-
-  .container {
-    flex: 1;
-    max-width: 960px;
-    margin: auto;
-    padding: 2rem 1rem;
-    background: rgba(0,0,0,0.75);
-    border-radius: 12px;
-    box-shadow: 0 0 20px #ff6600aa;
-  }
-
-  /* Reproductor */
-  .player {
-    background: #111;
-    border: 2px solid #ff6600;
-    border-radius: 12px;
-    padding: 1rem 2rem;
-    max-width: 360px;
-    margin: 0 auto 2rem;
-    box-shadow: 0 0 15px #ff6600cc;
-  }
-  .controls {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    margin-bottom: 1rem;
-  }
-  button {
-    background: transparent;
-    border: 2px solid #ff6600;
-    color: #ff6600;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    font-weight: bold;
-    line-height: 1;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  button:hover, button:focus {
-    background-color: #ff6600;
-    color: #000;
-    outline: none;
-  }
-  button:active {
-    background-color: #cc5200;
-    color: #000;
-  }
-
-  .volume-control {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    color: #ff6600;
-    font-size: 0.9rem;
-  }
-  input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    background: transparent;
-    cursor: pointer;
-  }
-  input[type="range"]:focus {
-    outline: none;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    height: 20px;
-    width: 20px;
-    background: #bfff00; /* amarillo limón */
-    border-radius: 50%;
-    cursor: pointer;
-    margin-top: -7px;
-    border: none;
-  }
-  input[type="range"]::-webkit-slider-runnable-track {
-    height: 6px;
-    background: #444;
-    border-radius: 3px;
-  }
-
-  /* Animación olas (visualizer) */
-  .visualizer {
-    width: 100%;
-    height: 60px;
-    background: #222;
-    border-radius: 8px;
-    overflow: hidden;
-    position: relative;
-    margin-bottom: 1rem;
-  }
-  .bar {
-    position: absolute;
-    bottom: 0;
-    width: 5%;
-    background: #bfff00; /* amarillo limón */
-    animation: pulse 1s infinite ease-in-out;
-    border-radius: 4px;
-  }
-  @keyframes pulse {
-    0%, 100% {height: 20%;}
-    50% {height: 100%;}
-  }
-
-  /* Staff sección horizontal */
-  .staff-section {
-    background: rgba(0,0,0,0.85);
-    border: 2px solid #ff6600;
-    border-radius: 12px;
-    padding: 1rem;
-    margin-top: 2rem;
-    max-width: 960px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .staff-title {
-    color: #ff6600;
-    font-size: 1.3rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    text-align: center;
-  }
-  .staff-list {
-    display: flex;
-    gap: 1.5rem;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-  }
-  .staff-member {
-    min-width: 180px;
-    background: #111;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 0 10px #ff6600cc;
-    flex-shrink: 0;
-    color: #fff;
-  }
-  .staff-member h4 {
-    margin: 0 0 0.5rem;
-    color: #bfff00;
-  }
-  .staff-member p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #ddd;
-  }
-
-  /* Scroll barra horizontal personalizada */
-  .staff-list::-webkit-scrollbar {
-    height: 8px;
-  }
-  .staff-list::-webkit-scrollbar-thumb {
-    background-color: #ff6600;
-    border-radius: 4px;
-  }
-  .staff-list::-webkit-scrollbar-track {
-    background: #222;
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    .container {
-      padding: 1rem 0.5rem;
-    }
-    .player {
-      width: 100%;
-      max-width: none;
-      padding: 1rem;
-    }
-  }
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonar Rock - La Radio Independiente</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+        }
+        .header {
+            padding: 1rem;
+            background-color: #121212;
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        .logo {
+            height: 80px;
+            margin-right: 1rem;
+        }
+        .title-section h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: #ff6600;
+        }
+        .subtitle {
+            font-size: 1rem;
+            color: #ccc;
+        }
+        .main-image-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.3);
+        }
+        .player-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+        .custom-player {
+            background: #1e1e1e;
+            border: 2px solid #ff6600;
+            border-radius: 10px;
+            padding: 1rem;
+            width: 320px;
+            box-shadow: 0 0 15px #ff6600aa;
+        }
+        .social-section {
+            background-color: #111;
+            padding: 2rem;
+            text-align: center;
+        }
+        .social-buttons a {
+            margin: 0 10px;
+            color: #ff6600;
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+        .social-buttons a:hover {
+            color: #fff;
+        }
+        .staff-section {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem;
+            background-color: #121212;
+        }
+        .staff-member {
+            text-align: center;
+        }
+        .staff-member img {
+            width: 120px;
+            border-radius: 50%;
+            border: 2px solid #ff6600;
+        }
+    </style>
 </head>
 <body>
+    <header class="header">
+        <div class="logo-section">
+            <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
+            <div class="title-section">
+                <h1>SONAR ROCK</h1>
+                <p class="subtitle">LA RADIO INDEPENDIENTE</p>
+            </div>
+        </div>
+    </header>
 
-<div class="container">
-  <h1 style="text-align:center; margin-bottom:2rem; color:#ff6600;">Sonar Rock - Reproductor</h1>
+    <section class="main-image-container">
+        <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
+        <div class="player-overlay">
+            <div class="custom-player" role="region" aria-label="Reproductor de Sonar Rock">
+                <audio id="audio" crossorigin="anonymous" src="https://stream.zeno.fm/ezq3fcuf5ehvv"></audio>
+                <div class="metadata" id="metadata" aria-live="polite">Cargando información de la canción...</div>
+                <div class="controls">
+                    <button onclick="audio.play()">Play</button>
+                    <button onclick="audio.pause()">Pause</button>
+                    <button onclick="audio.currentTime=0; audio.pause()">Stop</button>
+                </div>
+                <div class="volume-control">
+                    <label for="volumeRange">Volumen</label>
+                    <input type="range" id="volumeRange" min="0" max="1" step="0.01" value="0.8" />
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <div class="player" role="region" aria-label="Reproductor de Sonar Rock">
-    <audio id="audio" crossorigin="anonymous" src="https://stream.zeno.fm/ezq3fcuf5ehvv"></audio>
+    <section class="social-section">
+        <div class="social-buttons">
+            <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://www.facebook.com/share/19pWMaua7S/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+    </section>
 
-    <div class="controls" aria-label="Controles de reproducción">
-      <button id="playBtn" aria-label="Reproducir" title="Play">▶️</button>
-      <button id="pauseBtn" aria-label="Pausar" title="Pause">⏸️</button>
-      <button id="stopBtn" aria-label="Detener" title="Stop">⏹️</button>
-    </div>
+    <section class="staff-section">
+        <div class="staff-member">
+            <img src="attached_assets/staff1.jpg" alt="Locutor 1">
+            <p>Locutor 1</p>
+        </div>
+        <div class="staff-member">
+            <img src="attached_assets/staff2.jpg" alt="Locutor 2">
+            <p>Locutor 2</p>
+        </div>
+        <!-- Agrega más staff aquí -->
+    </section>
 
-    <div class="volume-control" aria-label="Control de volumen">
-      <label for="volumeRange">Volumen</label>
-      <input type="range" id="volumeRange" min="0" max="1" step="0.01" value="0.8" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.8" />
-    </div>
+    <script>
+        const audio = document.getElementById('audio');
+        const volumeRange = document.getElementById('volumeRange');
+        const metadataDiv = document.getElementById('metadata');
 
-    <div class="visualizer" aria-hidden="true">
-      <!-- barras de animación -->
-    </div>
-  </div>
+        volumeRange.addEventListener('input', e => {
+            audio.volume = e.target.value;
+        });
 
-  <section class="staff-section" aria-label="Sección de staff">
-    <h2 class="staff-title">Nuestro Staff</h2>
-    <div class="staff-list">
-      <div class="staff-member">
-        <h4>Juan Pérez</h4>
-        <p>Locutor principal</p>
-      </div>
-      <div class="staff-member">
-        <h4>Ana Gómez</h4>
-        <p>Productora</p>
-      </div>
-      <div class="staff-member">
-        <h4>Carlos Martínez</h4>
-        <p>Editor de audio</p>
-      </div>
-      <div class="staff-member">
-        <h4>Laura Sánchez</h4>
-        <p>Community Manager</p>
-      </div>
-      <!-- Agrega más miembros si quieres -->
-    </div>
-  </section>
-</div>
+        async function fetchMetadata() {
+            try {
+                const response = await fetch('https://api.zeno.fm/mounts/metadata/subscribe/ezq3fcuf5ehvv');
+                const data = await response.json();
+                if (data?.data?.metadata?.stream?.currentSong) {
+                    const { artist = 'Desconocido', title = 'Desconocido' } = data.data.metadata.stream.currentSong;
+                    metadataDiv.textContent = `🎵 ${artist} – ${title}`;
+                } else {
+                    metadataDiv.textContent = 'No se encontró información de la canción.';
+                }
+            } catch (e) {
+                metadataDiv.textContent = 'Error al cargar metadatos.';
+                console.error(e);
+            }
+        }
 
-<script>
-  const audio = document.getElementById('audio');
-  const playBtn = document.getElementById('playBtn');
-  const pauseBtn = document.getElementById('pauseBtn');
-  const stopBtn = document.getElementById('stopBtn');
-  const volumeRange = document.getElementById('volumeRange');
-  const visualizer = document.querySelector('.visualizer');
-
-  // Crear barras para visualizador
-  const barCount = 20;
-  const bars = [];
-  for(let i = 0; i < barCount; i++) {
-    const bar = document.createElement('div');
-    bar.classList.add('bar');
-    bar.style.left = `${i * (100 / barCount)}%`;
-    bar.style.width = `${100 / (barCount * 2)}%`;
-    bar.style.animationDelay = `${i * 0.1}s`;
-    visualizer.appendChild(bar);
-    bars.push(bar);
-  }
-
-  // Controles
-  playBtn.addEventListener('click', async () => {
-    try {
-      // Reanuda contexto de audio en browsers que lo bloquean
-      if (audioCtx.state === 'suspended') await audioCtx.resume();
-      audio.play();
-    } catch(e) {
-      console.warn('No se pudo reproducir:', e);
-    }
-  });
-  pauseBtn.addEventListener('click', () => audio.pause());
-  stopBtn.addEventListener('click', () => {
-    audio.pause();
-    audio.currentTime = 0;
-  });
-
-  // Volumen
-  volumeRange.addEventListener('input', e => {
-    audio.volume = e.target.value;
-    volumeRange.setAttribute('aria-valuenow', e.target.value);
-  });
-  audio.volume = volumeRange.value;
-
-  // Visualizador Web Audio API
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  const audioCtx = new AudioContext();
-  const source = audioCtx.createMediaElementSource(audio);
-  const analyser = audioCtx.createAnalyser();
-
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-  analyser.fftSize = 64;
-
-  const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-  function animate() {
-    requestAnimationFrame(animate);
-    analyser.getByteFrequencyData(dataArray);
-    bars.forEach((bar, index) => {
-      let value = dataArray[index];
-      const heightPercent = Math.max(10, value / 2);
-      bar.style.height = heightPercent + '%';
-      bar.style.opacity = heightPercent / 100;
-    });
-  }
-  animate();
-</script>
-
+        fetchMetadata();
+        setInterval(fetchMetadata, 15000);
+    </script>
 </body>
 </html>
-

@@ -6,169 +6,378 @@
     <title>Sonar Rock - La Radio Independiente</title>
     <link href="style.css" rel="stylesheet" type="text/css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
-        }
-        .header {
-            padding: 1rem;
-            background-color: #121212;
-        }
-        .logo-section {
-            display: flex;
-            align-items: center;
-        }
-        .logo {
-            height: 80px;
-            margin-right: 1rem;
-        }
-        .title-section h1 {
-            margin: 0;
-            font-size: 2rem;
-            color: #ff6600;
-        }
-        .subtitle {
-            font-size: 1rem;
-            color: #ccc;
-        }
-        .main-image-container {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .main-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: brightness(0.3);
-        }
-        .player-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2;
-        }
-        .custom-player {
-            background: #1e1e1e;
-            border: 2px solid #ff6600;
-            border-radius: 10px;
-            padding: 1rem;
-            width: 320px;
-            box-shadow: 0 0 15px #ff6600aa;
-        }
-        .social-section {
-            background-color: #111;
-            padding: 2rem;
-            text-align: center;
-        }
-        .social-buttons a {
-            margin: 0 10px;
-            color: #ff6600;
-            font-size: 1.5rem;
-            transition: color 0.3s;
-        }
-        .social-buttons a:hover {
-            color: #fff;
-        }
-        .staff-section {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            padding: 2rem;
-            background-color: #121212;
-        }
-        .staff-member {
-            text-align: center;
-        }
-        .staff-member img {
-            width: 120px;
-            border-radius: 50%;
-            border: 2px solid #ff6600;
-        }
-    </style>
 </head>
 <body>
+    <!-- Header -->
     <header class="header">
-        <div class="logo-section">
-            <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
-            <div class="title-section">
-                <h1>SONAR ROCK</h1>
-                <p class="subtitle">LA RADIO INDEPENDIENTE</p>
+        <div class="container">
+            <div class="logo-section">
+                <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
+                <div class="title-section">
+                    <h1>SONAR ROCK</h1>
+                    <p class="subtitle">LA RADIO INDEPENDIENTE</p>
+                </div>
             </div>
         </div>
     </header>
 
-    <section class="main-image-container">
-        <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
-        <div class="player-overlay">
-            <div class="custom-player" role="region" aria-label="Reproductor de Sonar Rock">
-                <audio id="audio" crossorigin="anonymous" src="https://stream.zeno.fm/ezq3fcuf5ehvv"></audio>
-                <div class="metadata" id="metadata" aria-live="polite">Cargando información de la canción...</div>
-                <div class="controls">
-                    <button onclick="audio.play()">Play</button>
-                    <button onclick="audio.pause()">Pause</button>
-                    <button onclick="audio.currentTime=0; audio.pause()">Stop</button>
-                </div>
-                <div class="volume-control">
-                    <label for="volumeRange">Volumen</label>
-                    <input type="range" id="volumeRange" min="0" max="1" step="0.01" value="0.8" />
+    <!-- Main Image with Player -->
+    <section class="main-section">
+        <div class="container">
+            <div class="main-image-container">
+                <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
+                <div class="player-overlay">
+                    <div class="custom-player">
+                        <div class="player-header">
+
+                        </div>
+                     <div class="player-overlay">
+  <div class="custom-player" id="zeno-player"></div>
+</div>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reproductor Sonar Rock con Metadatos</title>
+<style>
+  body {
+    background-color: #121212;
+    color: #ff6600;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+  }
+  .player {
+    background: #1e1e1e;
+    border: 2px solid #ff6600;
+    border-radius: 10px;
+    padding: 1rem 2rem;
+    width: 340px;
+    box-shadow: 0 0 15px #ff6600aa;
+  }
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  button {
+    background: transparent;
+    border: 2px solid #ff6600;
+    color: #ff6600;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: #ff6600;
+    color: #121212;
+  }
+  .volume-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    background: transparent;
+  }
+  input[type="range"]:focus {
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 20px;
+    width: 20px;
+    background: #ff6600;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-top: -7px;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    background: #444;
+    border-radius: 3px;
+  }
+  /* Animación ondas */
+  .visualizer {
+    width: 100%;
+    height: 60px;
+    background: #222;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  .bar {
+    position: absolute;
+    bottom: 0;
+    width: 6px;
+    background: #ff6600;
+    animation: pulse 1s infinite ease-in-out;
+    border-radius: 3px;
+  }
+  @keyframes pulse {
+    0%, 100% {height: 20%;}
+    50% {height: 100%;}
+  }
+  .metadata {
+    text-align: center;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    min-height: 3em;
+  }
+</style>
+</head>
+<body>
+
+<div class="player" role="region" aria-label="Reproductor de Sonar Rock">
+  <audio id="audio" crossorigin="anonymous" src="https://stream.zeno.fm/ezq3fcuf5ehvv"></audio>
+
+  <div class="metadata" id="metadata" aria-live="polite" aria-atomic="true" aria-relevant="text">
+    Cargando información de la canción...
+  </div>
+
+  <div class="controls" aria-label="Controles de reproducción">
+    <button id="playBtn" aria-label="Reproducir">Play</button>
+    <button id="pauseBtn" aria-label="Pausar">Pause</button>
+    <button id="stopBtn" aria-label="Detener">Stop</button>
+  </div>
+
+  <div class="volume-control" aria-label="Control de volumen">
+    <label for="volumeRange">Volumen</label>
+    <input type="range" id="volumeRange" min="0" max="1" step="0.01" value="0.8" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.8" />
+  </div>
+
+  <div class="visualizer" aria-hidden="true">
+    <!-- Barras animadas -->
+  </div>
+</div>
+
+<script>
+  const audio = document.getElementById('audio');
+  const playBtn = document.getElementById('playBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const volumeRange = document.getElementById('volumeRange');
+  const visualizer = document.querySelector('.visualizer');
+  const metadataDiv = document.getElementById('metadata');
+
+  // Crear barras para visualizador
+  const barCount = 20;
+  const bars = [];
+  for(let i = 0; i < barCount; i++) {
+    const bar = document.createElement('div');
+    bar.classList.add('bar');
+    bar.style.left = `${i * (100 / barCount)}%`;
+    bar.style.width = `${100 / (barCount * 2)}%`;
+    bar.style.animationDelay = `${i * 0.1}s`;
+    visualizer.appendChild(bar);
+    bars.push(bar);
+  }
+
+  // Controles básicos
+  playBtn.addEventListener('click', () => {
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    audio.play();
+  });
+  pauseBtn.addEventListener('click', () => audio.pause());
+  stopBtn.addEventListener('click', () => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+
+  // Control volumen
+  volumeRange.addEventListener('input', e => {
+    audio.volume = e.target.value;
+    volumeRange.setAttribute('aria-valuenow', e.target.value);
+  });
+
+  audio.volume = volumeRange.value;
+
+  // Visualizador de volumen usando Web Audio API
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioContext();
+  const source = audioCtx.createMediaElementSource(audio);
+  const analyser = audioCtx.createAnalyser();
+
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+  analyser.fftSize = 64;
+
+  const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    analyser.getByteFrequencyData(dataArray);
+    bars.forEach((bar, index) => {
+      let value = dataArray[index];
+      const heightPercent = Math.max(10, value / 2);
+      bar.style.height = heightPercent + '%';
+      bar.style.opacity = heightPercent / 100;
+    });
+  }
+
+  animate();
+
+  // Función para obtener metadatos
+  const mount = 'ezq3fcuf5ehvv'; // tu mount
+  const apiUrl = `https://api.zeno.fm/mounts/metadata/subscribe/${mount}`;
+
+  async function fetchMetadata() {
+    try {
+      const response = await fetch(apiUrl);
+      if(!response.ok) throw new Error('Error en la API');
+      const data = await response.json();
+      if(data && data.data && data.data.metadata && data.data.metadata.stream) {
+        // Tomamos el título y artista del stream actual
+        const song = data.data.metadata.stream.currentSong || {};
+        const artist = song.artist || 'Desconocido';
+        const title = song.title || 'Desconocido';
+
+        metadataDiv.textContent = `🎵 ${artist} – ${title}`;
+      } else {
+        metadataDiv.textContent = 'No se encontró información de la canción.';
+      }
+    } catch (error) {
+      metadataDiv.textContent = 'Error al cargar metadatos.';
+      console.error('Error al obtener metadatos:', error);
+    }
+  }
+
+  // Refrescar metadatos cada 15 segundos
+  fetchMetadata();
+  setInterval(fetchMetadata, 15000);
+
+</script>
+
+</body>
+</html>
+                        </audio>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Social Media -->
     <section class="social-section">
-        <div class="social-buttons">
-            <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
-            <a href="https://www.facebook.com/share/19pWMaua7S/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
-            <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
+        <div class="container">
+            <div class="social-buttons">
+                <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+                <a href="https://www.facebook.com/share/19pWMaua7S/?mibextid=wwXIfr" target="_blank" class="social-btn facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://open.spotify.com/show/1B0o0Mj7p44eR2OFD5Ew4H?si=IhHzbqdMQ-ejnG5NqqESGA" target="_blank" class="social-btn spotify">
+                    <i class="fab fa-spotify"></i>
+                </a>
+                <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox">
+                    <i class="fas fa-podcast"></i>
+                </a>
+            </div>
         </div>
     </section>
 
+    <!-- Ivoox Embed -->
+    <section class="embed-section">
+        <div class="container">
+            <h2 class="section-title">Escúchanos en Ivoox</h2>
+            <div class="embed-container">
+                <iframe src="https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=04040c" width="100%" height="400" frameborder="0" allowfullscreen="" scrolling="no" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spotify Embed -->
+    <section class="embed-section">
+        <div class="container">
+            <h2 class="section-title">Síguenos en Spotify</h2>
+            <div class="embed-container spotify-embed">
+                <iframe style="border-radius:12px" 
+                    src="https://open.spotify.com/embed/show/1B0o0Mj7p44eR2OFD5Ew4H?utm_source=generator&theme=0" 
+                    width="90%" height="180" frameBorder="0" allowfullscreen="" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                    loading="lazy">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Staff Section -->
     <section class="staff-section">
-        <div class="staff-member">
-            <img src="attached_assets/staff1.jpg" alt="Locutor 1">
-            <p>Locutor 1</p>
+        <div class="container">
+            <h2 class="section-title">Staff</h2>
+            <div class="staff-grid">
+                <div class="staff-member">
+                    <img src="attached_assets/Wendy_1749601460841.jpeg" alt="Wendy" class="staff-image">
+                    <h3>Wendy</h3>
+                </div>
+                <div class="staff-member">
+                    <img src="attached_assets/Hans_1749601460841.jpeg" alt="Hans" class="staff-image">
+                    <h3>Hans</h3>
+                </div>
+                <div class="staff-member">
+                    <img src="attached_assets/El Chris_1749601460841.jpeg" alt="El Chris" class="staff-image">
+                    <h3>El Chris</h3>
+                </div>
+            </div>
         </div>
-        <div class="staff-member">
-            <img src="attached_assets/staff2.jpg" alt="Locutor 2">
-            <p>Locutor 2</p>
-        </div>
-        <!-- Agrega más staff aquí -->
     </section>
 
-    <script>
-        const audio = document.getElementById('audio');
-        const volumeRange = document.getElementById('volumeRange');
-        const metadataDiv = document.getElementById('metadata');
+    <!-- About Sections -->
+    <section class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <h2 class="section-title">¿Quiénes Somos?</h2>
+                <p class="about-text">
+                    
+                    En Sonar Rock, la radio independiente, no seguimos tendencias: las sentimos, las reinterpretamos, las hacemos rugir. Somos bohemios de oído fino, melómanos incurables, poetas con alma de vinilo y corazón de distorsión. Aquí la música no es fondo: es protagonista, es lenguaje, es vida.
 
-        volumeRange.addEventListener('input', e => {
-            audio.volume = e.target.value;
-        });
+Nacimos de una pasión: el rock en todas sus formas. Reverenciamos a los gigantes del pasado y nos dejamos sacudir por lo más nuevo del presente. Desde el crujir clásico de un solo de guitarra setentero hasta la energía cruda de una banda emergente, todo cabe en nuestro universo… siempre que tenga alma, verdad y potencia.
 
-        async function fetchMetadata() {
-            try {
-                const response = await fetch('https://api.zeno.fm/mounts/metadata/subscribe/ezq3fcuf5ehvv');
-                const data = await response.json();
-                if (data?.data?.metadata?.stream?.currentSong) {
-                    const { artist = 'Desconocido', title = 'Desconocido' } = data.data.metadata.stream.currentSong;
-                    metadataDiv.textContent = `🎵 ${artist} – ${title}`;
-                } else {
-                    metadataDiv.textContent = 'No se encontró información de la canción.';
-                }
-            } catch (e) {
-                metadataDiv.textContent = 'Error al cargar metadatos.';
-                console.error(e);
-            }
-        }
+Sonar Rock es más que una radio: es un refugio para quienes sienten que la música no se consume, se habita. Cada canción es un manifiesto, cada programa una declaración de amor al rock. Independientes por convicción, transmitimos con la única bandera que reconocemos: la de la autenticidad.
 
-        fetchMetadata();
-        setInterval(fetchMetadata, 15000);
-    </script>
+Bienvenidos a nuestra frecuencia. Bienvenidos a Sonar Rock, donde el rock suena libre.
+                    
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <h2 class="section-title">¿Qué es Sonar Rock?</h2>
+                <p class="about-text">
+                    
+                    Sonar Rock es una trinchera sonora, un espacio libre y apasionado que nace en México con una misión clara: ser un foro abierto para las bandas emergentes de la escena local. Creemos en el talento que nace en los garajes, en las letras que cuentan historias reales, en los riffs que aún no han llegado a la radio comercial… pero que merecen ser escuchados.
+
+Somos la radio independiente porque no seguimos formatos impuestos ni playlists predecibles. Aquí, el rock tiene todas sus caras: lo clásico que marcó generaciones, lo contemporáneo que sacude conciencias, y lo nuevo que está construyendo el futuro del género desde lo subterráneo hacia la superficie.
+
+En Sonar Rock, celebramos la esencia del rock n’ roll: su rebeldía, su poesía, su energía y su eterna capacidad de conectar almas. Transmitimos con el corazón puesto en cada acorde, convencidos de que la música auténtica todavía tiene mucho que decir.
+
+Sonar Rock: donde el presente del rock se encuentra con su historia… y con su porvenir.
+                    
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
 </body>
 </html>

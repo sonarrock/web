@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialize volume
-    audioPlayer.volume = 1.0;
+    audioPlayer.volume = 0.5;
     
     // Smooth scroll for navigation
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const volumeSlider = document.getElementById('volumeSlider');
     const bars = document.querySelectorAll('.bar');
     
-    let isPlaying = true;
+    let isPlaying = false;
     let visualizerInterval;
     
     // Play/Pause functionality

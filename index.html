@@ -8,41 +8,43 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
-  <section class="main-section">
-    <div class="container">
-      <div class="main-image-container">
-        <img src="assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image" />
-        <div class="player-overlay">
-          <div class="custom-player">
-            <div class="player-controls">
-              <button id="playBtn" class="play-btn">
-                <i class="fas fa-play"></i>
-              </button>
-              <div class="volume-control">
-                <i class="fas fa-volume-up"></i>
-                <input type="range" id="volumeSlider" min="0" max="100" value="80" class="volume-slider" />
-              </div>
+  <!-- Main Image with Player -->
+    <section class="main-section">
+        <div class="container">
+            <div class="main-image-container">
+                <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
+                <div class="player-overlay">
+                    <div class="custom-player">
+                        <div class="player-header"
+                        </div>
+                        <div class="player-controls">
+                            <button id="playBtn" class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <div class="volume-control">
+                                <i class="fas fa-volume-up"></i>
+                                <input type="range" id="volumeSlider" min="0" max="100" value="80" class="volume-slider">
+                            </div>
+                        </div>
+                        <div class="visualizer">
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                        </div>
+                        <audio id="audioPlayer" preload="none">
+                            <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                    </div>
+                </div>
             </div>
-            <div class="visualizer">
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-            </div>
-            <audio id="audioPlayer" preload="none">
-              <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg" />
-              Tu navegador no soporta el elemento de audio.
-            </audio>
-          </div>
         </div>
-      </div>
-    </div>
-  </section>
-
+    </section>                                                            
   <script src="script.js"></script>
 </body>
 </html>

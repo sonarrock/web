@@ -8,24 +8,24 @@
   <style>
     body {
       margin: 0;
-      padding: 0;
       background: #000;
       font-family: sans-serif;
-      color: #fff;
     }
 
     header {
-      text-align: center;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.7);
-      position: relative;
-      z-index: 2;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px 20px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.5);
     }
 
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
-      letter-spacing: 2px;
+    header img {
+      height: 50px;
     }
 
     .main-image-container {
@@ -81,7 +81,7 @@
 <body>
 
   <header>
-    <h1>Sonar Rock Radio</h1>
+    <img src="assets/logo_sonarrock.png" alt="Sonar Rock Logo" />
   </header>
 
   <div class="main-image-container">
@@ -112,6 +112,7 @@
       </audio>
     </div>
   </div>
+
 
 
     <!-- Social Media -->

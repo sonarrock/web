@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    background: #0a0a0a;
     color: #ffffff;
     line-height: 1.6;
     min-height: 100vh;
@@ -21,8 +21,7 @@ body {
 
 /* Header */
 .header {
-    background: rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(10px);
+    background: #0a0a0a;
     padding: 20px 0;
     border-bottom: 2px solid #ff6600;
 }
@@ -66,7 +65,7 @@ body {
 
 .main-image-container {
     position: relative;
-    max-width: 1000px;
+    max-width: 800px;
     margin: 0 auto;
     border-radius: 15px;
     overflow: hidden;
@@ -75,28 +74,30 @@ body {
 
 .main-image {
     width: 100%;
-    height: 800px;
+    height: 500px;
     object-fit: contain;
     display: block;
     background: #000;
 }
 
 .player-overlay {
-    position: absolute;
+    position: relative;
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
-    padding: 40px 20px 20px;
+    background: #0a0a0a;
+    padding: 20px;
+    border-top: 2px solid #ff6600;
 }
 
 .custom-player {
-    background: rgba(26, 26, 26, 0.7);
-    border-radius: 15px;
-    padding: 20px;
+    background: rgba(26, 26, 26, 0.9);
+    border-radius: 10px;
+    padding: 15px;
     border: 2px solid #ff6600;
-    box-shadow: 0 0 30px rgba(255, 102, 0, 0.3);
-    backdrop-filter: blur(5px);
+    box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .player-header h2 {
@@ -194,7 +195,7 @@ body {
 /* Social Media */
 .social-section {
     padding: 30px 0;
-    background: rgba(0, 0, 0, 0.3);
+    background: #0a0a0a;
 }
 
 .social-buttons {
@@ -259,7 +260,7 @@ body {
 /* Staff Section */
 .staff-section {
     padding: 60px 0;
-    background: rgba(0, 0, 0, 0.2);
+    background: #0a0a0a;
 }
 
 .staff-grid {
@@ -353,16 +354,27 @@ body {
     }
     
     /* Optimizaciones específicas para móviles */
+    .player-overlay {
+        position: relative;
+        padding: 15px;
+        background: #0a0a0a;
+    }
+    
     .custom-player {
-        backdrop-filter: blur(3px); /* Reducir intensidad del blur en móviles */
-        -webkit-backdrop-filter: blur(3px);
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(26, 26, 26, 0.95);
+    }
+    
+    .player-header h2 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
     }
     
     .play-btn {
-        width: 70px;
-        height: 70px;
-        font-size: 28px;
-        /* Mejorar área de toque */
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
         touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
     }
@@ -376,24 +388,23 @@ body {
     }
     
     .volume-slider {
-        width: 120px;
-        height: 8px;
-        /* Mejorar área de toque para el slider */
+        width: 100px;
+        height: 6px;
         touch-action: manipulation;
     }
     
     .volume-slider::-webkit-slider-thumb {
-        width: 20px;
-        height: 20px;
-        /* Hacer el thumb más grande para mejor control táctil */
+        width: 16px;
+        height: 16px;
     }
     
     .visualizer {
-        height: 30px; /* Reducir altura en móviles */
+        height: 25px;
+        margin-top: 10px;
     }
     
     .bar {
-        width: 3px; /* Barras más delgadas en móviles */
+        width: 3px;
     }
 }
 
@@ -411,7 +422,21 @@ body {
     }
     
     .player-controls {
-        flex-direction: column;
-        gap: 15px;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .custom-player {
+        padding: 10px;
+    }
+    
+    .player-header h2 {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+    
+    .visualizer {
+        height: 20px;
     }
 }

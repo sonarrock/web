@@ -35,8 +35,8 @@ body {
 }
 
 .logo {
-    width: 200px;
-    height: 200px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid #ff6600;
@@ -66,7 +66,7 @@ body {
 
 .main-image-container {
     position: relative;
-    max-width: 1200px;
+    max-width: 800px;
     margin: 0 auto;
     border-radius: 15px;
     overflow: hidden;
@@ -75,14 +75,14 @@ body {
 
 .main-image {
     width: 100%;
-    height: 1000px;
+    height: 500px;
     object-fit: contain;
     display: block;
     background: #000;
 }
 
 .player-overlay {
-    position: relative;
+    position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
@@ -350,6 +350,50 @@ body {
     .staff-grid {
         grid-template-columns: 1fr;
         gap: 30px;
+    }
+    
+    /* Optimizaciones específicas para móviles */
+    .custom-player {
+        backdrop-filter: blur(3px); /* Reducir intensidad del blur en móviles */
+        -webkit-backdrop-filter: blur(3px);
+    }
+    
+    .play-btn {
+        width: 70px;
+        height: 70px;
+        font-size: 28px;
+        /* Mejorar área de toque */
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .play-btn:active {
+        transform: scale(0.95);
+    }
+    
+    .volume-control {
+        touch-action: manipulation;
+    }
+    
+    .volume-slider {
+        width: 120px;
+        height: 8px;
+        /* Mejorar área de toque para el slider */
+        touch-action: manipulation;
+    }
+    
+    .volume-slider::-webkit-slider-thumb {
+        width: 20px;
+        height: 20px;
+        /* Hacer el thumb más grande para mejor control táctil */
+    }
+    
+    .visualizer {
+        height: 30px; /* Reducir altura en móviles */
+    }
+    
+    .bar {
+        width: 3px; /* Barras más delgadas en móviles */
     }
 }
 

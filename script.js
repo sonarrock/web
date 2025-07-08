@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialize volume
-    audioPlayer.volume = 0.5;
+    audioPlayer.volume = 1.0;
     
     // Optimización para touch devices
     if (isMobile) {

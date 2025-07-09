@@ -65,7 +65,7 @@ body {
 
 .main-image-container {
     position: relative;
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
     border-radius: 15px;
     overflow: hidden;

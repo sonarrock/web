@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: #0a0a0a;
+    background: #ff6600;
     color: #ffffff;
     line-height: 1.6;
     min-height: 100vh;
@@ -21,7 +21,7 @@ body {
 
 /* Header */
 .header {
-    background: #0a0a0a;
+    background: #ff6600;
     padding: 20px 0;
     border-bottom: 2px solid #ff6600;
 }
@@ -34,8 +34,8 @@ body {
 }
 
 .logo {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid #ff6600;
@@ -76,7 +76,7 @@ body {
     height: 800px;
     object-fit: contain;
     display: block;
-    background: #000;
+    background: #ff6600;
 }
 
 .player-overlay {

@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: #ff6600;
+    background: #0a0a0a;
     color: #ffffff;
     line-height: 1.6;
     min-height: 100vh;
@@ -21,7 +21,7 @@ body {
 
 /* Header */
 .header {
-    background: #ff6600;
+    background: #0a0a0a;
     padding: 20px 0;
     border-bottom: 2px solid #ff6600;
 }
@@ -34,8 +34,8 @@ body {
 }
 
 .logo {
-    width: 120px;
-    height: 120px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid #ff6600;

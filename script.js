@@ -16,22 +16,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     async function playAudio() {
-        try {
-            await audioPlayer.play();
-            retryCount = 0;
-            isPlaying = true;
-            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-            startVisualizer();
-        } catch (error) {
-            console.warn('Play failed:', error);
-            if (retryCount < maxRetries) {
-                retryCount++;
-                reconnectAudio();
-            } else {
-                alert('No se pudo reproducir el audio. Verifica tu conexión.');
-            }
+    try {
+        // Solo intenta reproducir sin recargar el stream
+        await audioPlayer.play();
+        retryCount = 0;
+        isPlaying = true;
+        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        startVisualizer();
+    } catch (error) {
+        console.warn('Reproducción fallida:', error);
+
+        // Evita mostrar error si el navegador bloqueó el autoplay
+        if (error.name === "NotAllowedError") {
+            alert('Toca el botón para iniciar la reproducción.');
+        } else if (retryCount < maxRetries) {
+            retryCount++;
+            setTimeout(() => {
+                playAudio();
+            }, 1500);
+        } else {
+            console.warn('No se pudo reproducir después de varios intentos');
         }
     }
+}
 
     function pauseAudio() {
         audioPlayer.pause();

@@ -6,21 +6,102 @@ document.addEventListener('DOMContentLoaded', function () {
     const bars = document.querySelectorAll('.bar');
 
     let isPlaying = false;
-    let visualizerAnimationId = null;
+    let visualizerInterval = null;
     let audioContext = null;
     let analyser = null;
     let source = null;
 
-    // Detectar si es un dispositivo móvil
+    // Detectar dispositivo móvil e iOS
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-    // Configurar el volumen inicial
+    console.log('Dispositivo detectado:', isIOS ? 'iOS' : isMobile ? 'Móvil' : 'Desktop');
+
+    // Configurar volumen inicial
     audioPlayer.volume = 1;
 
-    // Configurar eventos del reproductor de audio
+    // Función para actualizar estado
+    function updateStatus(message, type = '') {
+        streamStatus.textContent = message;
+        streamStatus.className = `stream-status ${type}`;
+        console.log('Estado:', message);
+    }
+
+    // Configurar AudioContext - Versión iOS optimizada
+    function setupAudioContext() {
+        if (audioContext) return;
+
+        try {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            audioContext = new AudioContextClass();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 64;
+            analyser.smoothingTimeConstant = 0.8;
+
+            source = audioContext.createMediaElementSource(audioPlayer);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+
+            console.log('AudioContext configurado correctamente');
+        } catch (error) {
+            console.warn('Error configurando AudioContext:', error);
+            audioContext = null;
+        }
+    }
+
+    // Función de reproducción simplificada para iOS
+    async function playAudio() {
+        try {
+            updateStatus('Iniciando reproducción...', 'loading');
+
+            // Configurar AudioContext en primera interacción
+            if (!audioContext) {
+                setupAudioContext();
+            }
+
+            // Reanudar AudioContext si está suspendido
+            if (audioContext && audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+
+            // Para iOS: forzar carga y pausa antes de reproducir
+            if (isIOS) {
+                audioPlayer.load();
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            // Reproducir con manejo de promesa
+            await audioPlayer.play();
+            
+        } catch (error) {
+            console.error('Error de reproducción:', error);
+            
+            if (error.name === 'NotAllowedError') {
+                updateStatus('Toca para permitir reproducción', 'error');
+            } else if (error.name === 'NotSupportedError') {
+                updateStatus('Stream no compatible', 'error');
+            } else if (error.name === 'AbortError') {
+                updateStatus('Reproducción interrumpida', 'error');
+            } else {
+                updateStatus('Error de conexión', 'error');
+            }
+            
+            isPlaying = false;
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        }
+    }
+
+    function pauseAudio() {
+        audioPlayer.pause();
+    }
+
+    // Eventos del audio player
     audioPlayer.addEventListener('loadstart', () => {
-        updateStatus('Cargando stream...');
+        updateStatus('Conectando...');
+    });
+
+    audioPlayer.addEventListener('loadedmetadata', () => {
+        updateStatus('Stream cargado');
     });
 
     audioPlayer.addEventListener('canplay', () => {
@@ -42,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     audioPlayer.addEventListener('ended', () => {
-        updateStatus('Stream finalizado');
+        updateStatus('Stream terminado');
         isPlaying = false;
         playBtn.innerHTML = '<i class="fas fa-play"></i>';
         stopVisualizer();
@@ -50,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     audioPlayer.addEventListener('error', (e) => {
         console.error('Error de audio:', e);
-        updateStatus('Error de conexión', 'error');
+        updateStatus('Error de stream', 'error');
         isPlaying = false;
         playBtn.innerHTML = '<i class="fas fa-play"></i>';
         stopVisualizer();
@@ -64,93 +145,12 @@ document.addEventListener('DOMContentLoaded', function () {
         updateStatus('Buffering...', 'loading');
     });
 
-    // Función para actualizar el estado
-    function updateStatus(message, type = '') {
-        streamStatus.textContent = message;
-        streamStatus.className = `stream-status ${type}`;
-    }
-
-    // Función para configurar AudioContext
-    function setupAudioContext() {
-        if (audioContext) return;
-
-        try {
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            if (!AudioContextClass) {
-                console.warn('AudioContext no disponible');
-                return;
-            }
-
-            audioContext = new AudioContextClass();
-            analyser = audioContext.createAnalyser();
-            analyser.fftSize = 64;
-            analyser.smoothingTimeConstant = 0.8;
-
-            source = audioContext.createMediaElementSource(audioPlayer);
-            source.connect(analyser);
-            analyser.connect(audioContext.destination);
-
-            console.log('AudioContext configurado correctamente');
-        } catch (error) {
-            console.warn('Error configurando AudioContext:', error);
-            audioContext = null;
-        }
-    }
-
-    // Función para reproducir audio
-    async function playAudio() {
-        try {
-            updateStatus('Iniciando reproducción...', 'loading');
-            
-            // Configurar AudioContext en la primera interacción del usuario
-            if (!audioContext) {
-                setupAudioContext();
-            }
-
-            // Reanudar AudioContext si está suspendido
-            if (audioContext && audioContext.state === 'suspended') {
-                await audioContext.resume();
-            }
-
-            // Para iOS, asegurar que el audio esté cargado
-            if (isIOS && audioPlayer.readyState === 0) {
-                audioPlayer.load();
-                // Pequeña pausa para iOS
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-
-            await audioPlayer.play();
-            
-        } catch (error) {
-            console.error('Error al reproducir:', error);
-            
-            // Manejo específico de errores comunes
-            if (error.name === 'NotAllowedError') {
-                updateStatus('Toca para reproducir', 'error');
-                if (isIOS) {
-                    // En iOS, mostrar mensaje específico
-                    updateStatus('Toca el botón para iniciar', 'error');
-                }
-            } else if (error.name === 'NotSupportedError') {
-                updateStatus('Formato no soportado', 'error');
-            } else {
-                updateStatus('Error de reproducción', 'error');
-            }
-            
-            isPlaying = false;
-            playBtn.innerHTML = '<i class="fas fa-play"></i>';
-        }
-    }
-
-    // Función para pausar audio
-    function pauseAudio() {
-        audioPlayer.pause();
-    }
-
-    // Event listener del botón de reproducción
+    // Botón de reproducción con manejo táctil
     playBtn.addEventListener('click', async function(e) {
         e.preventDefault();
         e.stopPropagation();
+        
+        console.log('Botón presionado, estado actual:', isPlaying);
         
         if (isPlaying) {
             pauseAudio();
@@ -159,8 +159,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Para dispositivos móviles, también manejar eventos touch
+    // Manejo especial para dispositivos táctiles
     if (isMobile) {
+        playBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+
         playBtn.addEventListener('touchend', async function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -175,85 +179,55 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Control de volumen
     volumeSlider.addEventListener('input', function() {
-        const volume = this.value / 100;
-        audioPlayer.volume = volume;
+        audioPlayer.volume = this.value / 100;
     });
 
-    // Visualizador de audio
+    // Visualizador
     function startVisualizer() {
         stopVisualizer();
-
+        
         if (analyser && audioContext) {
-            // Usar Web Audio API para visualización real
             const bufferLength = analyser.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
 
             function updateBars() {
                 if (!isPlaying) return;
-
-                analyser.getByteFrequencyData(dataArray);
                 
+                analyser.getByteFrequencyData(dataArray);
                 bars.forEach((bar, i) => {
-                    const value = dataArray[i] || 0;
-                    const height = Math.max(5, (value / 255) * 35 + 5);
+                    const val = dataArray[i] || 0;
+                    const height = (val / 255) * 35 + 5;
                     bar.style.height = height + 'px';
                 });
-
-                visualizerAnimationId = requestAnimationFrame(updateBars);
+                requestAnimationFrame(updateBars);
             }
-            
             updateBars();
         } else {
-            // Fallback: visualizador simulado
-            function updateBarsSimulated() {
-                if (!isPlaying) return;
-
-                bars.forEach(bar => {
-                    const height = Math.random() * 30 + 5;
-                    bar.style.height = height + 'px';
-                });
-
-                visualizerAnimationId = requestAnimationFrame(updateBarsSimulated);
-            }
-            
-            updateBarsSimulated();
+            // Visualizador básico
+            visualizerInterval = setInterval(() => {
+                if (isPlaying) {
+                    bars.forEach(bar => {
+                        const height = Math.random() * 30 + 5;
+                        bar.style.height = height + 'px';
+                    });
+                }
+            }, 150);
         }
     }
 
     function stopVisualizer() {
-        if (visualizerAnimationId) {
-            cancelAnimationFrame(visualizerAnimationId);
-            visualizerAnimationId = null;
+        if (visualizerInterval) {
+            clearInterval(visualizerInterval);
+            visualizerInterval = null;
         }
-        
         bars.forEach(bar => {
             bar.style.height = '5px';
         });
     }
 
-    // Manejo de visibilidad de la página para conservar batería
-    document.addEventListener('visibilitychange', function() {
-        if (document.hidden && audioContext && audioContext.state === 'running') {
-            audioContext.suspend();
-        } else if (!document.hidden && audioContext && audioContext.state === 'suspended' && isPlaying) {
-            audioContext.resume();
-        }
-    });
-
-    // Prevenir zoom en doble tap para móviles
+    // Prevenir zoom en doble tap en móviles
     if (isMobile) {
         let lastTap = 0;
-        playBtn.addEventListener('touchend', function(e) {
-            const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastTap;
-            if (tapLength < 300 && tapLength > 0) {
-                e.preventDefault();
-                return false;
-            }
-            lastTap = currentTime;
-        });
-
-        // Prevenir zoom general en doble tap
         document.addEventListener('touchend', function(event) {
             const now = (new Date()).getTime();
             if (now - lastTap <= 300) {
@@ -263,6 +237,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }, false);
     }
 
-    // Inicialización
-    updateStatus('Listo para reproducir');
+    // Manejo de visibilidad para ahorrar batería
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden && audioContext && audioContext.state === 'running') {
+            audioContext.suspend();
+        } else if (!document.hidden && audioContext && audioContext.state === 'suspended' && isPlaying) {
+            audioContext.resume();
+        }
+    });
+
+    // Estado inicial
+    updateStatus('Toca para reproducir');
+    console.log('Reproductor inicializado');
 });

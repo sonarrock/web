@@ -9,14 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let retryCount = 0;
     const maxRetries = 3;
 
-    // Configuración inicial
-    audioPlayer.preload = 'none'; // importante para streams en vivo
+    audioPlayer.preload = 'none';
     audioPlayer.crossOrigin = 'anonymous';
     audioPlayer.volume = 0.5;
 
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    // Reproducción optimizada
     async function playAudio() {
         try {
             await audioPlayer.play();
@@ -52,28 +50,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     playBtn.addEventListener('click', () => {
-        if (isPlaying) {
-            pauseAudio();
-        } else {
-            playAudio();
-        }
+        isPlaying ? pauseAudio() : playAudio();
     });
 
-    // Control de volumen
     volumeSlider.addEventListener('input', () => {
         audioPlayer.volume = volumeSlider.value / 100;
     });
 
-    // Indicadores de eventos
     audioPlayer.addEventListener('waiting', () => {
-        console.log('Buffering...');
         if (audioPlayer.readyState < 3) reconnectAudio();
     });
 
-    audioPlayer.addEventListener('error', (e) => {
-        console.error('Audio error:', e);
-        if (retryCount < maxRetries) reconnectAudio();
-        else {
+    audioPlayer.addEventListener('error', () => {
+        if (retryCount < maxRetries) {
+            retryCount++;
+            reconnectAudio();
+        } else {
             isPlaying = false;
             playBtn.innerHTML = '<i class="fas fa-play"></i>';
             stopVisualizer();
@@ -81,11 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     audioPlayer.addEventListener('ended', () => {
-        console.log('Stream ended — trying to reconnect');
         if (isPlaying) reconnectAudio();
     });
 
-    // Visualizador básico
     function startVisualizer() {
         clearInterval(visualizerInterval);
         const interval = isMobile ? 150 : 100;
@@ -101,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
         bars.forEach(bar => bar.style.height = '5px');
     }
 
-    // Touch seguro en móviles
     if (isMobile) {
         playBtn.addEventListener('touchend', (e) => {
             const now = Date.now();
@@ -112,17 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
             playBtn.lastTap = now;
         });
 
-        // Prevención de doble zoom
         let lastTouchEnd = 0;
         document.addEventListener('touchend', (event) => {
             const now = Date.now();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
+            if (now - lastTouchEnd <= 300) event.preventDefault();
             lastTouchEnd = now;
         }, false);
 
-        // Reanudar en focus
         window.addEventListener('focus', () => {
             if (isPlaying && audioPlayer.paused) {
                 setTimeout(() => {
@@ -132,9 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Smooth scroll navegación
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
+        anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
             if (target) {
@@ -143,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Animación en botones sociales
     document.querySelectorAll('.social-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             this.style.transform = 'scale(0.95)';
@@ -151,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Animaciones con IntersectionObserver
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -171,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(member);
     });
 
-    // Visualizador Web Audio (solo en desktop)
     if (!isMobile && (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined')) {
         try {
             const AudioContextClass = AudioContext || webkitAudioContext;
@@ -206,8 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
         } catch (e) {
-            console.warn('Web Audio API not supported, fallback visualizer in use');
+            console.warn('Web Audio API not supported');
         }
     }
 });
-</script>

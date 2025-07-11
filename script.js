@@ -7,38 +7,32 @@ document.addEventListener('DOMContentLoaded', function () {
     let isPlaying = false;
     let visualizerInterval = null;
 
-    // Detectar móvil (iOS y demás)
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    // Variables para Web Audio API
-    let audioContext;
-    let analyser;
+    let audioContext = null;
+    let analyser = null;
 
-    // Inicializar Web Audio API si está disponible
-    try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        audioContext = new AudioContextClass();
-        analyser = audioContext.createAnalyser();
-        const source = audioContext.createMediaElementSource(audioPlayer);
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-
-        analyser.fftSize = 64;
-    } catch (e) {
-        console.log('Web Audio API no disponible, usando visualizador básico.');
-        audioContext = null;
-        analyser = null;
-    }
-
-    // Volumen inicial
+    // Inicializar volumen
     audioPlayer.volume = 1;
 
-    // Función para iniciar reproducción, con desbloqueo AudioContext en iOS/Chrome iOS
+    // Función para iniciar reproducción con creación de AudioContext al vuelo
     async function playAudio() {
         try {
-            if (audioContext && audioContext.state === 'suspended') {
+            if (!audioContext) {
+                // Crear AudioContext solo aquí, tras la interacción
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioContext = new AudioContextClass();
+                analyser = audioContext.createAnalyser();
+                const source = audioContext.createMediaElementSource(audioPlayer);
+                source.connect(analyser);
+                analyser.connect(audioContext.destination);
+                analyser.fftSize = 64;
+            }
+
+            if (audioContext.state === 'suspended') {
                 await audioContext.resume();
             }
+
             await audioPlayer.play();
             isPlaying = true;
             playBtn.innerHTML = '<i class="fas fa-pause"></i>';
@@ -49,7 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Función para pausar
     function pauseAudio() {
         audioPlayer.pause();
         isPlaying = false;
@@ -57,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
         stopVisualizer();
     }
 
-    // Alternar play/pause al click o touch
     playBtn.addEventListener('click', async function () {
         if (isPlaying) {
             pauseAudio();
@@ -66,12 +58,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Control de volumen
     volumeSlider.addEventListener('input', function () {
         audioPlayer.volume = this.value / 100;
     });
 
-    // Visualizador
     function startVisualizer() {
         stopVisualizer();
         if (analyser) {
@@ -90,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             update();
         } else {
-            // Visualizador simple si no hay AudioContext
             visualizerInterval = setInterval(() => {
                 if (isPlaying) {
                     bars.forEach(bar => {
@@ -112,14 +101,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Reanudar audio si regresa foco y estaba reproduciendo
     window.addEventListener('focus', () => {
         if (isPlaying && audioPlayer.paused) {
             playAudio();
         }
     });
 
-    // Prevenir doble toque accidental en móviles
     if (isMobile) {
         let lastTap = 0;
         playBtn.addEventListener('touchend', function (e) {

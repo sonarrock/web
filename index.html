@@ -1,5 +1,4 @@
-
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -32,6 +31,17 @@
                     <div class="custom-player">
                         <div class="player-header">
                             <h2>SONAR ROCK</h2>
+                            <div class="now-playing">
+                                <div class="song-info">
+                                    <span class="now-playing-label">Ahora suena:</span>
+                                    <div class="song-title" id="songTitle">Conectando...</div>
+                                    <div class="artist-name" id="artistName">Cargando información...</div>
+                                </div>
+                                <div class="live-indicator" id="liveIndicator">
+                                    <span class="live-dot"></span>
+                                    <span id="programStatus">EN VIVO</span>
+                                </div>
+                            </div>
                             <div class="listeners-counter">
                                 <i class="fas fa-users"></i>
                                 <span id="listenersCount">0</span> oyentes conectados
@@ -166,8 +176,10 @@
       </div>
     </div>
   </section>
-
-  <!-- Script optimizado -->
-  <script src="script.js"></script>
+    
+ <!-- Particle System -->
+    <div id="particles-container"></div>
+    
+    <script src="script.js"></script>
 </body>
 </html>

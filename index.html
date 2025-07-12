@@ -7,6 +7,7 @@
     <title>Sonar Rock - La Radio Independiente</title>
     <link href="style.css" rel="stylesheet" type="text/css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -15,8 +16,8 @@
             <div class="logo-section">
                 <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
                 <div class="title-section">
-                    <h1>LA RADIO INDEPENDIENTE</h1>
-                    <p class="subtitle"></p>
+                    <h1>SONAR ROCK</h1>
+                    <p class="subtitle">LA RADIO INDEPENDIENTE</p>
                 </div>
             </div>
         </div>
@@ -30,6 +31,11 @@
                 <div class="player-overlay">
                     <div class="custom-player">
                         <div class="player-header">
+                            <h2>SONAR ROCK</h2>
+                            <div class="listeners-counter">
+                                <i class="fas fa-users"></i>
+                                <span id="listenersCount">0</span> oyentes conectados
+                            </div>
                         </div>
                         <div class="player-controls">
                             <button id="playBtn" class="play-btn">
@@ -63,7 +69,6 @@
     <!-- Social Media -->
     <section class="social-section">
         <div class="container">
-            <h2 class="section-title">Redes Sociales</h2>
             <div class="social-buttons">
                 <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp">
                     <i class="fab fa-whatsapp"></i>
@@ -89,7 +94,7 @@
         <div class="container">
             <h2 class="section-title">Escúchanos en Ivoox</h2>
             <div class="embed-container">
-                <iframe src="https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=04040c" width="100%" height="250" frameborder="0" allowfullscreen="" scrolling="no" loading="lazy"></iframe>
+                <iframe src="https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=04040c" width="100%" height="400" frameborder="0" allowfullscreen="" scrolling="no" loading="lazy"></iframe>
             </div>
         </div>
     </section>
@@ -129,8 +134,8 @@
             </div>
         </div>
     </section>
-
-  <!-- About Section -->
+    
+  <!-- About Section-->
   <section class="about-section">
     <div class="container">
       <div class="about-content">

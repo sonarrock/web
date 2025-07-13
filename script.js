@@ -69,6 +69,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Inicializar
     audioPlayer.volume = 1;
-    updateStatus('Toca para reproducir');
 });
 </script>

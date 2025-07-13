@@ -168,6 +168,19 @@ body {
     height: 40px;
 }
 
+.stream-status {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: white;
+    text-align: center;
+}
+.stream-status.error {
+    color: #ff4d4d;
+}
+.stream-status.playing {
+    color: #00ff88;
+}
+
 .bar {
     width: 4px;
     background: linear-gradient(to top, #ff6600, #ffaa66);

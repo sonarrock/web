@@ -1,744 +1,602 @@
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Arial', sans-serif;
-    background: #0a0a0a;
-    color: #ffffff;
-    line-height: 1.6;
-    min-height: 100vh;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* Header */
-.header {
-    background: #0a0a0a;
-    padding: 20px 0;
-    border-bottom: 2px solid #ff6600;
-}
-
-.logo-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-}
-
-.logo {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #ff6600;
-    box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
-}
-
-.title-section h1 {
-    font-size: 3rem;
-    font-weight: bold;
-    color: #ff6600;
-    text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
-    margin-bottom: 5px;
-}
-
-.subtitle {
-    font-size: 1.2rem;
-    color: #cccccc;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-/* Main Section */
-.main-section {
-    padding: 40px 0;
-    position: relative;
-}
-
-.main-image-container {
-    position: relative;
-    width: 100%;
-    height: 600px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-}
-
-.main-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    background: #000;
-}
-
-.player-overlay {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
-    padding: 20px;
-}
-
-.custom-player {
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 15px;
-    padding: 20px;
-    border: 2px solid #ff6600;
-    box-shadow: 0 0 30px rgba(255, 102, 0, 0.3);
-    backdrop-filter: blur(5px);
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.player-header h2 {
-    text-align: center;
-    color: #ff6600;
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-    text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
-    animation: titleGlow 3s ease-in-out infinite alternate;
-}
-
-@keyframes titleGlow {
-    0% { text-shadow: 0 0 10px rgba(255, 102, 0, 0.5); }
-    100% { text-shadow: 0 0 20px rgba(255, 102, 0, 0.8), 0 0 30px rgba(255, 102, 0, 0.4); }
-}
-
-.now-playing {
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
-    border: 1px solid #ff6600;
-    box-shadow: 0 0 15px rgba(255, 102, 0, 0.2);
-    backdrop-filter: blur(10px);
-}
-
-.song-info {
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.now-playing-label {
-    color: #cccccc;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.song-title {
-    color: #ff6600;
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin: 5px 0;
-    text-shadow: 0 0 8px rgba(255, 102, 0, 0.4);
-    animation: songPulse 2s ease-in-out infinite;
-}
-
-@keyframes songPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-}
-
-.artist-name {
-    color: #ffffff;
-    font-size: 1rem;
-    opacity: 0.9;
-}
-
-.live-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 5px 10px;
-    background: rgba(255, 0, 0, 0.1);
-    border-radius: 20px;
-    border: 1px solid #ff0000;
-}
-
-.live-dot {
-    width: 8px;
-    height: 8px;
-    background: #ff0000;
-    border-radius: 50%;
-    animation: livePulse 1.5s ease-in-out infinite;
-}
-
-@keyframes livePulse {
-    0%, 100% { 
-        opacity: 1;
-        box-shadow: 0 0 5px #ff0000;
-    }
-    50% { 
-        opacity: 0.3;
-        box-shadow: 0 0 15px #ff0000;
-    }
-}
-
-#programStatus {
-    color: #ff0000;
-    font-size: 0.8rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.listeners-counter {
-    text-align: center;
-    color: #cccccc;
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-}
-
-.listeners-counter i {
-    color: #ff6600;
-}
-
-#listenersCount {
-    color: #ff6600;
-    font-weight: bold;
-    font-size: 1rem;
-}
-
-.player-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-.play-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: linear-gradient(45deg, #ff6600, #ff8833);
-    border: none;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4);
-}
-
-.play-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(255, 102, 0, 0.6);
-}
-
-.volume-control {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.volume-control i {
-    color: #ff6600;
-    font-size: 18px;
-}
-
-.volume-slider {
-    width: 100px;
-    height: 5px;
-    background: #333;
-    border-radius: 5px;
-    outline: none;
-    -webkit-appearance: none;
-}
-
-.volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 15px;
-    height: 15px;
-    background: #ff6600;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.visualizer {
-    display: flex;
-    justify-content: center;
-    align-items: end;
-    gap: 3px;
-    height: 40px;
-}
-
-.bar {
-    width: 4px;
-    background: linear-gradient(to top, #ff6600, #ffaa66);
-    border-radius: 2px;
-    animation: pulse 1s ease-in-out infinite alternate;
-}
-
-.bar:nth-child(1) { animation-delay: 0s; }
-.bar:nth-child(2) { animation-delay: 0.1s; }
-.bar:nth-child(3) { animation-delay: 0.2s; }
-.bar:nth-child(4) { animation-delay: 0.3s; }
-.bar:nth-child(5) { animation-delay: 0.4s; }
-.bar:nth-child(6) { animation-delay: 0.5s; }
-.bar:nth-child(7) { animation-delay: 0.6s; }
-.bar:nth-child(8) { animation-delay: 0.7s; }
-
-@keyframes pulse {
-    0% { height: 5px; }
-    100% { height: 35px; }
-}
-
-/* Social Media */
-.social-section {
-    padding: 30px 0;
-    background: #0a0a0a;
-}
-
-.social-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.social-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: white;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-.social-btn:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-}
-
-.whatsapp { background: linear-gradient(45deg, #25d366, #128c7e); }
-.facebook { background: linear-gradient(45deg, #1877f2, #42a5f5); }
-.instagram { background: linear-gradient(45deg, #e4405f, #f77737); }
-.spotify { background: linear-gradient(45deg, #1db954, #1ed760); }
-.ivoox { background: linear-gradient(45deg, #ff6600, #ff8833); }
-
-/* Embed Sections */
-.embed-section {
-    padding: 40px 0;
-}
-
-.section-title {
-    text-align: center;
-    font-size: 2.5rem;
-    color: #ff6600;
-    margin-bottom: 30px;
-    text-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
-}
-
-.embed-container {
-    max-width: 800px;
-    margin: 0 auto;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    border: 2px solid #ff6600;
-}
-
-.spotify-embed {
-    display: flex;
-    justify-content: center;
-}
-
-/* Staff Section */
-.staff-section {
-    padding: 60px 0;
-    background: #0a0a0a;
-}
-
-.staff-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 40px;
-    margin-top: 40px;
-}
-
-.staff-member {
-    text-align: center;
-    background: rgba(26, 26, 26, 0.8);
-    padding: 30px;
-    border-radius: 15px;
-    border: 2px solid #ff6600;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.staff-member:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(255, 102, 0, 0.2);
-}
-
-.staff-image {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 20px;
-    border: 3px solid #ff6600;
-    box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
-}
-
-.staff-member h3 {
-    font-size: 1.5rem;
-    color: #ff6600;
-    text-shadow: 0 0 5px rgba(255, 102, 0, 0.3);
-}
-
-/* About Sections */
-.about-section {
-    padding: 60px 0;
-}
-
-.about-content {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.about-text {
-    font-size: 1.2rem;
-    line-height: 1.8;
-    color: #cccccc;
-    margin-top: 20px;
-}
-
-/* Particle System */
-#particles-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-    overflow: hidden;
-}
-
-.particle {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    background: #ff6600;
-    border-radius: 50%;
-    animation: float linear infinite;
-    opacity: 0.6;
-}
-
-@keyframes float {
-    0% {
-        transform: translateY(100vh) rotate(0deg);
-        opacity: 0;
-    }
-    10% {
-        opacity: 0.6;
-    }
-    90% {
-        opacity: 0.6;
-    }
-    100% {
-        transform: translateY(-10vh) rotate(360deg);
-        opacity: 0;
-    }
-}
-
-.particle.large {
-    width: 5px;
-    height: 5px;
-    box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
-}
-
-.particle.medium {
-    width: 4px;
-    height: 4px;
-    background: #ffaa66;
-}
-
-.particle.small {
-    width: 2px;
-    height: 2px;
-    background: rgba(255, 102, 0, 0.7);
-}
-
-/* Enhanced Glow Effects */
-.custom-player {
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 15px;
-    padding: 20px;
-    border: 2px solid #ff6600;
-    box-shadow: 
-        0 0 30px rgba(255, 102, 0, 0.3),
-        inset 0 0 20px rgba(255, 102, 0, 0.1);
-    backdrop-filter: blur(5px);
-    max-width: 600px;
-    margin: 0 auto;
-    animation: playerGlow 4s ease-in-out infinite alternate;
-}
-
-@keyframes playerGlow {
-    0% {
-        box-shadow: 
-            0 0 30px rgba(255, 102, 0, 0.3),
-            inset 0 0 20px rgba(255, 102, 0, 0.1);
-    }
-    100% {
-        box-shadow: 
-            0 0 40px rgba(255, 102, 0, 0.5),
-            0 0 60px rgba(255, 102, 0, 0.2),
-            inset 0 0 30px rgba(255, 102, 0, 0.15);
-    }
-}
-
-.play-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: linear-gradient(45deg, #ff6600, #ff8833);
-    border: none;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 
-        0 4px 15px rgba(255, 102, 0, 0.4),
-        0 0 20px rgba(255, 102, 0, 0.2);
-    animation: buttonBreath 3s ease-in-out infinite;
-}
-
-@keyframes buttonBreath {
-    0%, 100% {
-        transform: scale(1);
-        box-shadow: 
-            0 4px 15px rgba(255, 102, 0, 0.4),
-            0 0 20px rgba(255, 102, 0, 0.2);
-    }
-    50% {
-        transform: scale(1.05);
-        box-shadow: 
-            0 6px 20px rgba(255, 102, 0, 0.6),
-            0 0 30px rgba(255, 102, 0, 0.4);
-    }
-}
-
-.play-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 
-        0 6px 20px rgba(255, 102, 0, 0.6),
-        0 0 40px rgba(255, 102, 0, 0.4);
-    animation: none;
-}
-
-/* Enhanced Visualizer */
-.visualizer {
-    display: flex;
-    justify-content: center;
-    align-items: end;
-    gap: 3px;
-    height: 40px;
-    margin-top: 15px;
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 102, 0, 0.3);
-}
-
-.bar {
-    width: 4px;
-    background: linear-gradient(to top, #ff6600, #ffaa66, #ffffff);
-    border-radius: 2px;
-    animation: pulse 1s ease-in-out infinite alternate;
-    box-shadow: 0 0 5px rgba(255, 102, 0, 0.5);
-    transition: all 0.3s ease;
-}
-
-/* Smooth Transitions */
-* {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.staff-member {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.social-btn {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.main-image {
-    transition: all 0.5s ease;
-}
-
-.main-image:hover {
-    transform: scale(1.02);
-    filter: brightness(1.1);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .title-section h1 {
-        font-size: 2rem;
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    const playBtn = document.getElementById('playBtn');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const bars = document.querySelectorAll('.bar');
+    const listenersCountElement = document.getElementById('listenersCount');
+
+    let isPlaying = false;
+    let socket = null;
+
+    // Inicializar contador de oyentes (simulado)
+    let currentListeners = Math.floor(Math.random() * 50) + 15;
+    listenersCountElement.textContent = currentListeners;
     
-    .subtitle {
-        font-size: 1rem;
+    // Intentar inicializar Socket.IO si está disponible
+    try {
+        if (typeof io !== 'undefined') {
+            socket = io();
+            
+            socket.on('listeners-update', (count) => {
+                listenersCountElement.textContent = count;
+                currentListeners = count;
+            });
+            
+            socket.on('connect_error', (error) => {
+                console.log('Error de conexión Socket.IO:', error);
+            });
+        }
+    } catch (error) {
+        console.log('Socket.IO no disponible:', error);
     }
-    
-    .logo-section {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .main-image {
-        height: 300px;
-    }
-    
-    .social-buttons {
-        gap: 15px;
-    }
-    
-    .social-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-    }
-    
-    .staff-grid {
-        grid-template-columns: 1fr;
-        gap: 30px;
-    }
-    
-    /* Optimizaciones específicas para móviles */
-    .player-overlay {
-        position: relative;
-        padding: 15px;
-        background: #0a0a0a;
-    }
-    
-    .custom-player {
-        padding: 12px;
-        border-radius: 8px;
-        background: rgba(26, 26, 26, 0.95);
-    }
-    
-    .player-header h2 {
-        font-size: 1.3rem;
-        margin-bottom: 8px;
-    }
-    
-    .now-playing {
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .song-title {
-        font-size: 1rem;
-    }
-    
-    .artist-name {
-        font-size: 0.9rem;
-    }
-    
-    .live-indicator {
-        padding: 3px 8px;
-    }
-    
-    #programStatus {
-        font-size: 0.7rem;
-    }
-    
-    .listeners-counter {
-        font-size: 0.8rem;
-        margin-bottom: 10px;
-    }
-    
-    .play-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-        touch-action: manipulation;
-        -webkit-tap-highlight-color: transparent;
-    }
-    
-    .play-btn:active {
-        transform: scale(0.95);
-    }
-    
-    .volume-control {
-        touch-action: manipulation;
-    }
-    
-    .volume-slider {
-        width: 100px;
-        height: 6px;
-        touch-action: manipulation;
-    }
-    
-    .volume-slider::-webkit-slider-thumb {
-        width: 16px;
-        height: 16px;
-    }
-    
-    .visualizer {
-        height: 25px;
-        margin-top: 10px;
-    }
-    
-    .bar {
-        width: 3px;
-    }
-}
 
-@media (max-width: 480px) {
-    .container {
-        padding: 0 15px;
+    let visualizerInterval;
+    let retryCount = 0;
+    const maxRetries = 3;
+
+    // Optimización para móviles - precargar el audio
+    audioPlayer.preload = 'metadata';
+    audioPlayer.crossOrigin = 'anonymous';
+
+    // Detectar si es dispositivo móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    // Configuración específica para móviles
+    if (isMobile) {
+        // Prevenir que el dispositivo se quede dormido
+        let wakeLock = null;
+        if ('wakeLock' in navigator) {
+            navigator.wakeLock.request('screen').then(wl => {
+                wakeLock = wl;
+            }).catch(err => {
+                console.log('Wake lock not supported');
+            });
+        }
+
+        // Manejar interrupciones de audio en móviles
+        audioPlayer.addEventListener('pause', function() {
+            if (isPlaying) {
+                // Intentar reanudar automáticamente después de una pausa no intencional
+                setTimeout(() => {
+                    if (isPlaying && audioPlayer.paused) {
+                        audioPlayer.play().catch(e => console.log('Auto-resume failed:', e));
+                    }
+                }, 1000);
+            }
+        });
+
+        // Manejar cambios de visibilidad de la página
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Página oculta, mantener audio
+                if (isPlaying && !audioPlayer.paused) {
+                    audioPlayer.volume = audioPlayer.volume; // Mantener volumen
+                }
+            } else {
+                // Página visible, verificar estado del audio
+                if (isPlaying && audioPlayer.paused) {
+                    audioPlayer.play().catch(e => console.log('Resume on focus failed:', e));
+                }
+            }
+        });
     }
-    
-    .title-section h1 {
-        font-size: 1.5rem;
+
+    // Función mejorada para reproducir audio
+    function playAudio() {
+        const playPromise = audioPlayer.play();
+
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log('Audio playing successfully');
+                retryCount = 0;
+                isPlaying = true;
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                startVisualizer();
+                
+                // Notificar al servidor si está disponible
+                if (socket && socket.connected) {
+                    socket.emit('start-listening');
+                }
+            }).catch(error => {
+                console.log('Play failed:', error);
+
+                // Reintentar en caso de error
+                if (retryCount < maxRetries) {
+                    retryCount++;
+                    setTimeout(() => {
+                        audioPlayer.load();
+                        setTimeout(() => playAudio(), 500);
+                    }, 1000);
+                } else {
+                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    isPlaying = false;
+                    stopVisualizer();
+                    alert('No se pudo reproducir el audio. Verifica tu conexión.');
+                }
+            });
+        }
     }
-    
-    .section-title {
-        font-size: 2rem;
+
+    // Función para pausar audio
+    function pauseAudio() {
+        audioPlayer.pause();
+        isPlaying = false;
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        stopVisualizer();
+        
+        // Notificar al servidor si está disponible
+        if (socket && socket.connected) {
+            socket.emit('stop-listening');
+        }
     }
-    
-    .player-controls {
-        gap: 10px;
-        flex-wrap: wrap;
-        justify-content: center;
+
+    // Play/Pause functionality mejorada
+    playBtn.addEventListener('click', function() {
+        if (isPlaying) {
+            pauseAudio();
+        } else {
+            playAudio();
+        }
+    });
+
+    // Doble toque para prevenir clicks accidentales en móviles
+    if (isMobile) {
+        let lastTap = 0;
+        playBtn.addEventListener('touchend', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 300 && tapLength > 0) {
+                e.preventDefault();
+                return false;
+            }
+            lastTap = currentTime;
+        });
     }
-    
-    .custom-player {
-        padding: 10px;
+
+    // Volume control mejorado
+    volumeSlider.addEventListener('input', function() {
+        audioPlayer.volume = this.value / 100;
+    });
+
+    // Eventos de audio optimizados
+    audioPlayer.addEventListener('loadstart', function() {
+        console.log('Loading audio stream...');
+    });
+
+    audioPlayer.addEventListener('canplay', function() {
+        console.log('Audio ready to play');
+    });
+
+    audioPlayer.addEventListener('waiting', function() {
+        console.log('Audio buffering...');
+        // Mostrar indicador de carga si es necesario
+    });
+
+    audioPlayer.addEventListener('error', function(e) {
+        console.log('Audio error:', e);
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        isPlaying = false;
+        stopVisualizer();
+
+        // Reintentar automáticamente en caso de error
+        if (retryCount < maxRetries) {
+            retryCount++;
+            setTimeout(() => {
+                audioPlayer.load();
+                if (isPlaying) {
+                    setTimeout(() => playAudio(), 1000);
+                }
+            }, 2000);
+        }
+    });
+
+    audioPlayer.addEventListener('ended', function() {
+        // Para streams en vivo, esto normalmente no debería ocurrir
+        // Pero si ocurre, intentar reconectar
+        if (isPlaying) {
+            setTimeout(() => {
+                audioPlayer.load();
+                playAudio();
+            }, 1000);
+        }
+    });
+
+    // Manejar interrupciones del sistema (llamadas, notificaciones)
+    if (isMobile) {
+        window.addEventListener('focus', function() {
+            if (isPlaying && audioPlayer.paused) {
+                setTimeout(() => {
+                    audioPlayer.play().catch(e => console.log('Resume after focus:', e));
+                }, 500);
+            }
+        });
+
+        window.addEventListener('blur', function() {
+            // No pausar automáticamente, dejar que el usuario controle
+        });
     }
-    
-    .player-header h2 {
-        font-size: 1.1rem;
-        margin-bottom: 8px;
+
+    // Visualizer functions optimizadas
+    function startVisualizer() {
+        if (visualizerInterval) clearInterval(visualizerInterval);
+
+        // Reducir frecuencia de actualización en móviles para mejor rendimiento
+        const updateInterval = isMobile ? 150 : 100;
+
+        visualizerInterval = setInterval(() => {
+            if (isPlaying) {
+                bars.forEach(bar => {
+                    const height = Math.random() * 30 + 5;
+                    bar.style.height = height + 'px';
+                });
+            }
+        }, updateInterval);
     }
-    
-    .visualizer {
-        height: 20px;
+
+    function stopVisualizer() {
+        if (visualizerInterval) {
+            clearInterval(visualizerInterval);
+            visualizerInterval = null;
+        }
+        bars.forEach(bar => {
+            bar.style.height = '5px';
+        });
     }
-}
+
+    // Initialize volume al 100%
+    audioPlayer.volume = 1.0;
+    volumeSlider.value = 100;
+
+    // Optimización para touch devices
+    if (isMobile) {
+        // Prevenir zoom en doble toque
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    }
+
+    // Smooth scroll for navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Add loading animation for social links
+    document.querySelectorAll('.social-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+
+    // Intersection Observer for animations (optimizado para móviles)
+    const observerOptions = {
+        threshold: isMobile ? 0.05 : 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe staff members for scroll animations
+    document.querySelectorAll('.staff-member').forEach(member => {
+        member.style.opacity = '0';
+        member.style.transform = 'translateY(30px)';
+        member.style.transition = 'all 0.6s ease';
+        observer.observe(member);
+    });
+
+    // Enhanced visualizer (solo para desktop para mejor rendimiento)
+    if (!isMobile && (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined')) {
+        try {
+            const AudioContextClass = AudioContext || webkitAudioContext;
+            const audioContext = new AudioContextClass();
+            const analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaElementSource(audioPlayer);
+
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+
+            analyser.fftSize = 64;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function updateVisualizer() {
+                if (isPlaying) {
+                    analyser.getByteFrequencyData(dataArray);
+
+                    bars.forEach((bar, index) => {
+                        const value = dataArray[index] || 0;
+                        const height = (value / 255) * 35 + 5;
+                        bar.style.height = height + 'px';
+                    });
+
+                    requestAnimationFrame(updateVisualizer);
+                }
+            }
+
+            audioPlayer.addEventListener('play', () => {
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                updateVisualizer();
+            });
+
+        } catch (e) {
+            console.log('Web Audio API not supported, using fallback visualizer');
+        }
+    }
+
+    // Precarga el stream cuando la página esté lista
+    setTimeout(() => {
+        audioPlayer.load();
+    }, 1000);
+
+    // Contador simulado con variaciones realistas
+    setInterval(() => {
+        if (!socket) {
+            const hour = new Date().getHours();
+            let baseChange = 0;
+            
+            // Más oyentes en horarios pico
+            if (hour >= 7 && hour <= 9) baseChange = 2; // Mañana
+            else if (hour >= 12 && hour <= 14) baseChange = 1; // Mediodía
+            else if (hour >= 18 && hour <= 22) baseChange = 3; // Noche
+            else if (hour >= 23 || hour <= 6) baseChange = -2; // Madrugada
+            
+            const variation = Math.floor(Math.random() * 7) - 3; // -3 a +3
+            const newCount = Math.max(8, Math.min(120, currentListeners + baseChange + variation));
+            currentListeners = newCount;
+            listenersCountElement.textContent = newCount;
+        }
+    }, 15000); // Actualizar cada 15 segundos
+
+    // Sistema de información en tiempo real
+    const songTitleElement = document.getElementById('songTitle');
+    const artistNameElement = document.getElementById('artistName');
+    const programStatusElement = document.getElementById('programStatus');
+    const liveIndicator = document.getElementById('liveIndicator');
+
+    // Base de datos simulada de canciones
+    const songDatabase = [
+        { title: "Bohemian Rhapsody", artist: "Queen" },
+        { title: "Stairway to Heaven", artist: "Led Zeppelin" },
+        { title: "Hotel California", artist: "Eagles" },
+        { title: "Sweet Child O' Mine", artist: "Guns N' Roses" },
+        { title: "Smells Like Teen Spirit", artist: "Nirvana" },
+        { title: "Back in Black", artist: "AC/DC" },
+        { title: "Paranoid", artist: "Black Sabbath" },
+        { title: "Master of Puppets", artist: "Metallica" },
+        { title: "The Wall", artist: "Pink Floyd" },
+        { title: "November Rain", artist: "Guns N' Roses" },
+        { title: "Enter Sandman", artist: "Metallica" },
+        { title: "Thunderstruck", artist: "AC/DC" },
+        { title: "More Than a Feeling", artist: "Boston" },
+        { title: "Don't Stop Believin'", artist: "Journey" },
+        { title: "Living on a Prayer", artist: "Bon Jovi" }
+    ];
+
+    const programs = [
+        { name: "ROCK MATUTINO", time: "06:00 - 10:00" },
+        { name: "CLÁSICOS DEL ROCK", time: "10:00 - 14:00" },
+        { name: "METAL ZONE", time: "14:00 - 18:00" },
+        { name: "ROCK ALTERNATIVO", time: "18:00 - 22:00" },
+        { name: "NOCHE DE LEYENDAS", time: "22:00 - 02:00" },
+        { name: "MADRUGADA ROCK", time: "02:00 - 06:00" }
+    ];
+
+    // Intentar obtener metadatos reales del stream
+    async function fetchStreamMetadata() {
+        try {
+            // Intentar obtener metadatos de Zeno.FM
+            const response = await fetch('https://public.radio.co/stations/sf0d3f6b0c/status', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.current_track) {
+                    return {
+                        title: data.current_track.title || 'Título no disponible',
+                        artist: data.current_track.artist || 'Artista no disponible',
+                        isLive: data.status === 'live'
+                    };
+                }
+            }
+        } catch (error) {
+            console.log('No se pudieron obtener metadatos reales:', error);
+        }
+        
+        // Fallback a datos simulados más realistas
+        return null;
+    }
+
+    function updateNowPlaying() {
+        fetchStreamMetadata().then(realData => {
+            const currentHour = new Date().getHours();
+            
+            // Determinar el programa actual basado en la hora
+            let currentProgram;
+            if (currentHour >= 6 && currentHour < 10) currentProgram = programs[0];
+            else if (currentHour >= 10 && currentHour < 14) currentProgram = programs[1];
+            else if (currentHour >= 14 && currentHour < 18) currentProgram = programs[2];
+            else if (currentHour >= 18 && currentHour < 22) currentProgram = programs[3];
+            else if (currentHour >= 22 || currentHour < 2) currentProgram = programs[4];
+            else currentProgram = programs[5];
+
+            let songInfo, isLive;
+            
+            if (realData) {
+                // Usar datos reales si están disponibles
+                songInfo = realData;
+                isLive = realData.isLive;
+            } else {
+                // Usar datos simulados más inteligentes
+                const randomSong = songDatabase[Math.floor(Math.random() * songDatabase.length)];
+                songInfo = {
+                    title: randomSong.title,
+                    artist: randomSong.artist
+                };
+                
+                // Determinar si hay programa en vivo basado en horarios reales
+                const isBusinessHour = (currentHour >= 6 && currentHour <= 23);
+                isLive = isBusinessHour && Math.random() > 0.4; // 60% en horario comercial
+            }
+
+            // Actualizar información con animaciones suaves
+            songTitleElement.style.opacity = '0';
+            artistNameElement.style.opacity = '0';
+            
+            setTimeout(() => {
+                songTitleElement.textContent = songInfo.title;
+                artistNameElement.textContent = songInfo.artist;
+                songTitleElement.style.opacity = '1';
+                artistNameElement.style.opacity = '1';
+            }, 300);
+
+            // Actualizar estado del programa
+            if (isLive) {
+                programStatusElement.textContent = currentProgram.name;
+                liveIndicator.style.display = 'flex';
+                liveIndicator.style.background = 'rgba(255, 0, 0, 0.1)';
+                liveIndicator.style.borderColor = '#ff0000';
+            } else {
+                programStatusElement.textContent = 'MÚSICA AUTOMÁTICA';
+                liveIndicator.style.display = 'flex';
+                liveIndicator.style.background = 'rgba(255, 165, 0, 0.1)';
+                liveIndicator.style.borderColor = '#ffa500';
+            }
+        });
+    }
+
+    // Inicializar con información básica
+    songTitleElement.textContent = "Conectando con el stream...";
+    artistNameElement.textContent = "Obteniendo información...";
+    programStatusElement.textContent = "CARGANDO";
+
+    // Actualizar información cada 20-40 segundos
+    setTimeout(() => {
+        updateNowPlaying();
+        setInterval(updateNowPlaying, Math.random() * 20000 + 20000);
+    }, 2000); // Esperar 2 segundos antes de la primera actualización
+
+    // Sistema de partículas
+    function createParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Tipos de partículas aleatorias
+        const types = ['small', 'medium', 'large'];
+        const type = types[Math.floor(Math.random() * types.length)];
+        particle.classList.add(type);
+        
+        // Posición aleatoria
+        particle.style.left = Math.random() * 100 + '%';
+        
+        // Duración aleatoria
+        const duration = Math.random() * 10 + 8; // 8-18 segundos
+        particle.style.animationDuration = duration + 's';
+        
+        // Delay aleatorio
+        particle.style.animationDelay = Math.random() * 2 + 's';
+        
+        document.getElementById('particles-container').appendChild(particle);
+        
+        // Remover partícula después de la animación
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
+        }, (duration + 2) * 1000);
+    }
+
+    // Crear partículas continuamente (menos en móviles para mejor rendimiento)
+    const particleInterval = isMobile ? 3000 : 1500;
+    setInterval(createParticle, particleInterval);
+
+    // Crear partículas iniciales
+    for (let i = 0; i < (isMobile ? 5 : 10); i++) {
+        setTimeout(createParticle, i * 500);
+    }
+
+    // Efectos dinámicos en el reproductor cuando está activo
+    function enhanceVisualizerWhenPlaying() {
+        if (isPlaying) {
+            bars.forEach((bar, index) => {
+                const baseHeight = Math.random() * 30 + 5;
+                const glowIntensity = Math.random() * 0.5 + 0.3;
+                bar.style.height = baseHeight + 'px';
+                bar.style.boxShadow = `0 0 ${5 + glowIntensity * 10}px rgba(255, 102, 0, ${glowIntensity})`;
+                
+                // Efectos de color dinámicos
+                if (Math.random() > 0.7) {
+                    bar.style.background = 'linear-gradient(to top, #ff6600, #ffffff, #ffaa66)';
+                } else {
+                    bar.style.background = 'linear-gradient(to top, #ff6600, #ffaa66, #ffffff)';
+                }
+            });
+        }
+    }
+
+    // Mejorar el visualizador con efectos dinámicos
+    if (visualizerInterval) {
+        clearInterval(visualizerInterval);
+    }
+
+    function startEnhancedVisualizer() {
+        if (visualizerInterval) clearInterval(visualizerInterval);
+
+        const updateInterval = isMobile ? 150 : 100;
+
+        visualizerInterval = setInterval(() => {
+            if (isPlaying) {
+                enhanceVisualizerWhenPlaying();
+            }
+        }, updateInterval);
+    }
+
+    // Reemplazar la función original del visualizador
+    window.startVisualizer = startEnhancedVisualizer;
+});
+
+// Efectos de interacción mejorados
+document.addEventListener('mousemove', function(e) {
+    if (!isMobile) {
+        const particles = document.querySelectorAll('.particle');
+        const mouseX = e.clientX / window.innerWidth;
+        const mouseY = e.clientY / window.innerHeight;
+        
+        particles.forEach((particle, index) => {
+            if (index % 3 === 0) { // Solo afectar algunas partículas para mejor rendimiento
+                const offsetX = (mouseX - 0.5) * 10;
+                const offsetY = (mouseY - 0.5) * 10;
+                particle.style.transform += ` translate(${offsetX}px, ${offsetY}px)`;
+            }
+        });
+    }
+});

@@ -34,8 +34,8 @@ body {
 }
 
 .logo {
-    width: 150px;
-    height: 150px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid #ff6600;
@@ -56,7 +56,6 @@ body {
     text-transform: uppercase;
     letter-spacing: 2px;
 }
-
 /* Main Section */
 .main-section {
     padding: 40px 0;
@@ -65,7 +64,7 @@ body {
 
 .main-image-container {
     position: relative;
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
     border-radius: 15px;
     overflow: hidden;
@@ -74,7 +73,7 @@ body {
 
 .main-image {
     width: 100%;
-    height: 900px;
+    height: 800px;
     object-fit: contain;
     display: block;
     background: #000;
@@ -85,19 +84,17 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    background: #0a0a0a;
-    padding: 20px;
-    border-top: 2px solid #ff6600;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
+    padding: 40px 20px 20px;
 }
 
 .custom-player {
-    background: rgba(26, 26, 26, 0.9);
-    border-radius: 10px;
-    padding: 15px;
+    background: rgba(26, 26, 26, 0.7);
+    border-radius: 15px;
+    padding: 20px;
     border: 2px solid #ff6600;
-    box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
-    max-width: 500px;
-    margin: 0 auto;
+    box-shadow: 0 0 30px rgba(255, 102, 0, 0.3);
+    backdrop-filter: blur(5px);
 }
 
 .player-header h2 {
@@ -195,7 +192,7 @@ body {
 /* Social Media */
 .social-section {
     padding: 30px 0;
-    background: #0a0a0a;
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .social-buttons {
@@ -260,7 +257,7 @@ body {
 /* Staff Section */
 .staff-section {
     padding: 60px 0;
-    background: #0a0a0a;
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .staff-grid {
@@ -352,60 +349,6 @@ body {
         grid-template-columns: 1fr;
         gap: 30px;
     }
-    
-    /* Optimizaciones específicas para móviles */
-    .player-overlay {
-        position: relative;
-        padding: 15px;
-        background: #0a0a0a;
-    }
-    
-    .custom-player {
-        padding: 12px;
-        border-radius: 8px;
-        background: rgba(26, 26, 26, 0.95);
-    }
-    
-    .player-header h2 {
-        font-size: 1.3rem;
-        margin-bottom: 10px;
-    }
-    
-    .play-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-        touch-action: manipulation;
-        -webkit-tap-highlight-color: transparent;
-    }
-    
-    .play-btn:active {
-        transform: scale(0.95);
-    }
-    
-    .volume-control {
-        touch-action: manipulation;
-    }
-    
-    .volume-slider {
-        width: 100px;
-        height: 6px;
-        touch-action: manipulation;
-    }
-    
-    .volume-slider::-webkit-slider-thumb {
-        width: 16px;
-        height: 16px;
-    }
-    
-    .visualizer {
-        height: 25px;
-        margin-top: 10px;
-    }
-    
-    .bar {
-        width: 3px;
-    }
 }
 
 @media (max-width: 480px) {
@@ -422,21 +365,7 @@ body {
     }
     
     .player-controls {
-        gap: 10px;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .custom-player {
-        padding: 10px;
-    }
-    
-    .player-header h2 {
-        font-size: 1.1rem;
-        margin-bottom: 8px;
-    }
-    
-    .visualizer {
-        height: 20px;
+        flex-direction: column;
+        gap: 15px;
     }
 }

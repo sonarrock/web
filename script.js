@@ -1,4 +1,4 @@
-
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     const playBtn = document.getElementById('playBtn');
     const audioPlayer = document.getElementById('audioPlayer');
@@ -164,3 +164,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+</script>

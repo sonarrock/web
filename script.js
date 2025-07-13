@@ -29,22 +29,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Reproducción segura
     async function playAudio() {
-        try {
-            if (isIOS) {
-                audioPlayer.load();
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
+    try {
+        audioPlayer.pause();            // Por si ya está cargado raro
+        audioPlayer.src = audioPlayer.src; // Forzar reload real
+        audioPlayer.load();            // Importante para iOS y stream lento
 
-            await audioPlayer.play();
-            isPlaying = true;
-            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-            updateStatus('Reproduciendo...', 'playing');
-            startVisualizer();
-        } catch (e) {
-            console.error('Error al reproducir:', e);
-            updateStatus('Toca de nuevo para reproducir', 'error');
-            isPlaying = false;
-            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        if (isIOS) {
+            await new Promise(r => setTimeout(r, 200));
+        }
+
+        await audioPlayer.play();
+        isPlaying = true;
+        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        updateStatus('Reproduciendo...', 'playing');
+        startVisualizer();
+    } catch (e) {
+        console.error('Error al reproducir:', e);
+        updateStatus('Toca de nuevo para reproducir', 'error');
+        isPlaying = false;
+        playBtn.innerHTML = '<i class="fas fa-play"></i>'
+        
         }
     }
 

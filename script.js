@@ -1,4 +1,4 @@
-<!-- SCRIPT COMPLETO -->
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const playBtn = document.getElementById('playBtn');
@@ -69,5 +69,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Inicializar
     audioPlayer.volume = 1;
+    updateStatus('Toca para reproducir');
 });
 </script>

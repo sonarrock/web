@@ -1,10 +1,40 @@
+
 document.addEventListener('DOMContentLoaded', function() {
     const playBtn = document.getElementById('playBtn');
     const audioPlayer = document.getElementById('audioPlayer');
     const volumeSlider = document.getElementById('volumeSlider');
     const bars = document.querySelectorAll('.bar');
+    const listenersCountElement = document.getElementById('listenersCount');
 
     let isPlaying = false;
+    let socket = null;
+
+    // Inicializar Socket.IO si está disponible
+    try {
+        if (typeof io !== 'undefined') {
+            socket = io();
+            
+            // Escuchar actualizaciones del contador de oyentes
+            socket.on('listeners-update', (count) => {
+                listenersCountElement.textContent = count;
+            });
+            
+            // Manejar errores de conexión
+            socket.on('connect_error', (error) => {
+                console.log('Error de conexión Socket.IO:', error);
+                // Mostrar contador estático si no hay conexión al servidor
+                listenersCountElement.textContent = Math.floor(Math.random() * 50) + 10;
+            });
+        } else {
+            // Si no hay Socket.IO disponible, usar contador simulado
+            listenersCountElement.textContent = Math.floor(Math.random() * 50) + 10;
+        }
+    } catch (error) {
+        console.log('Socket.IO no disponible:', error);
+        // Usar contador simulado
+        listenersCountElement.textContent = Math.floor(Math.random() * 50) + 10;
+    }
+
     let visualizerInterval;
     let retryCount = 0;
     const maxRetries = 3;
@@ -67,6 +97,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 isPlaying = true;
                 playBtn.innerHTML = '<i class="fas fa-pause"></i>';
                 startVisualizer();
+                
+                // Notificar al servidor que el usuario está escuchando
+                if (socket) {
+                    socket.emit('start-listening');
+                }
             }).catch(error => {
                 console.log('Play failed:', error);
 
@@ -93,6 +128,11 @@ document.addEventListener('DOMContentLoaded', function() {
         isPlaying = false;
         playBtn.innerHTML = '<i class="fas fa-play"></i>';
         stopVisualizer();
+        
+        // Notificar al servidor que el usuario paró de escuchar
+        if (socket) {
+            socket.emit('stop-listening');
+        }
     }
 
     // Play/Pause functionality mejorada
@@ -208,8 +248,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Initialize volume
-    audioPlayer.volume = 0.5;
+    // Initialize volume al 100%
+    audioPlayer.volume = 1.0;
+    volumeSlider.value = 100;
 
     // Optimización para touch devices
     if (isMobile) {
@@ -316,4 +357,14 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         audioPlayer.load();
     }, 1000);
+
+    // Simular contador de oyentes si no hay servidor
+    if (!socket) {
+        setInterval(() => {
+            const currentCount = parseInt(listenersCountElement.textContent);
+            const variation = Math.floor(Math.random() * 5) - 2; // Variación de -2 a +2
+            const newCount = Math.max(5, currentCount + variation);
+            listenersCountElement.textContent = newCount;
+        }, 30000); // Actualizar cada 30 segundos
+    }
 });

@@ -151,6 +151,66 @@
         </div>
     </section>
 
-    <script src="script.js"></script>
+    <!-- Antes de cerrar </body> -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const playBtn = document.getElementById('playBtn');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const bars = document.querySelectorAll('.bar');
+    
+    let isPlaying = false;
+    let visualizerInterval;
+    
+    playBtn.addEventListener('click', function() {
+        if (isPlaying) {
+            audioPlayer.pause();
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            stopVisualizer();
+        } else {
+            audioPlayer.play().catch(e => {
+                console.log('Error playing audio:', e);
+                audioPlayer.load();
+                setTimeout(() => {
+                    audioPlayer.play().catch(err => console.log('Play error:', err));
+                }, 1000);
+            });
+            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            startVisualizer();
+        }
+        isPlaying = !isPlaying;
+    });
+
+    volumeSlider.addEventListener('input', function() {
+        audioPlayer.volume = this.value / 100;
+    });
+
+    audioPlayer.addEventListener('error', function(e) {
+        console.log('Audio error:', e);
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        isPlaying = false;
+        stopVisualizer();
+    });
+
+    function startVisualizer() {
+        visualizerInterval = setInterval(() => {
+            bars.forEach(bar => {
+                const height = Math.random() * 30 + 5;
+                bar.style.height = height + 'px';
+            });
+        }, 100);
+    }
+
+    function stopVisualizer() {
+        clearInterval(visualizerInterval);
+        bars.forEach(bar => {
+            bar.style.height = '5px';
+        });
+    }
+
+    audioPlayer.volume = 0.5;
+});
+</script>
+
 </body>
 </html>

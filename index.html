@@ -21,43 +21,44 @@
         </div>
     </header>
 
-    <!-- Main Image with Player -->
-    <section class="main-section">
-        <div class="container">
-            <div class="main-image-container">
-                <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
-                <div class="player-overlay">
-                    <div class="custom-player">
-                        <div class="player-header">
+   <!-- PLAYER ACTUALIZADO -->
+<section class="main-section">
+    <div class="container">
+        <div class="main-image-container">
+            <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
+            <div class="player-overlay">
+                <div class="custom-player">
+                    <div class="player-header"></div>
+                    <div class="player-controls">
+                        <button id="playBtn" class="play-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="volume-control">
+                            <i class="fas fa-volume-up"></i>
+                            <input type="range" id="volumeSlider" min="0" max="100" value="100" class="volume-slider">
                         </div>
-                        <div class="player-controls">
-                            <button id="playBtn" class="play-btn">
-                                <i class="fas fa-play"></i>
-                            </button>
-                            <div class="volume-control">
-                                <i class="fas fa-volume-up"></i>
-                                <input type="range" id="volumeSlider" min="0" max="100" value="100" class="volume-slider">
-                            </div>
-                        </div>
-                        <div class="visualizer">
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                        </div>
-                        <audio id="audioPlayer" preload="none">
-                            <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-                            Tu navegador no soporta el elemento de audio.
-                        </audio>
                     </div>
+                    <div class="visualizer">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                    <div id="streamStatus" class="stream-status">Toca para reproducir</div>
+                    <audio id="audioPlayer" preload="none">
+                        <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+                        Tu navegador no soporta audio.
+                    </audio>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
 
     <!-- Social Media -->
     <section class="social-section">

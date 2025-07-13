@@ -22,9 +22,9 @@ document.addEventListener('DOMContentLoaded', function () {
             updateStatus('Pausado');
             stopVisualizer();
         } else {
-            audioPlayer.load(); // fuerza carga
-            setTimeout(() => {
-                audioPlayer.play().then(() => {
+           audioPlayer.load(); // fuerza carga
+setTimeout(() => {
+    audioPlayer.play().then(() => {
                     playBtn.innerHTML = '<i class="fas fa-pause"></i>';
                     updateStatus('Reproduciendo');
                     startVisualizer();

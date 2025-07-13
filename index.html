@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,7 +7,6 @@
     <title>Sonar Rock - La Radio Independiente</title>
     <link href="style.css" rel="stylesheet" type="text/css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -21,6 +21,7 @@
             </div>
         </div>
     </header>
+
     <!-- Main Image with Player -->
     <section class="main-section">
         <div class="container">
@@ -128,42 +129,168 @@
             </div>
         </div>
     </section>
- 
-  <!-- About Section-->
-  <section class="about-section">
-    <div class="container">
-      <div class="about-content">
-        <h2 class="section-title">¿Quiénes Somos?</h2>
-        <p class="about-text">
-          Sonar Rock es una trinchera sonora, un espacio libre y apasionado que nace en México con una misión clara:
-          ser un foro abierto para las bandas emergentes de la escena local. Creemos en el talento que nace en los
-          garajes, en las letras que cuentan historias reales, en los riffs que aún no han llegado a la radio
-          comercial… pero que merecen ser escuchados. Somos la radio independiente porque no seguimos formatos
-          impuestos ni playlists predecibles. Aquí, el rock tiene todas sus caras: lo clásico que marcó generaciones,
-          lo contemporáneo que sacude conciencias, y lo nuevo que está construyendo el futuro del género desde lo
-          subterráneo hacia la superficie.
-        </p>
-      </div>
-    </div>
-  </section>
 
-  <section class="about-section">
-    <div class="container">
-      <div class="about-content">
-        <h2 class="section-title">¿Qué es Sonar Rock?</h2>
-        <p class="about-text">
-          En Sonar Rock, celebramos la esencia del rock n’ roll: su rebeldía, su poesía, su energía y su eterna
-          capacidad de conectar almas. Transmitimos con el corazón puesto en cada acorde, convencidos de que la música
-          auténtica todavía tiene mucho que decir. Sonar Rock: donde el presente del rock se encuentra con su
-          historia… y con su porvenir.
-        </p>
-      </div>
-    </div>
-  </section>
-    
- <!-- Particle System -->
-    <div id="particles-container"></div>
-    
+    <!-- About Sections -->
+    <section class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <h2 class="section-title">¿Quiénes Somos?</h2>
+                <p class="about-text">
+                    
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonar Rock - La Radio Independiente</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo-section">
+                <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
+                <div class="title-section">
+                    <h1>SONAR ROCK</h1>
+                    <p class="subtitle">LA RADIO INDEPENDIENTE</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Image with Player -->
+    <section class="main-section">
+        <div class="container">
+            <div class="main-image-container">
+                <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
+                <div class="player-overlay">
+                    <div class="custom-player">
+                        <div class="player-header">
+                            <h2>SONAR ROCK</h2>
+                        </div>
+                        <div class="player-controls">
+                            <button id="playBtn" class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <div class="volume-control">
+                                <i class="fas fa-volume-up"></i>
+                                <input type="range" id="volumeSlider" min="0" max="100" value="100" class="volume-slider">
+                            </div>
+                        </div>
+                        <div class="visualizer">
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                        </div>
+                        <audio id="audioPlayer" preload="none">
+                            <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Media -->
+    <section class="social-section">
+        <div class="container">
+            <div class="social-buttons">
+                <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+                <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" class="social-btn facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://open.spotify.com/show/1B0o0Mj7p44eR2OFD5Ew4H?si=IhHzbqdMQ-ejnG5NqqESGA" target="_blank" class="social-btn spotify">
+                    <i class="fab fa-spotify"></i>
+                </a>
+                <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox">
+                    <i class="fas fa-podcast"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ivoox Embed -->
+    <section class="embed-section">
+        <div class="container">
+            <h2 class="section-title">Escúchanos en Ivoox</h2>
+            <div class="embed-container">
+                <iframe src="https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=04040c" width="100%" height="400" frameborder="0" allowfullscreen="" scrolling="no" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spotify Embed -->
+    <section class="embed-section">
+        <div class="container">
+            <h2 class="section-title">Síguenos en Spotify</h2>
+            <div class="embed-container spotify-embed">
+                <iframe style="border-radius:12px" 
+                    src="https://open.spotify.com/embed/show/1B0o0Mj7p44eR2OFD5Ew4H?utm_source=generator&theme=0" 
+                    width="90%" height="180" frameBorder="0" allowfullscreen="" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                    loading="lazy">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Staff Section -->
+    <section class="staff-section">
+        <div class="container">
+            <h2 class="section-title">Nuestro Staff</h2>
+            <div class="staff-grid">
+                <div class="staff-member">
+                    <img src="attached_assets/Wendy_1749601460841.jpeg" alt="Wendy" class="staff-image">
+                    <h3>Wendy</h3>
+                </div>
+                <div class="staff-member">
+                    <img src="attached_assets/Hans_1749601460841.jpeg" alt="Hans" class="staff-image">
+                    <h3>Hans</h3>
+                </div>
+                <div class="staff-member">
+                    <img src="attached_assets/El Chris_1749601460841.jpeg" alt="El Chris" class="staff-image">
+                    <h3>El Chris</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Sections -->
+    <section class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <h2 class="section-title">¿Quiénes Somos?</h2>
+                <p class="about-text">
+                   En Sonar Rock, celebramos la esencia del rock n’ roll: su rebeldía, su poesía, su energía y su eterna capacidad de conectar almas. Transmitimos con el corazón puesto en cada acorde, convencidos de que la música auténtica todavía tiene mucho que decir. Sonar Rock: donde el presente del rock se encuentra con su historia… y con su porvenir.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <h2 class="section-title">¿Qué es Sonar Rock?</h2>
+                <p class="about-text">
+                    Sonar Rock es una trinchera sonora, un espacio libre y apasionado que nace en México con una misión clara: ser un foro abierto para las bandas emergentes de la escena local. Creemos en el talento que nace en los garajes, en las letras que cuentan historias reales, en los riffs que aún no han llegado a la radio comercial… pero que merecen ser escuchados. Somos la radio independiente porque no seguimos formatos impuestos ni playlists predecibles. Aquí, el rock tiene todas sus caras: lo clásico que marcó generaciones, lo contemporáneo que sacude conciencias, y lo nuevo que está construyendo el futuro del género desde lo subterráneo hacia la superficie.
+                </p>
+            </div>
+        </div>
+    </section>
+
     <script src="script.js"></script>
 </body>
 </html>

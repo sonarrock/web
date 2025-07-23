@@ -1,4 +1,3 @@
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const playBtn = document.getElementById('playBtn');
@@ -11,51 +10,20 @@ document.addEventListener('DOMContentLoaded', function () {
     let visualizerInterval;
 
     function updateStatus(msg, error = false) {
-        streamStatus.textContent = msg;
-        streamStatus.style.color = error ? 'red' : '#0f0';
-    }
-
-    playBtn.addEventListener('click', function () {
-        if (isPlaying) {
-            audioPlayer.pause();
-            playBtn.innerHTML = '<i class="fas fa-play"></i>';
-            updateStatus('Pausado');
-            stopVisualizer();
-        } else {
-          audioPlayer.play().then(() => {
-                    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                    updateStatus('Reproduciendo');
-                    startVisualizer();
-                    isPlaying = true;
-                }).catch((err) => {
-                    console.error('Error en reproducción:', err);
-                    updateStatus('Error al reproducir', true);
-                    isPlaying = false;
-                });
-            }, 300);
+        if (streamStatus) {
+            streamStatus.textContent = msg;
+            streamStatus.style.color = error ? 'red' : '#0f0';
         }
-    });
-
-    volumeSlider.addEventListener('input', function () {
-        audioPlayer.volume = this.value / 100;
-    });
-
-    audioPlayer.addEventListener('error', function (e) {
-        console.log('Audio error:', e);
-        updateStatus('Error de stream', true);
-        playBtn.innerHTML = '<i class="fas fa-play"></i>';
-        isPlaying = false;
-        stopVisualizer();
-    });
+    }
 
     function startVisualizer() {
         stopVisualizer();
         visualizerInterval = setInterval(() => {
             bars.forEach(bar => {
                 const height = Math.random() * 30 + 5;
-                bar.style.height = height + 'px';
+                bar.style.height = `${height}px`;
             });
-        }, 100);
+        }, 120); // menos uso de CPU
     }
 
     function stopVisualizer() {
@@ -65,8 +33,50 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Inicializar
-    audioPlayer.volume = 1;
+    if (playBtn && audioPlayer) {
+        playBtn.addEventListener('click', function () {
+            if (isPlaying) {
+                audioPlayer.pause();
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                updateStatus('Pausado');
+                stopVisualizer();
+                isPlaying = false;
+            } else {
+                audioPlayer.play()
+                    .then(() => {
+                        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                        updateStatus('Reproduciendo');
+                        startVisualizer();
+                        isPlaying = true;
+                    })
+                    .catch((err) => {
+                        console.error('Error en reproducción:', err);
+                        updateStatus('Error al reproducir', true);
+                        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                        isPlaying = false;
+                    });
+            }
+        });
+    }
+
+    if (volumeSlider && audioPlayer) {
+        volumeSlider.addEventListener('input', function () {
+            audioPlayer.volume = this.value / 100;
+        });
+    }
+
+    if (audioPlayer) {
+        audioPlayer.addEventListener('error', function (e) {
+            console.error('Error de stream:', e);
+            updateStatus('Error de stream', true);
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            stopVisualizer();
+            isPlaying = false;
+        });
+
+        audioPlayer.volume = 1;
+    }
+
     updateStatus('Toca para reproducir');
 });
 </script>

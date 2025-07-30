@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const height = Math.random() * 30 + 5;
                 bar.style.height = `${height}px`;
             });
-        }, 120); // menos uso de CPU
+        }, 120);
     }
 
     function stopVisualizer() {
@@ -31,6 +31,25 @@ document.addEventListener('DOMContentLoaded', function () {
         bars.forEach(bar => {
             bar.style.height = '5px';
         });
+    }
+
+    function playStream() {
+        updateStatus('Cargando...', false);
+        audioPlayer.load(); // fuerza recarga
+        audioPlayer.play()
+            .then(() => {
+                isPlaying = true;
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                updateStatus('Reproduciendo');
+                startVisualizer();
+            })
+            .catch((err) => {
+                console.error('Error en reproducción:', err);
+                updateStatus('Error al reproducir', true);
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                isPlaying = false;
+                stopVisualizer();
+            });
     }
 
     if (playBtn && audioPlayer) {
@@ -42,19 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 stopVisualizer();
                 isPlaying = false;
             } else {
-                audioPlayer.play()
-                    .then(() => {
-                        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                        updateStatus('Reproduciendo');
-                        startVisualizer();
-                        isPlaying = true;
-                    })
-                    .catch((err) => {
-                        console.error('Error en reproducción:', err);
-                        updateStatus('Error al reproducir', true);
-                        playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                        isPlaying = false;
-                    });
+                playStream();
             }
         });
     }
@@ -74,9 +81,24 @@ document.addEventListener('DOMContentLoaded', function () {
             isPlaying = false;
         });
 
+        audioPlayer.addEventListener('waiting', function () {
+            updateStatus('Cargando...', false);
+        });
+
+        audioPlayer.addEventListener('playing', function () {
+            updateStatus('Reproduciendo');
+        });
+
+        audioPlayer.addEventListener('pause', function () {
+            if (isPlaying) {
+                updateStatus('Pausado');
+            }
+        });
+
         audioPlayer.volume = 1;
+        audioPlayer.preload = 'none'; // optimiza carga
     }
 
-    updateStatus('Toca para reproducir');
+    updateStatus('Listo');
 });
 </script>

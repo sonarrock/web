@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sonar Rock - La Radio Independiente</title>
-    <link rel="stylesheet" href="styles.css">
-  <link rel="icon" type="image/png" href="favicon.png">
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
@@ -20,43 +20,44 @@
         </div>
     </header>
 
-    <!-- PLAYER ACTUALIZADO -->
-    <section class="main-section">
-        <div class="container">
-            <div class="main-image-container">
-                <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
-                <div class="player-overlay">
-                    <div class="custom-player">
-                        <div class="player-header"></div>
-                        <div class="player-controls">
-                            <button id="playBtn" class="play-btn">
-                                <i class="fas fa-play"></i>
-                            </button>
-                            <div class="volume-control">
-                                <i class="fas fa-volume-up"></i>
-                                <input type="range" id="volumeSlider" min="0" max="100" value="100" class="volume-slider">
-                            </div>
+   <!-- PLAYER ACTUALIZADO -->
+<section class="main-section">
+    <div class="container">
+        <div class="main-image-container">
+            <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
+            <div class="player-overlay">
+                <div class="custom-player">
+                    <div class="player-header"></div>
+                    <div class="player-controls">
+                        <button id="playBtn" class="play-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="volume-control">
+                            <i class="fas fa-volume-up"></i>
+                            <input type="range" id="volumeSlider" min="0" max="100" value="100" class="volume-slider">
                         </div>
-                        <div class="visualizer">
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                        </div>
-                        <div id="streamStatus" class="stream-status">Listo</div>
-                        <audio id="audioPlayer" preload="auto">
-                            <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-                            Tu navegador no soporta audio.
-                        </audio>
                     </div>
+                    <div class="visualizer">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                    <div id="streamStatus" class="stream-status">Toca para reproducir</div>
+                    <audio id="audioPlayer" preload="auto">
+                        <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+                        Tu navegador no soporta audio.
+                    </audio>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
 
     <!-- Social Media -->
     <section class="social-section">
@@ -91,20 +92,20 @@
         </div>
     </section>
 
-    <!-- Spotify Embed -->
-    <section class="embed-section">
-        <div class="container">
-            <h2 class="section-title">Síguenos en Spotify</h2>
-            <div class="embed-container spotify-embed">
-                <iframe style="border-radius:12px"
-                    src="https://open.spotify.com/embed/show/1B0o0Mj7p44eR2OFD5Ew4H?utm_source=generator&theme=0"
-                    width="100%" height="180" frameborder="0"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy">
-                </iframe>
-            </div>
+   <!-- Spotify Embed -->
+<section class="embed-section">
+    <div class="container">
+        <h2 class="section-title">Síguenos en Spotify</h2>
+        <div class="embed-container spotify-embed">
+            <iframe style="border-radius:12px"
+                src="https://open.spotify.com/embed/show/1B0o0Mj7p44eR2OFD5Ew4H?utm_source=generator&theme=0"
+                width="100%" height="180" frameborder="0"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy">
+            </iframe>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- Staff Section -->
     <section class="staff-section">
@@ -149,96 +150,63 @@
             </div>
         </div>
     </section>
-
-    <!-- Script del reproductor actualizado -->
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const playBtn = document.getElementById('playBtn');
-        const audioPlayer = document.getElementById('audioPlayer');
-        const volumeSlider = document.getElementById('volumeSlider');
-        const bars = document.querySelectorAll('.bar');
-        const streamStatus = document.getElementById('streamStatus');
+document.addEventListener('DOMContentLoaded', function() {
+    const playBtn = document.getElementById('playBtn');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const bars = document.querySelectorAll('.bar');
 
-        let isPlaying = false;
-        let visualizerInterval;
+    let isPlaying = false;
+    let visualizerInterval;
 
-        function updateStatus(text, error = false) {
-            if (streamStatus) {
-                streamStatus.textContent = text;
-                streamStatus.style.color = error ? 'red' : '#0f0';
-            }
-        }
-
-        function startVisualizer() {
-            visualizerInterval = setInterval(() => {
-                bars.forEach(bar => {
-                    const height = Math.random() * 30 + 5;
-                    bar.style.height = height + 'px';
-                });
-            }, 120);
-        }
-
-        function stopVisualizer() {
-            clearInterval(visualizerInterval);
-            bars.forEach(bar => {
-                bar.style.height = '5px';
-            });
-        }
-
-        playBtn.addEventListener('click', function () {
-            if (isPlaying) {
-                audioPlayer.pause();
-                playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                updateStatus('Pausado');
-                stopVisualizer();
-                isPlaying = false;
-            } else {
-                updateStatus('Cargando...');
-                audioPlayer.load();
-                audioPlayer.play().then(() => {
-                    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                    updateStatus('Reproduciendo');
-                    startVisualizer();
-                    isPlaying = true;
-                }).catch(e => {
-                    console.error('Error al reproducir:', e);
-                    updateStatus('Error al reproducir', true);
-                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                    stopVisualizer();
-                    isPlaying = false;
-                });
-            }
-        });
-
-        volumeSlider.addEventListener('input', function () {
-            audioPlayer.volume = this.value / 100;
-        });
-
-        audioPlayer.addEventListener('error', function (e) {
-            console.log('Error de audio:', e);
-            updateStatus('Error de stream', true);
+    playBtn.addEventListener('click', function () {
+        if (isPlaying) {
+            audioPlayer.pause();
             playBtn.innerHTML = '<i class="fas fa-play"></i>';
-            isPlaying = false;
             stopVisualizer();
-        });
-
-        audioPlayer.addEventListener('waiting', function () {
-            updateStatus('Cargando...');
-        });
-
-        audioPlayer.addEventListener('playing', function () {
-            updateStatus('Reproduciendo');
-        });
-
-        audioPlayer.addEventListener('pause', function () {
-            if (isPlaying) {
-                updateStatus('Pausado');
-            }
-        });
-
-        audioPlayer.volume = 0.5;
-        updateStatus('Listo');
+        } else {
+            audioPlayer.load();
+            audioPlayer.play().catch(e => {
+                console.error('Error al reproducir:', e);
+            });
+            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            startVisualizer();
+        }
+        isPlaying = !isPlaying;
     });
-    </script>
+
+    volumeSlider.addEventListener('input', function () {
+        audioPlayer.volume = this.value / 100;
+    });
+
+    audioPlayer.addEventListener('error', function (e) {
+        console.log('Error de audio:', e);
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        isPlaying = false;
+        stopVisualizer();
+    });
+
+    function startVisualizer() {
+        visualizerInterval = setInterval(() => {
+            bars.forEach(bar => {
+                const height = Math.random() * 30 + 5;
+                bar.style.height = height + 'px';
+            });
+        }, 100);
+    }
+
+    function stopVisualizer() {
+        clearInterval(visualizerInterval);
+        bars.forEach(bar => {
+            bar.style.height = '5px';
+        });
+    }
+
+    audioPlayer.volume = 0.5;
+});
+</script>
+
+
 </body>
 </html>

@@ -85,7 +85,7 @@
 
   <section class="embed-section">
   <div class="container" style="max-width: 650px; margin: auto;">
-    <h2 class="section-title" style="margin-bottom: 20px; color: #1DB954; font-family: 'Spotify Circular', Arial, sans-serif;">Escúchanos en Spotify</h2>
+    <h2 class="section-title" style="margin-bottom: 20px;">Escúchanos en Spotify</h2>
     <div class="player-wrapper">
       <!-- Spotify Embed -->
       <iframe
@@ -99,7 +99,7 @@
       </iframe>
     </div>
 
-    <h2 class="section-title" style="margin: 40px 0 20px; color: #1DB954; font-family: 'Spotify Circular', Arial, sans-serif;">Escúchanos en iVoox</h2>
+    <h2 class="section-title" style="margin: 40px 0 20px;">Último episodio en iVoox</h2>
     <div id="podcast-player" class="player-wrapper"></div>
   </div>
 </section>
@@ -137,7 +137,7 @@
     font-size: 20px;
     margin: 0 0 6px 0;
     font-weight: 700;
-    color: #1DB954; /* verde Spotify */
+    color: #FF6600; /* naranja */
   }
   #podcast-player p {
     font-size: 14px;
@@ -149,6 +149,11 @@
     outline: none;
     filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
     border-radius: 8px;
+    background: #222;
+  }
+  .section-title {
+    color: #FF6600 !important;
+    font-family: "Spotify Circular", Arial, sans-serif;
   }
 </style>
 
@@ -176,7 +181,7 @@
           <div style="flex:1;">
             <h3>${title}</h3>
             <p>Publicado el ${pubDate}</p>
-            <audio controls preload="none" style="background:#222; border-radius:8px;">
+            <audio controls preload="none">
               <source src="${audioUrl}" type="audio/mpeg" />
               Tu navegador no soporta audio HTML5.
             </audio>

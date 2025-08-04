@@ -83,30 +83,52 @@
         </div>
     </section>
 
-   <!-- Contenedor del reproductor iVoox -->
-<section class="embed-section">
-  <div class="container">
-    <h2 class="section-title">Escúchanos en iVoox</h2>
-    <div id="podcast-player" style="max-width: 600px; margin: auto;"></div>
+  <section class="embed-section">
+  <div class="container" style="max-width: 650px; margin: auto;">
+    <h2 class="section-title" style="margin-bottom: 20px; color: #1DB954; font-family: 'Spotify Circular', Arial, sans-serif;">Escúchanos en Spotify</h2>
+    <div class="player-wrapper">
+      <!-- Spotify Embed -->
+      <iframe
+        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
+        width="100%"
+        height="170"
+        frameborder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"
+        style="border-radius: 12px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.6);">
+      </iframe>
+    </div>
+
+    <h2 class="section-title" style="margin: 40px 0 20px; color: #1DB954; font-family: 'Spotify Circular', Arial, sans-serif;">Escúchanos en iVoox</h2>
+    <div id="podcast-player" class="player-wrapper"></div>
   </div>
 </section>
 
 <style>
-  /* Estilo similar al iframe de Spotify para el contenedor */
-  #podcast-player > div {
+  .player-wrapper {
+    width: 100%;
+    max-width: 650px;
+    height: 170px;
     background: #121212;
     border-radius: 12px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.6);
     display: flex;
-    gap: 15px;
-    padding: 15px;
+    align-items: center;
+    padding: 15px 20px;
+    box-sizing: border-box;
     color: #fff;
     font-family: "Spotify Circular", Arial, sans-serif;
-    box-shadow: 0 8px 24px rgb(0 0 0 / 0.6);
+    gap: 20px;
+  }
+  #podcast-player > div {
+    display: flex;
+    width: 100%;
+    gap: 20px;
     align-items: center;
   }
   #podcast-player img {
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     border-radius: 12px;
     object-fit: cover;
     flex-shrink: 0;
@@ -115,6 +137,7 @@
     font-size: 20px;
     margin: 0 0 6px 0;
     font-weight: 700;
+    color: #1DB954; /* verde Spotify */
   }
   #podcast-player p {
     font-size: 14px;
@@ -153,7 +176,7 @@
           <div style="flex:1;">
             <h3>${title}</h3>
             <p>Publicado el ${pubDate}</p>
-            <audio controls preload="none">
+            <audio controls preload="none" style="background:#222; border-radius:8px;">
               <source src="${audioUrl}" type="audio/mpeg" />
               Tu navegador no soporta audio HTML5.
             </audio>
@@ -170,24 +193,9 @@
 
   loadLatestIvooxEpisode();
 </script>
-        </div>
+  </div>
     </section>
-
-  <!-- Spotify Embed -->
-<section class="embed-section">
-    <div class="container">
-            <h2 class="section-title">Escúchanos en Spotify</h2>
-        <div class="embed-container spotify-embed">
-            <iframe style="border-radius:12px"
-                src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
-                width="100%" height="150" frameborder="0"
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy">
-            </iframe>
-        </div>
-    </div>
-</section>
-
+    
     <!-- Staff Section -->
     <section class="staff-section">
         <div class="container">
@@ -198,8 +206,8 @@
                     <h3>Wendy</h3>
                 </div>
                  <div class="staff-member">
-                    <img src="attached_assets/Alvaro_1749601460841.jpeg" alt="Wendy" class="staff-image">
-                    <h3>Alvaro</h3>
+                    <img src="attached_assets/Alvaro_1749601460841.jpeg" alt="Alvaro" class="staff-image">
+                    <h3>El Contralor</h3>
                 </div>
                 <div class="staff-member">
                     <img src="attached_assets/Hans_1749601460841.jpeg" alt="Hans" class="staff-image">

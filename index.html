@@ -57,11 +57,7 @@
         </div>
     </div>
 </section>
-    
-<!-- Contador de oyentes en vivo -->
-    <div id="live-listeners" style="color:#FF6600; font-family: Arial, sans-serif; font-size: 14px; margin-bottom: 10px;">
-      Oyentes en vivo: <span id="ezq3fcuf5ehvv">Cargando...</span>
-    </div>
+      </div>
 
 
     <!-- Social Media -->
@@ -312,31 +308,5 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 <script>
     
-  <!-- Contador de oyentes en vivo -->
-<div id="live-listeners">
-  Oyentes en vivo: <span id="listener-count">Cargando...</span>
-</div>
-
-<script>
-  async function fetchLiveListeners() {
-    const stationId = "ezq3fcuf5ehvv"; // Tu ID de estación Zeno.fm
-    const proxyUrl = "https://corsproxy.io/?";
-    const targetUrl = `https://stream.zeno.fm/api/stations/${stationId}/nowplaying`;
-
-    try {
-      const response = await fetch(proxyUrl + targetUrl);
-      const data = await response.json();
-
-      const listeners = data.listeners || 0;
-      document.getElementById("listener-count").textContent = listeners;
-    } catch (error) {
-      document.getElementById("listener-count").textContent = "N/D";
-      console.error("Error al obtener oyentes en vivo:", error);
-    }
-  }
-
-  fetchLiveListeners();
-  setInterval(fetchLiveListeners, 15000); // Cada 15 segundos
-</script>
 </body>
 </html>

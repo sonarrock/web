@@ -381,3 +381,55 @@ body {
         gap: 15px;
     }
 }
+@media (max-width: 480px) {
+  .custom-player {
+    padding: 10px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .player-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .volume-control {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .volume-slider {
+    width: 80%;
+  }
+
+  .visualizer {
+    margin-top: 10px;
+    gap: 3px;
+  }
+
+  .bar {
+    margin: 0 1px;
+    height: 5px;
+  }
+
+  #streamStatus {
+    font-size: 13px;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .main-image-container img.main-image {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .player-overlay {
+    position: relative;
+    width: 100%;
+    padding: 10px 0;
+  }
+}

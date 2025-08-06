@@ -433,3 +433,60 @@ body {
     padding: 10px 0;
   }
 }
+@media (max-width: 768px) {
+  .main-image {
+    height: auto;
+    max-height: 400px;
+    object-fit: contain;
+  }
+
+  .custom-player {
+    padding: 15px;
+  }
+
+  .player-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .play-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .volume-slider {
+    width: 80px;
+  }
+
+  .bar {
+    width: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 15px 0;
+  }
+
+  .player-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .about-text {
+    font-size: 1rem;
+  }
+
+  .embed-container {
+    width: 100%;
+    border-radius: 10px;
+  }
+
+  .staff-member {
+    padding: 20px;
+  }
+
+  .staff-image {
+    width: 120px;
+    height: 120px;
+  }
+}

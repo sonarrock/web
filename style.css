@@ -1,61 +1,240 @@
-/* Estilo base para Sonar Rock */
+/* ---------------------------
+   SONAR ROCK - ESTILO GENERAL
+----------------------------*/
+
 body {
-  background-color: #000000;
-  color: #FFFFFF;
-  font-family: 'Arial', sans-serif;
+  background-color: #000;
+  color: #fff;
+  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
 }
 
-/* Encabezado principal */
-.header {
-  background-color: #1a1a1a;
+header {
+  background-color: #111;
   padding: 20px 0;
   text-align: center;
-  box-shadow: 0px 2px 5px rgba(255, 255, 255, 0.1);
 }
 
-.header h1 {
+header h1 {
   font-size: 2.5rem;
   margin: 0;
+  color: #ff6600;
 }
 
-/* Imagen principal */
 .main-image {
   width: 100%;
-  height: 500px;
+  height: auto;
+  max-height: 600px;
   object-fit: cover;
 }
 
-/* Reproductor personalizado */
-.custom-player {
-  background-color: #1e1e1e;
-  padding: 20px;
-  border-radius: 10px;
-  margin: 30px auto;
-  max-width: 800px;
-  box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+.container {
+  padding: 30px 5%;
 }
 
-.player-header {
+.section-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ff6600;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+/* ---------------------------
+   REPRODUCTOR PERSONALIZADO
+----------------------------*/
+
+.custom-player {
+  background-color: #111;
+  border: 2px solid #ff6600;
+  border-radius: 15px;
+  padding: 20px;
   text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 40px;
 }
 
 .player-header h2 {
-  font-size: 1.8rem;
-  margin: 0;
-}
-
-.audio-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  font-size: 1.5rem;
+  color: #ff6600;
+  margin-bottom: 10px;
 }
 
 .play-btn {
-  background-color: #FF6600;
+  background-color: #ff6600;
   border: none;
   color: white;
+  font-size: 24px;
+  padding: 15px;
+  margin: 10px;
   border-radius: 50%;
-  wid
+  cursor: pointer;
+}
+
+.volume-slider {
+  width: 100px;
+  margin-top: 10px;
+}
+
+/* ---------------------------
+   VISUALIZADOR DE AUDIO
+----------------------------*/
+
+.visualizer {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.bar {
+  width: 4px;
+  height: 50px;
+  background-color: #ff6600;
+  margin: 0 2px;
+  animation: pulse 1s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    height: 20px;
+  }
+  50% {
+    height: 60px;
+  }
+  100% {
+    height: 20px;
+  }
+}
+
+/* ---------------------------
+   EMBEDS Y SECCIONES
+----------------------------*/
+
+.embed-container {
+  margin: 20px 0;
+  background-color: #222;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.about-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* ---------------------------
+   STAFF
+----------------------------*/
+
+.staff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+}
+
+.staff-member {
+  background-color: #1a1a1a;
+  padding: 25px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.staff-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.staff-name {
+  font-size: 1.2rem;
+  color: #ff6600;
+}
+
+/* ---------------------------
+   PIE DE PÁGINA
+----------------------------*/
+
+footer {
+  background-color: #111;
+  text-align: center;
+  padding: 15px 0;
+  font-size: 0.9rem;
+}
+
+/* ---------------------------
+   RESPONSIVE DESIGN
+----------------------------*/
+
+@media (max-width: 768px) {
+  .main-image {
+    height: auto;
+    max-height: 400px;
+    object-fit: contain;
+  }
+
+  .custom-player {
+    padding: 15px;
+  }
+
+  .player-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .play-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .volume-slider {
+    width: 80px;
+  }
+
+  .bar {
+    width: 3px;
+  }
+
+  .staff-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .about-text {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.8rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .player-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .about-text {
+    font-size: 0.95rem;
+  }
+
+  .staff-member {
+    padding: 20px;
+  }
+
+  .staff-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .embed-container {
+    width: 100%;
+    border-radius: 10px;
+    padding: 10px;
+  }
+}

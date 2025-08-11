@@ -67,7 +67,9 @@
                         <div class="bar"></div>
                         <div class="bar"></div>
                     </div>
-                    <div id="streamStatus" class="stream-status">En Vivo Miércoles 21:00</div>
+                    <div id="streamStatus" class="stream-status">
+  En Vivo Miércoles 21:00 <span class="listeners-badge">Oyentes: <span id="listenersCount">0</span></span>
+</div>
                     <audio id="audioPlayer" preload="auto">
                         <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
                         Tu navegador no soporta audio.
@@ -332,6 +334,24 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(reg => console.log("✅ Service Worker registrado", reg))
       .catch(err => console.error("❌ Error al registrar Service Worker:", err));
   }
+</script>
+
+    <script>
+async function getListeners() {
+    try {
+        const res = await fetch('contador.php'); // Archivo PHP en tu servidor
+        const data = await res.json();
+        document.getElementById('listenersCount').textContent = data.listeners;
+    } catch (e) {
+        console.error('Error obteniendo oyentes', e);
+    }
+}
+
+// Llamar al cargar
+getListeners();
+
+// Actualizar cada 60 segundos
+setInterval(getListeners, 60000);
 </script>
 
 </body>

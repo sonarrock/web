@@ -433,3 +433,14 @@ body {
     padding: 10px 0;
   }
 }
+.listeners-badge {
+    background-color: #ff6600;
+    color: #fff;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.9em;
+    margin-left: 10px;
+    display: inline-block;
+}
+

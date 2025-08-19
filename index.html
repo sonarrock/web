@@ -117,7 +117,14 @@
         </iframe>
       </div>
 
-    <script>
+    <h2 class="section-title" style="color: #FF6600; font-family: Arial, sans-serif; font-size: 20px;">Último episodio en iVoox</h2>
+    <div id="podcast-player" style="margin-bottom: 30px;"></div>
+
+  </div>
+</section>
+
+<!-- Script para el reproductor de Ivoox -->
+<script>
   async function loadPodcast() {
     const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
     try {
@@ -155,7 +162,6 @@
 
   loadPodcast();
 </script>
-
   
   <!-- Staff Section -->
   <section class="staff-section">

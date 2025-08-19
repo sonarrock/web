@@ -265,12 +265,6 @@ body {
     display: flex;
     justify-content: center;
 }
-#podcast-player h3 {
-    font-size: 20px; /* ← cámbialo por un número más pequeño */
-    margin: 0 0 6px 0;
-    font-weight: 700;
-    color: #FF6600;
-}
 
 /* Staff Section */
 .staff-section {

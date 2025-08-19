@@ -45,37 +45,141 @@
     <div class="container">
       <div class="main-image-container">
         <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
-        <div class="player-overlay">
-          <div class="custom-player">
-            <div class="player-header"></div>
-            <div class="player-controls">
-              <button id="playBtn" class="play-btn">
-                <i class="fas fa-play"></i>
-              </button>
-              <div class="volume-control">
-                <i class="fas fa-volume-up"></i>
-                <input type="range" id="volumeSlider" min="0" max="100" value="100" class="volume-slider">
-              </div>
-            </div>
-            <div class="visualizer">
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-            </div>
-            <audio id="audioPlayer" preload="none">
-              <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-              Tu navegador no soporta la reproducción de audio.
-            </audio>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <audio id="audio" preload="metadata">
+    <source src=""https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+    Tu navegador no soporta la reproducción de audio.
+  </audio>
+
+  <div class="player-controls">
+    <span id="current-time">0:00</span>
+    <input type="range" id="seek-bar" value="0" min="0" step="1">
+    <span id="duration">0:00</span>
+  </div>
+
+  <div class="playback">
+    <button id="play-pause">
+      ▶️
+    </button>
+    <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="1">
+  </div>
+
+  <div class="waveform">
+    <!-- Visualizador simple con barras -->
+    <canvas id="waveCanvas"></canvas>
+  </div>
+</div>
+
+<style>
+.audio-player-container {
+  background-color: #111;
+  color: #ff8800;
+  padding: 20px;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+.player-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+#seek-bar {
+  flex-grow: 1;
+  accent-color: #ff8800;
+}
+
+.playback {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#volume-bar {
+  width: 100px;
+}
+
+.waveform {
+  width: 100%;
+  height: 60px;
+  background-color: #222;
+  margin-top: 10px;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+}
+</style>
+
+<script>
+const audio = document.getElementById("audio");
+const playPause = document.getElementById("play-pause");
+const seekBar = document.getElementById("seek-bar");
+const currentTimeEl = document.getElementById("current-time");
+const durationEl = document.getElementById("duration");
+const volumeBar = document.getElementById("volume-bar");
+const canvas = document.getElementById("waveCanvas");
+const ctx = canvas.getContext("2d");
+
+audio.addEventListener("loadedmetadata", () => {
+  seekBar.max = Math.floor(audio.duration);
+  durationEl.textContent = formatTime(audio.duration);
+});
+
+audio.addEventListener("timeupdate", () => {
+  seekBar.value = Math.floor(audio.currentTime);
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+  drawWaveform();
+});
+
+seekBar.addEventListener("input", () => {
+  audio.currentTime = seekBar.value;
+});
+
+playPause.addEventListener("click", () => {
+  if (audio.paused) {
+    audio.play();
+    playPause.textContent = "⏸️";
+  } else {
+    audio.pause();
+    playPause.textContent = "▶️";
+  }
+});
+
+volumeBar.addEventListener("input", () => {
+  audio.volume = volumeBar.value;
+});
+
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+}
+
+// Visualizador simple
+function drawWaveform() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const width = canvas.width / 50;
+  for (let i = 0; i < 50; i++) {
+    const height = Math.random() * canvas.height;
+    ctx.fillStyle = "#ff8800";
+    ctx.fillRect(i * width, canvas.height - height, width * 0.8, height);
+  }
+}
+
+// Ajustar canvas responsive
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  drawWaveform();
+}
+
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+</script>
 
   <!-- Social Media -->
   <section class="social-section">

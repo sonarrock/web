@@ -70,7 +70,7 @@
                     <!-- Mantén todo tu HTML tal cual hasta el reproductor -->
 <div id="streamStatus" class="stream-status">
   En Vivo Miércoles 21:00 
-  <span class="listeners-badge">Oyentes: <span id="listenersCount">0</span></span>
+ <p>👥 Oyentes en línea: <span id="listeners-count">0</span></p>
 </div>
 
 <!-- ESTILO DEL CONTADOR -->
@@ -373,25 +373,19 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="contador-oyentes">Oyentes: cargando...</div>
 
 <script>
-async function actualizarOyentes() {
+async function getListeners() {
   try {
-    const url = "https://api.zeno.fm/stations/ezq3fcuf5ehvv/nowplaying";
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Error al obtener datos");
-
+    const response = await fetch("https://api.zeno.fm/stations/ezq3fcuf5ehvv");
     const data = await response.json();
-    const oyentes = data.listeners ?? data.current_listeners ?? 0;
-
-    document.getElementById("contador-oyentes").innerText = `Oyentes: ${oyentes}`;
-  } catch (error) {
-    console.error("Error obteniendo oyentes:", error);
-    document.getElementById("contador-oyentes").innerText = "Oyentes: N/D";
+    document.getElementById("listeners-count").innerText =
+      data?.now_playing?.listeners?.total ?? "0";
+  } catch (err) {
+    console.error("Error obteniendo oyentes", err);
+    document.getElementById("listeners-count").innerText = "0";
   }
 }
-
-// Actualiza cada 30 segundos
-setInterval(actualizarOyentes, 30000);
-actualizarOyentes();
+setInterval(getListeners, 15000); // cada 15s
+getListeners();
 </script>
 </body>
 </html>

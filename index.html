@@ -370,22 +370,28 @@ document.addEventListener('DOMContentLoaded', function() {
       .catch(err => console.error("❌ Error al registrar Service Worker:", err));
   }
 </script>
-<div id="contador">👥 Oyentes: 0</div>
+<div id="contador-oyentes">Oyentes: cargando...</div>
 
 <script>
-async function getListeners() {
-    try {
-        const response = await fetch("listeners.php");
-        const data = await response.json();
-        document.getElementById("contador").innerText = `👥 Oyentes: ${data.listeners}`;
-    } catch (e) {
-        console.error("Error obteniendo oyentes", e);
-    }
+async function actualizarOyentes() {
+  try {
+    const url = "https://api.zeno.fm/stations/ezq3fcuf5ehvv/nowplaying";
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Error al obtener datos");
+
+    const data = await response.json();
+    const oyentes = data.listeners ?? data.current_listeners ?? 0;
+
+    document.getElementById("contador-oyentes").innerText = `Oyentes: ${oyentes}`;
+  } catch (error) {
+    console.error("Error obteniendo oyentes:", error);
+    document.getElementById("contador-oyentes").innerText = "Oyentes: N/D";
+  }
 }
 
-// Ejecutar al cargar y luego cada 15s
-getListeners();
-setInterval(getListeners, 15000);
+// Actualiza cada 30 segundos
+setInterval(actualizarOyentes, 30000);
+actualizarOyentes();
 </script>
 </body>
 </html>

@@ -101,68 +101,67 @@
     </div>
   </section>
 
- <!-- Embeds unificados -->
-<section class="embed-section">
-  <div class="container">
+<!-- Embeds -->
+  <section class="embed-section">
+    <div class="container" style="max-width: 650px; margin: auto;">
+      <h2 class="section-title" style="margin-bottom: 15px;">Escucha en Spotify</h2>
+      <div class="player-wrapper">
+        <iframe
+          src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
+          width="100%"
+          height="170"
+          frameborder="0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+          style="border-radius: 12px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.6);">
+        </iframe>
+      </div>
 
-    <!-- Spotify -->
-    <h2 class="section-title spotify-title">Escucha en Spotify</h2>
-    <div class="player-wrapper">
-      <iframe
-        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        loading="lazy">
-      </iframe>
-    </div>
-
-    <!-- iVoox -->
-    <h2 class="section-title ivoox-title">Escúchanos en iVoox</h2>
-    <div class="player-wrapper">
-      <iframe
-        src="https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=141c24&autoplay=false&episodes=1"
-        allowfullscreen
-        scrolling="no"
-        loading="lazy">
-      </iframe>
-    </div>
+    <h2 class="section-title" style="color: #FF6600; font-family: Arial, sans-serif; font-size: 20px;">Último episodio en iVoox</h2>
+    <div id="podcast-player" style="margin-bottom: 30px;"></div>
 
   </div>
 </section>
 
-<style>
-/* Contenedor general */
-.embed-section {
-  padding: 40px 0;
-  background-color: #000; /* Fondo negro */
-}
+<!-- Script para el reproductor de Ivoox -->
+<script>
+  async function loadPodcast() {
+    const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
+    try {
+      const response = await fetch(feedUrl);
+      const xmlText = await response.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, "text/xml");
 
-.container {
-  max-width: 650px;
-  margin: 0 auto;
-  padding: 0 15px;
-}
+      const item = xml.querySelector("item");
+      const title = item.querySelector("title").textContent;
+      const audioUrl = item.querySelector("enclosure").getAttribute("url");
+      const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
+      const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
 
-/* Títulos */
-.section-title {
-  font-family: Arial, sans-serif;
-  font-size: 20px;
-  margin-bottom: 15px;
-  text-align: center;
-}
+      const playerHTML = `
+        <div style="border:1px solid #333;border-radius:12px;padding:15px;background:#111;display:flex;gap:15px;align-items:flex-start;">
+          <img src="${imageUrl}" alt="Carátula del episodio" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">
+          <div style="flex:1;">
+            <h3 style="margin-top:0;margin-bottom:5px;font-family:Arial,sans-serif;font-size:16px;color:#FF6600;">${Title}</h3>
+            <p style="font-size:12px;color:#bbb;">Publicado el ${pubDate}</p>
+            <audio controls style="width:100%;margin-top:10px;">
+              <source src="${audioUrl}" type="audio/mpeg">
+              Tu navegador no soporta audio HTML5.
+            </audio>
+          </div>
+        </div>
+      `;
+      document.getElementById("podcast-player").innerHTML = playerHTML;
 
-.spotify-title {
-  color: #1DB954; /* Verde Spotify */
-}
+    } catch (error) {
+      document.getElementById("podcast-player").innerHTML = "<p>No se pudo cargar el episodio. Intenta más tarde.</p>";
+      console.error("Error cargando el feed:", error);
+    }
+  }
 
-.ivoox-title {
-  color: #FF6600; /* Naranja iVoox */
-}
-
-/* Wrapper para los players */
-.player-wrapper {
-  position: relative;
-  width: 100%;
-  padding-top: 56.25%; /* Aspect rati*
+  loadPodcast();
+</script>
 
   <!-- Staff Section -->
   <section class="staff-section">

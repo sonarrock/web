@@ -370,24 +370,24 @@ document.addEventListener('DOMContentLoaded', function() {
       .catch(err => console.error("❌ Error al registrar Service Worker:", err));
   }
 </script>
+<div id="contador">
+    Oyentes en vivo: <span id="listenerCount">0</span>
+  </div>
 
-    <script>
-async function getListeners() {
-    try {
-        const res = await fetch('contador.php'); // Archivo PHP en tu servidor
+  <script>
+    async function getListeners() {
+      try {
+        const res = await fetch("contador.php");
         const data = await res.json();
-        document.getElementById('listenersCount').textContent = data.listeners;
-    } catch (e) {
-        console.error('Error obteniendo oyentes', e);
+        document.getElementById("listenerCount").textContent = data.listeners;
+      } catch (err) {
+        console.error("Error obteniendo oyentes", err);
+      }
     }
-}
 
-// Llamar al cargar
-getListeners();
-
-// Actualizar cada 60 segundos
-setInterval(getListeners, 60000);
+    // Actualizar cada 15 segundos
+    setInterval(getListeners, 15000);
+    getListeners();
 </script>
-
 </body>
 </html>

@@ -143,7 +143,7 @@
         <div style="border:1px solid #333;border-radius:12px;padding:15px;background:#111;display:flex;gap:15px;align-items:flex-start;">
           <img src="${imageUrl}" alt="Carátula del episodio" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">
           <div style="flex:1;">
-            <h3 style="margin-top:0;margin-bottom:5px;font-family:Arial,sans-serif;font-size:16px;color:#FF6600;">${Escuhca en Ivoox}</h3>
+            <h3 style="margin-top:0;margin-bottom:5px;font-family:Arial,sans-serif;font-size:16px;color:#FF6600;">${Title}</h3>
             <p style="font-size:12px;color:#bbb;">Publicado el ${pubDate}</p>
             <audio controls style="width:100%;margin-top:10px;">
               <source src="${audioUrl}" type="audio/mpeg">
@@ -254,7 +254,7 @@
       bars.forEach(bar => bar.style.height = '5px');
     }
 
-    audioPlayer.volume = 0.5;
+    audioPlayer.volume = 1.0;
   });
   </script>
 

@@ -1,7 +1,5 @@
-// ==== Reproductor Sonar Rock ====
-// URL de tu streaming en Zeno
-const streamUrl = "https://stream.zeno.fm/ezq3fcuf5ehvv"; // <-- cámbialo por tu enlace real
 
+const streamUrl = "https://stream.zeno.fm/ezq3fcuf5ehvv"; //
 const container = document.getElementById("sonar-player");
 container.innerHTML = `
   <div class="status">🔴 En Vivo</div>

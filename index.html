@@ -117,19 +117,45 @@
         </iframe>
       </div>
 
-     <h2 class="section-title" style="margin: 30px 0 15px;">Escucha en iVoox</h2>
-<div id="podcast-player" class="player-wrapper">
-    <iframe 
-        src="https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=141c24" 
-        width="100%" 
-        height="400" 
-        frameborder="0" 
-        allowfullscreen 
-        scrolling="no" 
-        loading="lazy"
-        style="border-radius: 12px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.6);">
-    </iframe>
-</div>
+    <script>
+  async function loadPodcast() {
+    const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
+    try {
+      const response = await fetch(feedUrl);
+      const xmlText = await response.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, "text/xml");
+
+      const item = xml.querySelector("item");
+      const title = item.querySelector("title").textContent;
+      const audioUrl = item.querySelector("enclosure").getAttribute("url");
+      const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
+      const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
+
+      const playerHTML = `
+        <div style="border:1px solid #333;border-radius:12px;padding:15px;background:#111;display:flex;gap:15px;align-items:flex-start;">
+          <img src="${imageUrl}" alt="Carátula del episodio" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">
+          <div style="flex:1;">
+            <h3 style="margin-top:0;margin-bottom:5px;font-family:Arial,sans-serif;font-size:16px;color:#FF6600;">${title}</h3>
+            <p style="font-size:12px;color:#bbb;">Publicado el ${pubDate}</p>
+            <audio controls style="width:100%;margin-top:10px;">
+              <source src="${audioUrl}" type="audio/mpeg">
+              Tu navegador no soporta audio HTML5.
+            </audio>
+          </div>
+        </div>
+      `;
+      document.getElementById("podcast-player").innerHTML = playerHTML;
+
+    } catch (error) {
+      document.getElementById("podcast-player").innerHTML = "<p>No se pudo cargar el episodio. Intenta más tarde.</p>";
+      console.error("Error cargando el feed:", error);
+    }
+  }
+
+  loadPodcast();
+</script>
+
   
   <!-- Staff Section -->
   <section class="staff-section">

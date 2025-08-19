@@ -67,17 +67,52 @@
                         <div class="bar"></div>
                         <div class="bar"></div>
                     </div>
-                    <div id="streamStatus" class="stream-status">
-  En Vivo Miércoles 21:00 <span class="listeners-badge">Oyentes: <span id="listenersCount">0</span></span>
+                    <!-- Mantén todo tu HTML tal cual hasta el reproductor -->
+<div id="streamStatus" class="stream-status">
+  En Vivo Miércoles 21:00 
+  <span class="listeners-badge">Oyentes: <span id="listenersCount">0</span></span>
 </div>
-                    <audio id="audioPlayer" preload="auto">
-                        <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-                        Tu navegador no soporta audio.
-                    </audio>
-                </div>
-            </div>
-        </div>
-    </div>
+
+<!-- ESTILO DEL CONTADOR -->
+<style>
+.listeners-badge {
+  display: inline-block;
+  background-color: #FF6600;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 10px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+</style>
+
+<!-- SCRIPT DEL CONTADOR -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  async function getListeners() {
+    try {
+      const res = await fetch('contador.php'); // Asegúrate que la ruta sea correcta
+      const data = await res.json();
+      document.getElementById('listenersCount').textContent = data.listeners;
+    } catch (e) {
+      console.error('Error obteniendo oyentes', e);
+    }
+  }
+
+  // Llamar al cargar y actualizar cada 10 segundos
+  getListeners();
+  setInterval(getListeners, 10000);
+});
+</script>
+
 </section>
       </div>
 

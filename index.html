@@ -45,24 +45,213 @@
     <div class="container">
       <div class="main-image-container">
         <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
-<link href="https://reproductor.cimaspeed.com/radio1/myCast.min.css" type="text/css" rel="stylesheet">
-<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<div class="myCast" id="stream1" align="center"></div>
-<script src="https://reproductor.cimaspeed.com/radio1/myCast.min.js"></script>
+<div class="radio-player" role="region" aria-label="Reproductor Sonar Rock en vivo">
+  <div class="player-header">
+    <span class="live-dot" aria-hidden="true"></span>
+    <span class="live-text">En vivo Miércoles 21:00</span>
+  </div>
+
+  <!-- Visualizador -->
+  <canvas id="waveform" aria-hidden="true"></canvas>
+
+  <!-- Controles -->
+  <div class="player-controls">
+    <button class="play-btn" id="playPauseBtn" aria-label="Reproducir / Pausar">
+      <span id="playIcon">▶</span>
+      <span id="pauseIcon" style="display:none;">❚❚</span>
+    </button>
+  </div>
+
+  <!-- Volumen -->
+  <div class="volume-row">
+    <button class="vol-btn" id="muteBtn" aria-label="Silenciar / Activar sonido">🔊</button>
+    <input type="range" id="volumeRange" min="0" max="1" step="0.01" value="0.8" aria-label="Control de volumen">
+  </div>
+</div>
+
+<!-- STREAM AUDIO -->
+<audio id="audioPlayer" preload="none" crossorigin="anonymous">
+  <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+  Tu navegador no soporta audio HTML5.
+</audio>
+
+<style>
+/* Contenedor general */
+.radio-player{
+  background: rgba(0,0,0,0.7);
+  border-radius: 16px;
+  padding: 16px 18px;
+  max-width: 420px;
+  width: 100%;
+  margin: 20px auto;
+  text-align: center;
+  color:#fff;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+}
+
+/* Cabecera EN VIVO */
+.player-header{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin-bottom:12px;
+}
+.live-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:#ff8a00;
+  animation:blink 1s infinite;
+}
+.live-text{font-size:14px;font-weight:700}
+@keyframes blink{0%,50%,100%{opacity:1}25%,75%{opacity:0}}
+
+/* Visualizador */
+#waveform{width:100%;height:64px;display:block;margin:10px 0}
+
+/* Botón play/pausa */
+.player-controls{display:flex;justify-content:center;margin-top:6px}
+.play-btn{
+  background:#ff8a00;border:none;border-radius:50%;
+  width:68px;height:68px;cursor:pointer;
+  font-size:28px;color:#fff;display:flex;align-items:center;justify-content:center;
+  transition:transform .2s ease;
+}
+.play-btn:hover{transform:scale(1.06)}
+
+/* Volumen */
+.volume-row{
+  margin-top:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.vol-btn{
+  background:transparent;border:1px solid rgba(255,255,255,.2);
+  color:#fff;border-radius:10px;padding:6px 10px;cursor:pointer;
+}
+#volumeRange{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:8px;border-radius:999px;outline:none;
+  background:linear-gradient(to right,#ff8a00 80%, #3c3c3c 0);
+}
+#volumeRange::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:18px;height:18px;border-radius:50%;
+  background:#ff8a00;border:none;box-shadow:0 0 0 2px rgba(0,0,0,.25);
+  cursor:pointer;margin-top:-5px;
+}
+#volumeRange::-moz-range-thumb{
+  width:18px;height:18px;border:none;border-radius:50%;background:#ff8a00;cursor:pointer;
+}
+#volumeRange::-moz-range-track{
+  height:8px;background:transparent;border:none;
+}
+
+/* Responsive */
+@media (max-width:420px){
+  .play-btn{width:62px;height:62px;font-size:26px}
+  #waveform{height:56px}
+}
+</style>
+
 <script>
-    $("#stream1").myCast({
-        URL: "https://stream.zeno.fm/ezq3fcuf5ehvv",
-        version: "1",
-        artwork: true,
-        logo: "https://www.sonarrock.com/attached_assets/logo2_1749601460841.jpeg",
-        bg: "black", 
-        accent: "",
-        vertical_layout: false,
-        autoplay: true,
-        blur: true,
-        blur_opacity: 0.16,
-        lang: "es"
-    });
+const audio = document.getElementById("audioPlayer");
+const playBtn = document.getElementById("playPauseBtn");
+const playIcon = document.getElementById("playIcon");
+const pauseIcon = document.getElementById("pauseIcon");
+const canvas = document.getElementById("waveform");
+const ctx = canvas.getContext("2d");
+const volRange = document.getElementById("volumeRange");
+const muteBtn  = document.getElementById("muteBtn");
+
+// ---- Persistencia de volumen ----
+const SAVED_VOL = localStorage.getItem("sr_volume");
+if (SAVED_VOL !== null) {
+  audio.volume = parseFloat(SAVED_VOL);
+  volRange.value = audio.volume.toString();
+} else {
+  audio.volume = parseFloat(volRange.value);
+}
+updateRangeFill();
+
+// ---- Visualizador WebAudio ----
+let audioCtx, analyser, source, bufferLength, dataArray;
+function resizeCanvas(){ canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+resizeCanvas(); addEventListener("resize", resizeCanvas);
+
+function initAudioContext(){
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+  analyser.fftSize = 256;
+  bufferLength = analyser.frequencyBinCount;
+  dataArray = new Uint8Array(bufferLength);
+  drawWaveform();
+}
+
+function drawWaveform(){
+  requestAnimationFrame(drawWaveform);
+  if (!analyser) return;
+  analyser.getByteTimeDomainData(dataArray);
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#ff8a00";
+  ctx.beginPath();
+
+  const sliceWidth = canvas.width / bufferLength;
+  let x = 0;
+  for (let i=0;i<bufferLength;i++){
+    const v = dataArray[i]/128.0;
+    const y = (v * canvas.height)/2;
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    x += sliceWidth;
+  }
+  ctx.lineTo(canvas.width, canvas.height/2);
+  ctx.stroke();
+}
+
+// ---- Play / Pausa ----
+playBtn.addEventListener("click", async ()=>{
+  if (audio.paused){
+    initAudioContext();
+    try { await audio.play(); } catch(e){ console.log("Error al reproducir:", e); }
+    playIcon.style.display = "none";
+    pauseIcon.style.display = "inline";
+  } else {
+    audio.pause();
+    playIcon.style.display = "inline";
+    pauseIcon.style.display = "none";
+  }
+});
+
+// ---- Volumen + Mute ----
+function updateRangeFill(){
+  const val = (parseFloat(volRange.value)*100).toFixed(0);
+  volRange.style.background = `linear-gradient(to right,#ff8a00 ${val}%, #3c3c3c ${val}%)`;
+}
+volRange.addEventListener("input", ()=>{
+  audio.volume = parseFloat(volRange.value);
+  localStorage.setItem("sr_volume", audio.volume.toString());
+  updateRangeFill();
+  if (audio.volume === 0){ muteBtn.textContent = "🔇"; } else { muteBtn.textContent = "🔊"; }
+});
+
+muteBtn.addEventListener("click", ()=>{
+  if (audio.volume > 0){
+    muteBtn.dataset.prev = audio.volume.toString();
+    audio.volume = 0; volRange.value = "0";
+    muteBtn.textContent = "🔇";
+  } else {
+    const prev = parseFloat(muteBtn.dataset.prev || "0.8") || 0.8;
+    audio.volume = prev; volRange.value = audio.volume.toString();
+    muteBtn.textContent = "🔊";
+  }
+  localStorage.setItem("sr_volume", audio.volume.toString());
+  updateRangeFill();
+});
 </script>
 
 

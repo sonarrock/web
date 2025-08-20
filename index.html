@@ -191,7 +191,24 @@ function updateRangeFill(){
 }
 volRange.addEventListener("input", ()=>{
   audio.volume = parseFloat(volRange.value);
-  localStorage
+  localStorage.setItem("sr_volume", audio.volume);
+  updateRangeFill();
+  muteBtn.textContent = audio.volume === 0 ? "🔇" : "🔊";
+});
+muteBtn.addEventListener("click", ()=>{
+  if (audio.volume > 0){
+    muteBtn.dataset.prev = audio.volume;
+    audio.volume = 0; volRange.value = "0";
+    muteBtn.textContent = "🔇";
+  } else {
+    const prev = parseFloat(muteBtn.dataset.prev || "0.8");
+    audio.volume = prev; volRange.value = audio.volume;
+    muteBtn.textContent = "🔊";
+  }
+  localStorage.setItem("sr_volume", audio.volume);
+  updateRangeFill();
+});
+</script>
 
 
   <!-- Social Media -->

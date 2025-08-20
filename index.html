@@ -80,7 +80,7 @@
 </section>
 
 <style>
-/* 🔥 Mantengo tus estilos sin cambios importantes */
+/* Mismos estilos, se mantienen */
 .radio-player{
   background: rgba(0,0,0,0.7);
   border-radius: 16px;
@@ -123,6 +123,8 @@ const volRange = document.getElementById("volumeRange");
 const muteBtn  = document.getElementById("muteBtn");
 
 let audioCtx, analyser, source, bufferLength, dataArray, rafId;
+let useFakeVisualizer = false; // fallback flag
+let fakePhase = 0;
 
 // ---- Volumen persistente ----
 const SAVED_VOL = localStorage.getItem("sr_volume");
@@ -148,32 +150,55 @@ function initAudioContext(){
 
 function drawWaveform(){
   rafId = requestAnimationFrame(drawWaveform);
-  analyser.getByteTimeDomainData(dataArray);
+
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.lineWidth = 2;
   ctx.strokeStyle = "#ff8a00";
   ctx.beginPath();
-  const sliceWidth = canvas.width / bufferLength;
-  let x = 0;
-  for (let i=0;i<bufferLength;i++){
-    const v = dataArray[i]/128.0;
-    const y = (v * canvas.height)/2;
-    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-    x += sliceWidth;
+
+  if (useFakeVisualizer){
+    // --- Animación simulada ---
+    const sliceWidth = canvas.width / 60;
+    let x = 0;
+    fakePhase += 0.1;
+    for (let i=0;i<60;i++){
+      const y = (canvas.height/2) + Math.sin(i*0.3 + fakePhase)* (canvas.height/3);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      x += sliceWidth;
+    }
+  } else {
+    // --- Visualizador real ---
+    analyser.getByteTimeDomainData(dataArray);
+    const avg = dataArray.reduce((a,b)=>a+b,0)/bufferLength;
+    if (avg === 128){ 
+      // ⚠️ Datos planos → sin acceso real → fallback
+      useFakeVisualizer = true;
+    }
+
+    const sliceWidth = canvas.width / bufferLength;
+    let x = 0;
+    for (let i=0;i<bufferLength;i++){
+      const v = dataArray[i]/128.0;
+      const y = (v * canvas.height)/2;
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      x += sliceWidth;
+    }
   }
-  ctx.lineTo(canvas.width, canvas.height/2);
+
   ctx.stroke();
 }
 
 // ---- Play / Pausa ----
 playBtn.addEventListener("click", async ()=>{
   if (audio.paused){
-    initAudioContext();
+    if (!audioCtx){
+      initAudioContext();
+      try { await audioCtx.resume(); } catch(e){}
+    }
     try {
       await audio.play();
-      if (audioCtx.state === "suspended") await audioCtx.resume();
       drawWaveform();
-    } catch(e){ console.log("Error al reproducir:", e); }
+    } catch(e){ console.log("Error:", e); }
     playIcon.style.display = "none";
     pauseIcon.style.display = "inline";
   } else {
@@ -209,6 +234,7 @@ muteBtn.addEventListener("click", ()=>{
   updateRangeFill();
 });
 </script>
+
 
 
   <!-- Social Media -->

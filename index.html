@@ -157,12 +157,24 @@ function drawWaveform(){
   ctx.beginPath();
 
   if (useFakeVisualizer){
-    // --- Animación simulada ---
-    const sliceWidth = canvas.width / 60;
+    // --- Visualizador simulado con ruido, volumen y latido ---
+    const sliceWidth = canvas.width / 80;
     let x = 0;
-    fakePhase += 0.1;
-    for (let i=0;i<60;i++){
-      const y = (canvas.height/2) + Math.sin(i*0.3 + fakePhase)* (canvas.height/3);
+    fakePhase += 0.15;
+
+    // Escala según volumen actual (mín 0.2 para que no desaparezca)
+    const intensity = Math.max(audio.volume, 0.2);
+
+    // Pulso tipo “latido” (0.05 = velocidad del beat, 1.5 = fuerza)
+    const beat = (Math.sin(Date.now() * 0.005) * 0.5 + 1) * 1.5;
+
+    for (let i=0;i<80;i++){
+      // Onda base
+      let base = Math.sin(i*0.35 + fakePhase) * (canvas.height/3) * intensity * beat;
+      // Ruido aleatorio controlado
+      let noise = (Math.random() - 0.5) * (canvas.height/4) * intensity * beat;
+      // Posición final Y
+      const y = (canvas.height/2) + base + noise;
       i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
       x += sliceWidth;
     }
@@ -171,7 +183,7 @@ function drawWaveform(){
     analyser.getByteTimeDomainData(dataArray);
     const avg = dataArray.reduce((a,b)=>a+b,0)/bufferLength;
     if (avg === 128){ 
-      // ⚠️ Datos planos → sin acceso real → fallback
+      // ⚠️ Datos planos → fallback
       useFakeVisualizer = true;
     }
 

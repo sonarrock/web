@@ -247,12 +247,9 @@ muteBtn.addEventListener("click", ()=>{
 });
 </script>
 
-<div id="now-playing">Cargando canción...</div>
-
-<script>
 async function cargarMetadata() {
   try {
-    const response = await fetch("https://stream.zeno.fm/ezq3fcuf5ehvv?json=1");
+    const response = await fetch("https://api.zeno.fm/mounts/ezq3fcuf5ehvv/nowplaying");
     const data = await response.json();
 
     if (data.artist && data.title) {
@@ -263,13 +260,9 @@ async function cargarMetadata() {
     }
   } catch (error) {
     console.error("Error al cargar metadata:", error);
+    document.getElementById("now-playing").innerText = "No se pudo cargar canción";
   }
 }
-
-// Actualizar cada 20 segundos
-setInterval(cargarMetadata, 20000);
-cargarMetadata();
-</script>
 
 
 

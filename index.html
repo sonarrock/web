@@ -238,7 +238,7 @@ muteBtn.addEventListener("click", ()=>{
     audio.volume = 0; volRange.value = "0";
     muteBtn.textContent = "🔇";
   } else {
-    const prev = parseFloat(muteBtn.dataset.prev || "0.8");
+    const prev = parseFloat(muteBtn.dataset.prev || "0");
     audio.volume = prev; volRange.value = audio.volume;
     muteBtn.textContent = "🔊";
   }
@@ -246,24 +246,6 @@ muteBtn.addEventListener("click", ()=>{
   updateRangeFill();
 });
 </script>
-
-async function cargarMetadata() {
-  try {
-    const response = await fetch("https://api.zeno.fm/mounts/ezq3fcuf5ehvv/nowplaying");
-    const data = await response.json();
-
-    if (data.artist && data.title) {
-      document.getElementById("now-playing").innerText =
-        `🎵 ${data.artist} - ${data.title}`;
-    } else {
-      document.getElementById("now-playing").innerText = "🔴 Transmisión en vivo";
-    }
-  } catch (error) {
-    console.error("Error al cargar metadata:", error);
-    document.getElementById("now-playing").innerText = "No se pudo cargar canción";
-  }
-}
-
 
 
   <!-- Social Media -->

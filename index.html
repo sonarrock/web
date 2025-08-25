@@ -114,22 +114,24 @@ audio { display:none; }
 </head>
 <body>
 
-<div class="player">
-  <div class="en-vivo">En vivo Miércoles 21:00</div>
+<div id="sonar-player-container">
+  <div class="player">
+    <div class="en-vivo">En vivo Miércoles 21:00</div>
 
-  <audio id="cancion">
-    <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-    Tu navegador no soporta el audio.
-  </audio>
+    <audio id="cancion">
+      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+      Tu navegador no soporta el audio.
+    </audio>
 
-  <div class="controles">
-    <button id="play-btn"><i class="bi bi-play-circle-fill"></i></button>
-    <button id="pause-btn"><i class="bi bi-pause-circle-fill"></i></button>
-    <button id="mute-btn"><i class="bi bi-volume-mute-fill"></i></button>
+    <div class="controles">
+      <button id="play-btn"><i class="bi bi-play-circle-fill"></i></button>
+      <button id="pause-btn"><i class="bi bi-pause-circle-fill"></i></button>
+      <button id="mute-btn"><i class="bi bi-volume-mute-fill"></i></button>
+    </div>
   </div>
-</div>
 
-<canvas id="visualizer"></canvas>
+  <canvas id="visualizer"></canvas>
+</div>
 
 <script>
 const audio = document.getElementById("cancion");

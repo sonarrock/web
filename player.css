@@ -12,12 +12,12 @@
 #sonar-player-container .player {
   position: relative;
   text-align: center;
-  background: rgba(228, 228, 228, 0.30); /* blanco semitransparente */
+  background: rgba(228,228,228,0.30) !important;
   padding: 2% 3%;
   border-radius: 20px;
   box-shadow: 0 0 20px rgba(0,0,0,0.3);
   overflow: hidden;
-  background-image: url("img/background.jpg");
+  background-image: url("img/background.jpg") !important;
   background-size: cover;
   background-position: center;
 }

@@ -3,7 +3,7 @@
 /* Contenedor principal */
 #sonar-player-container {
   width: 100%;
-  max-width: 800px; /* Ajusta según tu diseño */
+  max-width: 900px; /* Ajusta según tu diseño */
   margin: 0 auto;
   position: relative;
 }

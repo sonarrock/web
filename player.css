@@ -82,7 +82,7 @@
 #sonar-player-container * {
   user-select: none;
 }
-
+  
 #sonar-player-container .en-vivo {
   position: absolute;
   top: 28%; /* un poco más abajo */

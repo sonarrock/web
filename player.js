@@ -1,72 +1,83 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const audio = document.getElementById("cancion");
-  const playBtn = document.getElementById("play-btn");
-  const pauseBtn = document.getElementById("pause-btn");
-  const muteBtn = document.getElementById("mute-btn");
-  const canvas = document.getElementById("visualizer");
-  const ctx = canvas.getContext("2d");
+// Selección de elementos
+const audio = document.getElementById('cancion');
+const playBtn = document.getElementById('play-btn');
+const pauseBtn = document.getElementById('pause-btn');
+const muteBtn = document.getElementById('mute-btn');
+const canvas = document.getElementById('visualizer');
+const ctx = canvas.getContext('2d');
 
-  function resizeCanvas() {
-    canvas.width = canvas.parentElement.offsetWidth;
-    canvas.height = canvas.parentElement.offsetHeight * 0.2; // 20% del contenedor
-  }
-  window.addEventListener("resize", resizeCanvas);
-  resizeCanvas();
+let audioCtx, analyser, source, dataArray, bufferLength;
+let animationId;
 
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-  playBtn.addEventListener("click", () => {
-    if(audioCtx.state === "suspended") audioCtx.resume();
-    audio.play().catch(err => console.log(err));
-  });
-  pauseBtn.addEventListener("click", () => audio.pause());
-  muteBtn.addEventListener("click", () => {
-    audio.muted = !audio.muted;
-    muteBtn.innerHTML = audio.muted 
-      ? `<i class="bi bi-volume-up-fill"></i>` 
-      : `<i class="bi bi-volume-mute-fill"></i>`;
-  });
-
-  const bufferLength = 512;
-  let previousY = new Array(bufferLength).fill(canvas.height/2);
-  let phase = 0;
-
-  function draw() {
-    requestAnimationFrame(draw);
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    const gradient = ctx.createLinearGradient(0,0,canvas.width,0);
-    gradient.addColorStop(0,'#ff6600');
-    gradient.addColorStop(0.5,'#ffcc66');
-    gradient.addColorStop(1,'#ff6600');
-    ctx.strokeStyle = gradient;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-
-    const sliceWidth = canvas.width / bufferLength;
-    let x = 0;
-    phase += 0.02;
-
-    for(let i=0;i<bufferLength;i++){
-      const y = canvas.height/2 + Math.sin(i/10 + phase)*canvas.height/4*0.9;
-      const smoothY = previousY[i]*0.8 + y*0.2;
-      if(i===0) ctx.moveTo(x,smoothY);
-      else ctx.lineTo(x,smoothY);
-      previousY[i] = smoothY;
-      x += sliceWidth;
-    }
-    ctx.lineTo(canvas.width, canvas.height/2);
-    ctx.stroke();
-
-    const brightness = audio.paused ? 0.1 : 0.5 + 0.3*Math.sin(phase*2);
-    ctx.shadowColor = `rgba(255,204,102,${brightness})`;
-    ctx.shadowBlur = 20*brightness;
-
-    const glowIntensity = audio.paused ? 0.2 : 0.5 + 0.2*Math.sin(phase*3);
-    document.querySelectorAll('#sonar-player-container .controles button').forEach(btn => {
-      btn.style.boxShadow = `0 0 30px 10px rgba(255,204,102,${glowIntensity})`;
-    });
-  }
-
-  draw();
+// Reproducir
+playBtn.addEventListener('click', () => {
+  if (!audioCtx) initAudioContext();
+  audio.play();
 });
+
+// Pausar
+pauseBtn.addEventListener('click', () => {
+  audio.pause();
+});
+
+// Mute
+muteBtn.addEventListener('click', () => {
+  audio.muted = !audio.muted;
+  muteBtn.style.color = audio.muted ? '#FF6600' : '#ffffff';
+});
+
+// Inicializa AudioContext y visualizador
+function initAudioContext() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+  analyser.fftSize = 2048;
+
+  bufferLength = analyser.fftSize;
+  dataArray = new Uint8Array(bufferLength);
+
+  drawVisualizer();
+}
+
+// Dibuja ondas en canvas
+function drawVisualizer() {
+  animationId = requestAnimationFrame(drawVisualizer);
+
+  analyser.getByteTimeDomainData(dataArray);
+
+  ctx.fillStyle = 'rgba(0,0,0,0)'; // fondo transparente
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#FF6600'; // color de la onda
+
+  ctx.beginPath();
+  const sliceWidth = canvas.width / bufferLength;
+  let x = 0;
+
+  for (let i = 0; i < bufferLength; i++) {
+    const v = dataArray[i] / 128.0;
+    const y = (v * canvas.height) / 2;
+
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+
+    x += sliceWidth;
+  }
+
+  ctx.lineTo(canvas.width, canvas.height / 2);
+  ctx.stroke();
+}
+
+// Ajusta canvas al tamaño de la ventana
+function resizeCanvas() {
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();

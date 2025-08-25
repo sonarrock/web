@@ -121,20 +121,24 @@ botones.forEach(btn => {
   });
 });
 
-#sonar-player-container .en-vivo {
-  position: absolute;
-  top: 28%; /* un poco más abajo */
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 1.2rem; /* base más chica */
-  font-weight: bold;
-  color: #ffffff;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-  z-index: 10;
-}
+const botones = document.querySelectorAll('#sonar-player-container .controles button');
 
-@media (max-width: 480px) {
-  #sonar-player-container .en-vivo {
-    font-size: 1rem; /* aún más pequeña en celulares */
-  }
-}
+botones.forEach(btn => {
+  btn.addEventListener('mousedown', () => {
+    btn.style.background = 'rgba(255,255,255,1)';
+    btn.style.color = '#ffffff';
+    btn.style.transform = 'scale(1.3)';
+  });
+
+  btn.addEventListener('mouseup', () => {
+    btn.style.background = 'rgba(255,255,255,0.8)';
+    btn.style.color = '#FF6600';
+    btn.style.transform = 'scale(1)';
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    btn.style.background = 'rgba(255,255,255,0.8)';
+    btn.style.color = '#FF6600';
+    btn.style.transform = 'scale(1)';
+  });
+});

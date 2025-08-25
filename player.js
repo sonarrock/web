@@ -64,6 +64,14 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 // --- EVENTOS DE BOTONES ---
+document.addEventListener("DOMContentLoaded", () => {
+    const playBtn = document.getElementById("play-btn");
+    if (playBtn) {
+        playBtn.addEventListener("click", () => {
+            // tu código de play aquí
+        });
+    }
+});
 
 playBtn.addEventListener('click', () => {
   initAudio(); // Inicializa visualizador y audio context

@@ -1,4 +1,3 @@
-/* Contenedor principal */
 #sonar-player-container {
   width: 100%;
   max-width: 900px;
@@ -9,20 +8,20 @@
 /* Player con imagen de fondo */
 #sonar-player-container .player {
   position: relative;
-  background: rgba(255, 255, 255, 0.25); /* fondo blanco semitransparente */
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 20px;
   box-shadow: 0 0 20px rgba(0,0,0,0.3);
   overflow: hidden;
   background-image: url("img/background.jpg");
   background-size: cover;
   background-position: center;
-  min-height: 500px; /* altura ajustable para que se vea la imagen */
+  min-height: 450px;
 }
 
-/* Letrero en vivo centrado */
+/* Letrero en vivo */
 #sonar-player-container .en-vivo {
   position: absolute;
-  top: 45%;
+  top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 1.5rem;
@@ -35,7 +34,7 @@
 /* Contenedor de botones centrado */
 #sonar-player-container .controles {
   position: absolute;
-  top: 50%; /* ajusta según necesites */
+  top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
@@ -73,16 +72,13 @@
 /* Canvas del visualizador */
 #sonar-player-container #visualizer {
   width: 100%;
-  height: 20px;
+  height: 60px;
   display: block;
-  margin-top: 120px; /* coloca visualizador debajo del reproductor */
+  margin-top: 370px;
   border-radius: 12px;
   z-index: 5;
 }
 
-/* Evita selección de texto */
 #sonar-player-container * {
   user-select: none;
 }
-
-

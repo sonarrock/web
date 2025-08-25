@@ -9,25 +9,8 @@ const ctx = canvas.getContext('2d');
 let audioCtx, analyser, source, dataArray, bufferLength;
 let animationId;
 
-// Reproducir
-playBtn.addEventListener('click', () => {
-  if (!audioCtx) initAudioContext();
-  audio.play();
-});
-
-// Pausar
-pauseBtn.addEventListener('click', () => {
-  audio.pause();
-});
-
-// Mute
-muteBtn.addEventListener('click', () => {
-  audio.muted = !audio.muted;
-  muteBtn.style.color = audio.muted ? '#FF6600' : '#ffffff';
-});
-
-// Inicializa AudioContext y visualizador
-function initAudioContext() {
+// Función para inicializar AudioContext y visualizador
+function initAudio() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioCtx.createAnalyser();
   source = audioCtx.createMediaElementSource(audio);
@@ -41,19 +24,41 @@ function initAudioContext() {
   drawVisualizer();
 }
 
-// Dibuja ondas en canvas
+// Play
+playBtn.addEventListener('click', () => {
+  if (!audioCtx) initAudio();
+
+  // Resume AudioContext si estaba suspendido (Chrome/Safari)
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+
+  audio.play().catch(e => console.error('Error al reproducir:', e));
+});
+
+// Pause
+pauseBtn.addEventListener('click', () => {
+  audio.pause();
+});
+
+// Mute
+muteBtn.addEventListener('click', () => {
+  audio.muted = !audio.muted;
+  muteBtn.style.color = audio.muted ? '#FF6600' : '#ffffff';
+});
+
+// Visualizador de ondas
 function drawVisualizer() {
   animationId = requestAnimationFrame(drawVisualizer);
 
   analyser.getByteTimeDomainData(dataArray);
 
-  ctx.fillStyle = 'rgba(0,0,0,0)'; // fondo transparente
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   ctx.lineWidth = 2;
-  ctx.strokeStyle = '#FF6600'; // color de la onda
-
+  ctx.strokeStyle = '#FF6600';
   ctx.beginPath();
+
   const sliceWidth = canvas.width / bufferLength;
   let x = 0;
 

@@ -1,152 +1,71 @@
-// Selección de elementos
-const audio = document.getElementById('cancion');
-const playBtn = document.getElementById('play-btn');
-const pauseBtn = document.getElementById('pause-btn');
-const muteBtn = document.getElementById('mute-btn');
-const canvas = document.getElementById('visualizer');
-const ctx = canvas.getContext('2d');
+// ===== Control de Audio =====
+const audio = document.getElementById("audio");
+const playBtn = document.getElementById("play-btn");
+const pauseBtn = document.getElementById("pause-btn");
+const muteBtn = document.getElementById("mute-btn");
+const nowPlaying = document.getElementById("now-playing");
 
-let audioCtx, analyser, source, dataArray, bufferLength;
-let animationId;
-
-// Inicializa AudioContext y visualizador, solo al primer click
-function initAudio() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-    analyser.fftSize = 2048;
-
-    bufferLength = analyser.fftSize;
-    dataArray = new Uint8Array(bufferLength);
-
-    drawVisualizer();
-  }
-}
-
-// Función de visualizador
-function drawVisualizer() {
-  animationId = requestAnimationFrame(drawVisualizer);
-
-  analyser.getByteTimeDomainData(dataArray);
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = '#FF6600';
-  ctx.beginPath();
-
-  const sliceWidth = canvas.width / bufferLength;
-  let x = 0;
-
-  for (let i = 0; i < bufferLength; i++) {
-    const v = dataArray[i] / 128.0;
-    const y = (v * canvas.height) / 2;
-
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-
-    x += sliceWidth;
-  }
-
-  ctx.lineTo(canvas.width, canvas.height / 2);
-  ctx.stroke();
-}
-
-// Ajusta canvas al tamaño de la ventana
-function resizeCanvas() {
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-// --- EVENTOS DE BOTONES ---
-document.addEventListener("DOMContentLoaded", () => {
-    const playBtn = document.getElementById("play-btn");
-    if (playBtn) {
-        playBtn.addEventListener("click", () => {
-            // tu código de play aquí
-        });
-    }
-});
-
-playBtn.addEventListener('click', () => {
-  initAudio(); // Inicializa visualizador y audio context
-  if (audioCtx.state === 'suspended') audioCtx.resume(); // Resume si estaba suspendido
-  audio.play().catch(e => console.error('Error al reproducir:', e));
-});
-
-pauseBtn.addEventListener('click', () => {
-  audio.pause();
-});
-
-muteBtn.addEventListener('click', () => {
+playBtn.addEventListener("click", () => audio.play());
+pauseBtn.addEventListener("click", () => audio.pause());
+muteBtn.addEventListener("click", () => {
   audio.muted = !audio.muted;
-  muteBtn.style.color = audio.muted ? '#FF6600' : '#ffffff';
+  muteBtn.textContent = audio.muted ? "🔊 Unmute" : "🔇 Mute";
 });
 
-playBtn.addEventListener('click', () => {
-  // Inicializa AudioContext solo al primer click
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-    analyser.fftSize = 2048;
+// ===== Animación Matrix Code Rain =====
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
 
-    bufferLength = analyser.fftSize;
-    dataArray = new Uint8Array(bufferLength);
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
 
-    drawVisualizer();
+const letters = "アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチッヂツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const lettersArr = letters.split("");
+
+const fontSize = 14;
+const columns = canvas.width / fontSize;
+const drops = Array(Math.floor(columns)).fill(1);
+
+function drawMatrix() {
+  ctx.fillStyle = "rgba(0,0,0,0.1)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#0F0";
+  ctx.font = fontSize + "px monospace";
+
+  for (let i = 0; i < drops.length; i++) {
+    const text = lettersArr[Math.floor(Math.random() * lettersArr.length)];
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
+    }
+    drops[i]++;
   }
+}
+setInterval(drawMatrix, 50);
 
-  if (audioCtx.state === 'suspended') audioCtx.resume(); // Resume inmediato
-  audio.play().catch(e => console.error('Error al reproducir:', e));
-});
-const botones = document.querySelectorAll('#sonar-player-container .controles button');
+// ===== Metadatos desde Zeno.fm =====
+async function cargarMetadata() {
+  try {
+    const response = await fetch("https://stream.zeno.fm/ezq3fcuf5ehvv?json=1");
+    const data = await response.json();
+    if (data.artist && data.title) {
+      nowPlaying.textContent = `${data.artist} - ${data.title}`;
+    } else if (data.title) {
+      nowPlaying.textContent = data.title;
+    } else {
+      nowPlaying.textContent = "Transmitiendo en vivo...";
+    }
+  } catch (e) {
+    nowPlaying.textContent = "Cargando canción...";
+  }
+}
+setInterval(cargarMetadata, 10000);
+cargarMetadata();
 
-botones.forEach(btn => {
-  btn.addEventListener('mousedown', () => {
-    btn.style.background = 'rgba(255,255,255,1)';
-    btn.style.color = '#ffffff';
-    btn.style.transform = 'scale(1.3)';
-  });
-
-  btn.addEventListener('mouseup', () => {
-    btn.style.background = 'rgba(255,255,255,0.8)';
-    btn.style.color = '#FF6600';
-    btn.style.transform = 'scale(1)';
-  });
-
-  btn.addEventListener('mouseleave', () => {
-    btn.style.background = 'rgba(255,255,255,0.8)';
-    btn.style.color = '#FF6600';
-    btn.style.transform = 'scale(1)';
-  });
-});
-
-const botones = document.querySelectorAll('#sonar-player-container .controles button');
-
-botones.forEach(btn => {
-  btn.addEventListener('mousedown', () => {
-    btn.style.background = 'rgba(255,255,255,1)';
-    btn.style.color = '#ffffff';
-    btn.style.transform = 'scale(1.3)';
-  });
-
-  btn.addEventListener('mouseup', () => {
-    btn.style.background = 'rgba(255,255,255,0.8)';
-    btn.style.color = '#FF6600';
-    btn.style.transform = 'scale(1)';
-  });
-
-  btn.addEventListener('mouseleave', () => {
-    btn.style.background = 'rgba(255,255,255,0.8)';
-    btn.style.color = '#FF6600';
-    btn.style.transform = 'scale(1)';
-  });
+// Ajustar tamaño del canvas si la ventana cambia
+window.addEventListener("resize", () => {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
 });

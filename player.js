@@ -79,3 +79,24 @@ muteBtn.addEventListener('click', () => {
   audio.muted = !audio.muted;
   muteBtn.style.color = audio.muted ? '#FF6600' : '#ffffff';
 });
+
+playBtn.addEventListener('click', () => {
+  // Inicializa AudioContext solo al primer click
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    analyser.fftSize = 2048;
+
+    bufferLength = analyser.fftSize;
+    dataArray = new Uint8Array(bufferLength);
+
+    drawVisualizer();
+  }
+
+  if (audioCtx.state === 'suspended') audioCtx.resume(); // Resume inmediato
+  audio.play().catch(e => console.error('Error al reproducir:', e));
+});
+

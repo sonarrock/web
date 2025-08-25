@@ -1,4 +1,3 @@
-// Selección de elementos
 const audio = document.getElementById('cancion');
 const playBtn = document.getElementById('play-btn');
 const pauseBtn = document.getElementById('pause-btn');
@@ -9,7 +8,7 @@ const ctx = canvas.getContext('2d');
 let audioCtx, analyser, source, dataArray, bufferLength;
 let animationId;
 
-// Función para inicializar AudioContext y visualizador
+// Inicializa AudioContext y visualizador
 function initAudio() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioCtx.createAnalyser();
@@ -27,12 +26,7 @@ function initAudio() {
 // Play
 playBtn.addEventListener('click', () => {
   if (!audioCtx) initAudio();
-
-  // Resume AudioContext si estaba suspendido (Chrome/Safari)
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-
+  if (audioCtx.state === 'suspended') audioCtx.resume();
   audio.play().catch(e => console.error('Error al reproducir:', e));
 });
 
@@ -50,11 +44,9 @@ muteBtn.addEventListener('click', () => {
 // Visualizador de ondas
 function drawVisualizer() {
   animationId = requestAnimationFrame(drawVisualizer);
-
   analyser.getByteTimeDomainData(dataArray);
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   ctx.lineWidth = 2;
   ctx.strokeStyle = '#FF6600';
   ctx.beginPath();
@@ -66,11 +58,8 @@ function drawVisualizer() {
     const v = dataArray[i] / 128.0;
     const y = (v * canvas.height) / 2;
 
-    if (i === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
-    }
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
 
     x += sliceWidth;
   }

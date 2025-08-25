@@ -40,212 +40,175 @@
     </div>
   </header>
 
-<!-- PLAYER -->
-<section class="main-section">
-  <div class="container">
-    <div class="main-image-container">
-      <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reproductor Sonar Rock</title>
 
-      <div class="radio-player" role="region" aria-label="Reproductor Sonar Rock en vivo">
-        <div class="player-header">
-          <span class="live-dot" aria-hidden="true"></span>
-          <span class="live-text">En vivo Miércoles 21:00</span>
-        </div>
-
-        <!-- Visualizador -->
-        <canvas id="waveform" aria-hidden="true"></canvas>
-
-        <!-- Controles -->
-        <div class="player-controls">
-          <button class="play-btn" id="playPauseBtn" aria-label="Reproducir / Pausar">
-            <span id="playIcon">▶</span>
-            <span id="pauseIcon" style="display:none;">❚❚</span>
-          </button>
-        </div>
-
-        <!-- Volumen -->
-        <div class="volume-row">
-          <button class="vol-btn" id="muteBtn" aria-label="Silenciar / Activar sonido">🔊</button>
-          <input type="range" id="volumeRange" min="0" max="1" step="0.01" value="0.8" aria-label="Control de volumen">
-        </div>
-      </div>
-
-      <!-- STREAM AUDIO -->
-      <audio id="audioPlayer" preload="metadata" playsinline crossorigin="anonymous">
-        <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-        Tu navegador no soporta audio HTML5.
-      </audio>
-    </div>
-  </div>
-</section>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+/>
 
 <style>
-/* Mismos estilos, se mantienen */
-.radio-player{
-  background: rgba(0,0,0,0.7);
-  border-radius: 16px;
-  padding: 16px 18px;
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: 20px;
-  color:#fff;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+html, body { margin:0; padding:0; height:100%; }
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url("img/background.jpg") no-repeat center center/cover;
+  font-family: Arial, sans-serif;
+  color: white;
+  overflow: hidden;
 }
-.player-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.live-dot{width:10px;height:10px;border-radius:50%;background:#ff8a00;animation:blink 1s infinite;}
-.live-text{font-size:14px;font-weight:700}
-@keyframes blink{0%,50%,100%{opacity:1}25%,75%{opacity:0}}
-#waveform{width:100%;height:70px;display:block;margin:10px 0}
-.player-controls{display:flex;justify-content:center;margin-top:6px}
-.play-btn{background:#ff8a00;border:none;border-radius:50%;width:70px;height:70px;
-  cursor:pointer;font-size:30px;color:#fff;display:flex;align-items:center;justify-content:center;
-  transition:transform .2s ease;}
-.play-btn:hover{transform:scale(1.06)}
-.volume-row{margin-top:14px;display:flex;align-items:center;gap:10px;}
-.vol-btn{background:transparent;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:10px;
-  padding:6px 10px;cursor:pointer;}
-#volumeRange{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:999px;outline:none;
-  background:linear-gradient(to right,#ff8a00 80%, #3c3c3c 0);}
-#volumeRange::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
-  background:#ff8a00;border:none;cursor:pointer;margin-top:-5px;}
-#volumeRange::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:#ff8a00;cursor:pointer;}
+
+.player {
+  position: relative;
+  text-align: center;
+  background: rgba(0,0,0,0.5);
+  padding: 20px 40px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  z-index: 1;
+  width: 70%;
+  max-width: 900px;
+}
+
+.en-vivo { font-size:1.2rem; color:#ffcc66; margin-bottom:15px; }
+
+.controles {
+  display:flex;
+  justify-content:center;
+  gap:30px;
+  position: relative;
+  z-index: 2;
+}
+
+.controles button {
+  background:none;
+  border:none;
+  color:white;
+  font-size:3.5rem;
+  cursor:pointer;
+  transition: transform 0.2s, color 0.2s, box-shadow 0.3s;
+  border-radius: 50%;
+}
+
+.controles button:hover { transform:scale(1.2); color:#ff6600; }
+.controles button:active { transform:scale(1.5); }
+
+audio { display:none; }
+
+#visualizer {
+  position:absolute;
+  bottom:10px;
+  left:0;
+  width:100%;
+  height:140px;
+  z-index:0;
+}
 </style>
+</head>
+<body>
+
+<div class="player">
+  <div class="en-vivo">En vivo Miércoles 21:00</div>
+
+  <audio id="cancion">
+    <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+    Tu navegador no soporta el audio.
+  </audio>
+
+  <div class="controles">
+    <button id="play-btn"><i class="bi bi-play-circle-fill"></i></button>
+    <button id="pause-btn"><i class="bi bi-pause-circle-fill"></i></button>
+    <button id="mute-btn"><i class="bi bi-volume-mute-fill"></i></button>
+  </div>
+</div>
+
+<canvas id="visualizer"></canvas>
 
 <script>
-const audio = document.getElementById("audioPlayer");
-const playBtn = document.getElementById("playPauseBtn");
-const playIcon = document.getElementById("playIcon");
-const pauseIcon = document.getElementById("pauseIcon");
-const canvas = document.getElementById("waveform");
+const audio = document.getElementById("cancion");
+const playBtn = document.getElementById("play-btn");
+const pauseBtn = document.getElementById("pause-btn");
+const muteBtn = document.getElementById("mute-btn");
+const canvas = document.getElementById("visualizer");
 const ctx = canvas.getContext("2d");
-const volRange = document.getElementById("volumeRange");
-const muteBtn  = document.getElementById("muteBtn");
 
-let audioCtx, analyser, source, bufferLength, dataArray, rafId;
-let useFakeVisualizer = false; // fallback flag
-let fakePhase = 0;
-
-// ---- Volumen persistente ----
-const SAVED_VOL = localStorage.getItem("sr_volume");
-audio.volume = SAVED_VOL ? parseFloat(SAVED_VOL) : parseFloat(volRange.value);
-volRange.value = audio.volume;
-updateRangeFill();
-
-// ---- Visualizador ----
-function resizeCanvas(){ canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
-resizeCanvas(); window.addEventListener("resize", resizeCanvas);
-
-function initAudioContext(){
-  if (audioCtx) return;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  source = audioCtx.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-  analyser.fftSize = 256;
-  bufferLength = analyser.frequencyBinCount;
-  dataArray = new Uint8Array(bufferLength);
+// Ajustar canvas
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = 140;
 }
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
-function drawWaveform(){
-  rafId = requestAnimationFrame(drawWaveform);
+// AudioContext para reproducir audio
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+playBtn.addEventListener("click", () => {
+  if(audioCtx.state === "suspended") audioCtx.resume();
+  audio.play().catch(err => console.log(err));
+});
+pauseBtn.addEventListener("click", () => audio.pause());
+muteBtn.addEventListener("click", () => {
+  audio.muted = !audio.muted;
+  muteBtn.innerHTML = audio.muted 
+    ? `<i class="bi bi-volume-up-fill"></i>` 
+    : `<i class="bi bi-volume-mute-fill"></i>`;
+});
+
+// Ondas simuladas
+const bufferLength = 512;
+let previousY = new Array(bufferLength).fill(canvas.height/2);
+
+function draw() {
+  requestAnimationFrame(draw);
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = "#ff8a00";
+
+  // Visualizador tipo ondas
+  const gradient = ctx.createLinearGradient(0,0,canvas.width,0);
+  gradient.addColorStop(0,'#ff6600');
+  gradient.addColorStop(0.5,'#ffcc66');
+  gradient.addColorStop(1,'#ff6600');
+  ctx.strokeStyle = gradient;
+  ctx.lineWidth = 3;
   ctx.beginPath();
 
-  if (useFakeVisualizer){
-    // --- Visualizador simulado con ruido, volumen y latido ---
-    const sliceWidth = canvas.width / 80;
-    let x = 0;
-    fakePhase += 0.15;
-
-    // Escala según volumen actual (mín 0.2 para que no desaparezca)
-    const intensity = Math.max(audio.volume, 0.2);
-
-    // Pulso tipo “latido” (0.05 = velocidad del beat, 1.5 = fuerza)
-    const beat = (Math.sin(Date.now() * 0.005) * 0.5 + 1) * 1.5;
-
-    for (let i=0;i<80;i++){
-      // Onda base
-      let base = Math.sin(i*0.35 + fakePhase) * (canvas.height/3) * intensity * beat;
-      // Ruido aleatorio controlado
-      let noise = (Math.random() - 0.5) * (canvas.height/4) * intensity * beat;
-      // Posición final Y
-      const y = (canvas.height/2) + base + noise;
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-      x += sliceWidth;
-    }
-  } else {
-    // --- Visualizador real ---
-    analyser.getByteTimeDomainData(dataArray);
-    const avg = dataArray.reduce((a,b)=>a+b,0)/bufferLength;
-    if (avg === 128){ 
-      // ⚠️ Datos planos → fallback
-      useFakeVisualizer = true;
-    }
-
-    const sliceWidth = canvas.width / bufferLength;
-    let x = 0;
-    for (let i=0;i<bufferLength;i++){
-      const v = dataArray[i]/128.0;
-      const y = (v * canvas.height)/2;
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-      x += sliceWidth;
-    }
+  const sliceWidth = canvas.width / bufferLength;
+  let x = 0;
+  for(let i=0;i<bufferLength;i++){
+    const rand = Math.random()*0.4 + 0.8;
+    const y = canvas.height/2 + Math.sin(i/10 + Date.now()/300)*canvas.height/4*rand;
+    const smoothY = previousY[i]*0.7 + y*0.3;
+    if(i===0) ctx.moveTo(x,smoothY);
+    else ctx.lineTo(x,smoothY);
+    previousY[i] = smoothY;
+    x += sliceWidth;
   }
-
+  ctx.lineTo(canvas.width, canvas.height/2);
   ctx.stroke();
+
+  // Brillo del visualizador
+  const brightness = audio.paused ? 0.1 : 0.6 + Math.random()*0.4;
+  ctx.shadowColor = `rgba(255,204,102,${brightness})`;
+  ctx.shadowBlur = 20*brightness;
+
+  // Resplandor radial detrás de botones
+  const glowIntensity = audio.paused ? 0.2 : 0.7 + Math.random()*0.3;
+  document.querySelectorAll('.controles button').forEach(btn => {
+    btn.style.boxShadow = `0 0 30px 10px rgba(255,204,102,${glowIntensity})`;
+  });
 }
 
-// ---- Play / Pausa ----
-playBtn.addEventListener("click", async ()=>{
-  if (audio.paused){
-    if (!audioCtx){
-      initAudioContext();
-      try { await audioCtx.resume(); } catch(e){}
-    }
-    try {
-      await audio.play();
-      drawWaveform();
-    } catch(e){ console.log("Error:", e); }
-    playIcon.style.display = "none";
-    pauseIcon.style.display = "inline";
-  } else {
-    audio.pause();
-    if (rafId) cancelAnimationFrame(rafId);
-    playIcon.style.display = "inline";
-    pauseIcon.style.display = "none";
-  }
-});
-
-// ---- Volumen + Mute ----
-function updateRangeFill(){
-  const val = (parseFloat(volRange.value)*100).toFixed(0);
-  volRange.style.background = `linear-gradient(to right,#ff8a00 ${val}%, #3c3c3c ${val}%)`;
-}
-volRange.addEventListener("input", ()=>{
-  audio.volume = parseFloat(volRange.value);
-  localStorage.setItem("sr_volume", audio.volume);
-  updateRangeFill();
-  muteBtn.textContent = audio.volume === 0 ? "🔇" : "🔊";
-});
-muteBtn.addEventListener("click", ()=>{
-  if (audio.volume > 0){
-    muteBtn.dataset.prev = audio.volume;
-    audio.volume = 0; volRange.value = "0";
-    muteBtn.textContent = "🔇";
-  } else {
-    const prev = parseFloat(muteBtn.dataset.prev || "0");
-    audio.volume = prev; volRange.value = audio.volume;
-    muteBtn.textContent = "🔊";
-  }
-  localStorage.setItem("sr_volume", audio.volume);
-  updateRangeFill();
-});
+draw();
 </script>
+</body>
+</html>
 
 
   <!-- Social Media -->

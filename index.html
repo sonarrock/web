@@ -46,206 +46,27 @@
     <div class="main-image-container">
       <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
 
-      <div class="radio-player" role="region" aria-label="Reproductor Sonar Rock en vivo">
-        <div class="player-header">
-          <span class="live-dot" aria-hidden="true"></span>
-          <span class="live-text">En vivo Miércoles 21:00</span>
-        </div>
+     <div id="sonar-player-container">
+  <div class="player">
+    <div class="en-vivo">En vivo Miércoles 21:00</div>
 
-        <!-- Visualizador -->
-        <canvas id="waveform" aria-hidden="true"></canvas>
+    <audio id="cancion">
+      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+      Tu navegador no soporta el audio.
+    </audio>
 
-        <!-- Controles -->
-        <div class="player-controls">
-          <button class="play-btn" id="playPauseBtn" aria-label="Reproducir / Pausar">
-            <span id="playIcon">▶</span>
-            <span id="pauseIcon" style="display:none;">❚❚</span>
-          </button>
-        </div>
-
-        <!-- Volumen -->
-        <div class="volume-row">
-          <button class="vol-btn" id="muteBtn" aria-label="Silenciar / Activar sonido">🔊</button>
-          <input type="range" id="volumeRange" min="0" max="1" step="0.01" value="0.8" aria-label="Control de volumen">
-        </div>
-      </div>
-
-      <!-- STREAM AUDIO -->
-      <audio id="audioPlayer" preload="metadata" playsinline crossorigin="anonymous">
-        <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-        Tu navegador no soporta audio HTML5.
-      </audio>
+    <div class="controles">
+      <button id="play-btn"><i class="bi bi-play-circle-fill"></i></button>
+      <button id="pause-btn"><i class="bi bi-pause-circle-fill"></i></button>
+      <button id="mute-btn"><i class="bi bi-volume-mute-fill"></i></button>
     </div>
   </div>
-</section>
 
-<style>
-/* Mismos estilos, se mantienen */
-.radio-player{
-  background: rgba(0,0,0,0.7);
-  border-radius: 16px;
-  padding: 16px 18px;
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: 20px;
-  color:#fff;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  box-shadow: 0 4px 16px rgba(0,0,0,.5);
-}
-.player-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.live-dot{width:10px;height:10px;border-radius:50%;background:#ff8a00;animation:blink 1s infinite;}
-.live-text{font-size:14px;font-weight:700}
-@keyframes blink{0%,50%,100%{opacity:1}25%,75%{opacity:0}}
-#waveform{width:100%;height:70px;display:block;margin:10px 0}
-.player-controls{display:flex;justify-content:center;margin-top:6px}
-.play-btn{background:#ff8a00;border:none;border-radius:50%;width:70px;height:70px;
-  cursor:pointer;font-size:30px;color:#fff;display:flex;align-items:center;justify-content:center;
-  transition:transform .2s ease;}
-.play-btn:hover{transform:scale(1.06)}
-.volume-row{margin-top:14px;display:flex;align-items:center;gap:10px;}
-.vol-btn{background:transparent;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:10px;
-  padding:6px 10px;cursor:pointer;}
-#volumeRange{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:999px;outline:none;
-  background:linear-gradient(to right,#ff8a00 80%, #3c3c3c 0);}
-#volumeRange::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
-  background:#ff8a00;border:none;cursor:pointer;margin-top:-5px;}
-#volumeRange::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:#ff8a00;cursor:pointer;}
-</style>
+  <canvas id="visualizer"></canvas>
+</div>
 
-<script>
-const audio = document.getElementById("audioPlayer");
-const playBtn = document.getElementById("playPauseBtn");
-const playIcon = document.getElementById("playIcon");
-const pauseIcon = document.getElementById("pauseIcon");
-const canvas = document.getElementById("waveform");
-const ctx = canvas.getContext("2d");
-const volRange = document.getElementById("volumeRange");
-const muteBtn  = document.getElementById("muteBtn");
-
-let audioCtx, analyser, source, bufferLength, dataArray, rafId;
-let useFakeVisualizer = false; // fallback flag
-let fakePhase = 0;
-
-// ---- Volumen persistente ----
-const SAVED_VOL = localStorage.getItem("sr_volume");
-audio.volume = SAVED_VOL ? parseFloat(SAVED_VOL) : parseFloat(volRange.value);
-volRange.value = audio.volume;
-updateRangeFill();
-
-// ---- Visualizador ----
-function resizeCanvas(){ canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
-resizeCanvas(); window.addEventListener("resize", resizeCanvas);
-
-function initAudioContext(){
-  if (audioCtx) return;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  source = audioCtx.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-  analyser.fftSize = 256;
-  bufferLength = analyser.frequencyBinCount;
-  dataArray = new Uint8Array(bufferLength);
-}
-
-function drawWaveform(){
-  rafId = requestAnimationFrame(drawWaveform);
-
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = "#ff8a00";
-  ctx.beginPath();
-
-  if (useFakeVisualizer){
-    // --- Visualizador simulado con ruido, volumen y latido ---
-    const sliceWidth = canvas.width / 80;
-    let x = 0;
-    fakePhase += 0.15;
-
-    // Escala según volumen actual (mín 0.2 para que no desaparezca)
-    const intensity = Math.max(audio.volume, 0.2);
-
-    // Pulso tipo “latido” (0.05 = velocidad del beat, 1.5 = fuerza)
-    const beat = (Math.sin(Date.now() * 0.005) * 0.5 + 1) * 1.5;
-
-    for (let i=0;i<80;i++){
-      // Onda base
-      let base = Math.sin(i*0.35 + fakePhase) * (canvas.height/3) * intensity * beat;
-      // Ruido aleatorio controlado
-      let noise = (Math.random() - 0.5) * (canvas.height/4) * intensity * beat;
-      // Posición final Y
-      const y = (canvas.height/2) + base + noise;
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-      x += sliceWidth;
-    }
-  } else {
-    // --- Visualizador real ---
-    analyser.getByteTimeDomainData(dataArray);
-    const avg = dataArray.reduce((a,b)=>a+b,0)/bufferLength;
-    if (avg === 128){ 
-      // ⚠️ Datos planos → fallback
-      useFakeVisualizer = true;
-    }
-
-    const sliceWidth = canvas.width / bufferLength;
-    let x = 0;
-    for (let i=0;i<bufferLength;i++){
-      const v = dataArray[i]/128.0;
-      const y = (v * canvas.height)/2;
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-      x += sliceWidth;
-    }
-  }
-
-  ctx.stroke();
-}
-
-// ---- Play / Pausa ----
-playBtn.addEventListener("click", async ()=>{
-  if (audio.paused){
-    if (!audioCtx){
-      initAudioContext();
-      try { await audioCtx.resume(); } catch(e){}
-    }
-    try {
-      await audio.play();
-      drawWaveform();
-    } catch(e){ console.log("Error:", e); }
-    playIcon.style.display = "none";
-    pauseIcon.style.display = "inline";
-  } else {
-    audio.pause();
-    if (rafId) cancelAnimationFrame(rafId);
-    playIcon.style.display = "inline";
-    pauseIcon.style.display = "none";
-  }
-});
-
-// ---- Volumen + Mute ----
-function updateRangeFill(){
-  const val = (parseFloat(volRange.value)*100).toFixed(0);
-  volRange.style.background = `linear-gradient(to right,#ff8a00 ${val}%, #3c3c3c ${val}%)`;
-}
-volRange.addEventListener("input", ()=>{
-  audio.volume = parseFloat(volRange.value);
-  localStorage.setItem("sr_volume", audio.volume);
-  updateRangeFill();
-  muteBtn.textContent = audio.volume === 0 ? "🔇" : "🔊";
-});
-muteBtn.addEventListener("click", ()=>{
-  if (audio.volume > 0){
-    muteBtn.dataset.prev = audio.volume;
-    audio.volume = 0; volRange.value = "0";
-    muteBtn.textContent = "🔇";
-  } else {
-    const prev = parseFloat(muteBtn.dataset.prev || "0");
-    audio.volume = prev; volRange.value = audio.volume;
-    muteBtn.textContent = "🔊";
-  }
-  localStorage.setItem("sr_volume", audio.volume);
-  updateRangeFill();
-});
-</script>
+<link rel="stylesheet" href="css/player.css">
+<script src="js/player.js" defer></script>
 
 
   <!-- Social Media -->

@@ -1,0 +1,109 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif;
+}
+
+:root {
+  --naranja:rgba(255, 87, 34, 0.8);
+  
+} 
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background-image: url("./img/background.jpg") !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: cover !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px);
+-webkit-backdrop-filter: blur(8px);
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+}
+
+
+
+
+.reproductor-music {
+  background: rgba(228,228,228,0.2);
+  padding: 20px;
+  border-radius: 10px;
+  color: #df620f;
+  text-align: center;
+  position: relative;
+  line-height: 1.8;
+}
+
+.reproductor-music p {
+  margin-bottom: 20px;
+  font-size: 1.0rem;
+  font width: 400;
+  opacity: 0.8;
+}
+
+.controles button {
+  font-size: 2.5rem;
+  margin: 10px;
+  cursor: pointer;
+  background: transparent;
+  border: 3px solid rgba(255, 255, 255, 0.3); 
+  border-radius: 50%;
+  width: 45x;
+  height: 45px;
+  color:  #df620f;
+}
+
+.controles .control :hover  {
+  background: var(--naranja);
+  border-color: var(--naranja);
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+#progreso {
+appearance: none;
+-webkit-appearance: none;
+width: 100%;
+height: 7px;
+background: rgba(165, 165, 165, 0.4);
+border-radius: 4px;
+margin: 32px 0 24px;
+cursor: pointer;
+}
+
+#progreso::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #df620f;
+  border-radius: 50%;
+  cursor: pointer;
+  outline: 4px solid rgba(228, 228, 228, 0.5);
+  transition: background 0.3s ease;
+}
+
+/* Canvas visualizer */
+#visualizer {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  height: 100px;
+}

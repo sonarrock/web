@@ -99,4 +99,25 @@ playBtn.addEventListener('click', () => {
   if (audioCtx.state === 'suspended') audioCtx.resume(); // Resume inmediato
   audio.play().catch(e => console.error('Error al reproducir:', e));
 });
+const botones = document.querySelectorAll('#sonar-player-container .controles button');
+
+botones.forEach(btn => {
+  btn.addEventListener('mousedown', () => {
+    btn.style.background = 'rgba(255,255,255,1)';
+    btn.style.color = '#ffffff';
+    btn.style.transform = 'scale(1.3)';
+  });
+
+  btn.addEventListener('mouseup', () => {
+    btn.style.background = 'rgba(255,255,255,0.8)';
+    btn.style.color = '#FF6600';
+    btn.style.transform = 'scale(1)';
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    btn.style.background = 'rgba(255,255,255,0.8)';
+    btn.style.color = '#FF6600';
+    btn.style.transform = 'scale(1)';
+  });
+});
 

@@ -1,63 +1,67 @@
+/* PLAYER CSS COMPLETO */
+
+/* Contenedor principal */
 #sonar-player-container {
-  position: relative;
   width: 100%;
-  max-width: 1200px;
+  max-width: 800px; /* Ajusta según tu diseño */
   margin: 0 auto;
+  position: relative;
 }
 
+/* Player */
 #sonar-player-container .player {
   position: relative;
   text-align: center;
-  background: rgba(0,0,0,0.5);
+  background: rgba(255, 255, 255, 0.25); /* blanco semitransparente */
   padding: 2% 3%;
   border-radius: 20px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
-  width: 100%;
-  height: auto;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
   overflow: hidden;
+  background-image: url("img/background.jpg");
   background-size: cover;
+  background-position: center;
 }
 
+/* Leyenda en vivo */
 #sonar-player-container .en-vivo {
-  font-size: 1.5vw; /* escala con ancho de pantalla */
-  color: #ffcc66;
-  margin-bottom: 1.5vh;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #FF6600;
+  margin-bottom: 10px;
 }
 
+/* Contenedor de botones */
 #sonar-player-container .controles {
-  display:flex;
-  justify-content:center;
-  gap:2vw;
-  position: relative;
-  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 15px;
+  padding: 15px; /* más espacio alrededor */
 }
 
+/* Botones */
 #sonar-player-container .controles button {
-  background:none;
-  border:none;
-  color:white;
-  font-size:4vw; /* escala con pantalla */
-  cursor:pointer;
-  transition: transform 0.2s, color 0.2s, box-shadow 0.5s;
-  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  font-size: 2.5rem; /* botones más grandes */
 }
 
-#sonar-player-container .controles button:hover { 
-  transform:scale(1.2); 
-  color:#ff6600; 
+#sonar-player-container .controles button:active {
+  transform: scale(1.3);
 }
 
-#sonar-player-container .controles button:active { 
-  transform:scale(1.5); 
-}
-
-#sonar-player-container audio { display:none; }
-
+/* Canvas del visualizador */
 #sonar-player-container #visualizer {
-  position:absolute;
-  bottom:5%;
-  left:0;
-  width:100%;
-  height:20vh; /* se adapta a la altura de la sección */
-  z-index:0;
+  width: 100%;
+  height: 100px;
+  display: block;
+  margin-top: 20px;
+  border-radius: 12px;
+}
+
+/* Opcional: evita que se seleccione texto al hacer clic */
+#sonar-player-container * {
+  user-select: none;
 }

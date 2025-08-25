@@ -12,7 +12,7 @@
 #sonar-player-container .player {
   position: relative;
   text-align: center;
-  background: rgba(255, 255, 255, 0.25); /* blanco semitransparente */
+  background: rgba(228, 228, 228, 0.30); /* blanco semitransparente */
   padding: 2% 3%;
   border-radius: 20px;
   box-shadow: 0 0 20px rgba(0,0,0,0.3);

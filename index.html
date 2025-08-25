@@ -62,29 +62,33 @@
     <div class="main-image-container">
       <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
 
-    <div id="sonar-player-container">
+     
+   <div id="sonar-player-container">
   <div class="player">
     <!-- Letrero centrado -->
     <div class="en-vivo">En vivo Miércoles 21:00</div>
-   
-    <audio id="cancion">
-      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-      Tu navegador no soporta el audio.
-    </audio>
 
-    <!-- Contenedor de botones -->
+    <!-- Contenedor de botones centrado -->
     <div class="controles">
       <button id="play-btn"><i class="bi bi-play-circle-fill"></i></button>
       <button id="pause-btn"><i class="bi bi-pause-circle-fill"></i></button>
       <button id="mute-btn"><i class="bi bi-volume-mute-fill"></i></button>
     </div>
 
-     <canvas id="visualizer"></canvas>
+    <!-- Visualizador de ondas -->
+    <canvas id="visualizer"></canvas>
+
+    <!-- Audio oculto -->
+    <audio id="cancion">
+      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+      Tu navegador no soporta audio.
+    </audio>
   </div>
 </div>
 
 <link rel="stylesheet" href="player.css">
 <script src="player.js" defer></script>
+
 
   <!-- Social Media -->
   <section class="social-section">

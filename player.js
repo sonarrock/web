@@ -121,3 +121,20 @@ botones.forEach(btn => {
   });
 });
 
+#sonar-player-container .en-vivo {
+  position: absolute;
+  top: 28%; /* un poco más abajo */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem; /* base más chica */
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+  z-index: 10;
+}
+
+@media (max-width: 480px) {
+  #sonar-player-container .en-vivo {
+    font-size: 1rem; /* aún más pequeña en celulares */
+  }
+}

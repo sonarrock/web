@@ -1,70 +1,108 @@
-/* Contenedor principal */
-#matrix-player {
-  position: relative;
-  width: 100%;
-  max-width: 600px;
-  height: 400px;
-  margin: auto;
-  overflow: hidden;
-  border: 3px solid #f60;
-  border-radius: 12px;
+/* ================= PLAYER CONTAINER ================= */
+.player-container {
+    position: relative;
+    width: 100%;
+    max-width: 650px;
+    margin: 20px auto;
+    border: 2px solid #ff6600;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
 }
 
-/* Fondo */
-.bg-img {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: url("img/background.jpg") no-repeat center center;
-  background-size: cover;
-  z-index: 1;
+/* ================== PLAYER BACKGROUND ================== */
+.player-background {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
 }
 
-/* Matrix canvas */
+.background-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ================== CANVAS MATRIX ================== */
 #matrix {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 2;
-  pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+    z-index: 1;
 }
 
-/* Player UI */
-.player-ui {
-  position: relative;
-  z-index: 3;
-  text-align: center;
-  padding: 20px;
-  color: #fff;
-}
-
-/* Botones */
-.player-ui button {
-  margin: 8px;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 10px;
-  background: #f60;
-  color: #fff;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
-}
-
-.player-ui button:hover {
-  background: #ff7518;
-  box-shadow: 0 0 20px rgba(255, 102, 0, 0.8);
-}
-
-.player-ui button:active {
-  transform: scale(0.95);
-  box-shadow: 0 0 30px rgba(255, 140, 0, 1);
-}
-
-/* Texto de canción */
+/* ================= METADATA ================= */
 #now-playing {
-  margin-top: 15px;
-  font-size: 14px;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    z-index: 3;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* ================= CONTROLES ================= */
+.controls {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px 20px;
+    border-radius: 12px;
+}
+
+/* ================= BOTONES ================= */
+.btn {
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+/* Play Button */
+.btn.play {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(45deg, #ff6600, #ff8833);
+    font-size: 28px;
+    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
+}
+
+/* Stop Button */
+.btn.stop {
+    width: 55px;
+    height: 55px;
+    background: linear-gradient(45deg, #ff6600, #ff8833);
+    font-size: 22px;
+    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
+}
+
+/* Mute Button */
+.btn.mute {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(45deg, #ff6600, #ff8833);
+    font-size: 18px;
+    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
+}
+
+/* Hover efecto brillo */
+.btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(255, 102, 0, 1);
 }

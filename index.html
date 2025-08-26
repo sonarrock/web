@@ -84,26 +84,31 @@
       <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
 
 <div class="player-container">
-  <!-- Leyenda superior -->
+  <!-- Leyenda -->
   <h3 class="live-label">En vivo Miércoles 21:00</h3>
 
-  <!-- Imagen de fondo -->
-  <div class="background">
+  <!-- Fondo + Matrix -->
+  <div class="player-background">
     <canvas id="matrix"></canvas>
-    <!-- Contenedor de controles -->
-    <div class="controls">
-      <button id="play-btn" class="btn play"><i class="fas fa-play"></i></button>
-      <button id="stop-btn" class="btn stop"><i class="fas fa-stop"></i></button>
-      <button id="mute-btn" class="btn mute"><i class="fas fa-volume-mute"></i></button>
-    </div>
+    <img src="img/background.jpg" alt="Background" class="background-img">
   </div>
 
+  <!-- Controles -->
+  <div class="controls">
+    <button id="play-btn" class="btn play"><i class="fas fa-play"></i></button>
+    <button id="stop-btn" class="btn stop"><i class="fas fa-stop"></i></button>
+    <button id="mute-btn" class="btn mute"><i class="fas fa-volume-mute"></i></button>
+  </div>
+
+  <!-- Metadata -->
+  <div id="now-playing">Cargando canción...</div>
+
   <!-- Audio -->
-  <audio id="audio" preload="auto" crossorigin="anonymous">
+  <audio id="audio" preload="auto">
     <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-        Tu navegador no soporta audio HTML5
   </audio>
 </div>
+
 
 
   <!-- Social Media -->

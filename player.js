@@ -1,40 +1,78 @@
-// ===== Control de Audio =====
+// Audio player
 const audio = document.getElementById("audio");
 const playBtn = document.getElementById("play-btn");
-const pauseBtn = document.getElementById("pause-btn");
+const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
 const nowPlaying = document.getElementById("now-playing");
 
-playBtn.addEventListener("click", () => audio.play());
-pauseBtn.addEventListener("click", () => audio.pause());
+let isPlaying = false;
+
+// Play / Pause toggle
+playBtn.addEventListener("click", () => {
+  if (!isPlaying) {
+    audio.play();
+    playBtn.textContent = "⏸ Pause";
+    isPlaying = true;
+  } else {
+    audio.pause();
+    playBtn.textContent = "▶ Play";
+    isPlaying = false;
+  }
+});
+
+// Stop
+stopBtn.addEventListener("click", () => {
+  audio.pause();
+  audio.currentTime = 0;
+  playBtn.textContent = "▶ Play";
+  isPlaying = false;
+});
+
+// Mute
 muteBtn.addEventListener("click", () => {
   audio.muted = !audio.muted;
   muteBtn.textContent = audio.muted ? "🔊 Unmute" : "🔇 Mute";
 });
 
-// ===== Animación Matrix Code Rain =====
+// Metadata fetch
+async function loadMetadata() {
+  try {
+    const res = await fetch("https://stream.zeno.fm/ezq3fcuf5ehvv?json=1");
+    const data = await res.json();
+    if (data.title) {
+      nowPlaying.textContent = `${data.artist || ""} - ${data.title}`;
+    }
+  } catch {
+    nowPlaying.textContent = "No se pudo cargar la canción";
+  }
+}
+setInterval(loadMetadata, 10000);
+loadMetadata();
+
+// Matrix Animation
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 
-canvas.width = canvas.offsetWidth;
-canvas.height = canvas.offsetHeight;
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+resizeCanvas();
 
-const letters = "アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチッヂツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-const lettersArr = letters.split("");
-
+const letters = "アイウエオカキクケコサシスセソ0123456789".split("");
 const fontSize = 14;
-const columns = canvas.width / fontSize;
-const drops = Array(Math.floor(columns)).fill(1);
+let columns = Math.floor(canvas.width / fontSize);
+let drops = Array(columns).fill(1);
 
-function drawMatrix() {
-  ctx.fillStyle = "rgba(0,0,0,0.1)";
+function draw() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "#0F0";
+  ctx.fillStyle = "#0f0";
   ctx.font = fontSize + "px monospace";
 
   for (let i = 0; i < drops.length; i++) {
-    const text = lettersArr[Math.floor(Math.random() * lettersArr.length)];
+    const text = letters[Math.floor(Math.random() * letters.length)];
     ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
     if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
@@ -43,29 +81,12 @@ function drawMatrix() {
     drops[i]++;
   }
 }
-setInterval(drawMatrix, 50);
 
-// ===== Metadatos desde Zeno.fm =====
-async function cargarMetadata() {
-  try {
-    const response = await fetch("https://stream.zeno.fm/ezq3fcuf5ehvv?json=1");
-    const data = await response.json();
-    if (data.artist && data.title) {
-      nowPlaying.textContent = `${data.artist} - ${data.title}`;
-    } else if (data.title) {
-      nowPlaying.textContent = data.title;
-    } else {
-      nowPlaying.textContent = "Transmitiendo en vivo...";
-    }
-  } catch (e) {
-    nowPlaying.textContent = "Cargando canción...";
-  }
-}
-setInterval(cargarMetadata, 10000);
-cargarMetadata();
+setInterval(draw, 50);
 
-// Ajustar tamaño del canvas si la ventana cambia
+// Ajustar animación al redimensionar
 window.addEventListener("resize", () => {
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
+  resizeCanvas();
+  columns = Math.floor(canvas.width / fontSize);
+  drops = Array(columns).fill(1);
 });

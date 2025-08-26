@@ -1,9 +1,10 @@
 /* ================== PLAYER CONTAINER ================== */
 .player-container {
     position: relative;
+    width: 100%;
     max-width: 650px;
-    margin: 0 auto;
-    border: 3px solid #FF6600; /* marco naranja */
+    margin: 20px auto;
+    border: 2px solid #ff6600; /* marco naranja */
     border-radius: 12px;
     overflow: hidden;
     background: #000;
@@ -13,52 +14,52 @@
 .player-background {
     position: relative;
     width: 100%;
-    height: 500px; /* más altura para ver toda la imagen */
+    height: 500px; /* altura ajustada */
     overflow: hidden;
 }
 
 .background-img {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    top: 0;
-    left: 0;
-    z-index: 0;
-    opacity: 1;
+    z-index: 1;
 }
 
 #matrix {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1;
-    opacity: 0.50; /* semitransparente para no saturar la imagen */
-}
-
-/* ================== EN VIVO LABEL ================== */
-.live-label {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 3;
-    font-size: 16px;
-    color: #fff; /* blanco */
-    font-weight: bold;
+    z-index: 2;
+    opacity: 0.5; /* no satura la imagen de fondo */
 }
 
 /* ================== METADATA ================== */
 #now-playing {
     position: absolute;
-    bottom: 80px;
+    bottom: 100px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 3;
     color: #fff;
     text-align: center;
-    font-family: Arial, sans-serif;
+    font-family: monospace;
     font-size: 14px;
-    max-width: 90%;
+}
+
+/* ================== LEYENDA EN VIVO ================== */
+.live-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 3;
+    color: #fff; /* ahora en blanco */
+    font-weight: bold;
+    font-family: Arial, sans-serif;
 }
 
 /* ================== CONTROLES ================== */
@@ -71,7 +72,7 @@
     gap: 15px;
     z-index: 3;
     background: rgba(255, 255, 255, 0.3); /* contenedor blanco con transparencia */
-    padding: 15px 25px;
+    padding: 10px 20px;
     border-radius: 12px;
 }
 
@@ -89,26 +90,26 @@
 
 /* Play Button */
 .btn.play {
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     background: linear-gradient(45deg, #ff6600, #ff8833);
-    font-size: 24px;
+    font-size: 28px;
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
 }
 
 /* Stop Button */
 .btn.stop {
-    width: 40px;
-    height: 40px;
+    width: 55px;
+    height: 55px;
     background: linear-gradient(45deg, #ff6600, #ff8833);
-    font-size: 20px;
+    font-size: 22px;
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
 }
 
 /* Mute Button */
 .btn.mute {
-    width: 35px;
-    height: 35px;
+    width: 45px;
+    height: 45px;
     background: linear-gradient(45deg, #ff6600, #ff8833);
     font-size: 18px;
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
@@ -120,13 +121,38 @@
     box-shadow: 0 0 20px rgba(255, 102, 0, 1);
 }
 
-/* ================== RESPONSIVE ================== */
+/* ================== RESPONSIVO ================== */
 @media (max-width: 480px) {
-    .player-background {
-        height: 300px;
+    .player-container {
+        width: 95%;
     }
 
-    .btn.play { width: 50px; height: 50px; font-size: 20px; }
-    .btn.stop { width: 45px; height: 45px; font-size: 16px; }
-    .btn.mute { width: 40px; height: 40px; font-size: 14px; }
+    .controls {
+        flex-direction: row; /* asegúrate horizontal en móviles */
+        gap: 10px;
+        padding: 8px 15px;
+    }
+
+    .btn.play {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+
+    .btn.stop {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .btn.mute {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    #now-playing {
+        bottom: 90px;
+        font-size: 12px;
+    }
 }

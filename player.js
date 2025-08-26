@@ -59,57 +59,71 @@ document.addEventListener('DOMContentLoaded', function() {
     muteBtn.innerHTML = isMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
   });
 
-// Matrix Animation
+// MATRIX ANIMATION
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 
-// Ajusta el tamaño del canvas
-canvas.width = canvas.offsetWidth;
-canvas.height = canvas.offsetHeight;
+// Ajusta tamaño del canvas
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
 
 // Letras para la animación
 const letters = "アァカサタナハマヤャラワガザダバパイィキシチニヒミリギジヂビピウゥクスツヌフムユュルグズヅブプエェケセテネヘメレゲゼデベペオォコソトノホモヨョロヲゴゾドボポABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-const fontSize = 14; // más pequeño = más caracteres
-const columns = Math.floor(canvas.width / fontSize);
+const fontSize = 12; // más pequeño = más densidad
+let columns = Math.floor(canvas.width / fontSize);
+let drops = Array(columns).fill(0);
 
-// Posiciones iniciales de cada columna
-const drops = [];
-for (let x = 0; x < columns; x++) {
-  drops[x] = Math.floor(Math.random() * canvas.height / fontSize);
+// Redimensiona columnas si cambia el tamaño
+function updateColumns() {
+  columns = Math.floor(canvas.width / fontSize);
+  drops = Array(columns).fill(0);
 }
+window.addEventListener("resize", updateColumns);
 
-// Función de dibujo
-function draw() {
-  // Fondo semitransparente para efecto de estela
-  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+function drawMatrix() {
+  ctx.fillStyle = "rgba(0,0,0,0.5)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.fillStyle = "#0F0"; // color de letras
+  ctx.fillStyle = "#0F0";
   ctx.font = fontSize + "px monospace";
 
   for (let i = 0; i < drops.length; i++) {
     const text = letters.charAt(Math.floor(Math.random() * letters.length));
     ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-    // Reinciar caída al llegar al fondo
-    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-      drops[i] = 0;
-    }
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
     drops[i]++;
   }
 }
 
-// Ejecutar animación solo al dar play
-let matrixInterval;
-document.getElementById("play-btn").addEventListener("click", () => {
-  if (!matrixInterval) {
-    matrixInterval = setInterval(draw, 50);
-  }
+// CONTROLES
+const playBtn = document.getElementById("play-btn");
+const stopBtn = document.getElementById("stop-btn");
+const muteBtn = document.getElementById("mute-btn");
+const audio = document.getElementById("audio");
+
+let matrixInterval = null;
+
+// Play
+playBtn.addEventListener("click", () => {
+  if (!matrixInterval) matrixInterval = setInterval(drawMatrix, 50);
+  if (audio.paused) audio.play();
 });
 
-document.getElementById("stop-btn").addEventListener("click", () => {
+// Stop
+stopBtn.addEventListener("click", () => {
   clearInterval(matrixInterval);
   matrixInterval = null;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  audio.pause();
+  audio.currentTime = 0;
+});
+
+// Mute / Unmute
+muteBtn.addEventListener("click", () => {
+  audio.muted = !audio.muted;
+  muteBtn.innerHTML = audio.muted ? '<i class="fas fa-volume-off"></i>' : '<i class="fas fa-volume-mute"></i>';
 });

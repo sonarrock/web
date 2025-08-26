@@ -68,24 +68,21 @@
     text-shadow: 0 0 5px rgba(0,0,0,0.7);
 }
 
-/* ================= CONTENEDOR DE CONTROLES ================= */
+/* ================= CONTROLES ================= */
 .controls {
     position: absolute;
     bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
-    display: flex;               /* fila horizontal */
-    flex-direction: row;         /* fuerza horizontal */
-    justify-content: center;     /* centra los botones */
-    align-items: center;         /* alinea verticalmente dentro del contenedor */
-    gap: 15px;                   /* espacio entre botones */
+    display: flex;
+    gap: 15px;
     z-index: 3;
-    background: rgba(255, 255, 255, 0.3); /* contenedor blanco semi-transparente */
+    background: rgba(255, 255, 255, 0.1);
     padding: 10px 20px;
     border-radius: 12px;
 }
 
-/* ================= BOTONES ================= */
+/* BOTONES */
 .btn {
     border: none;
     cursor: pointer;

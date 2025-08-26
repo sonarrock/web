@@ -128,4 +128,3 @@ async function loadLatestIvooxEpisode() {
   }
 }
 
-loadLatestIvooxEpisode();

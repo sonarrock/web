@@ -10,12 +10,16 @@
 <meta name="theme-color" content="#ff6600">
 
 <!-- iOS -->
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+<!-- Favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+<link rel="shortcut icon" href="/icons/favicon.ico">
+
 <script>
-  // Registrar Service Worker
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/service-worker.js")
       .then(() => console.log("Service Worker registrado"))

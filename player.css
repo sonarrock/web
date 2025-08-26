@@ -68,24 +68,24 @@
     text-shadow: 0 0 5px rgba(0,0,0,0.7);
 }
 
-/* ================= CONTROLES ================= */
+/* ================= CONTENEDOR DE CONTROLES ================= */
 .controls {
     position: absolute;
     bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
-    display: flex;
-    flex-direction: row; /* fuerza alineación horizontal */
-    flex-wrap: nowrap;    /* no permite que se envuelvan */
-    gap: 15px;
+    display: flex;               /* fila horizontal */
+    flex-direction: row;         /* fuerza horizontal */
+    justify-content: center;     /* centra los botones */
+    align-items: center;         /* alinea verticalmente dentro del contenedor */
+    gap: 15px;                   /* espacio entre botones */
     z-index: 3;
-    background: rgba(255, 255, 255, 0.3); /* contenedor blanco con 30% opacidad */
+    background: rgba(255, 255, 255, 0.3); /* contenedor blanco semi-transparente */
     padding: 10px 20px;
     border-radius: 12px;
-    justify-content: center; /* centrado horizontal */
 }
 
-/* BOTONES */
+/* ================= BOTONES ================= */
 .btn {
     border: none;
     cursor: pointer;
@@ -99,15 +99,24 @@
 
 /* Play Button */
 .btn.play {
-    width: 55px;   /* más pequeño para móviles */
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(45deg, #ff6600, #ff8833);
+    font-size: 28px;
+    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
+}
+
+/* Stop Button */
+.btn.stop {
+    width: 55px;
     height: 55px;
     background: linear-gradient(45deg, #ff6600, #ff8833);
     font-size: 22px;
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
 }
 
-/* Stop Button */
-.btn.stop {
+/* Mute Button */
+.btn.mute {
     width: 45px;
     height: 45px;
     background: linear-gradient(45deg, #ff6600, #ff8833);
@@ -115,17 +124,20 @@
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
 }
 
-/* Mute Button */
-.btn.mute {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(45deg, #ff6600, #ff8833);
-    font-size: 16px;
-    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
-}
-
 /* Hover efecto brillo */
 .btn:hover {
     transform: scale(1.1);
     box-shadow: 0 0 20px rgba(255, 102, 0, 1);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 480px) {
+    .controls {
+        flex-direction: row;   /* fuerza horizontal en móviles */
+        gap: 12px;
+        padding: 8px 15px;
+    }
+    .btn.play { width: 60px; height: 60px; font-size: 24px; }
+    .btn.stop { width: 50px; height: 50px; font-size: 20px; }
+    .btn.mute { width: 40px; height: 40px; font-size: 16px; }
 }

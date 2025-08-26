@@ -13,7 +13,7 @@
 .player-background {
     position: relative;
     width: 100%;
-    height: 450px; /* más altura para ver toda la imagen */
+    height: 500px; /* más altura para ver toda la imagen */
     overflow: hidden;
 }
 
@@ -33,7 +33,7 @@
     width: 100%;
     height: 100%;
     z-index: 1;
-    opacity: 0.75; /* semitransparente para no saturar la imagen */
+    opacity: 0.50; /* semitransparente para no saturar la imagen */
 }
 
 /* ================== EN VIVO LABEL ================== */

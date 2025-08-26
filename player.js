@@ -106,18 +106,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
   drawMatrix();
 
-  // ===== INSERTAR REPRODUCTOR IVOOX SOLO EN SU CONTENEDOR =====
-  const podcastPlayer = document.getElementById("podcast-player");
-  if (podcastPlayer) {
-    podcastPlayer.innerHTML = `
-      <iframe 
-        src="https://www.ivoox.com/player_ejemplo" 
-        width="100%" 
-        height="170" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        style="border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.6);">
-      </iframe>
-    `;
-  }
-});

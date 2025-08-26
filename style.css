@@ -444,3 +444,22 @@ body {
     display: inline-block;
 }
 
+.spotify-container,
+.ivoox-container {
+  width: 100%;
+}
+
+.ivoox-container #podcast-player {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .spotify-container iframe,
+  .ivoox-container #podcast-player audio {
+    height: 150px;
+  }
+}
+

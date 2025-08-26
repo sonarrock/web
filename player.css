@@ -1,9 +1,8 @@
 /* ================= PLAYER CONTAINER ================= */
 .player-container {
     position: relative;
-    width: 100%;
     max-width: 650px;
-    margin: 20px auto;
+    margin: 30px auto;
     border: 2px solid #ff6600;
     border-radius: 12px;
     overflow: hidden;
@@ -14,8 +13,7 @@
 .player-background {
     position: relative;
     width: 100%;
-    height: 250px;
-    overflow: hidden;
+    height: 300px;
 }
 
 .background-img {
@@ -25,7 +23,7 @@
     display: block;
 }
 
-/* ================== CANVAS MATRIX ================== */
+/* ================= MATRIX CANVAS ================= */
 #matrix {
     position: absolute;
     top: 0;
@@ -33,19 +31,32 @@
     width: 100%;
     height: 100%;
     opacity: 0.5;
+    pointer-events: none;
     z-index: 1;
 }
 
-/* ================= METADATA ================= */
+/* ================== LIVE LABEL ================== */
+.live-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #ff6600;
+    font-weight: bold;
+    z-index: 2;
+    font-family: Arial, sans-serif;
+    text-shadow: 0 0 8px #000;
+}
+
+/* ================== METADATA ================== */
 #now-playing {
     position: absolute;
-    top: 15px;
-    left: 15px;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
     color: #fff;
+    z-index: 2;
+    text-align: center;
     font-family: Arial, sans-serif;
-    font-size: 14px;
-    z-index: 3;
-    text-shadow: 1px 1px 2px #000;
 }
 
 /* ================= CONTROLES ================= */
@@ -57,12 +68,12 @@
     display: flex;
     gap: 15px;
     z-index: 3;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.3);
     padding: 10px 20px;
     border-radius: 12px;
 }
 
-/* ================= BOTONES ================= */
+/* BOTONES */
 .btn {
     border: none;
     cursor: pointer;
@@ -106,3 +117,11 @@
     transform: scale(1.1);
     box-shadow: 0 0 20px rgba(255, 102, 0, 1);
 }
+
+/* Responsive: botones en horizontal en móviles */
+@media screen and (max-width: 480px) {
+    .controls {
+        flex-direction: row;
+    }
+}
+

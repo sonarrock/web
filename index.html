@@ -6,6 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sonar Rock - La Radio Independiente</title>
 
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff6600">
+
+<!-- iOS -->
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<script>
+  // Registrar Service Worker
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js")
+      .then(() => console.log("Service Worker registrado"))
+      .catch(err => console.log("Error registrando SW:", err));
+  }
+</script>
+
+  
   <!-- Tu CSS principal -->
   <link href="style.css" rel="stylesheet" type="text/css" />
 

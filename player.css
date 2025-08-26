@@ -1,79 +1,81 @@
-/* ================= PLAYER CONTAINER ================= */
+/* ================== PLAYER CONTAINER ================== */
 .player-container {
     position: relative;
     max-width: 650px;
-    margin: 30px auto;
-    border: 2px solid #ff6600;
+    margin: 0 auto;
+    border: 3px solid #FF6600; /* marco naranja */
     border-radius: 12px;
     overflow: hidden;
     background: #000;
 }
 
-/* ================== PLAYER BACKGROUND ================== */
+/* ================== FONDO + MATRIX ================== */
 .player-background {
     position: relative;
     width: 100%;
-    height: 300px;
+    height: 350px; /* más altura para ver toda la imagen */
+    overflow: hidden;
 }
 
 .background-img {
+    position: absolute;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
-}
-
-/* ================= MATRIX CANVAS ================= */
-#matrix {
-    position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.5;
-    pointer-events: none;
-    z-index: 1;
+    z-index: 0;
+    opacity: 1;
 }
 
-/* ================== LIVE LABEL ================== */
+#matrix {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0.5; /* semitransparente para no saturar la imagen */
+}
+
+/* ================== EN VIVO LABEL ================== */
 .live-label {
     position: absolute;
     top: 10px;
     left: 10px;
-    color: #ff6600;
+    z-index: 3;
+    font-size: 16px;
+    color: #fff; /* blanco */
     font-weight: bold;
-    z-index: 2;
-    font-family: Arial, sans-serif;
-    text-shadow: 0 0 8px #000;
 }
 
 /* ================== METADATA ================== */
 #now-playing {
     position: absolute;
-    bottom: 90px;
+    bottom: 80px;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 3;
     color: #fff;
-    z-index: 2;
     text-align: center;
     font-family: Arial, sans-serif;
+    font-size: 14px;
+    max-width: 90%;
 }
 
-/* ================= CONTROLES ================= */
+/* ================== CONTROLES ================== */
 .controls {
     position: absolute;
     bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
-    display: flex;
+    display: flex; /* horizontal */
     gap: 15px;
     z-index: 3;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.3); /* contenedor blanco con transparencia */
     padding: 10px 20px;
     border-radius: 12px;
 }
 
-/* BOTONES */
+/* ================== BOTONES ================== */
 .btn {
     border: none;
     cursor: pointer;
@@ -87,19 +89,19 @@
 
 /* Play Button */
 .btn.play {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
     background: linear-gradient(45deg, #ff6600, #ff8833);
-    font-size: 28px;
+    font-size: 24px;
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
 }
 
 /* Stop Button */
 .btn.stop {
-    width: 55px;
-    height: 55px;
+    width: 50px;
+    height: 50px;
     background: linear-gradient(45deg, #ff6600, #ff8833);
-    font-size: 22px;
+    font-size: 20px;
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
 }
 
@@ -118,10 +120,13 @@
     box-shadow: 0 0 20px rgba(255, 102, 0, 1);
 }
 
-/* Responsive: botones en horizontal en móviles */
-@media screen and (max-width: 480px) {
-    .controls {
-        flex-direction: row;
+/* ================== RESPONSIVE ================== */
+@media (max-width: 480px) {
+    .player-background {
+        height: 300px;
     }
-}
 
+    .btn.play { width: 50px; height: 50px; font-size: 20px; }
+    .btn.stop { width: 45px; height: 45px; font-size: 16px; }
+    .btn.mute { width: 40px; height: 40px; font-size: 14px; }
+}

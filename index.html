@@ -47,32 +47,36 @@
       <div class="main-image-container">
         <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
 
-       <!-- ================== REPRODUCTOR DE STREAMING ================== -->
-<div class="player-container">
-  <!-- Leyenda -->
-  <h3 class="live-label">En vivo Miércoles 21:00</h3>
+        <!-- ================== REPRODUCTOR DE STREAMING ================== -->
+        <div class="player-container">
+          <!-- Leyenda -->
+          <h3 class="live-label">En vivo Miércoles 21:00</h3>
 
-  <!-- Fondo + Matrix -->
-  <div class="player-background">
-    <canvas id="matrix"></canvas>
-    <img src="img/background.jpg" alt="Background" class="background-img">
-  </div>
+          <!-- Fondo + Matrix -->
+          <div class="player-background">
+            <canvas id="matrix"></canvas>
+            <img src="img/background.jpg" alt="Background" class="background-img">
+          </div>
 
-  <!-- Controles -->
-  <div class="controls">
-    <button id="play-btn" class="btn play"><i class="fas fa-play"></i></button>
-    <button id="stop-btn" class="btn stop"><i class="fas fa-stop"></i></button>
-    <button id="mute-btn" class="btn mute"><i class="fas fa-volume-mute"></i></button>
-  </div>
+          <!-- Controles -->
+          <div class="controls">
+            <button id="play-btn" class="btn play"><i class="fas fa-play"></i></button>
+            <button id="stop-btn" class="btn stop"><i class="fas fa-stop"></i></button>
+            <button id="mute-btn" class="btn mute"><i class="fas fa-volume-mute"></i></button>
+          </div>
 
-  <!-- Metadata -->
-  <div id="now-playing">Cargando canción...</div>
+          <!-- Metadata -->
+          <div id="now-playing">Cargando canción...</div>
 
-  <!-- Audio -->
-  <audio id="audio" preload="auto">
-    <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-  </audio>
-</div>
+          <!-- Audio -->
+          <audio id="audio" preload="auto">
+            <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+          </audio>
+        </div>
+
+      </div>
+    </div>
+  </section>
 
   <!-- Social Section -->
   <section class="social-section">
@@ -88,29 +92,31 @@
     </div>
   </section>
 
-<div class="embed-section">
-  <div class="container" style="max-width: 650px; margin: auto;">
+  <div class="embed-section">
+    <div class="container" style="max-width: 650px; margin: auto;">
 
-   <!-- ================== SPOTIFY ================== -->
-<div class="spotify-container">
-  <h2 class="section-title">Escucha en Spotify</h2>
-  <iframe
-    src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
-    width="100%"
-    height="170"
-    frameborder="0"
-    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-    loading="lazy"
-    style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
-  </iframe>
-</div>
+      <!-- ================== SPOTIFY ================== -->
+      <div class="spotify-container">
+        <h2 class="section-title">Escucha en Spotify</h2>
+        <iframe
+          src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
+          width="100%"
+          height="170"
+          frameborder="0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+          style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+        </iframe>
+      </div>
 
-<!-- ================== IVOOX ================== -->
-<div class="ivoox-container">
-  <h2 class="section-title">Escucha en iVoox</h2>
-  <div id="podcast-player"></div>
-</div>
+      <!-- ================== IVOOX ================== -->
+      <div class="ivoox-container">
+        <h2 class="section-title">Escucha en iVoox</h2>
+        <div id="podcast-player"></div>
+      </div>
 
+    </div>
+  </div>
 
   <!-- Staff Section -->
   <section class="staff-section">

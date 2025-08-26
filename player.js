@@ -1,88 +1,135 @@
-const audio = new Audio("https://stream.zeno.fm/ezq3fcuf5ehvv");
-audio.preload = "auto";
-
-const playBtn = document.getElementById("play-btn");
-const stopBtn = document.getElementById("stop-btn");
-const muteBtn = document.getElementById("mute-btn");
-const nowPlaying = document.getElementById("now-playing");
-
-let matrixRunning = false;
-const canvas = document.getElementById("matrix");
-const ctx = canvas.getContext("2d");
-
-canvas.width = canvas.offsetWidth;
-canvas.height = canvas.offsetHeight;
-
-const letters = "アァイィウヴエェオカガキギクケゲコゴサザシジスセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフヘベホボポマミムメモヤユヨラリルレロワンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-const fontSize = 16;
-const columns = Math.floor(canvas.width / fontSize);
-const drops = Array(columns).fill(1);
-
-function drawMatrix() {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#0F0";
-  ctx.font = fontSize + "px monospace";
-
-  for (let i = 0; i < drops.length; i++) {
-    const text = letters.charAt(Math.floor(Math.random() * letters.length));
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-      drops[i] = 0;
-    }
-    drops[i]++;
-  }
+/* ===== Contenedor principal ===== */
+.player-container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto;
+  border: 2px solid #ff6600; /* marco naranja */
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: monospace;
 }
 
-let matrixInterval;
-
-// 🔹 Play/Pause
-playBtn.addEventListener("click", () => {
-  if (audio.paused) {
-    audio.play();
-    playBtn.textContent = "⏸"; // Cambia a pausa
-    if (!matrixRunning) {
-      matrixInterval = setInterval(drawMatrix, 50);
-      matrixRunning = true;
-    }
-  } else {
-    audio.pause();
-    playBtn.textContent = "▶"; // Vuelve a play
-    clearInterval(matrixInterval);
-    matrixRunning = false;
-  }
-});
-
-// 🔹 Stop
-stopBtn.addEventListener("click", () => {
-  audio.pause();
-  audio.currentTime = 0;
-  playBtn.textContent = "▶";
-  clearInterval(matrixInterval);
-  matrixRunning = false;
-});
-
-// 🔹 Mute
-muteBtn.addEventListener("click", () => {
-  audio.muted = !audio.muted;
-  muteBtn.textContent = audio.muted ? "🔊" : "🔇";
-});
-
-// 🔹 Metadatos
-async function cargarMetadata() {
-  try {
-    const response = await fetch("https://stream.zeno.fm/ezq3fcuf5ehvv?json=1");
-    const data = await response.json();
-    if (data.artist && data.title) {
-      nowPlaying.textContent = `${data.artist} - ${data.title}`;
-    } else {
-      nowPlaying.textContent = "Transmisión en vivo";
-    }
-  } catch (err) {
-    nowPlaying.textContent = "Conectando...";
-  }
+/* ===== Imagen de fondo ===== */
+.player-background {
+  position: relative;
+  width: 100%;
+  height: 450px;
+  overflow: hidden;
 }
 
-setInterval(cargarMetadata, 10000);
-cargarMetadata();
+.player-background img.background-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 0;
+}
+
+/* ===== Canvas Matrix ===== */
+#matrix {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  mix-blend-mode: screen;
+  opacity: 0.50; /* 50% opacidad */
+}
+
+/* ===== Leyenda en vivo ===== */
+.live-label {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  z-index: 2;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+}
+
+/* ===== Controles ===== */
+.controls {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 15px;
+  padding: 10px 20px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 12px;
+  z-index: 2;
+}
+
+/* Botones */
+.controls .btn {
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #ff6600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s, background 0.2s, color 0.2s;
+  background: rgba(255,255,255,0.3);
+}
+
+.controls .btn.play {
+  width: 70px;
+  height: 70px;
+  font-size: 2rem;
+}
+
+.controls .btn.stop {
+  width: 60px;
+  height: 60px;
+  font-size: 1.5rem;
+}
+
+.controls .btn.mute {
+  width: 50px;
+  height: 50px;
+  font-size: 1.2rem;
+}
+
+.controls .btn:hover {
+  transform: scale(1.2);
+  background: rgba(255,255,255,0.6);
+  color: #fff;
+}
+
+/* ===== Metadata ===== */
+#now-playing {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 1rem;
+  z-index: 2;
+  max-width: 90%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+}
+
+/* ===== Responsivo ===== */
+@media (max-width: 480px) {
+  .player-background {
+    height: 350px;
+  }
+  .live-label {
+    font-size: 1rem;
+  }
+  .controls .btn.play { width: 60px; height: 60px; font-size: 1.8rem; }
+  .controls .btn.stop { width: 50px; height: 50px; font-size: 1.2rem; }
+  .controls .btn.mute { width: 40px; height: 40px; font-size: 1rem; }
+  #now-playing { font-size: 0.9rem; bottom: 70px; }
+}

@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function stopMatrix() {
     if (matrixInterval) clearInterval(matrixInterval);
     matrixInterval = null;
+    drawMatrix(); // deja la Matrix estática cuando no se reproduce
   }
 
   // iniciar matrix solo cuando se reproduce
@@ -110,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // por defecto, mostrar matrix estática
   drawMatrix();
 
-  // ===== INSERTAR REPRODUCTOR IVOOX =====
+  // ===== REPRODUCTOR IVOOX (opcional, fuera del streaming) =====
   const podcastPlayer = document.getElementById("podcast-player");
   if (podcastPlayer) {
     podcastPlayer.innerHTML = `

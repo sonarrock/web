@@ -4,30 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sonar Rock - La Radio Independiente</title>
-  <link href="style.css" rel="stylesheet" type="text/css" />
+
+  <!-- CSS -->
+  <link href="style.css" rel="stylesheet">
+  <link href="player.css" rel="stylesheet">
+
+  <!-- Iconos -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- PWA y favicons -->
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#ff6600">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <!-- Favicon general -->
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
   <link rel="shortcut icon" href="/icons/favicon.ico">
-
-  <!-- Apple Touch Icon -->
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-title" content="Sonar Rock">
-
-  <!-- Android Chrome Icons -->
   <link rel="icon" type="image/png" sizes="192x192" href="/icons/android-chrome-192x192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="/icons/android-chrome-512x512.png">
-
-  <!-- Evita traducción automática en Chrome -->
   <meta name="google" content="notranslate">
 </head>
 <body>
+
   <!-- Header -->
   <header class="header">
     <div class="container">
@@ -40,34 +40,44 @@
     </div>
   </header>
 
-<!-- PLAYER -->
-<section class="main-section">
-  <div class="container">
-    <div class="main-image-container">
-      <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
+  <!-- MAIN SECTION -->
+  <section class="main-section">
+    <div class="container">
+      <div class="main-image-container">
+        <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
 
-     <div id="sonar-player-container">
-  <div class="player">
-    <div class="en-vivo">En vivo Miércoles 21:00</div>
+        <!-- ================= PLAYER STREAMING ================= -->
+        <div class="player-container">
 
-    <audio id="cancion">
-      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-      Tu navegador no soporta el audio.
-    </audio>
+          <!-- Leyenda EN VIVO -->
+          <h3 class="live-label">En vivo Miércoles 21:00</h3>
 
-    <div class="controles">
-      <button id="play-btn"><i class="bi bi-play-circle-fill"></i></button>
-      <button id="pause-btn"><i class="bi bi-pause-circle-fill"></i></button>
-      <button id="mute-btn"><i class="bi bi-volume-mute-fill"></i></button>
+          <!-- Fondo + Matrix -->
+          <div class="player-background">
+            <canvas id="matrix"></canvas>
+            <img src="img/background.jpg" alt="Background" class="background-img">
+          </div>
+
+          <!-- Metadata -->
+          <div id="now-playing">Cargando canción...</div>
+
+          <!-- Controles -->
+          <div class="controls">
+            <button id="play-btn" class="btn play"><i class="fas fa-play"></i></button>
+            <button id="stop-btn" class="btn stop"><i class="fas fa-stop"></i></button>
+            <button id="mute-btn" class="btn mute"><i class="fas fa-volume-mute"></i></button>
+          </div>
+
+          <!-- Audio -->
+          <audio id="audio" preload="auto" autoplay>
+            <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+          </audio>
+
+        </div>
+        <!-- ================= FIN PLAYER ================= -->
+      </div>
     </div>
-  </div>
-
-  <canvas id="visualizer"></canvas>
-</div>
-
-<link rel="stylesheet" href="player.css">
-<script src="player.js" defer></script>
-
+  </section>
 
   <!-- Social Media -->
   <section class="social-section">
@@ -261,51 +271,9 @@
   </section>
 
   <!-- Scripts -->
-  <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const playBtn = document.getElementById('playBtn');
-    const audioPlayer = document.getElementById('audioPlayer');
-    const volumeSlider = document.getElementById('volumeSlider');
-    const bars = document.querySelectorAll('.bar');
-
-    let isPlaying = false;
-    let visualizerInterval;
-
-    playBtn.addEventListener('click', function () {
-      if (isPlaying) {
-        audioPlayer.pause();
-        playBtn.innerHTML = '<i class="fas fa-play"></i>';
-        stopVisualizer();
-      } else {
-        audioPlayer.load();
-        audioPlayer.play().catch(e => console.error('Error al reproducir:', e));
-        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        startVisualizer();
-      }
-      isPlaying = !isPlaying;
-    });
-
-    volumeSlider.addEventListener('input', function () {
-      audioPlayer.volume = this.value / 100;
-    });
-
-    function startVisualizer() {
-      visualizerInterval = setInterval(() => {
-        bars.forEach(bar => {
-          const height = Math.random() * 30 + 5;
-          bar.style.height = height + 'px';
-        });
-      }, 100);
-    }
-
-    function stopVisualizer() {
-      clearInterval(visualizerInterval);
-      bars.forEach(bar => bar.style.height = '5px');
-    }
-
-    audioPlayer.volume = 1.0;
-  });
-  </script>
+ <script src="player.js"></script>
+  <script src="metadatos.js"></script>
+  <script src="hijack.js"></script>
 
 </body>
 </html>

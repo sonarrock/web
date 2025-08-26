@@ -75,12 +75,15 @@
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 10px; /* menos separación */
+    flex-direction: row;   /* siempre horizontal */
+    flex-wrap: nowrap;     /* evita que se bajen */
+    gap: 10px;
     z-index: 3;
     background: rgba(255, 255, 255, 0.3); /* blanco con 30% opacidad */
     padding: 8px 15px;
     border-radius: 12px;
-    flex-direction: row; /* siempre horizontal */
+}
+
 }
 
 /* BOTONES */

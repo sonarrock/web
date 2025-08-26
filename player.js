@@ -1,96 +1,70 @@
-// ================== PLAYER ==================
+// ================== PLAYER ZENO ==================
 const audio = document.getElementById("audio");
 const playBtn = document.getElementById("play-btn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
-
-// Play / Pause
-playBtn.addEventListener("click", () => {
-    if (audio.paused) {
-        audio.play();
-        matrixRunning = true;
-        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    } else {
-        audio.pause();
-        matrixRunning = false;
-        playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    }
-});
-
-// Stop
-stopBtn.addEventListener("click", () => {
-    audio.pause();
-    audio.currentTime = 0;
-    matrixRunning = false;
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-});
-
-// Mute / Unmute
-muteBtn.addEventListener("click", () => {
-    audio.muted = !audio.muted;
-    muteBtn.innerHTML = audio.muted
-        ? '<i class="fas fa-volume-mute"></i>'
-        : '<i class="fas fa-volume-up"></i>';
-});
-
-// ================== MATRIX ANIMATION ==================
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 
-// Ajusta el tamaño del canvas
-canvas.width = canvas.offsetWidth;
-canvas.height = canvas.offsetHeight;
+// ================== MATRIX ANIMATION ==================
+let animationId;
+const fontSize = 14; // tamaño de fuente
+let columns;
 
-// Caracteres y columnas
-const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
-const fontSize = 12; // más pequeño = más columnas
-const columns = Math.floor(canvas.width / fontSize);
+function setupCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    columns = Math.floor(canvas.width / fontSize);
+    // Array con posiciones Y de cada columna
+    matrixDrops = Array(columns).fill(0);
+}
+setupCanvas();
+window.addEventListener('resize', setupCanvas);
 
-// Arreglo de posiciones Y de cada columna
-const drops = Array(columns).fill(0);
+let matrixDrops = [];
 
-// Control de animación
-let matrixRunning = false;
-
-// Animación
-function draw() {
-    if (!matrixRunning) return;
-
-    // Fondo semitransparente para efecto "trazo"
-    ctx.fillStyle = "rgba(0,0,0,0.05)";
+// Dibujo de Matrix
+function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.fillStyle = "#0F0";
     ctx.font = fontSize + "px monospace";
 
-    for (let i = 0; i < drops.length; i++) {
-        const text = chars.charAt(Math.floor(Math.random() * chars.length));
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    for (let i = 0; i < matrixDrops.length; i++) {
+        const text = String.fromCharCode(33 + Math.random() * 94);
+        ctx.fillText(text, i * fontSize, matrixDrops[i] * fontSize);
 
-        // Reinicia la columna aleatoriamente para efecto infinito
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-            drops[i] = 0;
+        if (matrixDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            matrixDrops[i] = 0;
         }
-
-        drops[i]++;
+        matrixDrops[i]++;
     }
-
-    requestAnimationFrame(draw);
+    animationId = requestAnimationFrame(drawMatrix);
 }
 
-// Inicializa matrix solo al dar play
-audio.addEventListener("play", () => {
-    if (!matrixRunning) {
-        matrixRunning = true;
-        draw();
+// ================== BOTONES ==================
+// PLAY
+playBtn.addEventListener("click", () => {
+    audio.play();
+    drawMatrix();
+});
+
+// STOP
+stopBtn.addEventListener("click", () => {
+    audio.pause();
+    audio.currentTime = 0;
+    cancelAnimationFrame(animationId);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+// MUTE
+muteBtn.addEventListener("click", () => {
+    audio.muted = !audio.muted;
+    if(audio.muted){
+        muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+    } else {
+        muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
     }
 });
 
-audio.addEventListener("pause", () => {
-    matrixRunning = false;
-});
-
-audio.addEventListener("ended", () => {
-    matrixRunning = false;
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-});

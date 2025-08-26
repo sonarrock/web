@@ -1,22 +1,22 @@
-// Audio player
+// Audio
 const audio = document.getElementById("audio");
 const playBtn = document.getElementById("play-btn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
-const nowPlaying = document.getElementById("now-playing");
 
 let isPlaying = false;
 
-// Play / Pause toggle
+// Play / Pause
 playBtn.addEventListener("click", () => {
   if (!isPlaying) {
-    audio.play();
-    playBtn.textContent = "⏸ Pause";
-    isPlaying = true;
+    audio.play().then(() => {
+      isPlaying = true;
+      playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    }).catch(err => console.log("Error al reproducir:", err));
   } else {
     audio.pause();
-    playBtn.textContent = "▶ Play";
     isPlaying = false;
+    playBtn.innerHTML = '<i class="fas fa-play"></i>';
   }
 });
 
@@ -24,32 +24,19 @@ playBtn.addEventListener("click", () => {
 stopBtn.addEventListener("click", () => {
   audio.pause();
   audio.currentTime = 0;
-  playBtn.textContent = "▶ Play";
   isPlaying = false;
+  playBtn.innerHTML = '<i class="fas fa-play"></i>';
 });
 
-// Mute
+// Mute / Unmute
 muteBtn.addEventListener("click", () => {
   audio.muted = !audio.muted;
-  muteBtn.textContent = audio.muted ? "🔊 Unmute" : "🔇 Mute";
+  muteBtn.innerHTML = audio.muted
+    ? '<i class="fas fa-volume-up"></i>'
+    : '<i class="fas fa-volume-mute"></i>';
 });
 
-// Metadata fetch
-async function loadMetadata() {
-  try {
-    const res = await fetch("https://stream.zeno.fm/ezq3fcuf5ehvv?json=1");
-    const data = await res.json();
-    if (data.title) {
-      nowPlaying.textContent = `${data.artist || ""} - ${data.title}`;
-    }
-  } catch {
-    nowPlaying.textContent = "No se pudo cargar la canción";
-  }
-}
-setInterval(loadMetadata, 10000);
-loadMetadata();
-
-// Matrix Animation
+// ===== Matrix Animation =====
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 
@@ -58,35 +45,30 @@ function resizeCanvas() {
   canvas.height = canvas.offsetHeight;
 }
 resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-const letters = "アイウエオカキクケコサシスセソ0123456789".split("");
+const letters = "アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤャユュヨラリルレロワヰヱヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 const fontSize = 14;
-let columns = Math.floor(canvas.width / fontSize);
-let drops = Array(columns).fill(1);
+let columns = canvas.width / fontSize;
+let drops = Array(Math.floor(columns)).fill(1);
 
-function draw() {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+function drawMatrix() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "#0f0";
+  ctx.fillStyle = "#0F0";
   ctx.font = fontSize + "px monospace";
 
-  for (let i = 0; i < drops.length; i++) {
+  drops.forEach((y, i) => {
     const text = letters[Math.floor(Math.random() * letters.length)];
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    const x = i * fontSize;
+    ctx.fillText(text, x, y * fontSize);
 
-    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+    if (y * fontSize > canvas.height && Math.random() > 0.975) {
       drops[i] = 0;
     }
     drops[i]++;
-  }
+  });
 }
 
-setInterval(draw, 50);
-
-// Ajustar animación al redimensionar
-window.addEventListener("resize", () => {
-  resizeCanvas();
-  columns = Math.floor(canvas.width / fontSize);
-  drops = Array(columns).fill(1);
-});
+setInterval(drawMatrix, 50);

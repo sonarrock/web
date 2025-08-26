@@ -91,3 +91,41 @@ audio.addEventListener('ended', () => {
   playBtn.innerHTML = '<i class="fas fa-play"></i>';
   isPlaying = false;
 });
+
+// ================== IVOOX ==================
+async function loadLatestIvooxEpisode() {
+  const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
+  try {
+    const response = await fetch(feedUrl);
+    const xmlText = await response.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, "text/xml");
+    const item = xml.querySelector("item");
+    if (!item) throw new Error("No se encontró ningún episodio");
+    
+    const title = item.querySelector("title").textContent;
+    const audioUrl = item.querySelector("enclosure").getAttribute("url");
+    const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
+    const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
+
+    const playerHTML = `
+      <div>
+        <img src="${imageUrl}" alt="Carátula episodio">
+        <div style="flex:1;">
+          <h3>${title}</h3>
+          <p>Publicado el ${pubDate}</p>
+          <audio controls preload="none">
+            <source src="${audioUrl}" type="audio/mpeg" />
+            Tu navegador no soporta audio HTML5.
+          </audio>
+        </div>
+      </div>
+    `;
+    document.getElementById("podcast-player").innerHTML = playerHTML;
+  } catch (error) {
+    document.getElementById("podcast-player").innerHTML = `<p style="color:#f00;">No se pudo cargar el reproductor. Intenta más tarde.</p>`;
+    console.error("Error cargando el feed:", error);
+  }
+}
+
+loadLatestIvooxEpisode();

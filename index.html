@@ -84,26 +84,19 @@
       <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
 
 <div class="player-container">
-  <!-- Leyenda superior -->
-  <h3 class="live-label">En vivo Miércoles 21:00</h3>
-
-  <!-- Fondo con Matrix -->
   <div class="player-background">
-    <img src="img/sonarrock.jpg" class="background-img" alt="Sonar Rock">
     <canvas id="matrix"></canvas>
-  </div>
+    <img src="img/background.jpg" alt="Background" class="player-image">
+    <h3 class="live-label">En vivo Miércoles 21:00</h3>
 
-  <!-- Controles -->
-  <div class="controls">
-    <button id="playBtn" class="btn play"><i class="fas fa-play"></i></button>
-    <button id="stopBtn" class="btn stop"><i class="fas fa-stop"></i></button>
-    <button id="muteBtn" class="btn mute"><i class="fas fa-volume-mute"></i></button>
-  </div>
+    <div class="controls">
+      <button id="play-btn" class="control-btn play">▶</button>
+      <button id="stop-btn" class="control-btn stop">■</button>
+      <button id="mute-btn" class="control-btn mute">🔇</button>
+    </div>
 
-  <!-- Audio -->
-  <audio id="audioPlayer" preload="auto">
-    <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-  </audio>
+    <div id="now-playing">Cargando canción...</div>
+  </div>
 </div>
 
 <!-- Cargar script -->

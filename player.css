@@ -85,18 +85,28 @@
     justify-content: center;
 }
 
-/* BOTONES */
-.btn {
-    border: none;
-    cursor: pointer;
-    border-radius: 50%;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
+.contenedor-horizontal {
+  display: flex; /* Permite alinear elementos en una fila */
+  justify-content: center; /* Centra los elementos en el eje horizontal */
+  align-items: center; /* Centra los elementos en el eje vertical */
+  /* Puedes agregar otras propiedades como: */
+  /* gap: 10px; */ /* Espacio entre los botones */
 }
 
+.btn {
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  color: #fff;
+  background-color: #007bff; /* Un color de fondo para los botones */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  width: 50px; /* Ancho del botón */
+  height: 50px; /* Alto del botón */
+  margin: 5px; /* Espacio entre botones */
+    
 /* Play Button */
 .btn.play {
     width: 50px;  /* más pequeño */

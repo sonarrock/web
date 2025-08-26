@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
     muteBtn.innerHTML = isMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
   });
 
- // Matrix Animation
+// Matrix Animation
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 
@@ -67,50 +67,49 @@ const ctx = canvas.getContext("2d");
 canvas.width = canvas.offsetWidth;
 canvas.height = canvas.offsetHeight;
 
+
 // Letras para la animación
 const letters = "アァカサタナハマヤャラワガザダバパイィキシチニヒミリギジヂビピウゥクスツヌフムユュルグズヅブプエェケセテネヘメレゲゼデベペオォコソトノホモヨョロヲゴゾドボポABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-const lettersArray = letters.split("");
-
-// Tamaño de fuente más pequeño para más densidad
-const fontSize = 10; // antes 14
+const fontSize = 14; // más pequeño = más caracteres
 const columns = Math.floor(canvas.width / fontSize);
 
-// Array para mantener la posición de cada columna
+// Posiciones iniciales de cada columna
 const drops = [];
-for (let i = 0; i < columns; i++) drops[i] = Math.random() * canvas.height;
-
-// Función de animación
-function drawMatrix() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = "#0F0";
-    ctx.font = fontSize + "px monospace";
-
-    for (let i = 0; i < drops.length; i++) {
-        const text = lettersArray[Math.floor(Math.random() * lettersArray.length)];
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        // Movimiento de la letra
-        if (drops[i] * fontSize > canvas.height || Math.random() > 0.95) {
-            drops[i] = 0;
-        }
-
-        drops[i]++;
-    }
-
-    requestAnimationFrame(drawMatrix);
+for (let x = 0; x < columns; x++) {
+  drops[x] = Math.floor(Math.random() * canvas.height / fontSize);
 }
 
-// Ejecutar solo al dar Play
-const playBtn = document.getElementById("play-btn");
-let matrixRunning = false;
+// Función de dibujo
+function draw() {
+  // Fondo semitransparente para efecto de estela
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-playBtn.addEventListener("click", () => {
-    const audio = document.getElementById("audio");
-    audio.play();
-    if (!matrixRunning) {
-        matrixRunning = true;
-        drawMatrix();
+  ctx.fillStyle = "#0F0"; // color de letras
+  ctx.font = fontSize + "px monospace";
+
+  for (let i = 0; i < drops.length; i++) {
+    const text = letters.charAt(Math.floor(Math.random() * letters.length));
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+    // Reinciar caída al llegar al fondo
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
     }
+    drops[i]++;
+  }
+}
+
+// Ejecutar animación solo al dar play
+let matrixInterval;
+document.getElementById("play-btn").addEventListener("click", () => {
+  if (!matrixInterval) {
+    matrixInterval = setInterval(draw, 50);
+  }
+});
+
+document.getElementById("stop-btn").addEventListener("click", () => {
+  clearInterval(matrixInterval);
+  matrixInterval = null;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 });

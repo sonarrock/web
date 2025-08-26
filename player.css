@@ -1,96 +1,135 @@
+/* ===== Contenedor principal ===== */
 .player-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
+  width: 100%;
+  max-width: 900px;
   margin: 20px auto;
+  border: 2px solid #ff6600; /* marco naranja */
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: monospace;
 }
 
+/* ===== Imagen de fondo ===== */
 .player-background {
   position: relative;
   width: 100%;
-  max-width: 600px;
-  height: 450px; /* Ajuste para que se vea completa la imagen */
+  height: 450px;
   overflow: hidden;
-  border: 4px solid orange;
-  border-radius: 15px;
 }
 
-.player-image {
+.player-background img.background-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 0;
 }
 
+/* ===== Canvas Matrix ===== */
 #matrix {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.75; /* Transparencia Matrix */
-  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: screen;
+  opacity: 0.75; /* 75% opacidad */
 }
 
+/* ===== Leyenda en vivo ===== */
 .live-label {
   position: absolute;
   top: 10px;
   left: 15px;
-  color: white;
+  color: #fff;
   font-size: 1.2rem;
-  margin: 0;
+  font-weight: bold;
+  z-index: 2;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
 }
 
+/* ===== Controles ===== */
 .controls {
   position: absolute;
-  bottom: 15px;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 15px;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 10px 15px;
-  border-radius: 15px;
+  padding: 10px 20px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 12px;
+  z-index: 2;
 }
 
-.control-btn {
+/* Botones */
+.controls .btn {
   border: none;
-  cursor: pointer;
   border-radius: 50%;
-  transition: all 0.3s ease;
-  color: white;
-  background: orange;
-  box-shadow: 0 0 10px orange;
+  cursor: pointer;
+  color: #ff6600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s, background 0.2s, color 0.2s;
+  background: rgba(255,255,255,0.3);
 }
 
-.control-btn:hover {
-  box-shadow: 0 0 20px white, 0 0 40px orange;
+.controls .btn.play {
+  width: 70px;
+  height: 70px;
+  font-size: 2rem;
 }
 
-/* Tamaños relativos */
-.play {
+.controls .btn.stop {
   width: 60px;
   height: 60px;
   font-size: 1.5rem;
 }
 
-.stop {
+.controls .btn.mute {
   width: 50px;
   height: 50px;
   font-size: 1.2rem;
 }
 
-.mute {
-  width: 40px;
-  height: 40px;
-  font-size: 1rem;
+.controls .btn:hover {
+  transform: scale(1.2);
+  background: rgba(255,255,255,0.6);
+  color: #fff;
 }
 
+/* ===== Metadata ===== */
 #now-playing {
   position: absolute;
-  bottom: 60px;
-  width: 100%;
-  text-align: center;
-  color: white;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
   font-size: 1rem;
+  z-index: 2;
+  max-width: 90%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+}
+
+/* ===== Responsivo ===== */
+@media (max-width: 480px) {
+  .player-background {
+    height: 350px;
+  }
+  .live-label {
+    font-size: 1rem;
+  }
+  .controls .btn.play { width: 60px; height: 60px; font-size: 1.8rem; }
+  .controls .btn.stop { width: 50px; height: 50px; font-size: 1.2rem; }
+  .controls .btn.mute { width: 40px; height: 40px; font-size: 1rem; }
+  #now-playing { font-size: 0.9rem; bottom: 70px; }
 }

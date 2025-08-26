@@ -1,24 +1,19 @@
-// Player.js original restaurado
-
+// ================== PLAYER ==================
 const audio = document.getElementById("audio");
 const playBtn = document.getElementById("play-btn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
 
-let isPlaying = false;
-
 // Play / Pause
 playBtn.addEventListener("click", () => {
-    if (!isPlaying) {
+    if (audio.paused) {
         audio.play();
-        isPlaying = true;
+        matrixRunning = true;
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        startMatrix();
     } else {
         audio.pause();
-        isPlaying = false;
+        matrixRunning = false;
         playBtn.innerHTML = '<i class="fas fa-play"></i>';
-        stopMatrix();
     }
 });
 
@@ -26,66 +21,76 @@ playBtn.addEventListener("click", () => {
 stopBtn.addEventListener("click", () => {
     audio.pause();
     audio.currentTime = 0;
-    isPlaying = false;
+    matrixRunning = false;
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    stopMatrix();
 });
 
 // Mute / Unmute
 muteBtn.addEventListener("click", () => {
     audio.muted = !audio.muted;
-    muteBtn.innerHTML = audio.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+    muteBtn.innerHTML = audio.muted
+        ? '<i class="fas fa-volume-mute"></i>'
+        : '<i class="fas fa-volume-up"></i>';
 });
 
-// Matrix animation
-let canvas, ctx;
-let matrixInterval;
-let columns;
-let drops;
-let fontSize = 14; // tamaño de letra original
+// ================== MATRIX ANIMATION ==================
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
 
-function startMatrix() {
-    canvas = document.getElementById("matrix");
-    ctx = canvas.getContext("2d");
+// Ajusta el tamaño del canvas
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
 
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+// Caracteres y columnas
+const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
+const fontSize = 12; // más pequeño = más columnas
+const columns = Math.floor(canvas.width / fontSize);
 
-    columns = Math.floor(canvas.width / fontSize);
-    drops = Array(columns).fill(1);
+// Arreglo de posiciones Y de cada columna
+const drops = Array(columns).fill(0);
 
-    matrixInterval = setInterval(drawMatrix, 50);
-}
+// Control de animación
+let matrixRunning = false;
 
-function stopMatrix() {
-    clearInterval(matrixInterval);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
+// Animación
+function draw() {
+    if (!matrixRunning) return;
 
-function drawMatrix() {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    // Fondo semitransparente para efecto "trazo"
+    ctx.fillStyle = "rgba(0,0,0,0.05)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.fillStyle = "#0F0";
     ctx.font = fontSize + "px monospace";
 
     for (let i = 0; i < drops.length; i++) {
-        const text = String.fromCharCode(33 + Math.random() * 94);
+        const text = chars.charAt(Math.floor(Math.random() * chars.length));
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
+        // Reinicia la columna aleatoriamente para efecto infinito
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
             drops[i] = 0;
         }
+
         drops[i]++;
     }
+
+    requestAnimationFrame(draw);
 }
 
-// Autoajuste canvas al redimensionar
-window.addEventListener("resize", () => {
-    if (canvas) {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-        columns = Math.floor(canvas.width / fontSize);
-        drops = Array(columns).fill(1);
+// Inicializa matrix solo al dar play
+audio.addEventListener("play", () => {
+    if (!matrixRunning) {
+        matrixRunning = true;
+        draw();
     }
+});
+
+audio.addEventListener("pause", () => {
+    matrixRunning = false;
+});
+
+audio.addEventListener("ended", () => {
+    matrixRunning = false;
+    playBtn.innerHTML = '<i class="fas fa-play"></i>';
 });

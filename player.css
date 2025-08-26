@@ -75,11 +75,12 @@
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 15px;
+    gap: 10px; /* menos separación */
     z-index: 3;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.3); /* blanco con 30% opacidad */
+    padding: 8px 15px;
     border-radius: 12px;
+    flex-direction: row; /* siempre horizontal */
 }
 
 /* BOTONES */
@@ -96,35 +97,35 @@
 
 /* Play Button */
 .btn.play {
-    width: 70px;
-    height: 70px;
+    width: 55px;   /* más pequeño */
+    height: 55px;
     background: linear-gradient(45deg, #ff6600, #ff8833);
-    font-size: 28px;
-    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
+    font-size: 22px;
+    box-shadow: 0 4px 12px rgba(255, 102, 0, 0.6);
 }
 
 /* Stop Button */
 .btn.stop {
-    width: 55px;
-    height: 55px;
-    background: linear-gradient(45deg, #ff6600, #ff8833);
-    font-size: 22px;
-    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
-}
-
-/* Mute Button */
-.btn.mute {
     width: 45px;
     height: 45px;
     background: linear-gradient(45deg, #ff6600, #ff8833);
     font-size: 18px;
-    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
+    box-shadow: 0 4px 12px rgba(255, 102, 0, 0.6);
+}
+
+/* Mute Button */
+.btn.mute {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(45deg, #ff6600, #ff8833);
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(255, 102, 0, 0.6);
 }
 
 /* Hover efecto brillo */
 .btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(255, 102, 0, 1);
+    box-shadow: 0 0 18px rgba(255, 102, 0, 1);
 }
 
 /* ================= RESPONSIVE ================= */

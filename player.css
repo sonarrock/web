@@ -6,18 +6,17 @@
     margin: 20px auto;
     border-radius: 15px;
     overflow: hidden;
-    border: 2px solid #ff6600; /* Marco naranja */
+    border: 2px solid #ff6600;
     box-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
     background: #000;
 }
 
-/* ================= FONDO + MATRIX ================= */
+/* ================= PLAYER BACKGROUND ================= */
 .player-background {
     position: relative;
     width: 100%;
-    height: 450px;
+    height: 450px; /* altura ajustable */
     overflow: hidden;
-    background: #000;
 }
 
 .player-background img.background-img {
@@ -36,11 +35,11 @@
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0.5; /* 50% opacidad */
+    opacity: 0.5; /* Matrix al 50% de opacidad */
     z-index: 2;
 }
 
-/* ================= LEYENDA EN VIVO ================= */
+/* ================= LIVE LABEL ================= */
 .live-label {
     position: absolute;
     top: 10px;
@@ -49,12 +48,13 @@
     color: #fff;
     font-size: 1.2rem;
     font-weight: bold;
+    text-shadow: 0 0 8px rgba(0,0,0,0.7);
 }
 
 /* ================= METADATA ================= */
 #now-playing {
     position: absolute;
-    bottom: 90px;
+    bottom: 100px; /* encima de los botones */
     left: 50%;
     transform: translateX(-50%);
     color: #fff;
@@ -65,6 +65,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-shadow: 0 0 5px rgba(0,0,0,0.7);
 }
 
 /* ================= CONTROLES ================= */
@@ -81,7 +82,7 @@
     border-radius: 12px;
 }
 
-/* BOTONES NARANJAS */
+/* BOTONES */
 .btn {
     border: none;
     cursor: pointer;
@@ -93,6 +94,7 @@
     transition: all 0.3s ease;
 }
 
+/* Play Button */
 .btn.play {
     width: 70px;
     height: 70px;
@@ -101,6 +103,7 @@
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
 }
 
+/* Stop Button */
 .btn.stop {
     width: 55px;
     height: 55px;
@@ -109,6 +112,7 @@
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
 }
 
+/* Mute Button */
 .btn.mute {
     width: 45px;
     height: 45px;
@@ -117,7 +121,7 @@
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
 }
 
-/* HOVER BRILLO */
+/* Hover efecto brillo */
 .btn:hover {
     transform: scale(1.1);
     box-shadow: 0 0 20px rgba(255, 102, 0, 1);
@@ -128,17 +132,14 @@
     .player-background {
         height: 350px;
     }
-
     .controls {
         gap: 10px;
         padding: 8px 15px;
     }
-
     .btn.play { width: 60px; height: 60px; font-size: 24px; }
     .btn.stop { width: 45px; height: 45px; font-size: 20px; }
     .btn.mute { width: 35px; height: 35px; font-size: 16px; }
-
-    #now-playing { bottom: 75px; font-size: 0.9rem; }
+    #now-playing { bottom: 80px; font-size: 0.9rem; }
     .live-label { font-size: 1rem; top: 8px; left: 8px; }
 }
 
@@ -146,17 +147,14 @@
     .player-background {
         height: 250px;
     }
-
     .controls {
         flex-direction: column;
         gap: 8px;
         padding: 5px 10px;
     }
-
     .btn.play { width: 50px; height: 50px; font-size: 20px; }
     .btn.stop { width: 40px; height: 40px; font-size: 18px; }
     .btn.mute { width: 30px; height: 30px; font-size: 14px; }
-
     #now-playing { bottom: 60px; font-size: 0.8rem; }
     .live-label { font-size: 0.9rem; top: 5px; left: 5px; }
 }

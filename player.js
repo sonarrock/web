@@ -1,135 +1,93 @@
-/* ===== Contenedor principal ===== */
-.player-container {
-  position: relative;
-  width: 100%;
-  max-width: 900px;
-  margin: 20px auto;
-  border: 2px solid #ff6600; /* marco naranja */
-  border-radius: 12px;
-  overflow: hidden;
-  font-family: monospace;
+const audio = document.getElementById('audio');
+const playBtn = document.getElementById('play-btn');
+const stopBtn = document.getElementById('stop-btn');
+const muteBtn = document.getElementById('mute-btn');
+const nowPlaying = document.getElementById('now-playing');
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+
+let isPlaying = false;
+let animationId;
+
+// Ajuste del canvas
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
 }
 
-/* ===== Imagen de fondo ===== */
-.player-background {
-  position: relative;
-  width: 100%;
-  height: 450px;
-  overflow: hidden;
-}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
-.player-background img.background-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  position: absolute;
-  top: 0; left: 0;
-  z-index: 0;
-}
+// Matrix Effect
+const letters = 'アカサタナハマヤラワABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*';
+const lettersArray = letters.split('');
+const fontSize = 14;
+let columns = canvas.width / fontSize;
+let drops = Array(Math.floor(columns)).fill(1);
 
-/* ===== Canvas Matrix ===== */
-#matrix {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  mix-blend-mode: screen;
-  opacity: 0.50; /* 50% opacidad */
-}
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(0,0,0,0.1)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-/* ===== Leyenda en vivo ===== */
-.live-label {
-  position: absolute;
-  top: 10px;
-  left: 15px;
-  color: #fff;
-  font-size: 1.2rem;
-  font-weight: bold;
-  z-index: 2;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
-}
+  ctx.fillStyle = '#00FF41';
+  ctx.font = `${fontSize}px monospace`;
 
-/* ===== Controles ===== */
-.controls {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 15px;
-  padding: 10px 20px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 12px;
-  z-index: 2;
-}
+  for (let i = 0; i < drops.length; i++) {
+    const text = lettersArray[Math.floor(Math.random() * lettersArray.length)];
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-/* Botones */
-.controls .btn {
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  color: #ff6600;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: transform 0.2s, background 0.2s, color 0.2s;
-  background: rgba(255,255,255,0.3);
-}
-
-.controls .btn.play {
-  width: 70px;
-  height: 70px;
-  font-size: 2rem;
-}
-
-.controls .btn.stop {
-  width: 60px;
-  height: 60px;
-  font-size: 1.5rem;
-}
-
-.controls .btn.mute {
-  width: 50px;
-  height: 50px;
-  font-size: 1.2rem;
-}
-
-.controls .btn:hover {
-  transform: scale(1.2);
-  background: rgba(255,255,255,0.6);
-  color: #fff;
-}
-
-/* ===== Metadata ===== */
-#now-playing {
-  position: absolute;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #fff;
-  font-size: 1rem;
-  z-index: 2;
-  max-width: 90%;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
-}
-
-/* ===== Responsivo ===== */
-@media (max-width: 480px) {
-  .player-background {
-    height: 350px;
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
+    }
+    drops[i]++;
   }
-  .live-label {
-    font-size: 1rem;
-  }
-  .controls .btn.play { width: 60px; height: 60px; font-size: 1.8rem; }
-  .controls .btn.stop { width: 50px; height: 50px; font-size: 1.2rem; }
-  .controls .btn.mute { width: 40px; height: 40px; font-size: 1rem; }
-  #now-playing { font-size: 0.9rem; bottom: 70px; }
+
+  animationId = requestAnimationFrame(drawMatrix);
 }
+
+// Control Play/Pause
+playBtn.addEventListener('click', () => {
+  if (!isPlaying) {
+    audio.play();
+    drawMatrix();
+    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+  } else {
+    audio.pause();
+    cancelAnimationFrame(animationId);
+    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+  }
+  isPlaying = !isPlaying;
+});
+
+// Stop
+stopBtn.addEventListener('click', () => {
+  audio.pause();
+  audio.currentTime = 0;
+  cancelAnimationFrame(animationId);
+  playBtn.innerHTML = '<i class="fas fa-play"></i>';
+  isPlaying = false;
+});
+
+// Mute
+muteBtn.addEventListener('click', () => {
+  audio.muted = !audio.muted;
+  muteBtn.innerHTML = audio.muted
+    ? '<i class="fas fa-volume-mute"></i>'
+    : '<i class="fas fa-volume-up"></i>';
+});
+
+// Mostrar metadata placeholder
+audio.addEventListener('play', () => {
+  nowPlaying.textContent = 'Reproduciendo...';
+});
+
+audio.addEventListener('pause', () => {
+  nowPlaying.textContent = 'Pausado';
+});
+
+audio.addEventListener('ended', () => {
+  nowPlaying.textContent = 'Reproducción finalizada';
+  cancelAnimationFrame(animationId);
+  playBtn.innerHTML = '<i class="fas fa-play"></i>';
+  isPlaying = false;
+});

@@ -1,130 +1,128 @@
-const audio = document.getElementById('audio');
-const playBtn = document.getElementById('play-btn');
-const stopBtn = document.getElementById('stop-btn');
-const muteBtn = document.getElementById('mute-btn');
-const nowPlaying = document.getElementById('now-playing');
-const canvas = document.getElementById('matrix');
-const ctx = canvas.getContext('2d');
+// ======== PLAYER STREAMING ========
 
-let isPlaying = false;
-let animationId;
+document.addEventListener('DOMContentLoaded', function() {
+  const playBtn = document.getElementById('play-btn');
+  const stopBtn = document.getElementById('stop-btn');
+  const muteBtn = document.getElementById('mute-btn');
+  const audio = document.getElementById('audio');
+  const nowPlaying = document.getElementById('now-playing');
 
-// Ajuste del canvas
-function resizeCanvas() {
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-}
+  let isPlaying = false;
+  let isMuted = false;
 
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-// Matrix Effect
-const letters = 'アカサタナハマヤラワABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*';
-const lettersArray = letters.split('');
-const fontSize = 14;
-let columns = canvas.width / fontSize;
-let drops = Array(Math.floor(columns)).fill(1);
-
-function drawMatrix() {
-  ctx.fillStyle = 'rgba(0,0,0,0.1)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.fillStyle = '#00FF41';
-  ctx.font = `${fontSize}px monospace`;
-
-  for (let i = 0; i < drops.length; i++) {
-    const text = lettersArray[Math.floor(Math.random() * lettersArray.length)];
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-      drops[i] = 0;
+  // ===== CONTROLES DE AUDIO =====
+  playBtn.addEventListener('click', function() {
+    if (!isPlaying) {
+      audio.play().catch(e => console.error('Error al reproducir:', e));
+      playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+      stopBtn.innerHTML = '<i class="fas fa-stop"></i>';
+    } else {
+      audio.pause();
+      playBtn.innerHTML = '<i class="fas fa-play"></i>';
     }
-    drops[i]++;
-  }
+    isPlaying = !isPlaying;
+  });
 
-  animationId = requestAnimationFrame(drawMatrix);
-}
-
-// Control Play/Pause
-playBtn.addEventListener('click', () => {
-  if (!isPlaying) {
-    audio.play();
-    drawMatrix();
-    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-  } else {
+  stopBtn.addEventListener('click', function() {
     audio.pause();
-    cancelAnimationFrame(animationId);
+    audio.currentTime = 0;
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    stopBtn.innerHTML = '<i class="fas fa-stop"></i>';
+    isPlaying = false;
+  });
+
+  muteBtn.addEventListener('click', function() {
+    isMuted = !isMuted;
+    audio.muted = isMuted;
+    muteBtn.innerHTML = isMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+  });
+
+  // ===== METADATOS =====
+  async function cargarMetadata() {
+    try {
+      const response = await fetch("https://stream.zeno.fm/ezq3fcuf5ehvv?json=1");
+      const data = await response.json();
+
+      if (data.artist && data.title) {
+        nowPlaying.textContent = `${data.artist} - ${data.title}`;
+      } else {
+        nowPlaying.textContent = "Escuchando Sonar Rock";
+      }
+    } catch (error) {
+      nowPlaying.textContent = "Cargando canción...";
+      console.error("Error cargando metadata:", error);
+    }
   }
-  isPlaying = !isPlaying;
-});
 
-// Stop
-stopBtn.addEventListener('click', () => {
-  audio.pause();
-  audio.currentTime = 0;
-  cancelAnimationFrame(animationId);
-  playBtn.innerHTML = '<i class="fas fa-play"></i>';
-  isPlaying = false;
-});
+  cargarMetadata();
+  setInterval(cargarMetadata, 15000); // actualiza cada 15s
 
-// Mute
-muteBtn.addEventListener('click', () => {
-  audio.muted = !audio.muted;
-  muteBtn.innerHTML = audio.muted
-    ? '<i class="fas fa-volume-mute"></i>'
-    : '<i class="fas fa-volume-up"></i>';
-});
+  // ===== VISUALIZADOR MATRIX =====
+  const canvas = document.getElementById("matrix");
+  const ctx = canvas.getContext("2d");
 
-// Mostrar metadata placeholder
-audio.addEventListener('play', () => {
-  nowPlaying.textContent = 'Reproduciendo...';
-});
+  function ajustarCanvas() {
+    canvas.width = canvas.parentElement.offsetWidth;
+    canvas.height = canvas.parentElement.offsetHeight;
+  }
+  ajustarCanvas();
+  window.addEventListener('resize', ajustarCanvas);
 
-audio.addEventListener('pause', () => {
-  nowPlaying.textContent = 'Pausado';
-});
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
+  const fontSize = 16;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
 
-audio.addEventListener('ended', () => {
-  nowPlaying.textContent = 'Reproducción finalizada';
-  cancelAnimationFrame(animationId);
-  playBtn.innerHTML = '<i class="fas fa-play"></i>';
-  isPlaying = false;
-});
+  function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-// ================== IVOOX ==================
-async function loadLatestIvooxEpisode() {
-  const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
-  try {
-    const response = await fetch(feedUrl);
-    const xmlText = await response.text();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(xmlText, "text/xml");
-    const item = xml.querySelector("item");
-    if (!item) throw new Error("No se encontró ningún episodio");
-    
-    const title = item.querySelector("title").textContent;
-    const audioUrl = item.querySelector("enclosure").getAttribute("url");
-    const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
-    const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
+    ctx.fillStyle = "rgba(0, 255, 70, 0.75)";
+    ctx.font = fontSize + "px monospace";
 
-    const playerHTML = `
-      <div>
-        <img src="${imageUrl}" alt="Carátula episodio">
-        <div style="flex:1;">
-          <h3>${title}</h3>
-          <p>Publicado el ${pubDate}</p>
-          <audio controls preload="none">
-            <source src="${audioUrl}" type="audio/mpeg" />
-            Tu navegador no soporta audio HTML5.
-          </audio>
-        </div>
-      </div>
+    for (let i = 0; i < drops.length; i++) {
+      const text = letters.charAt(Math.floor(Math.random() * letters.length));
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  let matrixInterval = null;
+
+  function startMatrix() {
+    if (!matrixInterval) matrixInterval = setInterval(drawMatrix, 50);
+  }
+
+  function stopMatrix() {
+    if (matrixInterval) clearInterval(matrixInterval);
+    matrixInterval = null;
+  }
+
+  // iniciar matrix solo cuando se reproduce
+  audio.addEventListener('play', startMatrix);
+  audio.addEventListener('pause', stopMatrix);
+  audio.addEventListener('ended', stopMatrix);
+
+  // por defecto, mostrar matrix estática
+  drawMatrix();
+
+  // ===== INSERTAR REPRODUCTOR IVOOX =====
+  const podcastPlayer = document.getElementById("podcast-player");
+  if (podcastPlayer) {
+    podcastPlayer.innerHTML = `
+      <iframe 
+        src="https://www.ivoox.com/player_ejemplo" 
+        width="100%" 
+        height="170" 
+        frameborder="0" 
+        allow="autoplay; encrypted-media" 
+        style="border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.6);">
+      </iframe>
     `;
-    document.getElementById("podcast-player").innerHTML = playerHTML;
-  } catch (error) {
-    document.getElementById("podcast-player").innerHTML = `<p style="color:#f00;">No se pudo cargar el reproductor. Intenta más tarde.</p>`;
-    console.error("Error cargando el feed:", error);
   }
-}
 
+});

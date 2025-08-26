@@ -1,22 +1,22 @@
-/* ================= PLAYER CONTAINER ================= */
+/* ================= PLAYER REPRODUCTOR ================= */
+
 .player-container {
     position: relative;
     width: 100%;
     max-width: 650px;
-    margin: 20px auto;
+    margin: 0 auto;
     border-radius: 15px;
     overflow: hidden;
     border: 2px solid #ff6600;
     box-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
-    background: #000;
 }
 
-/* ================= PLAYER BACKGROUND ================= */
 .player-background {
     position: relative;
     width: 100%;
-    height: 450px; /* altura ajustable */
+    height: 450px; /* altura ajustable para mostrar la imagen completa */
     overflow: hidden;
+    background: #000;
 }
 
 .player-background img.background-img {
@@ -35,11 +35,11 @@
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0.5; /* Matrix al 50% de opacidad */
+    opacity: 0.75; /* transparencia 75% */
     z-index: 2;
 }
 
-/* ================= LIVE LABEL ================= */
+/* Leyenda en vivo */
 .live-label {
     position: absolute;
     top: 10px;
@@ -48,87 +48,53 @@
     color: #fff;
     font-size: 1.2rem;
     font-weight: bold;
-    text-shadow: 0 0 8px rgba(0,0,0,0.7);
 }
 
-/* ================= METADATA ================= */
-#now-playing {
-    position: absolute;
-    bottom: 100px; /* encima de los botones */
-    left: 50%;
-    transform: translateX(-50%);
-    color: #fff;
-    font-weight: bold;
-    z-index: 3;
-    font-size: 1rem;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-shadow: 0 0 5px rgba(0,0,0,0.7);
-}
-
-/* ================= CONTROLES ================= */
+/* Contenedor de botones */
 .controls {
-    position: relative;
-    bottom: 13px;
+    position: absolute;
+    bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
-    display: flex;          /* Mantener horizontal */
-    flex-direction: row;    /* Forzar fila horizontal */
+    display: flex;
     gap: 15px;
     z-index: 3;
-    background: rgba(255, 255, 255, 0.3); /* Contenedor blanco transparente */
+    background: rgba(255, 255, 255, 0.1); /* contenedor transparente */
     padding: 10px 20px;
     border-radius: 12px;
-    flex-wrap: wrap;        /* Permite que se ajusten en pantallas muy pequeñas */
-    justify-content: center;
 }
 
-.contenedor-horizontal {
-  display: flex; /* Permite alinear elementos en una fila */
-  justify-content: center; /* Centra los elementos en el eje horizontal */
-  align-items: center; /* Centra los elementos en el eje vertical */
-  /* Puedes agregar otras propiedades como: */
-  /* gap: 10px; */ /* Espacio entre los botones */
-}
-
+/* Botones */
 .btn {
-  border: none;
-  cursor: pointer;
-  border-radius: 50%;
-  color: #fff;
-  background-color: #007bff; /* Un color de fondo para los botones */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  width: 50px; /* Ancho del botón */
-  height: 50px; /* Alto del botón */
-  margin: 5px; /* Espacio entre botones */
-    
-/* Play Button */
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
 .btn.play {
-    width: 50px;  /* más pequeño */
-    height: 50px;
+    width: 70px;
+    height: 70px;
     background: linear-gradient(45deg, #ff6600, #ff8833);
-    font-size: 24px;
+    font-size: 28px;
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
 }
 
-/* Stop Button */
 .btn.stop {
-    width: 40px;
-    height: 40px;
+    width: 55px;
+    height: 55px;
     background: linear-gradient(45deg, #ff6600, #ff8833);
-    font-size: 20px;
+    font-size: 22px;
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
 }
 
-/* Mute Button */
 .btn.mute {
-    width: 35px;
-    height: 35px;
+    width: 45px;
+    height: 45px;
     background: linear-gradient(45deg, #ff6600, #ff8833);
     font-size: 18px;
     box-shadow: 0 4px 15px rgba(255, 102, 0, 0.6);
@@ -140,14 +106,56 @@
     box-shadow: 0 0 20px rgba(255, 102, 0, 1);
 }
 
-/* ================= RESPONSIVE ================= */
-@media (max-width: 480px) {
+/* Metadata */
+#now-playing {
+    position: absolute;
+    bottom: 90px; /* encima de los botones */
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-weight: bold;
+    z-index: 3;
+    font-size: 1rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .player-background {
+        height: 350px;
+    }
+
     .controls {
-        flex-direction: row;   /* fuerza horizontal en móviles */
-        gap: 12px;
+        gap: 10px;
         padding: 8px 15px;
     }
+
     .btn.play { width: 60px; height: 60px; font-size: 24px; }
-    .btn.stop { width: 50px; height: 50px; font-size: 20px; }
-    .btn.mute { width: 40px; height: 40px; font-size: 16px; }
+    .btn.stop { width: 45px; height: 45px; font-size: 20px; }
+    .btn.mute { width: 35px; height: 35px; font-size: 16px; }
+
+    #now-playing { bottom: 75px; font-size: 0.9rem; }
+    .live-label { font-size: 1rem; top: 8px; left: 8px; }
+}
+
+@media (max-width: 480px) {
+    .player-background {
+        height: 250px;
+    }
+
+    .controls {
+        flex-direction: column;
+        gap: 8px;
+        padding: 5px 10px;
+    }
+
+    .btn.play { width: 50px; height: 50px; font-size: 20px; }
+    .btn.stop { width: 40px; height: 40px; font-size: 18px; }
+    .btn.mute { width: 30px; height: 30px; font-size: 14px; }
+
+    #now-playing { bottom: 60px; font-size: 0.8rem; }
+    .live-label { font-size: 0.9rem; top: 5px; left: 5px; }
 }

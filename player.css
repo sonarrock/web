@@ -3,7 +3,9 @@
   width: 100%;
   max-width: 500px;
   margin: auto;
-  font-family: Arial, sans-serif;
+  border: 4px solid #ff6600; /* Marco naranja */
+  border-radius: 15px;
+  overflow: hidden;
 }
 
 .live-label {
@@ -15,44 +17,49 @@
   z-index: 3;
 }
 
-.background {
+.player-background {
   position: relative;
   width: 100%;
   height: 300px;
-  background: url("img/background.jpg") no-repeat center center/cover;
-  border-radius: 15px;
   overflow: hidden;
+}
+
+.background-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Asegura que la imagen cubra sin cortarse */
+  display: block;
 }
 
 #matrix {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   width: 100%;
-  height: 40%;
-  z-index: 1;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .controls {
-  position: absolute;
-  bottom: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.2);
-  padding: 8px 15px;
-  border-radius: 15px;
   display: flex;
-  gap: 10px;
-  z-index: 2;
+  justify-content: center;
+  gap: 15px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  margin: 10px auto;
+  width: fit-content;
+  z-index: 3;
+  position: relative;
 }
 
-/* Botones */
 .btn {
   border: none;
   border-radius: 50%;
-  cursor: pointer;
   color: white;
-  background: orange;
+  background-color: #ff6600;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,10 +68,9 @@
 
 .btn:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 8px orange;
+  box-shadow: 0 0 15px #ff6600;
 }
 
-/* Tamaños */
 .play {
   width: 60px;
   height: 60px;
@@ -80,5 +86,12 @@
 .mute {
   width: 35px;
   height: 35px;
-  font-size: 14px;
+  font-size: 16px;
+}
+
+#now-playing {
+  text-align: center;
+  color: #fff;
+  font-size: 1rem;
+  margin-bottom: 10px;
 }

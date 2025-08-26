@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
   let isPlaying = false;
   let isMuted = false;
 
-  // ===== CONTROLES DE AUDIO =====
   playBtn.addEventListener('click', function() {
     if (!isPlaying) {
       audio.play().catch(e => console.error('Error al reproducir:', e));
@@ -34,26 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
     audio.muted = isMuted;
     muteBtn.innerHTML = isMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
   });
-
-  // ===== METADATOS =====
-  async function cargarMetadata() {
-    try {
-      const response = await fetch("https://stream.zeno.fm/ezq3fcuf5ehvv?json=1");
-      const data = await response.json();
-
-      if (data.artist && data.title) {
-        nowPlaying.textContent = `${data.artist} - ${data.title}`;
-      } else {
-        nowPlaying.textContent = "Escuchando Sonar Rock";
-      }
-    } catch (error) {
-      nowPlaying.textContent = "Cargando canción...";
-      console.error("Error cargando metadata:", error);
-    }
-  }
-
-  cargarMetadata();
-  setInterval(cargarMetadata, 15000);
 
   // ===== VISUALIZADOR MATRIX =====
   const canvas = document.getElementById("matrix");
@@ -91,18 +70,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   let matrixInterval = null;
 
-  function startMatrix() {
-    if (!matrixInterval) matrixInterval = setInterval(drawMatrix, 50);
-  }
-
-  function stopMatrix() {
-    if (matrixInterval) clearInterval(matrixInterval);
-    matrixInterval = null;
-  }
+  function startMatrix() { if (!matrixInterval) matrixInterval = setInterval(drawMatrix, 50); }
+  function stopMatrix() { if (matrixInterval) clearInterval(matrixInterval); matrixInterval = null; }
 
   audio.addEventListener('play', startMatrix);
   audio.addEventListener('pause', stopMatrix);
   audio.addEventListener('ended', stopMatrix);
 
   drawMatrix();
-
+});

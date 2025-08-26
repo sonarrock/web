@@ -1,70 +1,84 @@
-/* Contenedor principal */
-#matrix-player {
+.player-container {
   position: relative;
   width: 100%;
-  max-width: 600px;
-  height: 400px;
+  max-width: 500px;
   margin: auto;
-  overflow: hidden;
-  border: 3px solid #f60;
-  border-radius: 12px;
+  font-family: Arial, sans-serif;
 }
 
-/* Fondo */
-.bg-img {
+.live-label {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: url("img/background.jpg") no-repeat center center;
-  background-size: cover;
+  top: 10px;
+  left: 15px;
+  color: white;
+  font-size: 1.2rem;
+  z-index: 3;
+}
+
+.background {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  background: url("img/background.jpg") no-repeat center center/cover;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+#matrix {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
   z-index: 1;
 }
 
-/* Matrix canvas */
-#matrix {
+.controls {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 15px;
+  border-radius: 15px;
+  display: flex;
+  gap: 10px;
   z-index: 2;
-  pointer-events: none;
-}
-
-/* Player UI */
-.player-ui {
-  position: relative;
-  z-index: 3;
-  text-align: center;
-  padding: 20px;
-  color: #fff;
 }
 
 /* Botones */
-.player-ui button {
-  margin: 8px;
-  padding: 12px 24px;
+.btn {
   border: none;
-  border-radius: 10px;
-  background: #f60;
-  color: #fff;
-  font-size: 16px;
-  font-weight: bold;
+  border-radius: 50%;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+  color: white;
+  background: orange;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.player-ui button:hover {
-  background: #ff7518;
-  box-shadow: 0 0 20px rgba(255, 102, 0, 0.8);
+.btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 8px orange;
 }
 
-.player-ui button:active {
-  transform: scale(0.95);
-  box-shadow: 0 0 30px rgba(255, 140, 0, 1);
+/* Tamaños */
+.play {
+  width: 60px;
+  height: 60px;
+  font-size: 24px;
 }
 
-/* Texto de canción */
-#now-playing {
-  margin-top: 15px;
+.stop {
+  width: 45px;
+  height: 45px;
+  font-size: 18px;
+}
+
+.mute {
+  width: 35px;
+  height: 35px;
   font-size: 14px;
 }

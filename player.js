@@ -68,8 +68,8 @@ document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('resize', ajustarCanvas);
 
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
-  const fontSize = 16;
-  let columns = Math.floor(canvas.width / fontSize);
+  const fontSize = 14; // más pequeño = más caracteres
+  const columns = canvas.width / fontSize;
   let drops = Array(columns).fill(1);
 
   function drawMatrix() {

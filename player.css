@@ -1,82 +1,14 @@
 /* ================== PLAYER ================== */
-
-/* Contenedor de la barra de progreso */
-.progress-container {
-  width: 100%;
-  height: 5px;
-  background: #333;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-top: 8px;
-  cursor: pointer; /* interactiva */
-}
-
-/* Barra de progreso dinámica */
-#progress {
-  height: 100%;
-  width: 0%;
-  background: #ff6600;
-  transition: width 0.2s linear;
-}
-
-/* Botón mute activo en rojo */
-#mute-btn.muted {
-  color: red;
-}
-
-/* Contador de tiempo debajo de la barra */
-.time-display {
-  color: #fff;
-  font-size: 12px;
-  margin-top: 4px;
-  text-align: center;
-}
-
-/* ================== BOTONES ================== */
-.controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-.btn {
-  background: rgba(255,255,255,0.1);
-  border: none;
-  color: #fff;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-}
-
-.btn:hover {
-  background: rgba(255,255,255,0.2);
-  transform: scale(1.05);
-}
-
-/* Play/Pause mantiene el mismo estilo */
-.btn.play i {
-  font-size: 18px;
-}
-
-.btn.stop i, 
-.btn.mute i {
-  font-size: 16px;
-}
-
-/* ================== CONTAINER PLAYER ================== */
 .player-container {
   position: relative;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.05); /* contenedor translúcido */
   border-radius: 12px;
   padding: 15px;
   max-width: 400px;
   margin: 20px auto;
   text-align: center;
   color: #fff;
+  border: 2px solid #ff6600; /* marco naranja */
 }
 
 /* Fondo + Matrix */
@@ -112,3 +44,65 @@
   font-size: 12px;
   margin-bottom: 6px;
 }
+
+/* ================== CONTROLES ================== */
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #ff6600; /* color naranja */
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn:hover {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.05);
+}
+
+/* ================== BARRA DE PROGRESO ================== */
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.progress-container {
+  flex: 1;
+  height: 5px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+#progress {
+  height: 100%;
+  width: 0%;
+  background: #ff6600;
+  transition: width 0.2s linear;
+}
+
+.time-display {
+  color: #ff6600;
+  font-size: 16px;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Mute activo en rojo */
+#mute-btn.muted {
+  color: red;
+}
+

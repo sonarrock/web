@@ -2,83 +2,102 @@ const audio = document.getElementById("audio");
 const playBtn = document.getElementById("play-btn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
-const progressBar = document.getElementById("progress");
+const progress = document.getElementById("progress");
+const progressContainer = document.querySelector(".progress-container");
 const timeDisplay = document.getElementById("time-display");
 
 let matrixCanvas = document.getElementById("matrix");
 let ctx = matrixCanvas.getContext("2d");
-matrixCanvas.width = matrixCanvas.offsetWidth;
-matrixCanvas.height = matrixCanvas.offsetHeight;
+let animationId;
+let matrixActive = false;
 
-let animationFrame;
-let columns = Math.floor(matrixCanvas.width / 20);
-let drops = Array(columns).fill(1);
+function resizeMatrix() {
+  matrixCanvas.width = matrixCanvas.offsetWidth;
+  matrixCanvas.height = matrixCanvas.offsetHeight;
+}
+window.addEventListener("resize", resizeMatrix);
+resizeMatrix();
+
+const letters = "アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤユヨラリルレロワヲン";
+const lettersArr = letters.split("");
+let fontSize = 14;
+let columns = matrixCanvas.width / fontSize;
+let drops = Array(Math.floor(columns)).fill(1);
 
 function drawMatrix() {
-  ctx.fillStyle = "rgba(0,0,0,0.05)";
+  ctx.fillStyle = "rgba(0,0,0,0.1)";
   ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+  ctx.fillStyle = "#0F0";
+  ctx.font = fontSize + "px monospace";
 
-  ctx.fillStyle = "#0f0";
-  ctx.font = "15px monospace";
+  for (let i = 0; i < drops.length; i++) {
+    let text = lettersArr[Math.floor(Math.random() * lettersArr.length)];
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-  drops.forEach((y, x) => {
-    let text = String.fromCharCode(0x30A0 + Math.random() * 96);
-    ctx.fillText(text, x * 20, y * 20);
-
-    if (y * 20 > matrixCanvas.height && Math.random() > 0.975) {
-      drops[x] = 0;
+    if (drops[i] * fontSize > matrixCanvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
     }
-    drops[x]++;
-  });
-
-  animationFrame = requestAnimationFrame(drawMatrix);
-}
-
-function startMatrix() {
-  if (!animationFrame) {
-    drawMatrix();
+    drops[i]++;
   }
 }
 
+function startMatrix() {
+  if (!matrixActive) {
+    matrixActive = true;
+    function animate() {
+      drawMatrix();
+      animationId = requestAnimationFrame(animate);
+    }
+    animate();
+  }
+}
 function stopMatrix() {
-  cancelAnimationFrame(animationFrame);
-  animationFrame = null;
+  matrixActive = false;
+  cancelAnimationFrame(animationId);
   ctx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
 }
 
-// ▶ Play
+// --- Controles ---
 playBtn.addEventListener("click", () => {
-  audio.play();
-  playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-  startMatrix();
+  if (audio.paused) {
+    audio.play();
+    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    startMatrix();
+  } else {
+    audio.pause();
+    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    stopMatrix();
+  }
 });
 
-// ⏸ Pause con el mismo botón
-audio.addEventListener("pause", () => {
-  playBtn.innerHTML = '<i class="fas fa-play"></i>';
-  stopMatrix();
-});
-
-// ⏹ Stop
 stopBtn.addEventListener("click", () => {
   audio.pause();
   audio.currentTime = 0;
-  stopMatrix();
   playBtn.innerHTML = '<i class="fas fa-play"></i>';
+  stopMatrix();
 });
 
-// 🔇 Mute (NO afecta Matrix)
 muteBtn.addEventListener("click", () => {
   audio.muted = !audio.muted;
-  muteBtn.classList.toggle("active");
+  muteBtn.classList.toggle("muted", audio.muted);
 });
 
-// Barra de progreso
+// Progreso
 audio.addEventListener("timeupdate", () => {
-  let progress = (audio.currentTime / audio.duration) * 100;
-  progressBar.style.width = progress + "%";
+  if (audio.duration) {
+    const percent = (audio.currentTime / audio.duration) * 100;
+    progress.style.width = percent + "%";
+  }
+  let minutes = Math.floor(audio.currentTime / 60);
+  let seconds = Math.floor(audio.currentTime % 60);
+  if (seconds < 10) seconds = "0" + seconds;
+  timeDisplay.textContent = `${minutes}:${seconds}`;
+});
 
-  let mins = Math.floor(audio.currentTime / 60);
-  let secs = Math.floor(audio.currentTime % 60).toString().padStart(2, "0");
-  timeDisplay.textContent = `${mins}:${secs}`;
+progressContainer.addEventListener("click", (e) => {
+  const width = progressContainer.clientWidth;
+  const clickX = e.offsetX;
+  if (audio.duration) {
+    audio.currentTime = (clickX / width) * audio.duration;
+  }
 });

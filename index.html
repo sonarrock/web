@@ -65,6 +65,14 @@
           <button id="mute-btn" class="btn mute"><i class="fas fa-volume-mute"></i></button>
         </div>
 
+        <!-- Barra de progreso y contador -->
+        <div class="progress-wrapper">
+          <div class="progress-container">
+            <div id="progress"></div>
+          </div>
+          <div id="time-display" class="time-display">00:00</div>
+        </div>
+
         <!-- Audio -->
         <audio id="audio" preload="auto">
           <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
@@ -93,7 +101,6 @@
 <!-- Embed Section -->
 <section class="embed-section">
   <div class="container" style="max-width: 650px; margin: auto;">
-
     <!-- Spotify -->
     <div class="spotify-container">
       <h3 class="section-title">Escucha en Spotify</h3>
@@ -112,103 +119,6 @@
     <div id="podcast-player" class="player-wrapper"></div>
   </div>
 </section>
-
-<style>
-  .player-wrapper {
-    width: 100%;
-    max-width: 650px;
-    height: 170px;
-    background: #121212;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgb(0 0 0 / 0.6);
-    display: flex;
-    align-items: center;
-    padding: 15px 20px;
-    box-sizing: border-box;
-    color: #fff;
-    font-family: "Spotify Circular", Arial, sans-serif;
-    gap: 20px;
-  }
-  #podcast-player > div {
-    display: flex;
-    width: 100%;
-    gap: 20px;
-    align-items: center;
-  }
-  #podcast-player img {
-    width: 140px;
-    height: 140px;
-    border-radius: 12px;
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-  #podcast-player h3 {
-    font-size: 14px;
-    margin: 0 0 6px 0;
-    font-weight: 700;
-    color: #FFFFFF; /* blanco */
-  }
-  #podcast-player p {
-    font-size: 10px;
-    color: #b3b3b3;
-    margin: 0 0 10px 0;
-  }
-  #podcast-player audio {
-    width: 100%;
-    outline: none;
-    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
-    border-radius: 8px;
-    background: #222;
-  }
-  .section-title {
-    color: #FF6600 !important;
-    font-family: "Spotify Circular", Arial, sans-serif;
-  }
-</style>
-
-<script>
-  async function loadLatestIvooxEpisode() {
-    const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
-
-    try {
-      const response = await fetch(feedUrl);
-      const xmlText = await response.text();
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(xmlText, "text/xml");
-
-      const item = xml.querySelector("item");
-      if (!item) throw new Error("No se encontró ningún episodio");
-
-      const title = item.querySelector("title").textContent;
-      const audioUrl = item.querySelector("enclosure").getAttribute("url");
-      const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
-      const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
-
-      const playerHTML = `
-        <div>
-          <img src="${imageUrl}" alt="Carátula episodio" />
-          <div style="flex:1;">
-            <h3>${title}</h3>
-            <p>Publicado el ${pubDate}</p>
-            <audio controls preload="none">
-              <source src="${audioUrl}" type="audio/mpeg" />
-              Tu navegador no soporta audio HTML5.
-            </audio>
-          </div>
-        </div>
-      `;
-
-      document.getElementById("podcast-player").innerHTML = playerHTML;
-    } catch (error) {
-      document.getElementById("podcast-player").innerHTML = `<p style="color:#f00;">No se pudo cargar el reproductor. Intenta más tarde.</p>`;
-      console.error("Error cargando el feed:", error);
-    }
-  }
-
-  loadLatestIvooxEpisode();
-</script>
-  </div>
-    </section>
 
 <!-- Staff Section -->
 <section class="staff-section">
@@ -235,43 +145,6 @@
   </div>
 </section>
 
- <!-- About -->
-  <section class="about-section">
-    <div class="container">
-      <div class="about-content">
-        <h2 class="section-title">¿Quiénes Somos?</h2>
-        <p class="about-text">
-          Sonar Rock es una trinchera sonora, un espacio libre y apasionado que nace en Guadalajara, Jalisco, México.
-Nuestra misión es simple pero poderosa: abrir un foro auténtico para las bandas emergentes, apoyar la escena local y mantener viva la esencia del rock en todas sus vertientes.
-
-Creemos en la fuerza de la música como motor de cambio, como punto de encuentro y como refugio de quienes buscan algo distinto a lo convencional.
-En Sonar Rock somos más que una radio: somos comunidad, resistencia y pasión por el sonido que nos une.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section class="about-section">
-    <div class="container">
-      <div class="about-content">
-        <h2 class="section-title">¿Qué es Sonar Rock?</h2>
-        <p class="about-text">
-          Sonar Rock celebra la esencia eterna del rock n’ roll:
-
-Su rebeldía frente a lo establecido.
-
-Su poesía en cada letra y acorde.
-
-Su energía que enciende escenarios y corazones.
-
-Su capacidad de conectar almas más allá de fronteras y generaciones.
-
-Aquí el rock no se escucha de fondo, se vive. Somos un canal donde conviven lo clásico, lo alternativo y lo emergente, siempre con la autenticidad como bandera.
-        </p>
-      </div>
-    </div>
-  </section>
-
 <!-- JS -->
 <script src="player.js"></script>
 <script src="metadatos.js"></script>
@@ -279,103 +152,6 @@ Aquí el rock no se escucha de fondo, se vive. Somos un canal donde conviven lo 
 
 </body>
 </html>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sonar Rock - La Radio Independiente</title>
-
-<!-- CSS -->
-<link href="style.css" rel="stylesheet">
-<link href="player.css" rel="stylesheet">
-
-<!-- Iconos -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
-<!-- PWA & Favicons -->
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ff6600">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
-<link rel="shortcut icon" href="/icons/favicon.ico">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="google" content="notranslate">
-</head>
-<body>
-
-<!-- Header -->
-<header class="header">
-  <div class="container">
-    <div class="logo-section">
-      <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
-      <div class="title-section">
-        <h1>LA RADIO INDEPENDIENTE</h1>
-      </div>
-    </div>
-  </div>
-</header>
-
-<!-- Main Section -->
-<section class="main-section">
-  <div class="container">
-    <div class="main-image-container">
-      <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
-
-      <!-- ================== REPRODUCTOR DE STREAMING ZENO ================== -->
-      <div class="player-container">
-
-        <!-- Leyenda EN VIVO -->
-        <h3 class="live-label" style="color:#fff;">En vivo Miércoles 21:00</h3>
-
-        <!-- Fondo + Matrix -->
-        <div class="player-background">
-          <canvas id="matrix"></canvas>
-          <img src="img/background.jpg" alt="Background" class="background-img">
-        </div>
-
-        <!-- Metadata -->
-        <div id="now-playing">Cargando canción...</div>
-
-        <!-- Controles -->
-        <div class="controls">
-          <button id="play-btn" class="btn play"><i class="fas fa-play"></i></button>
-          <button id="stop-btn" class="btn stop"><i class="fas fa-stop"></i></button>
-          <button id="mute-btn" class="btn mute"><i class="fas fa-volume-mute"></i></button>
-        </div>
-
-        <!-- Barra de progreso -->
-        <div class="progress-container">
-          <div id="progress"></div>
-        </div>
-        <div id="time-display" class="time-display">00:00</div>
-
-        <!-- Audio -->
-        <audio id="audio" preload="auto">
-          <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-        </audio>
-
-      </div> <!-- /.player-container -->
-
-    </div> <!-- /.main-image-container -->
-  </div> <!-- /.container -->
-</section>
-
-<!-- Social Section -->
-<section class="social-section">
-  <div class="container">
-    <h2 class="section-title">Redes Sociales</h2>
-    <div class="social-buttons">
-      <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
-      <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
-      <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
-      <a href="https://open.spotify.com/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA" target="_blank" class="social-btn spotify"><i class="fab fa-spotify"></i></a>
-      <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox"><i class="fas fa-podcast"></i></a>
-    </div>
-  </div>
-</section>
 
 <!-- Embed Section -->
 <section class="embed-section">

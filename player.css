@@ -1,4 +1,121 @@
+/* ================== PLAYER ================== */
+.player-container {
+  position: relative;
+  background: rgba(255,255,255,0.05); /* contenedor translúcido */
+  border-radius: 12px;
+  padding: 15px;
+  max-width: 400px;
+  height: 500px; /* más alto */
+  margin: 20px auto;
+  text-align: center;
+  color: #fff;
+  border: 2px solid #ff6600; /* marco naranja */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* Fondo + Matrix */
 .player-background {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.player-background canvas,
+.player-background .background-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  z-index: 0;
+}
+
+#now-playing {
+  font-size: 14px;
+  margin-bottom: 8px;
+  z-index: 1;
+  position: relative;
+}
+
+.live-label {
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+/* ================== CONTROLES ================== */
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.btn {
+  background: rgba(255,255,255,0.1);
+  border: 2px solid #fff; /* contorno blanco */
+  color: #ff6600; /* naranja */
+  padding: 14px 18px;
+  border-radius: 50%; /* redondeados */
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn:hover {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.05);
+}
+
+.btn:active {
+  transform: scale(0.9); /* animación al presionar */
+}
+
+/* ================== BARRA DE PROGRESO ================== */
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.progress-container {
+  flex: 1;
+  height: 6px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+#progress {
+  height: 100%;
+  width: 0%;
+  background: #ff6600;
+  transition: width 0.2s linear;
+}
+
+.time-display {
+  color: #ff6600;
+  font-size: 16px;
+  min-width: 60px;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Mute activo en rojo */
+#mute-btn.muted {
+  color: red;
+}
+
+player-background {
   position: relative;
   width: 100%;
   height: 400px; /* ajusta si quieres más alto */

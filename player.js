@@ -56,8 +56,7 @@ function runMatrix() {
   const drops = Array(columns).fill(1);
 
   function draw() {
-    ctx.fillStyle = "rgba(0,0,0,0)"; // transparente
-    ctx.fillRect(0, 0, matrix.width, matrix.height);
+    ctx.clearRect(0,0,matrix.width,matrix.height);
 
     ctx.fillStyle = "rgba(0,255,0,0.5)";
     ctx.font = fontSize + "px monospace";

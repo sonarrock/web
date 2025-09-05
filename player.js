@@ -1,103 +1,81 @@
 const audio = document.getElementById("audio");
 const playBtn = document.getElementById("play-btn");
+const pauseBtn = document.getElementById("pause-btn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
 const progress = document.getElementById("progress");
-const progressContainer = document.querySelector(".progress-container");
 const timeDisplay = document.getElementById("time-display");
+const matrix = document.getElementById("matrix");
+let matrixInterval;
 
-let matrixCanvas = document.getElementById("matrix");
-let ctx = matrixCanvas.getContext("2d");
-let animationId;
-let matrixActive = false;
-
-function resizeMatrix() {
-  matrixCanvas.width = matrixCanvas.offsetWidth;
-  matrixCanvas.height = matrixCanvas.offsetHeight;
-}
-window.addEventListener("resize", resizeMatrix);
-resizeMatrix();
-
-const letters = "アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤユヨラリルレロワヲン";
-const lettersArr = letters.split("");
-let fontSize = 14;
-let columns = matrixCanvas.width / fontSize;
-let drops = Array(Math.floor(columns)).fill(1);
-
-function drawMatrix() {
-  ctx.fillStyle = "rgba(0,0,0,0.1)";
-  ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-  ctx.fillStyle = "#0F0";
-  ctx.font = fontSize + "px monospace";
-
-  for (let i = 0; i < drops.length; i++) {
-    let text = lettersArr[Math.floor(Math.random() * lettersArr.length)];
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-    if (drops[i] * fontSize > matrixCanvas.height && Math.random() > 0.975) {
-      drops[i] = 0;
-    }
-    drops[i]++;
-  }
-}
-
-function startMatrix() {
-  if (!matrixActive) {
-    matrixActive = true;
-    function animate() {
-      drawMatrix();
-      animationId = requestAnimationFrame(animate);
-    }
-    animate();
-  }
-}
-function stopMatrix() {
-  matrixActive = false;
-  cancelAnimationFrame(animationId);
-  ctx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-}
-
-// --- Controles ---
+// CONTROLES
 playBtn.addEventListener("click", () => {
-  if (audio.paused) {
-    audio.play();
-    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    startMatrix();
-  } else {
-    audio.pause();
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    stopMatrix();
-  }
+  audio.play();
+  runMatrix();
 });
-
+pauseBtn.addEventListener("click", () => {
+  audio.pause();
+  stopMatrix();
+});
 stopBtn.addEventListener("click", () => {
   audio.pause();
   audio.currentTime = 0;
-  playBtn.innerHTML = '<i class="fas fa-play"></i>';
   stopMatrix();
 });
-
 muteBtn.addEventListener("click", () => {
   audio.muted = !audio.muted;
-  muteBtn.classList.toggle("muted", audio.muted);
+  muteBtn.classList.toggle("active");
 });
 
-// Progreso
+// BARRA DE PROGRESO
 audio.addEventListener("timeupdate", () => {
-  if (audio.duration) {
-    const percent = (audio.currentTime / audio.duration) * 100;
-    progress.style.width = percent + "%";
-  }
-  let minutes = Math.floor(audio.currentTime / 60);
-  let seconds = Math.floor(audio.currentTime % 60);
-  if (seconds < 10) seconds = "0" + seconds;
-  timeDisplay.textContent = `${minutes}:${seconds}`;
+  const percent = (audio.currentTime / audio.duration) * 100;
+  progress.style.width = percent + "%";
+
+  const minutes = Math.floor(audio.currentTime / 60);
+  const seconds = Math.floor(audio.currentTime % 60);
+  timeDisplay.textContent = `${minutes.toString().padStart(2,"0")}:${seconds.toString().padStart(2,"0")}`;
 });
 
-progressContainer.addEventListener("click", (e) => {
-  const width = progressContainer.clientWidth;
-  const clickX = e.offsetX;
-  if (audio.duration) {
-    audio.currentTime = (clickX / width) * audio.duration;
-  }
+document.querySelector(".progress-container").addEventListener("click", (e) => {
+  const rect = e.target.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const width = rect.width;
+  audio.currentTime = (x / width) * audio.duration;
 });
+
+// MATRIX ANIMATION
+function runMatrix() {
+  const ctx = matrix.getContext("2d");
+  matrix.width = matrix.offsetWidth;
+  matrix.height = matrix.offsetHeight;
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
+  const fontSize = 16;
+  const columns = Math.floor(matrix.width / fontSize);
+  const drops = Array(columns).fill(1);
+
+  function draw() {
+    ctx.fillStyle = "rgba(0,0,0,0)"; // transparente
+    ctx.fillRect(0, 0, matrix.width, matrix.height);
+
+    ctx.fillStyle = "rgba(0,255,0,0.5)";
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = letters[Math.floor(Math.random() * letters.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > matrix.height || Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+
+  if (!matrixInterval) matrixInterval = setInterval(draw, 50);
+}
+
+function stopMatrix() {
+  clearInterval(matrixInterval);
+  matrixInterval = null;
+  const ctx = matrix.getContext("2d");
+  ctx.clearRect(0,0,matrix.width,matrix.height);
+}

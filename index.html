@@ -1,27 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sonar Rock - La Radio Independiente</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sonar Rock - La Radio Independiente</title>
 
-  <!-- CSS -->
-  <link href="style.css" rel="stylesheet">
-  <link href="player.css" rel="stylesheet">
+<!-- CSS -->
+<link href="style.css" rel="stylesheet">
+<link href="player.css" rel="stylesheet">
 
-  <!-- Iconos -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<!-- Iconos -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-  <!-- PWA & Favicons -->
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#ff6600">
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
-  <link rel="shortcut icon" href="/icons/favicon.ico">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="google" content="notranslate">
+<!-- PWA & Favicons -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ff6600">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+<link rel="shortcut icon" href="/icons/favicon.ico">
 </head>
 <body>
 
@@ -43,44 +40,43 @@
     <div class="main-image-container">
       <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
 
-      <!-- ================== REPRODUCTOR DE STREAMING ZENO ================== -->
-     <!-- ================== REPRODUCTOR DE STREAMING ZENO ================== -->
-<div class="player-container">
+      <!-- ================== REPRODUCTOR ================== -->
+      <div class="player-container">
+        <!-- Fondo + Matrix -->
+        <div class="player-background">
+          <img src="img/background.jpg" alt="Background" class="background-img">
+          <canvas id="matrix"></canvas>
+        </div>
 
-  <!-- Leyenda EN VIVO -->
-  <h3 class="live-label">En vivo Miércoles 21:00</h3>
+        <!-- Contenido encima -->
+        <div class="player-content">
+          <h3 class="live-label">En vivo Miércoles 21:00</h3>
+          <div id="now-playing">Cargando canción...</div>
 
-  <!-- Fondo + Matrix -->
-  <div class="player-background">
-    <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="background-img">
-    <canvas id="matrix"></canvas>
-  </div>
+          <!-- Controles -->
+          <div class="controls">
+            <button id="play-btn" class="btn play"><i class="fas fa-play"></i></button>
+            <button id="stop-btn" class="btn stop"><i class="fas fa-stop"></i></button>
+            <button id="mute-btn" class="btn mute"><i class="fas fa-volume-mute"></i></button>
+          </div>
 
-  <!-- Metadata -->
-  <div id="now-playing">Cargando canción...</div>
+          <!-- Barra de progreso -->
+          <div class="progress-wrapper">
+            <div class="progress-container">
+              <div id="progress"></div>
+            </div>
+            <div id="time-display" class="time-display">00:00</div>
+          </div>
+        </div>
 
-  <!-- Controles -->
-  <div class="controls">
-    <button id="play-btn" class="btn"><i class="fas fa-play"></i></button>
-    <button id="stop-btn" class="btn"><i class="fas fa-stop"></i></button>
-    <button id="mute-btn" class="btn"><i class="fas fa-volume-mute"></i></button>
-  </div>
-
-  <!-- Barra de progreso + contador -->
-  <div class="progress-wrapper">
-    <div class="progress-container" id="progress-bar">
-      <div id="progress"></div>
+        <!-- Audio -->
+        <audio id="audio" preload="auto">
+          <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+        </audio>
+      </div>
     </div>
-    <div id="time-display" class="time-display">00:00</div>
   </div>
-
-  <!-- Audio -->
-  <audio id="audio" preload="auto">
-    <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-  </audio>
-
-</div>
-
+</section>
 
 <!-- Social Section -->
 <section class="social-section">
@@ -93,27 +89,6 @@
       <a href="https://open.spotify.com/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA" target="_blank" class="social-btn spotify"><i class="fab fa-spotify"></i></a>
       <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox"><i class="fas fa-podcast"></i></a>
     </div>
-  </div>
-</section>
-
-<!-- Embed Section -->
-<section class="embed-section">
-  <div class="container" style="max-width: 650px; margin: auto;">
-    <div class="spotify-container">
-      <h3 class="section-title">Escucha en Spotify</h3>
-      <iframe
-        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
-        width="100%"
-        height="170"
-        frameborder="0"
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        loading="lazy"
-        style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
-      </iframe>
-    </div>
-
-    <h3 class="section-title" style="margin: 30px 0 15px;">Escucha en iVoox</h3>
-    <div id="podcast-player" class="player-wrapper"></div>
   </div>
 </section>
 
@@ -146,10 +121,8 @@
 <script src="player.js"></script>
 <script src="metadatos.js"></script>
 <script src="hijack.js"></script>
-
 </body>
 </html>
-
 
 </body>
 </html>

@@ -1,118 +1,84 @@
-// ================== PLAYER ==================
 const audio = document.getElementById("audio");
 const playBtn = document.getElementById("play-btn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
-const progressContainer = document.querySelector(".progress-container");
 const progressBar = document.getElementById("progress");
 const timeDisplay = document.getElementById("time-display");
-const nowPlaying = document.getElementById("now-playing");
 
-let isPlaying = false;
-let isLive = true; // streaming en vivo
-let matrixInterval;
+let matrixCanvas = document.getElementById("matrix");
+let ctx = matrixCanvas.getContext("2d");
+matrixCanvas.width = matrixCanvas.offsetWidth;
+matrixCanvas.height = matrixCanvas.offsetHeight;
 
-// ================== MATRIX ==================
-const canvas = document.getElementById("matrix");
-const ctx = canvas.getContext("2d");
-
-function resizeCanvas() {
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-const characters = "アカサタナハマヤラワABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-let fontSize = 14;
-let columns = canvas.width / fontSize;
-let drops = [];
-for (let x = 0; x < columns; x++) drops[x] = Math.floor(Math.random() * canvas.height / fontSize);
+let animationFrame;
+let columns = Math.floor(matrixCanvas.width / 20);
+let drops = Array(columns).fill(1);
 
 function drawMatrix() {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#0F0";
-  ctx.font = fontSize + "px monospace";
+  ctx.fillStyle = "rgba(0,0,0,0.05)";
+  ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
 
-  for (let i = 0; i < drops.length; i++) {
-    const text = characters.charAt(Math.floor(Math.random() * characters.length));
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-    drops[i]++;
-    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-  }
+  ctx.fillStyle = "#0f0";
+  ctx.font = "15px monospace";
+
+  drops.forEach((y, x) => {
+    let text = String.fromCharCode(0x30A0 + Math.random() * 96);
+    ctx.fillText(text, x * 20, y * 20);
+
+    if (y * 20 > matrixCanvas.height && Math.random() > 0.975) {
+      drops[x] = 0;
+    }
+    drops[x]++;
+  });
+
+  animationFrame = requestAnimationFrame(drawMatrix);
 }
 
 function startMatrix() {
-  if (!matrixInterval) {
-    matrixInterval = setInterval(drawMatrix, 50);
+  if (!animationFrame) {
+    drawMatrix();
   }
 }
 
 function stopMatrix() {
-  clearInterval(matrixInterval);
-  matrixInterval = null;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  cancelAnimationFrame(animationFrame);
+  animationFrame = null;
+  ctx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
 }
 
-// ================== BOTONES ==================
+// ▶ Play
 playBtn.addEventListener("click", () => {
-  if (!isPlaying) {
-    audio.play();
-    isPlaying = true;
-    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    startMatrix();
-  } else {
-    audio.pause();
-    isPlaying = false;
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    stopMatrix();
-  }
+  audio.play();
+  playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+  startMatrix();
 });
 
-stopBtn.addEventListener("click", () => {
-  audio.pause();
-  audio.currentTime = 0;
-  isPlaying = false;
+// ⏸ Pause con el mismo botón
+audio.addEventListener("pause", () => {
   playBtn.innerHTML = '<i class="fas fa-play"></i>';
-  updateProgress();
   stopMatrix();
 });
 
-muteBtn.addEventListener("click", () => {
-  audio.muted = !audio.muted;
-  muteBtn.classList.toggle("muted", audio.muted);
+// ⏹ Stop
+stopBtn.addEventListener("click", () => {
+  audio.pause();
+  audio.currentTime = 0;
+  stopMatrix();
+  playBtn.innerHTML = '<i class="fas fa-play"></i>';
 });
 
-// ================== PROGRESO ==================
-function updateProgress() {
-  let percent;
-  let currentTime = audio.currentTime;
-  let duration = audio.duration;
+// 🔇 Mute (NO afecta Matrix)
+muteBtn.addEventListener("click", () => {
+  audio.muted = !audio.muted;
+  muteBtn.classList.toggle("active");
+});
 
-  if (!isLive && !isNaN(duration)) {
-    percent = (currentTime / duration) * 100;
-    timeDisplay.textContent = formatTime(currentTime) + " / " + formatTime(duration);
-  } else {
-    percent = (currentTime / 600) * 100; // solo referencia en vivo
-    timeDisplay.textContent = formatTime(currentTime);
-  }
-  progressBar.style.width = percent + "%";
-}
+// Barra de progreso
+audio.addEventListener("timeupdate", () => {
+  let progress = (audio.currentTime / audio.duration) * 100;
+  progressBar.style.width = progress + "%";
 
-function formatTime(sec) {
-  let minutes = Math.floor(sec / 60);
-  let seconds = Math.floor(sec % 60);
-  return `${minutes < 10 ? "0" + minutes : minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
-}
-
-audio.addEventListener("timeupdate", updateProgress);
-
-// ================== BARRA INTERACTIVA ==================
-progressContainer.addEventListener("click", (e) => {
-  if (!isLive && audio.duration) {
-    const rect = progressContainer.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    audio.currentTime = (clickX / rect.width) * audio.duration;
-  }
+  let mins = Math.floor(audio.currentTime / 60);
+  let secs = Math.floor(audio.currentTime % 60).toString().padStart(2, "0");
+  timeDisplay.textContent = `${mins}:${secs}`;
 });

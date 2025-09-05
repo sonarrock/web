@@ -41,7 +41,6 @@
 <section class="main-section">
   <div class="container">
     <div class="main-image-container">
-      <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
 
       <!-- REPRODUCTOR ZENO -->
       <div class="player-container">
@@ -85,6 +84,213 @@
   </div> <!-- /.container -->
 </section>
 
+  <!-- Social Section -->
+<section class="social-section">
+  <div class="container">
+    <h2 class="section-title">Redes Sociales</h2>
+    <div class="social-buttons">
+      <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
+      <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
+      <a href="https://open.spotify.com/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA" target="_blank" class="social-btn spotify"><i class="fab fa-spotify"></i></a>
+      <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox"><i class="fas fa-podcast"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- Embed Section -->
+<section class="embed-section">
+  <div class="container" style="max-width: 650px; margin: auto;">
+    <!-- Spotify -->
+    <div class="spotify-container">
+      <h3 class="section-title">Escucha en Spotify</h3>
+      <iframe
+        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
+        width="100%"
+        height="170"
+        frameborder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"
+        style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+      </iframe>
+    </div>
+
+  <h3 class="section-title" style="margin: 30px 0 15px;">Escucha en iVoox</h3>
+    <div id="podcast-player" class="player-wrapper"></div>
+ 
+<!-- Embed Section -->
+<section class="embed-section">
+  <div class="container" style="max-width: 650px; margin: auto;">
+
+    <!-- Spotify -->
+    <div class="spotify-container">
+      <h3 class="section-title">Escucha en Spotify</h3>
+      <iframe
+        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
+        width="100%"
+        height="170"
+        frameborder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"
+        style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+      </iframe>
+    </div>
+
+  <h3 class="section-title" style="margin: 30px 0 15px;">Escucha en iVoox</h3>
+    <div id="podcast-player" class="player-wrapper"></div>
+  </div>
+</section>
+
+<style>
+  .player-wrapper {
+    width: 100%;
+    max-width: 650px;
+    height: 170px;
+    background: #121212;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.6);
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    box-sizing: border-box;
+    color: #fff;
+    font-family: "Spotify Circular", Arial, sans-serif;
+    gap: 20px;
+  }
+  #podcast-player > div {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    align-items: center;
+  }
+  #podcast-player img {
+    width: 140px;
+    height: 140px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  #podcast-player h3 {
+    font-size: 14px;
+    margin: 0 0 6px 0;
+    font-weight: 700;
+    color: #FFFFFF; /* blanco */
+  }
+  #podcast-player p {
+    font-size: 10px;
+    color: #b3b3b3;
+    margin: 0 0 10px 0;
+  }
+  #podcast-player audio {
+    width: 100%;
+    outline: none;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
+    border-radius: 8px;
+    background: #222;
+  }
+  .section-title {
+    color: #FF6600 !important;
+    font-family: "Spotify Circular", Arial, sans-serif;
+  }
+  /* barra progreso y tiempo */
+  .progress-container {
+    width: 90%;
+    height: 6px;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 10px auto 4px;
+    cursor: pointer;
+  }
+  #progress {
+    width: 0%;
+    height: 100%;
+    background: #ff6600;
+  }
+  .time-display {
+    text-align: center;
+    font-size: 12px;
+    color: #fff;
+  }
+  /* mute activo en rojo */
+  .btn.mute.active {
+    color: red !important;
+  }
+</style>
+
+<script>
+  async function loadLatestIvooxEpisode() {
+    const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
+
+    try {
+      const response = await fetch(feedUrl);
+      const xmlText = await response.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, "text/xml");
+
+      const item = xml.querySelector("item");
+      if (!item) throw new Error("No se encontró ningún episodio");
+
+      const title = item.querySelector("title").textContent;
+      const audioUrl = item.querySelector("enclosure").getAttribute("url");
+      const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
+      const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
+
+      const playerHTML = `
+        <div>
+          <img src="${imageUrl}" alt="Carátula episodio" />
+          <div style="flex:1;">
+            <h3>${title}</h3>
+            <p>Publicado el ${pubDate}</p>
+            <audio controls preload="none">
+              <source src="${audioUrl}" type="audio/mpeg" />
+              Tu navegador no soporta audio HTML5.
+            </audio>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("podcast-player").innerHTML = playerHTML;
+    } catch (error) {
+      document.getElementById("podcast-player").innerHTML = `<p style="color:#f00;">No se pudo cargar el reproductor. Intenta más tarde.</p>`;
+      console.error("Error cargando el feed:", error);
+    }
+  }
+
+  loadLatestIvooxEpisode();
+</script>
+ </div>
+</section>
+
+
+  
+<!-- Staff Section -->
+<section class="staff-section">
+  <div class="container">
+    <h2 class="section-title">Nuestro Staff</h2>
+    <div class="staff-grid">
+      <div class="staff-member">
+        <img src="attached_assets/Wendy_1749601460841.jpeg" alt="Wendy" class="staff-image">
+        <h3>Wendy</h3>
+      </div>
+      <div class="staff-member">
+        <img src="attached_assets/Alvaro_1749601460841.jpeg" alt="Alvaro" class="staff-image">
+        <h3>El Contralor</h3>
+      </div>
+      <div class="staff-member">
+        <img src="attached_assets/Hans_1749601460841.jpeg" alt="Hans" class="staff-image">
+        <h3>Hans</h3>
+      </div>
+      <div class="staff-member">
+        <img src="attached_assets/El Chris_1749601460841.jpeg" alt="El Chris" class="staff-image">
+        <h3>El Chris</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  
 <!-- JS -->
 <script src="player.js"></script>
 <script src="metadatos.js"></script>

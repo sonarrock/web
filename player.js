@@ -3,8 +3,14 @@ const audio = document.getElementById("audio");
 const playBtn = document.getElementById("play-btn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
+const progress = document.getElementById("progress");
+const timeDisplay = document.getElementById("time-display");
+const progressContainer = document.querySelector(".progress-container");
 
 let isPlaying = false;
+let matrixInterval;
+let liveStartTime = 0;
+const isLive = audio.src.includes("zeno.fm");
 
 // ================== MATRIX ==================
 const canvas = document.getElementById("matrix");
@@ -17,14 +23,11 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// Caracteres para Matrix
 const characters = "アカサタナハマヤラワABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 let fontSize = 14;
 let columns = canvas.width / fontSize;
 let drops = [];
 for (let x = 0; x < columns; x++) drops[x] = Math.floor(Math.random() * canvas.height / fontSize);
-
-let matrixInterval;
 
 function drawMatrix() {
     ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
@@ -46,10 +49,13 @@ playBtn.addEventListener("click", () => {
     if (!isPlaying) {
         audio.play();
         isPlaying = true;
+        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
         matrixInterval = setInterval(drawMatrix, 50);
+        if (isLive) liveStartTime = Date.now();
     } else {
         audio.pause();
         isPlaying = false;
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
         clearInterval(matrixInterval);
     }
 });
@@ -58,6 +64,7 @@ stopBtn.addEventListener("click", () => {
     audio.pause();
     audio.currentTime = 0;
     isPlaying = false;
+    playBtn.innerHTML = '<i class="fas fa-play"></i>';
     clearInterval(matrixInterval);
 });
 
@@ -65,3 +72,60 @@ muteBtn.addEventListener("click", () => {
     audio.muted = !audio.muted;
     muteBtn.classList.toggle("muted", audio.muted);
 });
+
+// ================== PROGRESS ==================
+audio.addEventListener("timeupdate", () => {
+    if (!isLive && audio.duration) {
+        let percent = (audio.currentTime / audio.duration) * 100;
+        progress.style.width = percent + "%";
+        let remaining = audio.duration - audio.currentTime;
+        timeDisplay.textContent = formatTime(remaining);
+    } else if (isLive && isPlaying) {
+        let elapsed = Math.floor((Date.now() - liveStartTime) / 1000);
+        timeDisplay.textContent = formatTime(elapsed);
+        progress.style.width = "100%";
+    }
+});
+
+// ================== INTERACTIVIDAD ==================
+progressContainer.addEventListener("click", (e) => {
+    if (!isLive && audio.duration) {
+        const rect = progressContainer.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const percent = clickX / rect.width;
+        audio.currentTime = percent * audio.duration;
+    }
+});
+
+let isDragging = false;
+
+progressContainer.addEventListener("mousedown", (e) => {
+    if (!isLive && audio.duration) {
+        isDragging = true;
+        updateProgressByDrag(e);
+    }
+});
+
+window.addEventListener("mousemove", (e) => {
+    if (isDragging) updateProgressByDrag(e);
+});
+
+window.addEventListener("mouseup", () => {
+    isDragging = false;
+});
+
+function updateProgressByDrag(e) {
+    const rect = progressContainer.getBoundingClientRect();
+    let offsetX = e.clientX - rect.left;
+    offsetX = Math.max(0, Math.min(offsetX, rect.width));
+    const percent = offsetX / rect.width;
+    progress.style.width = (percent * 100) + "%";
+    audio.currentTime = percent * audio.duration;
+}
+
+// ================== HELPER ==================
+function formatTime(seconds) {
+    let m = Math.floor(seconds / 60).toString().padStart(2, "0");
+    let s = Math.floor(seconds % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+}

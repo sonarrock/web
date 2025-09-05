@@ -44,45 +44,43 @@
       <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
 
       <!-- ================== REPRODUCTOR DE STREAMING ZENO ================== -->
-      <div class="player-container">
+     <!-- ================== REPRODUCTOR DE STREAMING ZENO ================== -->
+<div class="player-container">
 
-        <!-- Leyenda EN VIVO -->
-        <h3 class="live-label">En vivo Miércoles 21:00</h3>
+  <!-- Leyenda EN VIVO -->
+  <h3 class="live-label">En vivo Miércoles 21:00</h3>
 
-        <!-- Fondo + Matrix -->
-        <div class="player-background">
-          <canvas id="matrix"></canvas>
-          <img src="img/background.jpg" alt="Background" class="background-img">
-        </div>
-
-        <!-- Metadata -->
-        <div id="now-playing">Cargando canción...</div>
-
-        <!-- Controles -->
-        <div class="controls">
-          <button id="play-btn" class="btn"><i class="fas fa-play"></i></button>
-          <button id="stop-btn" class="btn"><i class="fas fa-stop"></i></button>
-          <button id="mute-btn" class="btn"><i class="fas fa-volume-mute"></i></button>
-        </div>
-
-        <!-- Barra de progreso + contador -->
-        <div class="progress-wrapper">
-          <div class="progress-container" id="progress-bar">
-            <div id="progress"></div>
-          </div>
-          <div id="time-display" class="time-display">00:00</div>
-        </div>
-
-        <!-- Audio -->
-        <audio id="audio" preload="auto">
-          <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-        </audio>
-
-      </div> <!-- /.player-container -->
-
-    </div>
+  <!-- Fondo + Matrix -->
+  <div class="player-background">
+    <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="background-img">
+    <canvas id="matrix"></canvas>
   </div>
-</section>
+
+  <!-- Metadata -->
+  <div id="now-playing">Cargando canción...</div>
+
+  <!-- Controles -->
+  <div class="controls">
+    <button id="play-btn" class="btn"><i class="fas fa-play"></i></button>
+    <button id="stop-btn" class="btn"><i class="fas fa-stop"></i></button>
+    <button id="mute-btn" class="btn"><i class="fas fa-volume-mute"></i></button>
+  </div>
+
+  <!-- Barra de progreso + contador -->
+  <div class="progress-wrapper">
+    <div class="progress-container" id="progress-bar">
+      <div id="progress"></div>
+    </div>
+    <div id="time-display" class="time-display">00:00</div>
+  </div>
+
+  <!-- Audio -->
+  <audio id="audio" preload="auto">
+    <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+  </audio>
+
+</div>
+
 
 <!-- Social Section -->
 <section class="social-section">

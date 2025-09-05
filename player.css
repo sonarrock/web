@@ -1,102 +1,126 @@
+/* Contenedor reproductor */
 .player-container {
   position: relative;
   width: 100%;
-  max-width: 650px;
+  max-width: 900px;
   height: 500px;
-  margin: 20px auto;
-  border: 4px solid #ff6600;
+  margin: auto;
+  background: rgba(255,255,255,0.1);
+  border: 3px solid #ff6600;
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(0,0,0,0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 /* Fondo */
 .player-background {
   position: absolute;
-  top: 0; left: 0;
   width: 100%;
   height: 100%;
+  top:0;
+  left:0;
+  z-index:0;
   overflow: hidden;
-  z-index: 0;
 }
+
 .background-img {
-  position: absolute;
-  top: 0; left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
+
+/* Matrix Canvas */
 #matrix {
   position: absolute;
-  top: 0; left: 0;
+  top:0;
+  left:0;
   width: 100%;
   height: 100%;
-  z-index: 1;
+  z-index:1;
   pointer-events: none;
 }
 
-/* Contenido */
-.player-content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+/* Leyenda EN VIVO */
+.live-label {
+  position: absolute;
+  top: 10px;
+  left: 15px;
   color: #fff;
-  text-align: center;
-  padding: 15px;
-  box-sizing: border-box;
+  font-weight: bold;
+  z-index:2;
+  font-size: 16px;
 }
 
+/* Controles */
 .controls {
-  margin: 10px 0;
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index:2;
+  display: flex;
+  gap: 15px;
 }
+
 .btn {
-  background: transparent;
+  background: #ff6600;
+  color: #fff;
   border: 2px solid #fff;
-  color: #ff6600;
   border-radius: 50%;
   width: 50px;
   height: 50px;
-  font-size: 20px;
-  margin: 0 8px;
   cursor: pointer;
-  transition: transform 0.2s ease, background 0.3s ease;
-}
-.btn:hover {
-  background: rgba(255,255,255,0.2);
-  transform: scale(1.1);
-}
-#mute-btn.muted {
-  color: red;
+  font-size: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.15s ease;
 }
 
-/* Progreso */
+.btn:hover {
+  transform: scale(1.1);
+}
+
+/* Barra de progreso */
 .progress-wrapper {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-top: 8px;
   gap: 10px;
+  z-index:2;
 }
+
 .progress-container {
-  flex: 1;
+  flex:1;
   height: 6px;
   background: #333;
   border-radius: 4px;
   overflow: hidden;
   cursor: pointer;
 }
+
 #progress {
-  height: 100%;
   width: 0%;
+  height: 100%;
   background: #ff6600;
-  transition: width 0.2s linear;
 }
+
 .time-display {
-  font-size: 14px;
-  font-weight: bold;
+  width: 50px;
+  text-align: right;
   color: #ff6600;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Mute activo */
+.btn.mute.active {
+  color: red !important;
 }

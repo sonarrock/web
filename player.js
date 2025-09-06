@@ -18,35 +18,42 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-// Letras del efecto Matrix
 const letters = "アカサタナハマヤラワイウエオabcdefghijklmnopqrstuvwxyz0123456789";
 const fontSize = 20;
 const columns = Math.floor(canvas.width / fontSize);
-const drops = Array(columns).fill(0);
 
-// Función de dibujo vertical
+// Cada columna mantiene su historial de caracteres y opacidades
+const drops = [];
+for (let i = 0; i < columns; i++) {
+  drops[i] = [];
+}
+
+// Función de dibujo con estelas
 function drawMatrix() {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; // pequeña transparencia para borrar caracteres anteriores
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.fillStyle = "#0F0"; // color verde clásico
-  ctx.font = fontSize + "px monospace";
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   for (let i = 0; i < drops.length; i++) {
-    const text = letters[Math.floor(Math.random() * letters.length)];
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    // Agregar nuevo carácter iluminado al principio
+    const char = letters[Math.floor(Math.random() * letters.length)];
+    drops[i].unshift({ char: char, opacity: 1.0 });
 
-    // Nueva posición o reinicio
-    drops[i]++;
-    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-      drops[i] = 0;
+    // Limitar la longitud de la columna
+    if (drops[i].length > 30) drops[i].pop();
+
+    // Dibujar todos los caracteres de la columna
+    for (let j = 0; j < drops[i].length; j++) {
+      const y = j * fontSize;
+      ctx.fillStyle = `rgba(0,255,0,${drops[i][j].opacity})`;
+      ctx.font = `${fontSize}px monospace`;
+      ctx.fillText(drops[i][j].char, i * fontSize, y);
+      drops[i][j].opacity *= 0.9; // desvanecimiento gradual
     }
   }
 
   animationId = requestAnimationFrame(drawMatrix);
 }
 
-// Funciones de control de audio
+// Control de audio y animación
 playBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
@@ -75,7 +82,7 @@ muteBtn.addEventListener("click", () => {
   muteBtn.classList.toggle("active", audio.muted);
 });
 
-// Actualizar barra de progreso y tiempo
+// Barra de progreso y contador
 audio.addEventListener("timeupdate", () => {
   const percent = (audio.currentTime / audio.duration) * 100 || 0;
   progress.style.width = percent + "%";

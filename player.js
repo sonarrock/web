@@ -1,78 +1,96 @@
-.player-container {
-  max-width: 650px;
-  margin: auto;
-  position: relative;
-  background: rgba(0,0,0,0.4);
-  border-radius: 12px;
-  padding: 20px;
-  box-sizing: border-box;
-}
+// ====== Reproductor ======
+const audio = document.getElementById("audio");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const stopBtn = document.getElementById("stop-btn");
+const muteBtn = document.getElementById("mute-btn");
+const progress = document.getElementById("progress");
+const timeDisplay = document.getElementById("time-display");
 
-/* Controles */
-.controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  margin-top: 10px;
-  z-index: 3;
-  position: relative;
-}
-
-.controls .btn {
-  font-size: 18px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  background: rgba(0,0,0,0.6);
-  color: #ff6600;
-  transition: all 0.2s ease;
-}
-.controls .btn:hover {
-  background: rgba(0,0,0,0.8);
-}
-
-/* Barra de progreso */
-.progress-wrapper {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-  gap: 10px;
-}
-
-.progress-container {
-  flex: 1;
-  height: 6px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-#progress {
-  width: 0%;
-  height: 100%;
-  background: #ff6600;
-  border-radius: 3px;
-}
-
-/* Contador de tiempo */
-.time-display {
-  font-size: 12px;
-  color: #fff;
-  width: 45px;
-  text-align: right;
-}
-
-/* Reproductor más estrecho en móviles */
-@media screen and (max-width:600px){
-  .player-container {
-    max-width: 90%;
-    padding: 15px;
+// Play/Pause
+playPauseBtn.addEventListener("click", () => {
+  if(audio.paused){
+    audio.play();
+    playPauseBtn.innerHTML='<i class="fas fa-pause"></i>';
+  } else {
+    audio.pause();
+    playPauseBtn.innerHTML='<i class="fas fa-play"></i>';
   }
-  .controls .btn {
-    font-size: 16px;
-    padding: 8px 12px;
-  }
-  .time-display { font-size: 10px; width: 40px; }
+});
+
+// Stop
+stopBtn.addEventListener("click", () => {
+  audio.pause();
+  audio.currentTime = 0;
+  playPauseBtn.innerHTML='<i class="fas fa-play"></i>';
+});
+
+// Mute
+muteBtn.addEventListener("click", () => {
+  audio.muted = !audio.muted;
+  muteBtn.innerHTML = audio.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+});
+
+// Barra de progreso y contador
+audio.addEventListener("timeupdate", () => {
+  const percent = (audio.currentTime / audio.duration) * 100;
+  progress.style.width = percent + "%";
+
+  let minutes = Math.floor(audio.currentTime / 60);
+  let seconds = Math.floor(audio.currentTime % 60);
+  if(seconds<10) seconds="0"+seconds;
+  timeDisplay.textContent = `${minutes}:${seconds}`;
+});
+
+// Reinicia barra al finalizar
+audio.addEventListener("ended", () => {
+  progress.style.width = "0%";
+  playPauseBtn.innerHTML='<i class="fas fa-play"></i>';
+  timeDisplay.textContent="00:00";
+});
+
+// ====== Matrix animado ======
+const canvas = document.getElementById("matrixCanvas");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas(){ 
+  canvas.width = window.innerWidth; 
+  canvas.height = window.innerHeight; 
 }
+window.addEventListener('resize', resizeCanvas); 
+resizeCanvas();
+
+const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
+const fontSize=20;
+const columns=Math.floor(canvas.width/fontSize);
+let drops=Array.from({length:columns},()=>Math.random()*canvas.height);
+let trails = Array.from({length:columns},()=>[]);
+
+function drawMatrix(){
+  ctx.fillStyle="rgba(0,0,0,0.04)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.font=fontSize+"px monospace";
+
+  for(let i=0;i<columns;i++){
+    const text=letters.charAt(Math.floor(Math.random()*letters.length));
+    let yPos=drops[i]*fontSize;
+
+    trails[i].push({char:text, y:yPos, brightness:255});
+    if(trails[i].length>20) trails[i].shift();
+
+    trails[i].forEach(t=>{
+      ctx.fillStyle=`rgb(0,${t.brightness},0)`;
+      ctx.fillText(t.char,i*fontSize,t.y);
+      t.brightness = Math.max(50,t.brightness-12);
+    });
+
+    if(yPos>canvas.height && Math.random()>0.975){ 
+      drops[i]=0; 
+      trails[i]=[]; 
+    }
+    drops[i]++;
+  }
+}
+
+// Velocidad reducida (~40% más lenta)
+setInterval(drawMatrix,40);
+

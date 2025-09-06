@@ -32,8 +32,10 @@ muteBtn.addEventListener("click", () => {
 
 // Barra de progreso y contador
 audio.addEventListener("timeupdate", () => {
-  const percent = (audio.currentTime / audio.duration) * 100;
-  progress.style.width = percent + "%";
+  if(audio.duration){
+    const percent = (audio.currentTime / audio.duration) * 100;
+    progress.style.width = percent + "%";
+  }
 
   let minutes = Math.floor(audio.currentTime / 60);
   let seconds = Math.floor(audio.currentTime % 60);
@@ -53,8 +55,8 @@ const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
 
 function resizeCanvas(){ 
-  canvas.width = window.innerWidth; 
-  canvas.height = window.innerHeight; 
+  canvas.width = canvas.parentElement.offsetWidth; 
+  canvas.height = canvas.parentElement.offsetHeight; 
 }
 window.addEventListener('resize', resizeCanvas); 
 resizeCanvas();
@@ -66,8 +68,7 @@ let drops=Array.from({length:columns},()=>Math.random()*canvas.height);
 let trails = Array.from({length:columns},()=>[]);
 
 function drawMatrix(){
-  ctx.fillStyle="rgba(0,0,0,0.04)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.font=fontSize+"px monospace";
 
   for(let i=0;i<columns;i++){
@@ -91,6 +92,5 @@ function drawMatrix(){
   }
 }
 
-// Velocidad reducida (~40% más lenta)
+// Velocidad reducida ~40%
 setInterval(drawMatrix,40);
-

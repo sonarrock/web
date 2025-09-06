@@ -7,8 +7,9 @@
 
 .player-container {
   position:relative;
-  width:250px;
+  width:500px;   /* ahora doble de ancho */
   height:500px;
+  border:3px solid #ff6600; /* marco naranja */
   border-radius:12px;
   overflow:hidden;
   display:flex;
@@ -70,17 +71,26 @@
   gap:15px;
   margin-bottom:10px;
 }
+
 .controls .btn {
-  font-size:18px;
-  padding:10px 14px;
-  border-radius:8px;
-  border:none;
+  font-size:20px;
+  padding:12px 16px;
+  border-radius:50%;          /* botones redondeados */
+  border:2px solid #fff;      /* contorno blanco */
   cursor:pointer;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.6);/* fondo negro translúcido */
   color:#ff6600;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease, box-shadow 0.3s ease;
 }
-.controls .btn:hover { background: rgba(0,0,0,0.8); }
+
+.controls .btn:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+.controls .btn:active {
+  box-shadow: 0 0 15px #ff6600; /* brillo al presionar */
+  transform: scale(0.95);
+}
 
 /* Barra de progreso y tiempo */
 .progress-wrapper {
@@ -114,8 +124,7 @@
 
 /* Ajustes móviles */
 @media screen and (max-width:600px){
-  .player-container { width:90%; height:400px; }
-  .controls .btn { font-size:16px; padding:8px 12px; }
+  .player-container { width:95%; height:400px; }
+  .controls .btn { font-size:18px; padding:10px; }
   .time-display { font-size:10px; width:50px; }
 }
-

@@ -1,9 +1,7 @@
-/* Contenedor reproductor */
+/* Contenedor reproductor debajo */
 .player-container {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  margin: 20px auto;
   width: 90%;
   max-width: 900px;
   height: 500px;
@@ -35,7 +33,7 @@
   display: block;
 }
 
-/* Matrix Canvas */
+/* Matrix Canvas transparente */
 #matrix {
   position: absolute;
   top:0;
@@ -103,7 +101,7 @@
 .progress-container {
   flex:1;
   height: 6px;
-  background: #333;
+  background: #fff;
   border-radius: 4px;
   overflow: hidden;
   cursor: pointer;
@@ -112,13 +110,13 @@
 #progress {
   width: 0%;
   height: 100%;
-  background: #ff6600;
+  background: #fff;
 }
 
 .time-display {
   width: 50px;
   text-align: right;
-  color: #ff6600;
+  color: #fff;
   font-weight: bold;
   font-size: 14px;
 }

@@ -1,4 +1,3 @@
-// ====== Reproductor ======
 const audio = document.getElementById("audio");
 const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
@@ -29,69 +28,25 @@ stopBtn.addEventListener("click", () => {
 muteBtn.addEventListener("click", () => {
   audio.muted = !audio.muted;
   muteBtn.innerHTML = audio.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+  muteBtn.style.color = audio.muted ? '#ff0000' : '#ff6600';
 });
 
-// Barra de progreso y contador
+// Barra de progreso y contador H:M:S
 audio.addEventListener("timeupdate", () => {
   if(audio.duration){
     const percent = (audio.currentTime / audio.duration) * 100;
     progress.style.width = percent + "%";
   }
 
-  let minutes = Math.floor(audio.currentTime / 60);
-  let seconds = Math.floor(audio.currentTime % 60);
-  if(seconds<10) seconds="0"+seconds;
-  timeDisplay.textContent = `${minutes}:${seconds}`;
+  let h = Math.floor(audio.currentTime / 3600);
+  let m = Math.floor((audio.currentTime % 3600) / 60);
+  let s = Math.floor(audio.currentTime % 60);
+
+  if(h<10) h="0"+h;
+  if(m<10) m="0"+m;
+  if(s<10) s="0"+s;
+  timeDisplay.textContent = `${h}:${m}:${s}`;
 });
 
-// Reinicia barra al finalizar
-audio.addEventListener("ended", () => {
-  progress.style.width = "0%";
-  playPauseBtn.innerHTML='<i class="fas fa-play"></i>';
-  timeDisplay.textContent="00:00";
-});
-
-// ====== Matrix animado ======
-const canvas = document.getElementById("matrixCanvas");
-const ctx = canvas.getContext("2d");
-
-function resizeCanvas(){ 
-  canvas.width = canvas.parentElement.offsetWidth; 
-  canvas.height = canvas.parentElement.offsetHeight; 
-}
-window.addEventListener('resize', resizeCanvas); 
-resizeCanvas();
-
-const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
-const fontSize=20;
-const columns=Math.floor(canvas.width/fontSize);
-let drops=Array.from({length:columns},()=>Math.random()*canvas.height);
-let trails = Array.from({length:columns},()=>[]);
-
-function drawMatrix(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.font=fontSize+"px monospace";
-
-  for(let i=0;i<columns;i++){
-    const text=letters.charAt(Math.floor(Math.random()*letters.length));
-    let yPos=drops[i]*fontSize;
-
-    trails[i].push({char:text, y:yPos, brightness:255});
-    if(trails[i].length>20) trails[i].shift();
-
-    trails[i].forEach(t=>{
-      ctx.fillStyle=`rgb(0,${t.brightness},0)`;
-      ctx.fillText(t.char,i*fontSize,t.y);
-      t.brightness = Math.max(50,t.brightness-12);
-    });
-
-    if(yPos>canvas.height && Math.random()>0.975){ 
-      drops[i]=0; 
-      trails[i]=[]; 
-    }
-    drops[i]++;
-  }
-}
-
-// Velocidad reducida ~40%
-setInterval(drawMatrix,40);
+// Muestra título si existe, sino oculta
+audio.addEventListener("play",

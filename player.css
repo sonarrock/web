@@ -1,58 +1,54 @@
-/* Contenedor reproductor debajo */
+/* Contenedor del reproductor */
 .player-container {
   position: relative;
-  margin: 20px auto;
-  width: 90%;
+  width: 100%;
   max-width: 900px;
-  height: 500px;
-  background: rgba(255,255,255,0.1);
-  border: 3px solid #ff6600;
+  height: 500px; /* altura original */
+  margin: 20px auto;
   border-radius: 12px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  z-index:2;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
-/* Fondo */
+/* Fondo y canvas matrix */
 .player-background {
   position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  top:0;
-  left:0;
-  z-index:0;
-  overflow: hidden;
+  z-index: 1;
 }
 
-.background-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Matrix Canvas transparente */
-#matrix {
+.player-background canvas {
   position: absolute;
-  top:0;
-  left:0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  z-index:1;
   pointer-events: none;
 }
 
-/* Leyenda EN VIVO */
+.player-background .background-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Leyenda "En vivo" */
 .live-label {
   position: absolute;
   top: 10px;
-  left: 15px;
+  left: 10px;
+  z-index: 2;
   color: #fff;
   font-weight: bold;
-  z-index:2;
   font-size: 16px;
+  text-shadow: 0 0 6px #000;
 }
 
 /* Controles */
@@ -61,67 +57,72 @@
   bottom: 60px;
   left: 50%;
   transform: translateX(-50%);
-  z-index:2;
   display: flex;
-  gap: 15px;
+  gap: 20px;
+  z-index: 2;
 }
 
 .btn {
-  background: #ff6600;
-  color: #fff;
-  border: 2px solid #fff;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  cursor: pointer;
-  font-size: 18px;
+  border: 2px solid #fff;
+  background: rgba(0,0,0,0.5);
+  color: #ff6600;
   display: flex;
-  justify-content: center;
   align-items: center;
-  transition: all 0.15s ease;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s ease;
 }
 
 .btn:hover {
   transform: scale(1.1);
+  background: rgba(0,0,0,0.7);
 }
 
-/* Barra de progreso */
+.btn:active {
+  transform: scale(0.95);
+}
+
+/* Barra de progreso y contador */
 .progress-wrapper {
   position: absolute;
   bottom: 15px;
   left: 50%;
   transform: translateX(-50%);
-  width: 90%;
+  width: 80%;
   display: flex;
   align-items: center;
   gap: 10px;
-  z-index:2;
+  z-index: 2;
 }
 
 .progress-container {
-  flex:1;
+  flex: 1;
   height: 6px;
-  background: #fff;
-  border-radius: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 3px;
   overflow: hidden;
   cursor: pointer;
 }
 
 #progress {
-  width: 0%;
   height: 100%;
+  width: 0%;
   background: #fff;
+  transition: width 0.2s linear;
 }
 
 .time-display {
-  width: 50px;
-  text-align: right;
   color: #fff;
-  font-weight: bold;
-  font-size: 14px;
+  font-size: 16px;
+  width: 50px;
+  text-align: center;
 }
 
-/* Mute activo */
+/* Mute activo en rojo */
 .btn.mute.active {
   color: red !important;
 }

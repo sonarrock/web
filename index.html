@@ -8,7 +8,6 @@
 <!-- CSS -->
 <link href="style.css" rel="stylesheet">
 <link href="player.css" rel="stylesheet">
-<link href="matrix.css" rel="stylesheet">
 
 <!-- Iconos -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -45,36 +44,24 @@
       <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
     </div>
 
+    <!-- REPRODUCTOR ZENO DEBAJO -->
     <div class="player-container">
-      <h3 class="live-label">En vivo Miércoles 21:00</h3>
+      <canvas id="matrixCanvas"></canvas>
 
-      <div class="player-background">
-        <img src="img/background.jpg" alt="Background" class="background-img">
-        <canvas id="matrixCanvas"></canvas>
-        <div id="overlay"></div>
-      </div>
+      <h3 class="live-label">En vivo Miércoles 21:00</h3>
 
       <div id="now-playing">Cargando canción...</div>
 
       <div class="controls">
-        <button id="playPauseBtn" class="btn play">▶️</button>
-        <button id="stop-btn" class="btn stop"><i class="fas fa-stop"></i></button>
-        <button id="mute-btn" class="btn mute"><i class="fas fa-volume-mute"></i></button>
+        <button id="playPauseBtn" class="btn"><i class="fas fa-play"></i></button>
+        <button id="stop-btn" class="btn"><i class="fas fa-stop"></i></button>
+        <button id="mute-btn" class="btn"><i class="fas fa-volume-up"></i></button>
       </div>
 
       <div class="progress-wrapper">
-        <div class="progress-container">
-          <div id="progress"></div>
-        </div>
+        <div class="progress-container"><div id="progress"></div></div>
         <div id="time-display" class="time-display">00:00</div>
       </div>
-
-      <audio id="audio" preload="auto">
-        <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-      </audio>
-    </div>
-  </div>
-</section>
   
 <!-- Social Section -->
 <section class="social-section">

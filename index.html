@@ -5,10 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sonar Rock - La Radio Independiente</title>
 
+<!-- CSS -->
 <link href="style.css" rel="stylesheet">
 <link href="player.css" rel="stylesheet">
+
+<!-- Iconos -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
+<!-- PWA & Favicons -->
+<link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#ff6600">
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
@@ -16,6 +21,7 @@
 <link rel="shortcut icon" href="/icons/favicon.ico">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="google" content="notranslate">
 </head>
 <body>
 
@@ -24,50 +30,62 @@
   <div class="container">
     <div class="logo-section">
       <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
-      <div class="title-section"><h1>LA RADIO INDEPENDIENTE</h1></div>
+      <div class="title-section">
+        <h1>LA RADIO INDEPENDIENTIENTE</h1>
+      </div>
     </div>
   </div>
 </header>
 
-<!-- Imagen principal grande -->
-<section class="main-image-section">
-  <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image" style="width:100%; max-width:1220px; display:block; margin:auto; border-radius:12px;">
+<!-- Imagen Principal -->
+<section class="main-section">
+  <div class="container">
+    <div class="main-image-container">
+      <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image" style="max-width:1220px; width:100%;">
+    </div>
+  </div>
 </section>
 
-<!-- Reproductor separado -->
+<!-- Reproductor -->
 <section class="player-section">
   <div class="player-container">
 
-    <!-- Imagen de fondo -->
+    <!-- Fondo imagen -->
     <img src="img/background.jpg" alt="Background" class="player-bg">
 
     <!-- Canvas Matrix -->
     <canvas id="matrixCanvas"></canvas>
 
-    <!-- Overlay negro 30% -->
+    <!-- Overlay negro -->
     <div class="overlay"></div>
 
-    <!-- Contenido reproductor -->
+    <!-- Contenido -->
     <div class="player-content">
       <div id="now-playing"></div>
 
+      <!-- Controles -->
       <div class="controls">
         <button id="playPauseBtn" class="btn"><i class="fas fa-play"></i></button>
         <button id="stop-btn" class="btn"><i class="fas fa-stop"></i></button>
         <button id="mute-btn" class="btn"><i class="fas fa-volume-up"></i></button>
       </div>
 
+      <!-- Barra + tiempo -->
       <div class="progress-wrapper">
-        <div class="progress-container"><div id="progress"></div></div>
+        <div class="progress-container">
+          <div id="progress"></div>
+        </div>
         <div id="time-display" class="time-display">00:00:00</div>
       </div>
-    </div>
 
-    <audio id="audio" preload="auto">
-      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-    </audio>
+      <!-- Audio -->
+      <audio id="audio" preload="auto">
+        <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+      </audio>
+    </div>
   </div>
 </section>
+
   
 <!-- Social Section -->
 <section class="social-section">

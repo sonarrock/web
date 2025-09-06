@@ -86,6 +86,20 @@
   </div> <!-- /.container -->
 </section>
 
+<!-- Social Section -->
+<section class="social-section">
+  <div class="container">
+    <h2 class="section-title">Redes Sociales</h2>
+    <div class="social-buttons">
+      <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
+      <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
+      <a href="https://open.spotify.com/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA" target="_blank" class="social-btn spotify"><i class="fab fa-spotify"></i></a>
+      <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox"><i class="fas fa-podcast"></i></a>
+    </div>
+  </div>
+</section>
+
 <!-- Embed Section -->
 <section class="embed-section">
   <div class="container" style="max-width: 650px; margin: auto;">
@@ -160,30 +174,6 @@
     color: #FF6600 !important;
     font-family: "Spotify Circular", Arial, sans-serif;
   }
-  /* barra progreso y tiempo */
-  .progress-container {
-    width: 90%;
-    height: 6px;
-    background: #333;
-    border-radius: 4px;
-    overflow: hidden;
-    margin: 10px auto 4px;
-    cursor: pointer;
-  }
-  #progress {
-    width: 0%;
-    height: 100%;
-    background: #ff6600;
-  }
-  .time-display {
-    text-align: center;
-    font-size: 12px;
-    color: #fff;
-  }
-  /* mute activo en rojo */
-  .btn.mute.active {
-    color: red !important;
-  }
 </style>
 
 <script>
@@ -225,7 +215,11 @@
     }
   }
 
-  
+  loadLatestIvooxEpisode();
+</script>
+  </div>
+    </section>
+
 <!-- Staff Section -->
 <section class="staff-section">
   <div class="container">
@@ -250,6 +244,43 @@
     </div>
   </div>
 </section>
+
+ <!-- About -->
+  <section class="about-section">
+    <div class="container">
+      <div class="about-content">
+        <h2 class="section-title">¿Quiénes Somos?</h2>
+        <p class="about-text">
+          Sonar Rock es una trinchera sonora, un espacio libre y apasionado que nace en Guadalajara, Jalisco, México.
+Nuestra misión es simple pero poderosa: abrir un foro auténtico para las bandas emergentes, apoyar la escena local y mantener viva la esencia del rock en todas sus vertientes.
+
+Creemos en la fuerza de la música como motor de cambio, como punto de encuentro y como refugio de quienes buscan algo distinto a lo convencional.
+En Sonar Rock somos más que una radio: somos comunidad, resistencia y pasión por el sonido que nos une.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-section">
+    <div class="container">
+      <div class="about-content">
+        <h2 class="section-title">¿Qué es Sonar Rock?</h2>
+        <p class="about-text">
+          Sonar Rock celebra la esencia eterna del rock n’ roll:
+
+Su rebeldía frente a lo establecido.
+
+Su poesía en cada letra y acorde.
+
+Su energía que enciende escenarios y corazones.
+
+Su capacidad de conectar almas más allá de fronteras y generaciones.
+
+Aquí el rock no se escucha de fondo, se vive. Somos un canal donde conviven lo clásico, lo alternativo y lo emergente, siempre con la autenticidad como bandera.
+        </p>
+      </div>
+    </div>
+  </section>
 
 <!-- JS -->
 <script src="player.js"></script>

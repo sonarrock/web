@@ -19,6 +19,7 @@
 </head>
 <body>
 
+<!-- Header -->
 <header class="header">
   <div class="container">
     <div class="logo-section">
@@ -28,24 +29,24 @@
   </div>
 </header>
 
-<!-- Main Section -->
-<section class="main-section">
-  <div class="container main-player-container" style="position:relative;">
+<!-- Imagen principal -->
+<section class="main-image-section">
+  <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image" style="width:100%; max-width:1220px; display:block; margin:auto; border-radius:12px;">
+</section>
 
-    <!-- Imagen principal -->
-    <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image" style="width:100%; border-radius:12px; display:block;">
+<!-- Reproductor separado -->
+<section class="player-section">
+  <div class="player-container">
 
-    <!-- Canvas Matrix sobre la imagen -->
-    <canvas id="matrixCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;"></canvas>
+    <!-- Canvas Matrix -->
+    <canvas id="matrixCanvas"></canvas>
 
-    <!-- Overlay negro 25% -->
-    <div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.25); z-index:2; border-radius:12px;"></div>
+    <!-- Overlay negro 40% -->
+    <div class="overlay"></div>
 
-    <!-- Controles centrados al pie -->
-    <div style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); z-index:3; width:90%; display:flex; flex-direction:column; align-items:center;">
-
-      <h3 class="live-label" style="margin-bottom:10px;">En vivo Miércoles 21:00</h3>
-      <div id="now-playing" style="margin-bottom:10px;">Cargando canción...</div>
+    <!-- Controles y barra -->
+    <div class="player-content">
+      <div id="now-playing"></div>
 
       <div class="controls">
         <button id="playPauseBtn" class="btn"><i class="fas fa-play"></i></button>
@@ -53,18 +54,18 @@
         <button id="mute-btn" class="btn"><i class="fas fa-volume-up"></i></button>
       </div>
 
-      <div class="progress-wrapper" style="margin-top:10px; width:100%;">
+      <div class="progress-wrapper">
         <div class="progress-container"><div id="progress"></div></div>
-        <div id="time-display" class="time-display">00:00</div>
+        <div id="time-display" class="time-display">00:00:00</div>
       </div>
-
-      <audio id="audio" preload="auto">
-        <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-      </audio>
     </div>
 
+    <audio id="audio" preload="auto">
+      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+    </audio>
   </div>
 </section>
+
   
 <!-- Social Section -->
 <section class="social-section">

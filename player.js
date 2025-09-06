@@ -6,14 +6,21 @@ const progress = document.getElementById("progress");
 const timeDisplay = document.getElementById("time-display");
 const nowPlaying = document.getElementById("now-playing");
 
+let animationRunning = false;
+let animationFrame;
+
+// ==== CONTROL DE AUDIO ====
+
 // Play/Pause
 playPauseBtn.addEventListener("click", () => {
   if(audio.paused){
     audio.play();
     playPauseBtn.innerHTML='<i class="fas fa-pause"></i>';
+    startMatrix();
   } else {
     audio.pause();
     playPauseBtn.innerHTML='<i class="fas fa-play"></i>';
+    stopMatrix();
   }
 });
 
@@ -22,6 +29,7 @@ stopBtn.addEventListener("click", () => {
   audio.pause();
   audio.currentTime = 0;
   playPauseBtn.innerHTML='<i class="fas fa-play"></i>';
+  stopMatrix();
 });
 
 // Mute
@@ -38,47 +46,70 @@ audio.addEventListener("timeupdate", () => {
     progress.style.width = percent + "%";
   }
 
-  let h = Math.floor(audio.currentTime / 3600);
-  let m = Math.floor((audio.currentTime % 3600) / 60);
-  let s = Math.floor(audio.currentTime % 60);
-
-  if(h<10) h="0"+h;
-  if(m<10) m="0"+m;
-  if(s<10) s="0"+s;
-  timeDisplay.textContent = `${h}:${m}:${s}`;
+  const hrs = Math.floor(audio.currentTime / 3600);
+  const mins = Math.floor((audio.currentTime % 3600) / 60);
+  const secs = Math.floor(audio.currentTime % 60);
+  timeDisplay.textContent = 
+    `${hrs.toString().padStart(2,"0")}:${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
 });
 
-// Matrix animación
+// ==== ANIMACIÓN MATRIX ==== 
+
 const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
 
-function resizeCanvas(){ 
-  canvas.width = canvas.parentElement.offsetWidth; 
-  canvas.height = canvas.parentElement.offsetHeight; 
+let columns, drops, fontSize = 16;
+
+function resizeCanvas(){
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  columns = Math.floor(canvas.width / fontSize);
+  drops = Array(columns).fill(1);
 }
-window.addEventListener('resize', resizeCanvas); 
+window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
-const fontSize=16;
-const columns=Math.floor(canvas.width/fontSize);
-let drops=Array.from({length:columns},()=>Math.random()*canvas.height);
+const chars = "アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤャユュヨラリルレロワヰヱヲンabcdefghijklmnopqrstuvwxyz0123456789".split("");
 
 function drawMatrix(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.font=fontSize+"px monospace";
+  ctx.fillStyle = "rgba(0,0,0,0.1)"; // deja estela difuminada
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for(let i=0;i<columns;i++){
-    const text=letters.charAt(Math.floor(Math.random()*letters.length));
-    let yPos=drops[i]*fontSize;
+  ctx.font = fontSize + "px monospace";
 
-    ctx.fillStyle="rgb(0,255,0)";
-    ctx.fillText(text,i*fontSize,yPos);
+  for(let i=0; i<drops.length; i++){
+    const text = chars[Math.floor(Math.random()*chars.length)];
+    const x = i * fontSize;
+    const y = drops[i] * fontSize;
 
-    if(yPos>canvas.height && Math.random()>0.975){ 
-      drops[i]=0; 
+    // cabeza más brillante
+    ctx.fillStyle = "rgba(0,255,0,1)";
+    ctx.fillText(text, x, y);
+
+    // cola difuminada
+    ctx.fillStyle = "rgba(0,255,0,0.5)";
+    ctx.fillText(text, x, y - fontSize);
+
+    if(y > canvas.height && Math.random() > 0.975){
+      drops[i] = 0;
     }
-    drops[i]+=0.3; // velocidad lenta ~30%
+    drops[i]++;
+  }
+
+  animationFrame = requestAnimationFrame(drawMatrix);
+}
+
+function startMatrix(){
+  if(!animationRunning){
+    animationRunning = true;
+    drawMatrix();
   }
 }
-setInterval(drawMatrix,40);
+
+function stopMatrix(){
+  if(animationRunning){
+    cancelAnimationFrame(animationFrame);
+    animationRunning = false;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+}

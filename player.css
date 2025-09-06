@@ -1,51 +1,65 @@
-/* Contenedor principal del reproductor */
-.main-player-container {
-  max-width: 650px;
-  margin: auto;
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
+.player-section {
+  display:flex;
+  justify-content:center;
+  margin-top:20px;
+  margin-bottom:40px;
 }
 
-/* Imagen principal */
-.main-player-container .main-image {
-  display: block;
-  width: 100%;
-  border-radius: 12px;
+.player-container {
+  position:relative;
+  width:250px;
+  height:550px;
+  border-radius:12px;
+  overflow:hidden;
+  background:#000;
+  box-shadow:0 8px 24px rgba(0,0,0,0.6);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
 }
 
 /* Canvas Matrix */
 #matrixCanvas {
-  position: absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
+  position:absolute;
+  top:0; left:0;
+  width:100%; height:100%;
   z-index:1;
 }
 
-/* Overlay negro 25% */
-.main-player-container::before {
-  content:'';
+/* Overlay negro 40% */
+.overlay {
   position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background-color: rgba(0,0,0,0.25);
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.4);
   z-index:2;
-  border-radius:12px;
 }
 
-/* Controles centrados al pie */
+/* Contenido sobre el reproductor */
+.player-content {
+  position:relative;
+  z-index:3;
+  width:90%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+#now-playing {
+  color:#ff6600;
+  font-weight:bold;
+  margin-bottom:10px;
+  text-align:center;
+}
+
+/* Controles */
 .controls {
   display:flex;
   justify-content:center;
-  align-items:center;
   gap:15px;
-  margin-bottom:5px;
-  z-index:3;
+  margin-bottom:10px;
 }
 
 .controls .btn {
@@ -58,7 +72,6 @@
   color:#ff6600;
   transition: all 0.2s ease;
 }
-
 .controls .btn:hover {
   background: rgba(0,0,0,0.8);
 }
@@ -68,9 +81,7 @@
   display:flex;
   align-items:center;
   gap:10px;
-  width:90%;
-  margin:0 auto;
-  z-index:3;
+  width:100%;
 }
 
 .progress-container {
@@ -91,27 +102,19 @@
 .time-display {
   font-size:12px;
   color:#fff;
-  width:45px;
+  width:65px;
   text-align:right;
-}
-
-/* Etiqueta "En vivo" y ahora reproduciendo */
-.live-label {
-  color:#ff6600;
-  font-weight:bold;
-  margin-bottom:5px;
-  text-align:center;
-  z-index:3;
 }
 
 /* Ajustes móviles */
 @media screen and (max-width:600px){
-  .main-player-container {
-    max-width: 90%;
+  .player-container {
+    width:90%;
+    height:400px;
   }
   .controls .btn {
     font-size:16px;
     padding:8px 12px;
   }
-  .time-display { font-size:10px; width:40px; }
+  .time-display { font-size:10px; width:50px; }
 }

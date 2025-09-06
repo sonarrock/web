@@ -1,101 +1,78 @@
-const audio = document.getElementById("audio");
-const playBtn = document.getElementById("play-btn");
-const stopBtn = document.getElementById("stop-btn");
-const muteBtn = document.getElementById("mute-btn");
-const progress = document.getElementById("progress");
-const timeDisplay = document.getElementById("time-display");
-const canvas = document.getElementById("matrix");
-const ctx = canvas.getContext("2d");
-
-let animationId;
-let matrixRunning = false;
-
-// Ajuste de tamaño del canvas al contenedor
-function resizeCanvas() {
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-}
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-
-const letters = "アカサタナハマヤラワイウエオabcdefghijklmnopqrstuvwxyz0123456789";
-const fontSize = 20;
-const columns = Math.floor(canvas.width / fontSize);
-
-// Cada columna mantiene su historial de caracteres y opacidades
-const drops = [];
-for (let i = 0; i < columns; i++) {
-  drops[i] = [];
+.player-container {
+  max-width: 650px;
+  margin: auto;
+  position: relative;
+  background: rgba(0,0,0,0.4);
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-// Función de dibujo con estelas
-function drawMatrix() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+/* Controles */
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 10px;
+  z-index: 3;
+  position: relative;
+}
 
-  for (let i = 0; i < drops.length; i++) {
-    // Agregar nuevo carácter iluminado al principio
-    const char = letters[Math.floor(Math.random() * letters.length)];
-    drops[i].unshift({ char: char, opacity: 1.0 });
+.controls .btn {
+  font-size: 18px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: rgba(0,0,0,0.6);
+  color: #ff6600;
+  transition: all 0.2s ease;
+}
+.controls .btn:hover {
+  background: rgba(0,0,0,0.8);
+}
 
-    // Limitar la longitud de la columna
-    if (drops[i].length > 30) drops[i].pop();
+/* Barra de progreso */
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  gap: 10px;
+}
 
-    // Dibujar todos los caracteres de la columna
-    for (let j = 0; j < drops[i].length; j++) {
-      const y = j * fontSize;
-      ctx.fillStyle = `rgba(0,255,0,${drops[i][j].opacity})`;
-      ctx.font = `${fontSize}px monospace`;
-      ctx.fillText(drops[i][j].char, i * fontSize, y);
-      drops[i][j].opacity *= 0.9; // desvanecimiento gradual
-    }
+.progress-container {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#progress {
+  width: 0%;
+  height: 100%;
+  background: #ff6600;
+  border-radius: 3px;
+}
+
+/* Contador de tiempo */
+.time-display {
+  font-size: 12px;
+  color: #fff;
+  width: 45px;
+  text-align: right;
+}
+
+/* Reproductor más estrecho en móviles */
+@media screen and (max-width:600px){
+  .player-container {
+    max-width: 90%;
+    padding: 15px;
   }
-
-  animationId = requestAnimationFrame(drawMatrix);
-}
-
-// Control de audio y animación
-playBtn.addEventListener("click", () => {
-  if (audio.paused) {
-    audio.play();
-    if (!matrixRunning) {
-      drawMatrix();
-      matrixRunning = true;
-    }
-  } else {
-    audio.pause();
-    cancelAnimationFrame(animationId);
-    matrixRunning = false;
+  .controls .btn {
+    font-size: 16px;
+    padding: 8px 12px;
   }
-});
-
-stopBtn.addEventListener("click", () => {
-  audio.pause();
-  audio.currentTime = 0;
-  cancelAnimationFrame(animationId);
-  matrixRunning = false;
-  progress.style.width = "0%";
-  timeDisplay.textContent = "00:00";
-});
-
-muteBtn.addEventListener("click", () => {
-  audio.muted = !audio.muted;
-  muteBtn.classList.toggle("active", audio.muted);
-});
-
-// Barra de progreso y contador
-audio.addEventListener("timeupdate", () => {
-  const percent = (audio.currentTime / audio.duration) * 100 || 0;
-  progress.style.width = percent + "%";
-
-  const minutes = Math.floor(audio.currentTime / 60);
-  const seconds = Math.floor(audio.currentTime % 60);
-  timeDisplay.textContent = `${minutes.toString().padStart(2,"0")}:${seconds.toString().padStart(2,"0")}`;
-});
-
-// Barra interactiva
-document.querySelector(".progress-container").addEventListener("click", (e) => {
-  const rect = e.currentTarget.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const newTime = (x / rect.width) * audio.duration;
-  audio.currentTime = newTime;
-});
+  .time-display { font-size: 10px; width: 40px; }
+}

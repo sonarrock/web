@@ -44,7 +44,7 @@ document.querySelector(".progress-container").addEventListener("click", (e) => {
   audio.currentTime = (x / width) * audio.duration;
 });
 
-// MATRIX ANIMATION transparente, no saturada
+// MATRIX ANIMATION – Solo un carácter por posición
 function runMatrix() {
   const ctx = matrix.getContext("2d");
   matrix.width = matrix.offsetWidth;
@@ -53,24 +53,23 @@ function runMatrix() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
   const fontSize = 16;
   const columns = Math.floor(matrix.width / fontSize);
-  const drops = Array(columns).fill(1);
+  const drops = Array(columns).fill(0);
 
   function draw() {
-    ctx.fillStyle = "rgba(0,0,0,0)"; // transparente
-    ctx.fillRect(0,0,matrix.width,matrix.height);
+    // Limpiar completamente el canvas cada frame
+    ctx.clearRect(0, 0, matrix.width, matrix.height);
 
-    ctx.fillStyle = "rgba(0,255,0,0.3)";
+    ctx.fillStyle = "rgba(0,255,0,0.7)";
     ctx.font = fontSize + "px monospace";
 
-    for (let i = 0; i < drops.length; i++) {
+    for (let i = 0; i < columns; i++) {
       const text = letters[Math.floor(Math.random() * letters.length)];
+      drops[i] = 1; // Solo un carácter por columna
       ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-      if (drops[i] * fontSize > matrix.height || Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
     }
   }
 
-  if (!matrixInterval) matrixInterval = setInterval(draw, 80); // más lento, no distorsiona
+  if (!matrixInterval) matrixInterval = setInterval(draw, 100); // velocidad moderada
 }
 
 function stopMatrix() {
@@ -79,3 +78,4 @@ function stopMatrix() {
   const ctx = matrix.getContext("2d");
   ctx.clearRect(0,0,matrix.width,matrix.height);
 }
+

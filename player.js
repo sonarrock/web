@@ -48,5 +48,37 @@ audio.addEventListener("timeupdate", () => {
   timeDisplay.textContent = `${h}:${m}:${s}`;
 });
 
-// Muestra título si existe, sino oculta
-audio.addEventListener("play",
+// Matrix animación
+const canvas = document.getElementById("matrixCanvas");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas(){ 
+  canvas.width = canvas.parentElement.offsetWidth; 
+  canvas.height = canvas.parentElement.offsetHeight; 
+}
+window.addEventListener('resize', resizeCanvas); 
+resizeCanvas();
+
+const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
+const fontSize=16;
+const columns=Math.floor(canvas.width/fontSize);
+let drops=Array.from({length:columns},()=>Math.random()*canvas.height);
+
+function drawMatrix(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.font=fontSize+"px monospace";
+
+  for(let i=0;i<columns;i++){
+    const text=letters.charAt(Math.floor(Math.random()*letters.length));
+    let yPos=drops[i]*fontSize;
+
+    ctx.fillStyle="rgb(0,255,0)";
+    ctx.fillText(text,i*fontSize,yPos);
+
+    if(yPos>canvas.height && Math.random()>0.975){ 
+      drops[i]=0; 
+    }
+    drops[i]+=0.3; // velocidad lenta ~30%
+  }
+}
+setInterval(drawMatrix,40);

@@ -5,6 +5,7 @@ const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
 const progress = document.getElementById("progress");
 const timeDisplay = document.getElementById("time-display");
+const nowPlaying = document.getElementById("now-playing");
 
 // Play/Pause
 playPauseBtn.addEventListener("click", () => {

@@ -40,28 +40,39 @@
 <!-- Main Section -->
 <section class="main-section">
   <div class="container">
-    <div class="main-image-container">
-      <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
+    <div class="main-image-container" style="position:relative;">
+      <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image" style="width:100%; border-radius:12px;">
+      
+      <!-- REPRODUCTOR ZENO SOBRE la imagen -->
+      <div class="player-container" style="position:absolute; top:0; left:0; width:100%; height:100%;">
+        <canvas id="matrixCanvas"></canvas>
+
+        <!-- Overlay negro 25% -->
+        <div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.25); z-index:1; border-radius:12px;"></div>
+
+        <div style="position:relative; z-index:2; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; padding:20px; box-sizing:border-box;">
+          <h3 class="live-label">En vivo Miércoles 21:00</h3>
+          <div id="now-playing" style="margin-bottom:10px;">Cargando canción...</div>
+
+          <div class="controls">
+            <button id="playPauseBtn" class="btn"><i class="fas fa-play"></i></button>
+            <button id="stop-btn" class="btn"><i class="fas fa-stop"></i></button>
+            <button id="mute-btn" class="btn"><i class="fas fa-volume-up"></i></button>
+          </div>
+
+          <div class="progress-wrapper">
+            <div class="progress-container"><div id="progress"></div></div>
+            <div id="time-display" class="time-display">00:00</div>
+          </div>
+
+          <audio id="audio" preload="auto">
+            <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+          </audio>
+        </div>
+      </div>
     </div>
-
-    <!-- REPRODUCTOR ZENO DEBAJO -->
-    <div class="player-container">
-      <canvas id="matrixCanvas"></canvas>
-
-      <h3 class="live-label">En vivo Miércoles 21:00</h3>
-
-      <div id="now-playing">Cargando canción...</div>
-
-      <div class="controls">
-        <button id="playPauseBtn" class="btn"><i class="fas fa-play"></i></button>
-        <button id="stop-btn" class="btn"><i class="fas fa-stop"></i></button>
-        <button id="mute-btn" class="btn"><i class="fas fa-volume-up"></i></button>
-      </div>
-
-      <div class="progress-wrapper">
-        <div class="progress-container"><div id="progress"></div></div>
-        <div id="time-display" class="time-display">00:00</div>
-      </div>
+  </div>
+</section>
   
 <!-- Social Section -->
 <section class="social-section">

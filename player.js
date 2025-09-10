@@ -1,71 +1,75 @@
-<script>
 // ===============================
-// REPRODUCTOR STREAMING + MATRIX
+// REPRODUCTOR STREAMING ZENO + MATRIX
 // ===============================
 
-// ===== ELEMENTOS =====
-const radioAudio = document.getElementById("radio-audio");
+// ----- ELEMENTOS -----
+const audioStream = document.getElementById("radio-audio");
 const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
-const progress = document.getElementById("progress");
+const progressStream = document.getElementById("radio-progress");
+const progressContainerStream = document.getElementById("radio-progress-container");
 const timeDisplay = document.getElementById("time-display");
 const nowPlaying = document.getElementById("now-playing");
 
 let animationRunning = false;
 let animationFrame;
 
-// ===== PLAY/PAUSE =====
+// ----- PLAY / PAUSE -----
 playPauseBtn.addEventListener("click", () => {
-  if (radioAudio.paused) {
-    radioAudio.play().then(() => {
+  if(audioStream.paused){
+    audioStream.play().then(() => {
       playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
       startMatrix();
     }).catch(err => {
       console.warn("iOS/Chrome bloqueó autoplay:", err);
     });
   } else {
-    radioAudio.pause();
+    audioStream.pause();
     playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
     stopMatrix();
   }
 });
 
-// ===== STOP =====
+// ----- STOP -----
 stopBtn.addEventListener("click", () => {
-  radioAudio.pause();
-  radioAudio.currentTime = 0;
+  audioStream.pause();
+  audioStream.currentTime = 0;
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
   stopMatrix();
 });
 
-// ===== MUTE =====
+// ----- MUTE -----
 muteBtn.addEventListener("click", () => {
-  radioAudio.muted = !radioAudio.muted;
-  muteBtn.innerHTML = radioAudio.muted 
-    ? '<i class="fas fa-volume-mute"></i>' 
-    : '<i class="fas fa-volume-up"></i>';
-  muteBtn.style.color = radioAudio.muted ? '#ff0000' : '#ff6600';
+  audioStream.muted = !audioStream.muted;
+  muteBtn.innerHTML = audioStream.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+  muteBtn.style.color = audioStream.muted ? '#ff0000' : '#ff6600';
 });
 
-// ===== BARRA DE PROGRESO + TIEMPO =====
-radioAudio.addEventListener("timeupdate", () => {
-  if (radioAudio.duration) {
-    const percent = (radioAudio.currentTime / radioAudio.duration) * 100;
-    progress.style.width = percent + "%";
+// ----- BARRA DE PROGRESO + TIEMPO -----
+audioStream.addEventListener("timeupdate", () => {
+  if(audioStream.duration){
+    const percent = (audioStream.currentTime / audioStream.duration) * 100;
+    progressStream.style.width = percent + "%";
   }
 
-  const hrs = Math.floor(radioAudio.currentTime / 3600);
-  const mins = Math.floor((radioAudio.currentTime % 3600) / 60);
-  const secs = Math.floor(radioAudio.currentTime % 60);
-  timeDisplay.textContent =
-    `${hrs.toString().padStart(2,"0")}:${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
+  const hrs = Math.floor(audioStream.currentTime / 3600);
+  const mins = Math.floor((audioStream.currentTime % 3600) / 60);
+  const secs = Math.floor(audioStream.currentTime % 60);
+  timeDisplay.textContent = `${hrs.toString().padStart(2,"0")}:${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
 });
 
-// ===== ANIMACIÓN MATRIX =====
+// ----- CLICK EN PROGRESO -----
+progressContainerStream.addEventListener('click', (e) => {
+  const rect = progressContainerStream.getBoundingClientRect();
+  const offsetX = e.clientX - rect.left;
+  const width = rect.width;
+  audioStream.currentTime = (offsetX / width) * audioStream.duration;
+});
+
+// ----- ANIMACIÓN MATRIX -----
 const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
-
 let columns, drops, fontSize = 16;
 
 function resizeCanvas(){
@@ -80,7 +84,7 @@ resizeCanvas();
 const chars = "アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤャユュヨラリルレロワヰヱヲンabcdefghijklmnopqrstuvwxyz0123456789".split("");
 
 function drawMatrix(){
-  ctx.fillStyle = "rgba(0,0,0,0.1)"; // deja estela difuminada
+  ctx.fillStyle = "rgba(0,0,0,0.1)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.font = fontSize + "px monospace";
@@ -93,32 +97,3 @@ function drawMatrix(){
     // cabeza brillante
     ctx.fillStyle = "rgba(0,255,0,1)";
     ctx.fillText(text, x, y);
-
-    // cola difuminada
-    ctx.fillStyle = "rgba(0,255,0,0.5)";
-    ctx.fillText(text, x, y - fontSize);
-
-    if (y > canvas.height && Math.random() > 0.975) {
-      drops[i] = 0;
-    }
-    drops[i]++;
-  }
-
-  animationFrame = requestAnimationFrame(drawMatrix);
-}
-
-function startMatrix(){
-  if (!animationRunning) {
-    animationRunning = true;
-    drawMatrix();
-  }
-}
-
-function stopMatrix(){
-  if (animationRunning) {
-    cancelAnimationFrame(animationFrame);
-    animationRunning = false;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-}
-</script>

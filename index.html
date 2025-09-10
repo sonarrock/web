@@ -139,7 +139,7 @@
   box-shadow:0 8px 24px rgba(0,0,0,0.6);
   color:#fff;
   font-family:"Spotify Circular",Arial,sans-serif;
-  min-height:170px; /* Igual que el embed */
+  min-height:170px;
 }
 
 .disco-section .player-wrapper img{
@@ -156,7 +156,7 @@
   display:flex;
   flex-direction:column;
   gap:8px;
-  justify-content:center; /* Centrar verticalmente */
+  justify-content:center;
 }
 
 .player-controls h3{
@@ -193,13 +193,13 @@ audio{
 /* RESPONSIVE */
 @media(max-width:560px){
   .disco-section .player-wrapper{
-    flex-direction:row; /* Mantener portada y controles lado a lado */
+    flex-direction:row;
     justify-content:flex-start;
-    min-height:170px; /* Igual al embed */
+    min-height:170px;
   }
 
   .disco-section .player-wrapper img{
-    width:80px;  /* Más pequeña para móviles */
+    width:80px;
     height:80px;
     max-width:80px;
     border-radius:10px;
@@ -207,7 +207,7 @@ audio{
 
   .player-controls{
     flex:1;
-    margin-left:10px; /* Separación lateral */
+    margin-left:10px;
     justify-content:center;
   }
 
@@ -222,17 +222,22 @@ audio{
 </style>
 
 <script>
+// ----------------------------
+// SOLO CAMBIA EL NOMBRE DEL ARCHIVO AQUÍ CADA SEMANA
+// ----------------------------
+const fileName = "13 Pink Floyd - Wish you where here.mp3";
+// ----------------------------
+
 const audio = document.getElementById('audio-player');
 const progress = document.getElementById('progress');
 const progressContainer = document.getElementById('progress-container');
 const cover = document.getElementById('cover');
-const trackTitle = "13 Pink Floyd - Wish you where here.mp3";
 
 // Mostrar título sin extensión
-document.getElementById('track-title').textContent = trackTitle.replace(/\.mp3$/i,'');
+document.getElementById('track-title').textContent = fileName.replace(/\.mp3$/i,'');
 
 // Asignar src directamente al audio
-audio.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/13%20Pink%20Floyd%20-%20Wish%20you%20where%20here.mp3";
+audio.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
 
 // Actualizar barra de progreso mientras se reproduce
 audio.addEventListener('timeupdate', () => {
@@ -255,7 +260,7 @@ let zoomInterval;
 audio.addEventListener('play', () => {
   zoomInterval = setInterval(() => {
     let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g,'')) || 1;
-    scale += 0.0015 * zoomDirection; // respiración suave
+    scale += 0.0015 * zoomDirection;
     if(scale >= 1.03) zoomDirection = -1;
     if(scale <= 0.97) zoomDirection = 1;
     cover.style.transform = `scale(${scale})`;
@@ -272,7 +277,6 @@ audio.addEventListener('ended', () => {
   cover.style.transform = 'scale(1)';
 });
 </script>
-
 
   
 <!-- Embed Section -->

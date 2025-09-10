@@ -142,6 +142,7 @@
   border-radius:12px;
   object-fit:cover;
   flex-shrink:0;
+  transition: transform 2s ease-in-out;
 }
 .player-controls{
   flex:1;
@@ -150,7 +151,7 @@
   gap:8px;
 }
 .player-controls h3{
-  color:#ffffff; /* Título en blanco */
+  color:#ffffff;
   font-weight:700;
   margin:0;
 }
@@ -175,14 +176,29 @@ audio{
   background:#FF6600;
   transition:width 0.1s linear;
 }
+
+/* RESPONSIVE */
 @media(max-width:560px){
   .disco-section .player-wrapper{
     flex-direction:column;
-    align-items:flex-start;
+    align-items:center;
   }
   .disco-section .player-wrapper img{
-    width:100%;
+    width:80%;
     height:auto;
+    max-width:200px;
+    border-radius:10px;
+    margin-bottom:10px;
+  }
+  .player-controls{
+    width:100%;
+    align-items:center;
+  }
+  audio{
+    width:100%;
+  }
+  .progress-container{
+    width:100%;
   }
 }
 </style>
@@ -191,6 +207,7 @@ audio{
 const audio = document.getElementById('audio-player');
 const progress = document.getElementById('progress');
 const progressContainer = document.getElementById('progress-container');
+const cover = document.getElementById('cover');
 const trackTitle = "13 Pink Floyd - Wish you where here.mp3";
 
 // Mostrar título sin extensión
@@ -212,6 +229,30 @@ progressContainer.addEventListener('click', (e) => {
   const width = rect.width;
   const clickPercent = offsetX / width;
   audio.currentTime = clickPercent * audio.duration;
+});
+
+// Animación de portada al reproducir
+let zoomDirection = 1; // 1: ampliar, -1: reducir
+let zoomInterval;
+
+audio.addEventListener('play', () => {
+  zoomInterval = setInterval(() => {
+    let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g,'')) || 1;
+    scale += 0.002 * zoomDirection;
+    if(scale >= 1.05) zoomDirection = -1;
+    if(scale <= 0.95) zoomDirection = 1;
+    cover.style.transform = `scale(${scale})`;
+  }, 20);
+});
+
+audio.addEventListener('pause', () => {
+  clearInterval(zoomInterval);
+  cover.style.transform = 'scale(1)';
+});
+
+audio.addEventListener('ended', () => {
+  clearInterval(zoomInterval);
+  cover.style.transform = 'scale(1)';
 });
 </script>
 

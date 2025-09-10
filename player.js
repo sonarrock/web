@@ -124,7 +124,7 @@ function stopMatrix(){
 
 <script>
 // ===== ELEMENTOS =====
-const audio = document.getElementById("audio");
+const radioAudio = document.getElementById('radio-audio');
 const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");

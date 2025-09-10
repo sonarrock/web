@@ -112,8 +112,8 @@
 
       <div class="player-controls">
         <h3 id="track-title"></h3>
-        <audio id="audio-player">
-          <source src="https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/13%20Pink%20Floyd%20-%20Wish%20you%20where%20here.mp3" type="audio/mpeg">
+        <audio id="audio-player" controls preload="none" style="width:100%; border-radius:8px; background:#222;">
+          Tu navegador no soporta audio HTML5.
         </audio>
 
         <div class="progress-container">
@@ -154,12 +154,6 @@
   font-weight:700;
   margin:0;
 }
-audio{
-  width:100%;
-  border-radius:8px;
-  background:#222;
-  outline:none;
-}
 .progress-container{
   width:100%;
   height:5px;
@@ -194,14 +188,15 @@ const trackTitle="13 Pink Floyd - Wish you where here.mp3";
 // Mostrar título sin extensión
 document.getElementById('track-title').textContent=trackTitle.replace(/\.mp3$/i,'');
 
+// Asignar src directamente al audio
+audio.src="https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/13%20Pink%20Floyd%20-%20Wish%20you%20where%20here.mp3";
+
 // Actualizar barra de progreso mientras se reproduce
 audio.addEventListener('timeupdate',()=>{
   const percent=(audio.currentTime/audio.duration)*100;
   progress.style.width=percent+'%';
 });
 </script>
-
-
 
   
 <!-- Embed Section -->

@@ -107,11 +107,12 @@
     <h2 class="section-title">El Disco De La Semana</h2>
 
     <div class="player-wrapper">
-      <img src="https://raw.githubusercontent.com/USER/REPO/main/web/El%20Disco%20De%20La%20Semana/portada.jpg" alt="Portada del álbum" />
+      <!-- Portada -->
+      <img id="cover" src="https://raw.githubusercontent.com/sonarrock/web/main/web/El%20Disco%20De%20La%20Semana/portada.jpg" alt="Portada del álbum" />
 
-      <div style="flex:1;">
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:8px;">
         <h3 id="track-title"></h3>
-        <audio id="audio-player" controls preload="none" style="width:100%; margin-top:8px;">
+        <audio id="audio-player" controls preload="none" style="width:100%; border-radius:8px; background:#222;">
           <source id="audio-source" type="audio/mpeg" />
           Tu navegador no soporta audio HTML5.
         </audio>
@@ -121,14 +122,14 @@
 </section>
 
 <script>
-  // 🚀 Cambia solo esta variable cada semana
+  // 🎵 Solo cambia este nombre cada semana
   const fileName = "13 Pink Floyd - Wish you where here.mp3";
 
-  // Construir URL a GitHub
-  const baseUrl = "https://raw.githubusercontent.com/USER/REPO/main/web/El%20Disco%20De%20La%20Semana/";
+  // Construir la URL completa en GitHub
+  const baseUrl = "https://raw.githubusercontent.com/sonarrock/web/main/web/El%20Disco%20De%20La%20Semana/";
   const audioUrl = baseUrl + encodeURIComponent(fileName);
 
-  // Mostrar nombre sin .mp3
+  // Mostrar el título sin .mp3
   document.getElementById("track-title").textContent = fileName.replace(/\.mp3$/i, "");
 
   // Asignar la URL al reproductor
@@ -152,6 +153,7 @@
     gap: 20px;
     margin-top: 20px;
   }
+
   .disco-section .player-wrapper img {
     width: 140px;
     height: 140px;
@@ -159,16 +161,32 @@
     object-fit: cover;
     flex-shrink: 0;
   }
+
   .disco-section .player-wrapper h3 {
-    font-size: 16px;
-    margin: 0 0 8px 0;
+    font-size: 14px;
+    margin: 0;
     font-weight: 700;
-    color: #fff;
+    color: #FF6600; /* igual que tus títulos */
+    font-family: "Spotify Circular", Arial, sans-serif;
   }
+
   .disco-section .player-wrapper audio {
     filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
     border-radius: 8px;
     background: #222;
+    height: 35px;
+  }
+
+  @media (max-width: 560px){
+    .disco-section .player-wrapper {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .disco-section .player-wrapper img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
   }
 </style>
 

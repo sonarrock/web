@@ -1,8 +1,13 @@
-const audio = document.getElementById("audio");
+<script>
+// ===============================
+// REPRODUCTOR STREAMING + MATRIX
+// ===============================
+
+const audioStream = document.getElementById("audio-stream");
 const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
-const progress = document.getElementById("progress");
+const progressStream = document.getElementById("progress-stream");
 const timeDisplay = document.getElementById("time-display");
 const nowPlaying = document.getElementById("now-playing");
 
@@ -13,12 +18,12 @@ let animationFrame;
 
 // Play/Pause
 playPauseBtn.addEventListener("click", () => {
-  if(audio.paused){
-    audio.play();
+  if(audioStream.paused){
+    audioStream.play();
     playPauseBtn.innerHTML='<i class="fas fa-pause"></i>';
     startMatrix();
   } else {
-    audio.pause();
+    audioStream.pause();
     playPauseBtn.innerHTML='<i class="fas fa-play"></i>';
     stopMatrix();
   }
@@ -26,29 +31,31 @@ playPauseBtn.addEventListener("click", () => {
 
 // Stop
 stopBtn.addEventListener("click", () => {
-  audio.pause();
-  audio.currentTime = 0;
+  audioStream.pause();
+  audioStream.currentTime = 0;
   playPauseBtn.innerHTML='<i class="fas fa-play"></i>';
   stopMatrix();
 });
 
 // Mute
 muteBtn.addEventListener("click", () => {
-  audio.muted = !audio.muted;
-  muteBtn.innerHTML = audio.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
-  muteBtn.style.color = audio.muted ? '#ff0000' : '#ff6600';
+  audioStream.muted = !audioStream.muted;
+  muteBtn.innerHTML = audioStream.muted 
+    ? '<i class="fas fa-volume-mute"></i>' 
+    : '<i class="fas fa-volume-up"></i>';
+  muteBtn.style.color = audioStream.muted ? '#ff0000' : '#ff6600';
 });
 
 // Barra de progreso y contador H:M:S
-audio.addEventListener("timeupdate", () => {
-  if(audio.duration){
-    const percent = (audio.currentTime / audio.duration) * 100;
-    progress.style.width = percent + "%";
+audioStream.addEventListener("timeupdate", () => {
+  if(audioStream.duration){
+    const percent = (audioStream.currentTime / audioStream.duration) * 100;
+    progressStream.style.width = percent + "%";
   }
 
-  const hrs = Math.floor(audio.currentTime / 3600);
-  const mins = Math.floor((audio.currentTime % 3600) / 60);
-  const secs = Math.floor(audio.currentTime % 60);
+  const hrs = Math.floor(audioStream.currentTime / 3600);
+  const mins = Math.floor((audioStream.currentTime % 3600) / 60);
+  const secs = Math.floor(audioStream.currentTime % 60);
   timeDisplay.textContent = 
     `${hrs.toString().padStart(2,"0")}:${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
 });
@@ -113,3 +120,4 @@ function stopMatrix(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
   }
 }
+</script>

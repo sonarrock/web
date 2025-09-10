@@ -102,7 +102,7 @@
 </section>
 
 <!-- El Disco De La Semana -->
-<section class="disco-section">
+<section class="disco-section" style="margin-top:30px; margin-bottom:50px;">
   <div class="container" style="max-width:650px;margin:auto;">
     <h2 class="section-title">El Disco De La Semana</h2>
 
@@ -125,6 +125,10 @@
 </section>
 
 <style>
+.disco-section{
+  width:100%;
+  clear:both;
+}
 .disco-section .player-wrapper{
   display:flex;
   gap:20px;
@@ -135,6 +139,8 @@
   box-shadow:0 8px 24px rgba(0,0,0,0.6);
   color:#fff;
   font-family:"Spotify Circular",Arial,sans-serif;
+  position:relative;
+  min-height:170px; /* Igual al embed de Spotify */
 }
 .disco-section .player-wrapper img{
   width:140px;
@@ -149,9 +155,10 @@
   display:flex;
   flex-direction:column;
   gap:8px;
+  justify-content:center; /* Centrar verticalmente */
 }
 .player-controls h3{
-  color:#ffffff;
+  color:#ffffff; /* Título en blanco */
   font-weight:700;
   margin:0;
 }
@@ -182,6 +189,7 @@ audio{
   .disco-section .player-wrapper{
     flex-direction:column;
     align-items:center;
+    min-height:auto;
   }
   .disco-section .player-wrapper img{
     width:80%;
@@ -232,7 +240,7 @@ progressContainer.addEventListener('click', (e) => {
 });
 
 // Animación de portada al reproducir
-let zoomDirection = 1; // 1: ampliar, -1: reducir
+let zoomDirection = 1;
 let zoomInterval;
 
 audio.addEventListener('play', () => {

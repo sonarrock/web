@@ -46,149 +46,45 @@
   </div>
 </section>
 
-<!-- === AUDIO PLAYER === -->
-<div class="player">
-  <audio id="audio-stream" preload="none" playsinline>
-    <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-  </audio>
+<!-- Reproductor -->
+<section class="player-section">
+  <div class="player-container">
 
-  <div class="controls">
-    <button id="playPauseBtn"><i class="fas fa-play"></i></button>
-    <button id="stop-btn"><i class="fas fa-stop"></i></button>
-    <button id="mute-btn"><i class="fas fa-volume-up"></i></button>
-    <div id="time-display">00:00:00</div>
+    <!-- Fondo imagen -->
+    <img src="img/background.jpg" alt="Background" class="player-bg">
+
+    <!-- Canvas Matrix -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <!-- Overlay negro -->
+    <div class="overlay"></div>
+
+    <!-- Contenido -->
+    <div class="player-content">
+      <div id="now-playing"></div>
+
+      <!-- Controles -->
+      <div class="controls">
+        <button id="playPauseBtn" class="btn"><i class="fas fa-play"></i></button>
+        <button id="stop-btn" class="btn"><i class="fas fa-stop"></i></button>
+        <button id="mute-btn" class="btn"><i class="fas fa-volume-up"></i></button>
+      </div>
+
+      <!-- Barra + tiempo -->
+      <div class="progress-wrapper">
+        <div class="progress-container">
+          <div id="progress"></div>
+        </div>
+        <div id="time-display" class="time-display">00:00:00</div>
+      </div>
+
+      <!-- Audio -->
+      <audio id="audio" preload="auto">
+        <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+      </audio>
+    </div>
   </div>
-
-  <div class="progress-container">
-    <div id="progress"></div>
-  </div>
-
-  <canvas id="matrixCanvas"></canvas>
-</div>
-
-<!-- === SCRIPT PLAYER === -->
-<script>
-const audioStream = document.getElementById("audio-stream");
-const playPauseBtn = document.getElementById("playPauseBtn");
-const stopBtn = document.getElementById("stop-btn");
-const muteBtn = document.getElementById("mute-btn");
-const progress = document.getElementById("progress");
-const timeDisplay = document.getElementById("time-display");
-
-let animationRunning = false;
-let animationFrame;
-
-// ==== CONTROL DE AUDIO ====
-
-// Play/Pause
-playPauseBtn.addEventListener("click", () => {
-  if(audioStream.paused){
-    audioStream.play()
-      .then(() => {
-        playPauseBtn.innerHTML='<i class="fas fa-pause"></i>';
-        startMatrix();
-      })
-      .catch(err => {
-        console.error("iOS bloqueó el audio:", err);
-        alert("Toca el botón Play otra vez para iniciar el streaming.");
-      });
-  } else {
-    audioStream.pause();
-    playPauseBtn.innerHTML='<i class="fas fa-play"></i>';
-    stopMatrix();
-  }
-});
-
-// Stop
-stopBtn.addEventListener("click", () => {
-  audioStream.pause();
-  audioStream.currentTime = 0;
-  playPauseBtn.innerHTML='<i class="fas fa-play"></i>';
-  stopMatrix();
-});
-
-// Mute
-muteBtn.addEventListener("click", () => {
-  audioStream.muted = !audioStream.muted;
-  muteBtn.innerHTML = audioStream.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
-  muteBtn.style.color = audioStream.muted ? '#ff0000' : '#ff6600';
-});
-
-// Barra de progreso y contador H:M:S
-audioStream.addEventListener("timeupdate", () => {
-  if(audioStream.duration){
-    const percent = (audioStream.currentTime / audioStream.duration) * 100;
-    progress.style.width = percent + "%";
-  }
-
-  const hrs = Math.floor(audioStream.currentTime / 3600);
-  const mins = Math.floor((audioStream.currentTime % 3600) / 60);
-  const secs = Math.floor(audioStream.currentTime % 60);
-  timeDisplay.textContent = 
-    `${hrs.toString().padStart(2,"0")}:${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
-});
-
-// ==== ANIMACIÓN MATRIX ==== 
-const canvas = document.getElementById("matrixCanvas");
-const ctx = canvas.getContext("2d");
-
-let columns, drops, fontSize = 16;
-
-function resizeCanvas(){
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-  columns = Math.floor(canvas.width / fontSize);
-  drops = Array(columns).fill(1);
-}
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-
-const chars = "アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤャユュヨラリルレロワヰヱヲンabcdefghijklmnopqrstuvwxyz0123456789".split("");
-
-function drawMatrix(){
-  ctx.fillStyle = "rgba(0,0,0,0.1)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.font = fontSize + "px monospace";
-
-  for(let i=0; i<drops.length; i++){
-    const text = chars[Math.floor(Math.random()*chars.length)];
-    const x = i * fontSize;
-    const y = drops[i] * fontSize;
-
-    ctx.fillStyle = "rgba(0,255,0,1)";
-    ctx.fillText(text, x, y);
-
-    ctx.fillStyle = "rgba(0,255,0,0.5)";
-    ctx.fillText(text, x, y - fontSize);
-
-    if(y > canvas.height && Math.random() > 0.975){
-      drops[i] = 0;
-    }
-    drops[i]++;
-  }
-
-  animationFrame = requestAnimationFrame(drawMatrix);
-}
-
-function startMatrix(){
-  if(!animationRunning){
-    animationRunning = true;
-    drawMatrix();
-  }
-}
-
-function stopMatrix(){
-  if(animationRunning){
-    cancelAnimationFrame(animationFrame);
-    animationRunning = false;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-  }
-}
-
-<script src="player.js" defer></script>
-</script>
-
+</section>
   
 <!-- Social Section -->
 <section class="social-section">

@@ -155,10 +155,10 @@
   display:flex;
   flex-direction:column;
   gap:8px;
-  justify-content:center; /* Centrar verticalmente */
+  justify-content:center;
 }
 .player-controls h3{
-  color:#ffffff; /* Título en blanco */
+  color:#ffffff;
   font-weight:700;
   margin:0;
 }
@@ -192,9 +192,9 @@ audio{
     min-height:auto;
   }
   .disco-section .player-wrapper img{
-    width:80%;
-    height:auto;
-    max-width:200px;
+    height:170px; /* Igual al embed de iVoox/Spotify */
+    width:auto;   /* Mantener proporción */
+    max-width:100%;
     border-radius:10px;
     margin-bottom:10px;
   }
@@ -263,6 +263,7 @@ audio.addEventListener('ended', () => {
   cover.style.transform = 'scale(1)';
 });
 </script>
+
 
   
 <!-- Embed Section -->

@@ -100,126 +100,6 @@
   </div>
 </section>
 
-<!-- El Disco De La Semana -->
-<section class="disco-section" style="margin-top:30px; margin-bottom:50px;">
-  <div class="container" style="max-width:650px;margin:auto;">
-    <h2 class="section-title">El Disco De La Semana</h2>
-
-    <div class="player-wrapper">
-      <!-- Portada -->
-      <img id="cover" src="https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg" alt="Portada del álbum" />
-
-      <div class="player-controls">
-        <h3 id="track-title"></h3>
-        <audio id="audio-player" controls preload="none">
-          Tu navegador no soporta audio HTML5.
-        </audio>
-        <div class="progress-container" id="progress-container">
-          <div id="progress" class="progress"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<style>
-.disco-section{
-  width:100%;
-  clear:both;
-}
-
-.disco-section .player-wrapper{
-  display:flex;
-  gap:20px;
-  align-items:center;
-  background:#121212;
-  padding:15px 20px;
-  border-radius:12px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.6);
-  color:#fff;
-  font-family:"Spotify Circular",Arial,sans-serif;
-  min-height:170px;
-}
-
-.disco-section .player-wrapper img{
-  width:120px;
-  height:120px;
-  border-radius:12px;
-  object-fit:cover;
-  flex-shrink:0;
-  transition: transform 2s ease-in-out, box-shadow 0.3s ease-in-out;
-}
-
-.player-controls{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  justify-content:center;
-}
-
-.player-controls h3{
-  color:#ffffff;
-  font-weight:700;
-  margin:0 0 4px 0;
-  font-size:14px;
-}
-
-audio{
-  width:100%;
-  border-radius:8px;
-  background:#222;
-  outline:none;
-}
-
-.progress-container{
-  width:100%;
-  height:5px;
-  background:#333;
-  border-radius:3px;
-  overflow:hidden;
-  cursor:pointer;
-  margin-top:6px;
-}
-
-.progress{
-  width:0%;
-  height:100%;
-  background:#FF6600;
-  transition:width 0.1s linear;
-}
-
-/* RESPONSIVE */
-@media(max-width:560px){
-  .disco-section .player-wrapper{
-    flex-direction:row;
-    justify-content:flex-start;
-    min-height:170px;
-  }
-
-  .disco-section .player-wrapper img{
-    width:80px;
-    height:80px;
-    max-width:80px;
-    border-radius:10px;
-  }
-
-  .player-controls{
-    flex:1;
-    margin-left:10px;
-    justify-content:center;
-  }
-
-  audio{
-    width:100%;
-  }
-
-  .progress-container{
-    width:100%;
-  }
-}
-</style>
-
 <script>
 // ----------------------------
 // SOLO CAMBIA EL NOMBRE DEL ARCHIVO AQUÍ CADA SEMANA
@@ -227,7 +107,7 @@ audio{
 const fileName = "Pink Floyd - Wish you were here.mp3";
 // ----------------------------
 
-const audio = document.getElementById('audio-player');
+const discoAudio = document.getElementById('disco-audio');
 const progress = document.getElementById('progress');
 const progressContainer = document.getElementById('progress-container');
 const cover = document.getElementById('cover');
@@ -236,11 +116,11 @@ const cover = document.getElementById('cover');
 document.getElementById('track-title').textContent = fileName.replace(/\.mp3$/i,'');
 
 // Asignar src directamente al audio
-audio.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
+discoAudio.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
 
 // Actualizar barra de progreso mientras se reproduce
-audio.addEventListener('timeupdate', () => {
-  const percent = (audio.currentTime / audio.duration) * 100;
+discoAudio.addEventListener('timeupdate', () => {
+  const percent = (discoAudio.currentTime / discoAudio.duration) * 100;
   progress.style.width = percent + '%';
 });
 
@@ -249,14 +129,14 @@ progressContainer.addEventListener('click', (e) => {
   const rect = progressContainer.getBoundingClientRect();
   const offsetX = e.clientX - rect.left;
   const width = rect.width;
-  audio.currentTime = (offsetX / width) * audio.duration;
+  discoAudio.currentTime = (offsetX / width) * discoAudio.duration;
 });
 
 // Animación de portada: respiración + resplandor
 let zoomDirection = 1;
 let zoomInterval;
 
-audio.addEventListener('play', () => {
+discoAudio.addEventListener('play', () => {
   zoomInterval = setInterval(() => {
     let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g,'')) || 1;
     scale += 0.0015 * zoomDirection;
@@ -265,23 +145,24 @@ audio.addEventListener('play', () => {
     cover.style.transform = `scale(${scale})`;
 
     // Agregar resplandor dinámico
-    const shadowIntensity = 10 + (scale-0.97)*300; // valor dinámico
+    const shadowIntensity = 10 + (scale-0.97)*300; 
     cover.style.boxShadow = `0 0 ${shadowIntensity}px rgba(255,102,0,0.6)`;
   }, 20);
 });
 
-audio.addEventListener('pause', () => {
+discoAudio.addEventListener('pause', () => {
   clearInterval(zoomInterval);
   cover.style.transform = 'scale(1)';
   cover.style.boxShadow = 'none';
 });
 
-audio.addEventListener('ended', () => {
+discoAudio.addEventListener('ended', () => {
   clearInterval(zoomInterval);
   cover.style.transform = 'scale(1)';
   cover.style.boxShadow = 'none';
 });
 </script>
+
 
   
 <!-- Embed Section -->

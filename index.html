@@ -22,6 +22,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="google" content="notranslate">
+
+<style>
+/* ========================= */
+/* PORTADA DISCO MÓVIL       */
+/* ========================= */
+@media(max-width:560px){
+  .disco-section #cover{
+    width:90px !important;
+    height:90px !important;
+    border-radius:10px;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -46,7 +59,9 @@
   </div>
 </section>
 
-<!-- Reproductor Streaming -->
+<!-- ========================= -->
+<!-- REPRODUCTOR STREAMING + DISCO DE LA SEMANA -->
+<!-- ========================= -->
 <section class="player-section">
   <div class="player-container">
 
@@ -61,31 +76,28 @@
 
     <!-- Contenido -->
     <div class="player-content">
+
+      <!-- === Streaming Zeno === -->
       <div id="now-playing"></div>
 
-      <!-- Controles -->
       <div class="controls">
         <button id="playPauseBtn" class="btn"><i class="fas fa-play"></i></button>
         <button id="stop-btn" class="btn"><i class="fas fa-stop"></i></button>
         <button id="mute-btn" class="btn"><i class="fas fa-volume-up"></i></button>
       </div>
 
-      <!-- Barra + tiempo -->
-<div class="progress-wrapper">
-  <div id="radio-progress-container" class="progress-container">
-    <div id="radio-progress"></div>
-  </div>
-  <div id="time-display" class="time-display">00:00:00</div>
-</div>
+      <div class="progress-wrapper">
+        <div id="radio-progress-container" class="progress-container">
+          <div id="radio-progress"></div>
+        </div>
+        <div id="time-display" class="time-display">00:00:00</div>
+      </div>
 
-      <!-- Audio -->
       <audio id="radio-audio" preload="auto">
         <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
       </audio>
-    </div>
-  </div>
-</section>
 
+      
 <!-- Social Section -->
 <section class="social-section">
   <div class="container">
@@ -100,95 +112,21 @@
   </div>
 </section>
 
-<!-- Disco de la Semana -->
-<section class="disco-section">
-  <div class="container" style="max-width:650px; margin:auto; text-align:center;">
-    <h2 class="section-title"> El Disco de la Semana</h2>
+<!-- === Disco de la Semana === -->
+      <div class="disco-section" style="margin-top:30px; display:flex; align-items:center; gap:15px;">
+        <img id="cover" src="El Disco De La Semana/Pink Floyd - Wish you were here.jpg" alt="Portada" style="width:120px; height:120px; border-radius:12px; box-shadow:0 0 10px rgba(255,102,0,0.6); transition: transform 0.2s, box-shadow 0.2s;">
+        <div style="flex:1;">
+          <div id="track-title" style="color:#FF6600; font-weight:bold; font-size:1.1rem;">Título del Disco</div>
+          <div id="disco-progress-container" class="progress-container" style="margin-top:5px;">
+            <div id="disco-progress"></div>
+          </div>
+        </div>
+        <audio id="disco-audio" preload="auto"></audio>
+      </div>
 
-    <!-- Portada -->
-    <img id="cover" 
-         src="https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg" 
-         alt="Portada del Disco" 
-         style="width:100%; max-width:300px; border-radius:12px; margin:20px auto; display:block;">
-
-    <!-- Título -->
-    <h3 id="track-title" style="color:#fff; margin:10px 0;"></h3>
-
-    <!-- Barra de progreso -->
-    <div id="disco-progress-container" 
-         style="width:100%; background:#333; height:8px; border-radius:4px; cursor:pointer; margin:15px 0;">
-      <div id="disco-progress" style="width:0%; height:100%; background:#ff6600; border-radius:4px;"></div>
     </div>
-
-    <!-- Controles -->
-    <audio id="disco-audio" controls preload="none" style="width:100%; border-radius:8px;">
-      Tu navegador no soporta audio HTML5.
-    </audio>
   </div>
 </section>
-
-<script>
-// ----------------------------
-// SOLO CAMBIA EL NOMBRE DEL ARCHIVO AQUÍ CADA SEMANA
-// ----------------------------
-const fileName = "Pink Floyd - Wish you were here.mp3";
-// ----------------------------
-
-const discoAudio = document.getElementById('disco-audio');
-const progress = document.getElementById('disco-progress');
-const progressContainer = document.getElementById('disco-progress-container');
-const cover = document.getElementById('cover');
-
-// Mostrar título sin extensión
-document.getElementById('track-title').textContent = fileName.replace(/\.mp3$/i,'');
-
-// Asignar src directamente al audio
-discoAudio.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
-
-// Actualizar barra de progreso mientras se reproduce
-discoAudio.addEventListener('timeupdate', () => {
-  const percent = (discoAudio.currentTime / discoAudio.duration) * 100;
-  progress.style.width = percent + '%';
-});
-
-// Barra clicable para saltar
-progressContainer.addEventListener('click', (e) => {
-  const rect = progressContainer.getBoundingClientRect();
-  const offsetX = e.clientX - rect.left;
-  const width = rect.width;
-  discoAudio.currentTime = (offsetX / width) * discoAudio.duration;
-});
-
-// Animación de portada: respiración + resplandor
-let zoomDirection = 1;
-let zoomInterval;
-
-discoAudio.addEventListener('play', () => {
-  zoomInterval = setInterval(() => {
-    let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g,'')) || 1;
-    scale += 0.0015 * zoomDirection;
-    if(scale >= 1.03) zoomDirection = -1;
-    if(scale <= 0.97) zoomDirection = 1;
-    cover.style.transform = `scale(${scale})`;
-
-    const shadowIntensity = 10 + (scale-0.97)*300; 
-    cover.style.boxShadow = `0 0 ${shadowIntensity}px rgba(255,102,0,0.6)`;
-  }, 20);
-});
-
-discoAudio.addEventListener('pause', () => {
-  clearInterval(zoomInterval);
-  cover.style.transform = 'scale(1)';
-  cover.style.boxShadow = 'none';
-});
-
-discoAudio.addEventListener('ended', () => {
-  clearInterval(zoomInterval);
-  cover.style.transform = 'scale(1)';
-  cover.style.boxShadow = 'none';
-});
-</script>
-
   
 <!-- Embed Section -->
 <section class="embed-section">
@@ -372,10 +310,171 @@ Aquí el rock no se escucha de fondo, se vive. Somos un canal donde conviven lo 
     </div>
   </section>
 
+
+<!-- ========================= -->
 <!-- JS -->
-<script src="player.js"></script>
-<script src="metadatos.js"></script>
-<script src="hijack.js"></script>
+<!-- ========================= -->
+<script>
+// ----------------------------
+// STREAMING ZENO
+// ----------------------------
+const audio = document.getElementById("radio-audio");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const stopBtn = document.getElementById("stop-btn");
+const muteBtn = document.getElementById("mute-btn");
+const progress = document.getElementById("radio-progress");
+const progressContainer = document.getElementById("radio-progress-container");
+const timeDisplay = document.getElementById("time-display");
+
+let animationRunning = false;
+let animationFrame;
+
+playPauseBtn.addEventListener("click", () => {
+  if(audio.paused){
+    audio.play().then(()=> { playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>'; startMatrix(); })
+    .catch(err=>{ console.warn("Autoplay bloqueado:", err); });
+  } else {
+    audio.pause();
+    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    stopMatrix();
+  }
+});
+
+stopBtn.addEventListener("click", () => {
+  audio.pause();
+  audio.currentTime = 0;
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+  stopMatrix();
+});
+
+muteBtn.addEventListener("click", () => {
+  audio.muted = !audio.muted;
+  muteBtn.innerHTML = audio.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+  muteBtn.style.color = audio.muted ? '#ff0000' : '#ff6600';
+});
+
+audio.addEventListener("timeupdate", () => {
+  if(audio.duration){
+    const percent = (audio.currentTime / audio.duration)*100;
+    progress.style.width = percent+"%";
+  }
+  const hrs = Math.floor(audio.currentTime/3600);
+  const mins = Math.floor((audio.currentTime%3600)/60);
+  const secs = Math.floor(audio.currentTime%60);
+  timeDisplay.textContent = `${hrs.toString().padStart(2,"0")}:${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
+});
+
+progressContainer.addEventListener("click", (e)=>{
+  const rect = progressContainer.getBoundingClientRect();
+  const offsetX = e.clientX - rect.left;
+  audio.currentTime = (offsetX/rect.width)*audio.duration;
+});
+
+// ----------------------------
+// MATRIX
+// ----------------------------
+const canvas = document.getElementById("matrixCanvas");
+const ctx = canvas.getContext("2d");
+let columns, drops, fontSize = 16;
+function resizeCanvas(){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; columns=Math.floor(canvas.width/fontSize); drops=Array(columns).fill(1);}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+const chars = "アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤャユュヨラリルレロワヰヱヲンabcdefghijklmnopqrstuvwxyz0123456789".split("");
+function drawMatrix(){ ctx.fillStyle="rgba(0,0,0,0.1)"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.font=fontSize+"px monospace"; for(let i=0;i<drops.length;i++){ const text = chars[Math.floor(Math.random()*chars.length)]; const x=i*fontSize; const y=drops[i]*fontSize; ctx.fillStyle="rgba(0,255,0,1)"; ctx.fillText(text,x,y); ctx.fillStyle="rgba(0,255,0,0.5)"; ctx.fillText(text,x,y-fontSize); if(y>canvas.height && Math.random()>0.975){ drops[i]=0; } drops[i]++; } animationFrame=requestAnimationFrame(drawMatrix);}
+function startMatrix(){ if(!animationRunning){ animationRunning=true; drawMatrix(); } }
+function stopMatrix(){ if(animationRunning){ cancelAnimationFrame(animationFrame); animationRunning=false; ctx.clearRect(0,0,canvas.width,canvas.height); }}
+
+// ----------------------------
+// DISCO DE LA SEMANA
+// ----------------------------
+const fileName = "Pink Floyd - Wish you were here.mp3"; // <--- Reemplaza aquí el nombre del archivo cada semana
+const discoAudio = document.getElementById("disco-audio");
+const discoProgress = document.getElementById("disco-progress");
+const discoProgressContainer = document.getElementById("disco-progress-container");
+const cover = document.getElementById("cover");
+document.getElementById("track-title").textContent = fileName.replace(/\.mp3$/i,'');
+
+discoAudio.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
+
+discoAudio.addEventListener('timeupdate', ()=>{
+  const percent = (discoAudio.currentTime/discoAudio.duration)*100;
+  discoProgress.style.width = percent+'%';
+});
+
+discoProgressContainer.addEventListener('click',(e)=>{
+  const rect = discoProgressContainer.getBoundingClientRect();
+  const offsetX = e.clientX - rect.left;
+  discoAudio.currentTime = (offsetX/rect.width)*discoAudio.duration;
+});
+
+// Animación portada: respiración + resplandor
+let zoomDirection = 1;
+let zoomInterval;
+discoAudio.addEventListener('play', ()=>{
+  zoomInterval = setInterval(()=>{
+    let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g,'')) || 1;
+    scale += 0.0015*zoomDirection;
+    if(scale>=1.03) zoomDirection=-1;
+    if(scale<=0.97) zoomDirection=1;
+    cover.style.transform=`scale(${scale})`;
+    const shadowIntensity = 10 + (scale-0.97)*300; 
+    cover.style.boxShadow=`0 0 ${shadowIntensity}px rgba(255,102,0,0.6)`;
+  },20);
+});
+discoAudio.addEventListener('pause',()=>{
+  clearInterval(zoomInterval);
+  cover.style.transform='scale(1)';
+  cover.style.boxShadow='none';
+});
+discoAudio.addEventListener('ended',()=>{
+  clearInterval(zoomInterval);
+  cover.style.transform='scale(1)';
+  cover.style.boxShadow='none';
+});
+
+// ----------------------------
+// iVoox
+// ----------------------------
+async function loadLatestIvooxEpisode() {
+  const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
+
+  try {
+    const response = await fetch(feedUrl);
+    const xmlText = await response.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, "text/xml");
+
+    const item = xml.querySelector("item");
+    if (!item) throw new Error("No se encontró ningún episodio");
+
+    const title = item.querySelector("title").textContent;
+    const audioUrl = item.querySelector("enclosure").getAttribute("url");
+    const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
+    const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
+
+    const playerHTML = `
+      <div>
+        <img src="${imageUrl}" alt="Carátula episodio" />
+        <div style="flex:1;">
+          <h3>${title}</h3>
+          <p>Publicado el ${pubDate}</p>
+          <audio controls preload="none">
+            <source src="${audioUrl}" type="audio/mpeg" />
+            Tu navegador no soporta audio HTML5.
+          </audio>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("podcast-player").innerHTML = playerHTML;
+  } catch (error) {
+    document.getElementById("podcast-player").innerHTML = `<p style="color:#f00;">No se pudo cargar el reproductor. Intenta más tarde.</p>`;
+    console.error("Error cargando el feed:", error);
+  }
+}
+
+loadLatestIvooxEpisode();
+</script>
 
 </body>
 </html>

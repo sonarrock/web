@@ -140,11 +140,11 @@
   color:#fff;
   font-family:"Spotify Circular",Arial,sans-serif;
   position:relative;
-  min-height:170px; /* Igual al embed de Spotify */
+  min-height:170px; /* Igual al embed de Spotify/iVoox */
 }
 .disco-section .player-wrapper img{
-  width:140px;
-  height:140px;
+  width:120px;  /* Más pequeña */
+  height:120px; /* Más pequeña */
   border-radius:12px;
   object-fit:cover;
   flex-shrink:0;
@@ -158,7 +158,7 @@
   justify-content:center;
 }
 .player-controls h3{
-  color:#ffffff;
+  color:#ffffff; /* Título en blanco */
   font-weight:700;
   margin:0;
 }
@@ -192,9 +192,9 @@ audio{
     min-height:auto;
   }
   .disco-section .player-wrapper img{
-    height:170px; /* Igual al embed de iVoox/Spotify */
-    width:auto;   /* Mantener proporción */
-    max-width:100%;
+    height:120px; /* Más pequeña que antes */
+    width:120px;  /* Mantener proporción cuadrada */
+    max-width:50%; /* No abarque todo el contenedor */
     border-radius:10px;
     margin-bottom:10px;
   }
@@ -239,16 +239,16 @@ progressContainer.addEventListener('click', (e) => {
   audio.currentTime = clickPercent * audio.duration;
 });
 
-// Animación de portada al reproducir
+// Animación de portada al reproducir (respiración suave)
 let zoomDirection = 1;
 let zoomInterval;
 
 audio.addEventListener('play', () => {
   zoomInterval = setInterval(() => {
     let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g,'')) || 1;
-    scale += 0.002 * zoomDirection;
-    if(scale >= 1.05) zoomDirection = -1;
-    if(scale <= 0.95) zoomDirection = 1;
+    scale += 0.0015 * zoomDirection; // más suave
+    if(scale >= 1.03) zoomDirection = -1;
+    if(scale <= 0.97) zoomDirection = 1;
     cover.style.transform = `scale(${scale})`;
   }, 20);
 });

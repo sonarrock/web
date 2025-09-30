@@ -320,11 +320,3 @@ body {
     margin-left: 10px;
     display: inline-block;
 }
-
-.disco-section {
-  margin-bottom: 60px; /* espacio extra debajo de "Disco de la Semana" */
-}
-
-.embed-section {
-  margin-top: 60px; /* separación superior antes de Spotify/iVoox */
-}

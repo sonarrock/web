@@ -5,177 +5,330 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sonar Rock - La Radio Independiente</title>
 
+<!-- CSS -->
 <link href="style.css" rel="stylesheet">
+<link href="player.css" rel="stylesheet">
+
+<!-- Iconos -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
+<!-- PWA & Favicons -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#ff6600">
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
 <link rel="shortcut icon" href="/icons/favicon.ico">
-  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="google" content="notranslate">
 
+<style>
+/* ========================= */
+/* PORTADA DISCO MÓVIL       */
+/* ========================= */
+@media(max-width:560px){
+  .disco-section #cover{
+    width:90px !important;
+    height:90px !important;
+    border-radius:10px;
+  }
+}
+</style>
 </head>
 <body>
 
+<!-- Header -->
 <header class="header">
-  <div class="container">
-    <div class="logo-section">
-      <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
-      <div class="title-section">
-        <h1>LA RADIO INDEPENDIENTE</h1>
-      </div>
-    </div>
-  </div>
+  <div class="container">
+    <div class="logo-section">
+      <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
+      <div class="title-section">
+        <h1>LA RADIO INDEPENDIENTE</h1>
+      </div>
+    </div>
+  </div>
 </header>
 
+<!-- Imagen Principal -->
 <section class="main-section">
-        <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image">
-
-            <section class="player-section">
-      <div class="player-container">
-
-                <img src="img/background.jpg" alt="Background" class="player-bg">
-
-                <canvas id="matrixCanvas"></canvas>
-
-                <div class="overlay"></div>                 <div class="player-content">
-
-                    <div id="now-playing"></div>
-
-          <div class="controls">
-            <button id="playPauseBtn" class="btn"><i class="fas fa-play"></i></button>
-            <button id="stop-btn" class="btn"><i class="fas fa-stop"></i></button>
-            <button id="mute-btn" class="btn"><i class="fas fa-volume-up"></i></button>
-          </div>
-
-          <div class="progress-wrapper">
-            <div id="radio-progress-container" class="progress-container">
-              <div id="radio-progress"></div>
-            </div>
-            <div id="time-display" class="time-display">00:00:00</div>
-          </div>
-
-          <audio id="radio-audio" preload="auto">
-            <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-          </audio>
-
-        </div>
-      </div>
-    </section>
+  <div class="container">
+    <div class="main-image-container">
+      <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image" style="max-width:1220px; width:100%;">
+    </div>
+  </div>
 </section>
 
-<section class="social-section spaced-section">
-  <div class="container">
-    <h2 class="section-title">Redes Sociales</h2>
-    <div class="social-buttons">
-      <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
-      <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
-      <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
-      <a href="https://open.spotify.com/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA" target="_blank" class="social-btn spotify"><i class="fab fa-spotify"></i></a>
-      <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox"><i class="fas fa-podcast"></i></a>
-    </div>
-  </div>
+<!-- ========================= -->
+<!-- REPRODUCTOR STREAMING -->
+<!-- ========================= -->
+<section class="player-section">
+  <div class="player-container">
+
+    <!-- Fondo imagen -->
+    <img src="img/background.jpg" alt="Background" class="player-bg">
+
+    <!-- Canvas Matrix -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <!-- Overlay negro -->
+    <div class="overlay"></div>
+
+    <!-- Contenido -->
+    <div class="player-content">
+
+      <!-- === Streaming Zeno === -->
+      <div id="now-playing"></div>
+
+      <div class="controls">
+        <button id="playPauseBtn" class="btn"><i class="fas fa-play"></i></button>
+        <button id="stop-btn" class="btn"><i class="fas fa-stop"></i></button>
+        <button id="mute-btn" class="btn"><i class="fas fa-volume-up"></i></button>
+      </div>
+
+      <div class="progress-wrapper">
+        <div id="radio-progress-container" class="progress-container">
+          <div id="radio-progress"></div>
+        </div>
+        <div id="time-display" class="time-display">00:00:00</div>
+      </div>
+
+      <audio id="radio-audio" preload="auto">
+        <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+      </audio>
+
+    </div>
+  </div>
 </section>
 
-<h2 class="section-title">El Disco de la Semana</h2>
-<section class="disco-section spaced-section">
-  <div class="container disco-container">
-    <img id="cover" src="El Disco De La Semana/portada.jpg" alt="Portada">
-    <div class="disco-info">
-      <div id="track-title">Título del Disco</div>
-      <div id="disco-progress-container" class="progress-container">
-        <div id="disco-progress"></div>
-      </div>
-      <audio id="disco-audio" preload="auto" controls></audio>
-    </div>
-  </div>
+<!-- ========================= -->
+<!-- REDES SOCIALES -->
+<!-- ========================= -->
+<section class="social-section">
+  <div class="container">
+    <h2 class="section-title">Redes Sociales</h2>
+    <div class="social-buttons">
+      <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
+      <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
+      <a href="https://open.spotify.com/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA" target="_blank" class="social-btn spotify"><i class="fab fa-spotify"></i></a>
+      <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox"><i class="fas fa-podcast"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- ========================= -->
+<!-- DISCO DE LA SEMANA -->
+<!-- ========================= -->
+   <h2 class="section-title">El Disco de la Semana</h2>
+<section class="disco-section" style="margin-top:30px; display:flex; align-items:center; gap:15px;">
+  <div class="container" style="display:flex; align-items:center; gap:15px;">
+    <img id="cover" src="El Disco De La Semana/portada.jpg" alt="Portada" style="width:120px; height:120px; border-radius:12px; box-shadow:0 0 10px rgba(255,102,0,0.6); transition: transform 0.2s, box-shadow 0.2s;">
+    <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+      <div id="track-title" style="color:#FFFFF; font-weight:bold; font-size:1.1rem;">Título del Disco</div>
+      <div id="disco-progress-container" class="progress-container">
+        <div id="disco-progress"></div>
+      </div>
+      <audio id="disco-audio" preload="auto" controls style="margin-top:5px;"></audio>
+    </div>
+  </div>
 </section>
 
 
-<section class="embed-section spaced-section">
-  <div class="container" style="max-width: 650px; margin: auto;">
+<!-- ========================= -->
+<!-- EMBEDS SPOTIFY E IVOOX -->
+<!-- ========================= -->
+<section class="embed-section">
+  <div class="container" style="max-width: 650px; margin: auto;">
 
-        <div class="spotify-container">
-      <h3 class="section-title">Escucha en Spotify</h3>
-      <iframe
-        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
-        width="100%"
-        height="170"
-        frameborder="0"
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        loading="lazy"
-        style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
-      </iframe>
-    </div>
+    <!-- Spotify -->
+    <div class="spotify-container">
+      <h3 class="section-title">Escucha en Spotify</h3>
+      <iframe
+        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
+        width="100%"
+        height="170"
+        frameborder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"
+        style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+      </iframe>
+    </div>
 
-      <h3 class="section-title" style="margin: 30px 0 15px;">Escucha en iVoox</h3>
-    <div id="podcast-player" class="player-wrapper"></div>
-  </div>
+      <h3 class="section-title" style="margin: 30px 0 15px;">Escucha en iVoox</h3>
+    <div id="podcast-player" class="player-wrapper"></div>
+  </div>
 </section>
 
-<section class="staff-section spaced-section">
-  <div class="container">
-    <h2 class="section-title">Nuestro Staff</h2>
-    <div class="staff-grid">
-      <div class="staff-member">
-        <img src="attached_assets/Wendy_1749601460841.jpeg" alt="Wendy" class="staff-image">
-        <h3>Wendy</h3>
-      </div>
-      <div class="staff-member">
-        <img src="attached_assets/Alvaro_1749601460841.jpeg" alt="Alvaro" class="staff-image">
-        <h3>El Contralor</h3>
-      </div>
-      <div class="staff-member">
-        <img src="attached_assets/Hans_1749601460841.jpeg" alt="Hans" class="staff-image">
-        <h3>Hans</h3>
-      </div>
-      <div class="staff-member">
-        <img src="attached_assets/El Chris_1749601460841.jpeg" alt="El Chris" class="staff-image">
-        <h3>El Chris</h3>
-      </div>
-    </div>
-  </div>
+<style>
+  .player-wrapper {
+    width: 100%;
+    max-width: 650px;
+    height: 170px;
+    background: #121212;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.6);
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    box-sizing: border-box;
+    color: #fff;
+    font-family: "Spotify Circular", Arial, sans-serif;
+    gap: 20px;
+  }
+  #podcast-player > div {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    align-items: center;
+  }
+  #podcast-player img {
+    width: 140px;
+    height: 140px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  #podcast-player h3 {
+    font-size: 14px;
+    margin: 0 0 6px 0;
+    font-weight: 700;
+    color: #FFFFFF; /* blanco */
+  }
+  #podcast-player p {
+    font-size: 10px;
+    color: #b3b3b3;
+    margin: 0 0 10px 0;
+  }
+  #podcast-player audio {
+    width: 100%;
+    outline: none;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
+    border-radius: 8px;
+    background: #222;
+  }
+  .section-title {
+    color: #FF6600 !important;
+    font-family: "Spotify Circular", Arial, sans-serif;
+  }
+</style>
+
+<script>
+  async function loadLatestIvooxEpisode() {
+    const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
+
+    try {
+      const response = await fetch(feedUrl);
+      const xmlText = await response.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, "text/xml");
+
+      const item = xml.querySelector("item");
+      if (!item) throw new Error("No se encontró ningún episodio");
+
+      const title = item.querySelector("title").textContent;
+      const audioUrl = item.querySelector("enclosure").getAttribute("url");
+      const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
+      const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
+
+      const playerHTML = `
+        <div>
+          <img src="${imageUrl}" alt="Carátula episodio" />
+          <div style="flex:1;">
+            <h3>${title}</h3>
+            <p>Publicado el ${pubDate}</p>
+            <audio controls preload="none">
+              <source src="${audioUrl}" type="audio/mpeg" />
+              Tu navegador no soporta audio HTML5.
+            </audio>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("podcast-player").innerHTML = playerHTML;
+    } catch (error) {
+      document.getElementById("podcast-player").innerHTML = `<p style="color:#f00;">No se pudo cargar el reproductor. Intenta más tarde.</p>`;
+      console.error("Error cargando el feed:", error);
+    }
+  }
+
+  loadLatestIvooxEpisode();
+</script>
+  </div>
+    </section>
+<!-- ========================= -->
+<!-- STAFF -->
+<!-- ========================= -->
+<section class="staff-section">
+  <div class="container">
+    <h2 class="section-title">Nuestro Staff</h2>
+    <div class="staff-grid">
+      <div class="staff-member">
+        <img src="attached_assets/Wendy_1749601460841.jpeg" alt="Wendy" class="staff-image">
+        <h3>Wendy</h3>
+      </div>
+      <div class="staff-member">
+        <img src="attached_assets/Alvaro_1749601460841.jpeg" alt="Alvaro" class="staff-image">
+        <h3>El Contralor</h3>
+      </div>
+      <div class="staff-member">
+        <img src="attached_assets/Hans_1749601460841.jpeg" alt="Hans" class="staff-image">
+        <h3>Hans</h3>
+      </div>
+      <div class="staff-member">
+        <img src="attached_assets/El Chris_1749601460841.jpeg" alt="El Chris" class="staff-image">
+        <h3>El Chris</h3>
+      </div>
+    </div>
+  </div>
 </section>
 
-<section class="about-section spaced-section">
-  <div class="container">
-    <div class="about-content">
-      <h2 class="section-title">¿Quiénes Somos?</h2>
-      <p class="about-text">
-        Sonar Rock es una trinchera sonora, un espacio libre y apasionado que nace en Guadalajara, Jalisco, México.
-        Nuestra misión es simple pero poderosa: abrir un foro auténtico para las bandas emergentes, apoyar la escena local y mantener viva la esencia del rock en todas sus vertientes.
+<!-- ========================= -->
+<!-- ¿QUIÉNES SOMOS? -->
+<!-- ========================= -->
+<section class="about-section">
+  <div class="container">
+    <div class="about-content">
+      <h2 class="section-title">¿Quiénes Somos?</h2>
+      <p class="about-text">
+        Sonar Rock es una trinchera sonora, un espacio libre y apasionado que nace en Guadalajara, Jalisco, México.
+        Nuestra misión es simple pero poderosa: abrir un foro auténtico para las bandas emergentes, apoyar la escena local y mantener viva la esencia del rock en todas sus vertientes.
 
-        Creemos en la fuerza de la música como motor de cambio, como punto de encuentro y como refugio de quienes buscan algo distinto a lo convencional.
-        En Sonar Rock somos más que una radio: somos comunidad, resistencia y pasión por el sonido que nos une.
-      </p>
-    </div>
-  </div>
+        Creemos en la fuerza de la música como motor de cambio, como punto de encuentro y como refugio de quienes buscan algo distinto a lo convencional.
+        En Sonar Rock somos más que una radio: somos comunidad, resistencia y pasión por el sonido que nos une.
+      </p>
+    </div>
+  </div>
 </section>
 
-<section class="about-section spaced-section">
-  <div class="container">
-    <div class="about-content">
-      <h2 class="section-title">¿Qué es Sonar Rock?</h2>
-      <p class="about-text">
-        Sonar Rock celebra la esencia eterna del rock n’ roll:
+<!-- ========================= -->
+<!-- ¿QUÉ ES SONAR ROCK? -->
+<!-- ========================= -->
+<section class="about-section">
+  <div class="container">
+    <div class="about-content">
+      <h2 class="section-title">¿Qué es Sonar Rock?</h2>
+      <p class="about-text">
+        Sonar Rock celebra la esencia eterna del rock n’ roll:
 
-        Su rebeldía frente a lo establecido.
+        Su rebeldía frente a lo establecido.
 
-        Su poesía en cada letra y acorde.
+        Su poesía en cada letra y acorde.
 
-        Su energía que enciende escenarios y corazones.
+        Su energía que enciende escenarios y corazones.
 
-        Su capacidad de conectar almas más allá de fronteras y generaciones.
+        Su capacidad de conectar almas más allá de fronteras y generaciones.
 
-        Aquí el rock no se escucha de fondo, se vive. Somos un canal donde conviven lo clásico, lo alternativo y lo emergente, siempre con la autenticidad como bandera.
-      </p>
-    </div>
-  </div>
+        Aquí el rock no se escucha de fondo, se vive. Somos un canal donde conviven lo clásico, lo alternativo y lo emergente, siempre con la autenticidad como bandera.
+      </p>
+    </div>
+  </div>
 </section>
+
+<!-- ========================= -->
+<!-- JS -->
+<!-- ========================= -->
+<script src="player.js"></script>
 
 <script>
 // ----------------------------
@@ -193,44 +346,44 @@ let animationRunning = false;
 let animationFrame;
 
 playPauseBtn.addEventListener("click", () => {
-  if(audio.paused){
-    audio.play().then(()=> { playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>'; startMatrix(); })
-    .catch(err=>{ console.warn("Autoplay bloqueado:", err); });
-  } else {
-    audio.pause();
-    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-    stopMatrix();
-  }
+  if(audio.paused){
+    audio.play().then(()=> { playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>'; startMatrix(); })
+    .catch(err=>{ console.warn("Autoplay bloqueado:", err); });
+  } else {
+    audio.pause();
+    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    stopMatrix();
+  }
 });
 
 stopBtn.addEventListener("click", () => {
-  audio.pause();
-  audio.currentTime = 0;
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  stopMatrix();
+  audio.pause();
+  audio.currentTime = 0;
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+  stopMatrix();
 });
 
 muteBtn.addEventListener("click", () => {
-  audio.muted = !audio.muted;
-  muteBtn.innerHTML = audio.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
-  muteBtn.style.color = audio.muted ? '#ff0000' : '#ff6600';
+  audio.muted = !audio.muted;
+  muteBtn.innerHTML = audio.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+  muteBtn.style.color = audio.muted ? '#ff0000' : '#ff6600';
 });
 
 audio.addEventListener("timeupdate", () => {
-  if(audio.duration){
-    const percent = (audio.currentTime / audio.duration)*100;
-    progress.style.width = percent+"%";
-  }
-  const hrs = Math.floor(audio.currentTime/3600);
-  const mins = Math.floor((audio.currentTime%3600)/60);
-  const secs = Math.floor(audio.currentTime%60);
-  timeDisplay.textContent = `${hrs.toString().padStart(2,"0")}:${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
+  if(audio.duration){
+    const percent = (audio.currentTime / audio.duration)*100;
+    progress.style.width = percent+"%";
+  }
+  const hrs = Math.floor(audio.currentTime/3600);
+  const mins = Math.floor((audio.currentTime%3600)/60);
+  const secs = Math.floor(audio.currentTime%60);
+  timeDisplay.textContent = `${hrs.toString().padStart(2,"0")}:${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
 });
 
 progressContainer.addEventListener("click", (e)=>{
-  const rect = progressContainer.getBoundingClientRect();
-  const offsetX = e.clientX - rect.left;
-  audio.currentTime = (offsetX/rect.width)*audio.duration;
+  const rect = progressContainer.getBoundingClientRect();
+  const offsetX = e.clientX - rect.left;
+  audio.currentTime = (offsetX/rect.width)*audio.duration;
 });
 
 // ----------------------------
@@ -260,80 +413,80 @@ document.getElementById("track-title").textContent = fileName.replace(/\.mp3$/i,
 discoAudio.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
 
 discoAudio.addEventListener('timeupdate', ()=>{
-  const percent = (discoAudio.currentTime/discoAudio.duration)*100;
-  discoProgress.style.width = percent+'%';
+  const percent = (discoAudio.currentTime/discoAudio.duration)*100;
+  discoProgress.style.width = percent+'%';
 });
 
 discoProgressContainer.addEventListener('click',(e)=>{
-  const rect = discoProgressContainer.getBoundingClientRect();
-  const offsetX = e.clientX - rect.left;
-  discoAudio.currentTime = (offsetX/rect.width)*discoAudio.duration;
+  const rect = discoProgressContainer.getBoundingClientRect();
+  const offsetX = e.clientX - rect.left;
+  discoAudio.currentTime = (offsetX/rect.width)*discoAudio.duration;
 });
 
 // Animación portada: respiración + resplandor
 let zoomDirection = 1;
 let zoomInterval;
 discoAudio.addEventListener('play', ()=>{
-  zoomInterval = setInterval(()=>{
-    let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g,'')) || 1;
-    scale += 0.0015*zoomDirection;
-    if(scale>=1.03) zoomDirection=-1;
-    if(scale<=0.97) zoomDirection=1;
-    cover.style.transform=`scale(${scale})`;
-    const shadowIntensity = 10 + (scale-0.97)*300; 
-    cover.style.boxShadow=`0 0 ${shadowIntensity}px rgba(255,102,0,0.6)`;
-  },20);
+  zoomInterval = setInterval(()=>{
+    let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g,'')) || 1;
+    scale += 0.0015*zoomDirection;
+    if(scale>=1.03) zoomDirection=-1;
+    if(scale<=0.97) zoomDirection=1;
+    cover.style.transform=`scale(${scale})`;
+    const shadowIntensity = 10 + (scale-0.97)*300; 
+    cover.style.boxShadow=`0 0 ${shadowIntensity}px rgba(255,102,0,0.6)`;
+  },20);
 });
 discoAudio.addEventListener('pause',()=>{
-  clearInterval(zoomInterval);
-  cover.style.transform='scale(1)';
-  cover.style.boxShadow='0 0 12px rgba(255,102,0,0.8)'; // Restaura el brillo estático definido en CSS
+  clearInterval(zoomInterval);
+  cover.style.transform='scale(1)';
+  cover.style.boxShadow='none';
 });
 discoAudio.addEventListener('ended',()=>{
-  clearInterval(zoomInterval);
-  cover.style.transform='scale(1)';
-  cover.style.boxShadow='0 0 12px rgba(255,102,0,0.8)'; // Restaura el brillo estático definido en CSS
+  clearInterval(zoomInterval);
+  cover.style.transform='scale(1)';
+  cover.style.boxShadow='none';
 });
 
 // ----------------------------
 // iVoox
 // ----------------------------
 async function loadLatestIvooxEpisode() {
-  const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
+  const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
 
-  try {
-    const response = await fetch(feedUrl);
-    const xmlText = await response.text();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(xmlText, "text/xml");
+  try {
+    const response = await fetch(feedUrl);
+    const xmlText = await response.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, "text/xml");
 
-    const item = xml.querySelector("item");
-    if (!item) throw new Error("No se encontró ningún episodio");
+    const item = xml.querySelector("item");
+    if (!item) throw new Error("No se encontró ningún episodio");
 
-    const title = item.querySelector("title").textContent;
-    const audioUrl = item.querySelector("enclosure").getAttribute("url");
-    const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
-    const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
+    const title = item.querySelector("title").textContent;
+    const audioUrl = item.querySelector("enclosure").getAttribute("url");
+    const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
+    const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
 
-    const playerHTML = `
-      <div>
-        <img src="${imageUrl}" alt="Carátula episodio" />
-        <div style="flex:1;">
-          <h3>${title}</h3>
-          <p>Publicado el ${pubDate}</p>
-          <audio controls preload="none">
-            <source src="${audioUrl}" type="audio/mpeg" />
-            Tu navegador no soporta audio HTML5.
-          </audio>
-        </div>
-      </div>
-    `;
+    const playerHTML = `
+      <div>
+        <img src="${imageUrl}" alt="Carátula episodio" />
+        <div style="flex:1;">
+          <h3>${title}</h3>
+          <p>Publicado el ${pubDate}</p>
+          <audio controls preload="none">
+            <source src="${audioUrl}" type="audio/mpeg" />
+            Tu navegador no soporta audio HTML5.
+          </audio>
+        </div>
+      </div>
+    `;
 
-    document.getElementById("podcast-player").innerHTML = playerHTML;
-  } catch (error) {
-    document.getElementById("podcast-player").innerHTML = `<p style="color:#f00;">No se pudo cargar el reproductor. Intenta más tarde.</p>`;
-    console.error("Error cargando el feed:", error);
-  }
+    document.getElementById("podcast-player").innerHTML = playerHTML;
+  } catch (error) {
+    document.getElementById("podcast-player").innerHTML = `<p style="color:#f00;">No se pudo cargar el reproductor. Intenta más tarde.</p>`;
+    console.error("Error cargando el feed:", error);
+  }
 }
 
 loadLatestIvooxEpisode();

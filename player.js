@@ -97,3 +97,4 @@ function drawMatrix(){
     // cabeza brillante
     ctx.fillStyle = "rgba(0,255,0,1)";
     ctx.fillText(text, x, y);
+}

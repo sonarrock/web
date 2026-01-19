@@ -1,115 +1,148 @@
 /* =========================
-   SONAR ROCK PLAYER + MATRIX
+   PLAYER STREAMING
    ========================= */
+.player-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 50px 0;
+}
+
 .player-container {
-    position: relative;
-    width: 100%;
-    max-width: 1200px;
-    height: 500px; /* altura mayor para ver la imagen completa */
-    margin: 40px auto;
-    border-radius: 15px;
-    overflow: hidden;
-    background: none;
+  position: relative;
+  width: 90%;
+  max-width: 650px;
+  border-radius: 12px;
+  overflow: hidden; /* importante para que Matrix no salga del player */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
 }
 
 .player-bg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: auto;
-    height: 100%;
-    max-width: 100%;
-    max-height: 100%;
-    transform: translate(-50%, -50%);
-    object-fit: contain;
-    z-index: 1;
+  width: 100%;
+  display: block;
 }
 
 .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0); /* transparente antes de play */
-    z-index: 2;
-    transition: background 0.3s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0); /* inicio sin opacidad */
+  transition: background 0.3s;
+  pointer-events: none;
 }
 
 #matrixCanvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 3;
-    pointer-events: none;
-    opacity: 0; /* invisible hasta play */
-    transition: opacity 0.3s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 .player-content {
-    position: absolute;
-    bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 4;
-    width: 90%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  right: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: #fff;
 }
 
-/* Controles */
 .controls {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.controls .btn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.controls .btn:hover {
+  background: rgba(255,255,255,0.2);
 }
 
 .progress-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .progress-container {
-    flex: 1;
-    height: 6px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 5px;
-    cursor: pointer;
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 #radio-progress {
-    height: 100%;
-    width: 0%;
-    background: #ff6600;
-    border-radius: 5px;
+  height: 100%;
+  width: 0;
+  background: #FF6600;
+  border-radius: 4px;
 }
 
 .time-display {
-    color: #fff;
-    font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    .player-container {
-        height: 400px;
-    }
-    .player-content {
-        width: 95%;
-    }
+/* =========================
+   SECCIONES CENTRADAS Y ESPACIO
+   ========================= */
+.section-title {
+  text-align: center;
+  font-size: 1.6rem;
+  margin-bottom: 30px;
+  color: #FF6600;
 }
 
-@media (max-width: 480px) {
-    .player-container {
-        height: 300px;
-    }
-    .controls {
-        flex-wrap: wrap;
-    }
+.social-section, .disco-section, .staff-section, .embed-section {
+  margin-bottom: 60px;
+}
+
+/* Disco de la Semana ajustes mínimos para separar contenido */
+.disco-section .container {
+  gap: 25px; /* separa imagen y controls */
+}
+
+.staff-grid {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+/* Imagen principal */
+.main-section .main-image-container {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.main-section .main-image {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain; /* mantiene proporción completa */
+}
+
+/* Responsive */
+@media (max-width: 768px){
+  .player-container {
+    width: 95%;
+  }
+  .controls {
+    gap: 8px;
+  }
+  .time-display {
+    font-size: 0.7rem;
+  }
 }

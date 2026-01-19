@@ -7,38 +7,42 @@
 
 .player-container {
   position:relative;
-  width:500px;   /* ahora doble de ancho */
+  width:500px;
   height:500px;
-  border:3px solid #ff6600; /* marco naranja */
+  border:3px solid #ff6600;
   border-radius:12px;
   overflow:hidden;
   display:flex;
   flex-direction:column;
   justify-content:flex-end;
   align-items:center;
+  background:#000;
 }
 
-/* Imagen de fondo */
+/* IMAGEN DE FONDO */
 .player-bg {
   position:absolute;
-  top:0; left:0;
+  inset:0;
   width:100%;
   height:100%;
   object-fit:cover;
   z-index:1;
+  opacity:0.35;
+  filter: brightness(0.65) contrast(1.1);
+  transition: opacity 0.8s ease, filter 0.8s ease;
 }
 
-/* Canvas Matrix */
+/* CANVAS MATRIX */
 #matrixCanvas {
   position:absolute;
-  top:0; left:0;
-  width:100%; height:100%;
+  inset:0;
+  width:100%;
+  height:100%;
   z-index:2;
+  pointer-events:none;
 }
 
-
-
-/* Contenido reproductor */
+/* CONTENIDO */
 .player-content {
   position:relative;
   z-index:4;
@@ -49,7 +53,7 @@
   margin-bottom:10px;
 }
 
-/* Nombre de la pista */
+/* TEXTO */
 #now-playing {
   color:#ff6600;
   font-weight:bold;
@@ -57,10 +61,9 @@
   text-align:center;
 }
 
-/* Controles */
+/* CONTROLES */
 .controls {
   display:flex;
-  justify-content:center;
   gap:15px;
   margin-bottom:10px;
 }
@@ -68,24 +71,24 @@
 .controls .btn {
   font-size:20px;
   padding:12px 16px;
-  border-radius:50%;          /* botones redondeados */
-  border:2px solid #fff;      /* contorno blanco */
+  border-radius:50%;
+  border:2px solid #fff;
   cursor:pointer;
-  background: rgba(0,0,0,0.6);/* fondo negro translúcido */
+  background:rgba(0,0,0,0.65);
   color:#ff6600;
-  transition: all 0.2s ease, box-shadow 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .controls .btn:hover {
-  background: rgba(0,0,0,0.8);
+  background:rgba(0,0,0,0.85);
 }
 
 .controls .btn:active {
-  box-shadow: 0 0 15px #ff6600; /* brillo al presionar */
-  transform: scale(0.95);
+  box-shadow:0 0 15px #ff6600;
+  transform:scale(0.95);
 }
 
-/* Barra de progreso y tiempo */
+/* PROGRESO */
 .progress-wrapper {
   display:flex;
   align-items:center;
@@ -96,16 +99,15 @@
 .progress-container {
   flex:1;
   height:6px;
-  background: rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.2);
   border-radius:3px;
   overflow:hidden;
 }
 
-#progress {
+#radio-progress {
   width:0%;
   height:100%;
   background:#ff6600;
-  border-radius:3px;
 }
 
 .time-display {
@@ -115,8 +117,8 @@
   text-align:right;
 }
 
-/* Ajustes móviles */
-@media screen and (max-width:600px){
+/* MÓVIL */
+@media(max-width:600px){
   .player-container { width:95%; height:400px; }
   .controls .btn { font-size:18px; padding:10px; }
   .time-display { font-size:10px; width:50px; }

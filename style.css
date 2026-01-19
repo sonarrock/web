@@ -80,13 +80,14 @@ body {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    height: auto; /* Ajusta altura automática según la imagen */
 }
 
 .main-image {
-    width: 100%;          /* ocupa todo el ancho del contenedor */
-    height: auto;         /* mantiene proporción real */
-    max-height: 750px;    /* más alta que antes, ajustable */
-    object-fit: cover;    /* cubre el contenedor sin deformarse */
+    width: 100%;           /* ocupa todo el ancho del contenedor */
+    height: 700px;         /* un poco más alta que antes */
+    object-fit: contain;   /* mantiene proporción y se ve completa */
+    object-position: top;  /* muestra la parte superior completa */
     display: block;
 }
 /* =======================

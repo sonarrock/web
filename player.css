@@ -1,13 +1,15 @@
-/* PLAYER CON MATRIX */
+/* =========================
+   REPRODUCTOR STREAMING + MATRIX
+   ========================= */
 .player-container {
     position: relative;
     width: 100%;
     max-width: 1200px;
-    height: 450px; /* altura base, se ve el rostro */
+    height: 600px; /* mucho más alto para ver casi toda la imagen */
     margin: 40px auto;
     border-radius: 15px;
     overflow: hidden;
-    background: none; /* sin fondo negro */
+    background: none;
 }
 
 .player-bg {
@@ -16,7 +18,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* mantiene la proporción */
+    object-fit: cover;
     z-index: 1;
 }
 
@@ -26,9 +28,9 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0); /* al inicio transparente */
+    background: rgba(0,0,0,0); /* transparente al inicio */
     z-index: 2;
-    transition: background 0.3s ease;
+    transition: background 0.5s ease;
 }
 
 #matrixCanvas {
@@ -39,8 +41,8 @@
     height: 100%;
     z-index: 3;
     pointer-events: none;
-    opacity: 0; /* inicia invisible */
-    transition: opacity 0.3s ease;
+    opacity: 0;
+    transition: opacity 0.5s ease;
 }
 
 .player-content {
@@ -55,7 +57,6 @@
     gap: 10px;
 }
 
-/* Controles */
 .controls {
     display: flex;
     gap: 15px;
@@ -93,7 +94,7 @@
 /* RESPONSIVE */
 @media (max-width: 768px) {
     .player-container {
-        height: 350px; /* más pequeño en tablet */
+        height: 500px;
     }
     .player-content {
         width: 95%;
@@ -102,7 +103,7 @@
 
 @media (max-width: 480px) {
     .player-container {
-        height: 300px; /* móvil */
+        height: 400px;
     }
     .controls {
         flex-wrap: wrap;

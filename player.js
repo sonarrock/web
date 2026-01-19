@@ -1,5 +1,5 @@
 // ===============================
-// SONAR ROCK PLAYER + MATRIX + CONTENIDO
+// SONAR ROCK PLAYER + MATRIX
 // ===============================
 const audio = document.getElementById("radio-audio");
 const playPauseBtn = document.getElementById("playPauseBtn");
@@ -15,25 +15,24 @@ let columns, drops, fontSize = 16;
 let animationRunning = false;
 let animationFrame;
 
+// Overlay para oscurecer ligeramente al play
 const overlay = document.querySelector(".overlay");
 
 // --------------------
-// STREAMING PLAY/PAUSE
+// REPRODUCTOR PLAY/PAUSE/STOP
 // --------------------
 playPauseBtn.addEventListener("click", () => {
     if(audio.paused){
         audio.play().then(() => {
             playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-            overlay.style.background = "rgba(0,0,0,0.1)"; // 10% al play
-            canvas.style.opacity = 1;
             startMatrix();
+            overlay.style.background = "rgba(0,0,0,0.1)"; // solo 10% al reproducir
         }).catch(err => console.warn("Autoplay bloqueado:", err));
     } else {
         audio.pause();
         playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-        overlay.style.background = "rgba(0,0,0,0)"; // transparente al pausar
-        canvas.style.opacity = 0;
         stopMatrix();
+        overlay.style.background = "rgba(0,0,0,0)"; // volver transparente
     }
 });
 
@@ -41,9 +40,8 @@ stopBtn.addEventListener("click", () => {
     audio.pause();
     audio.currentTime = 0;
     playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-    overlay.style.background = "rgba(0,0,0,0)";
-    canvas.style.opacity = 0;
     stopMatrix();
+    overlay.style.background = "rgba(0,0,0,0)";
 });
 
 muteBtn.addEventListener("click", () => {
@@ -53,7 +51,7 @@ muteBtn.addEventListener("click", () => {
 });
 
 // --------------------
-// PROGRESO STREAMING
+// PROGRESO
 // --------------------
 audio.addEventListener("timeupdate", () => {
     if(audio.duration){
@@ -71,7 +69,7 @@ progressContainer.addEventListener("click", e => {
 });
 
 // --------------------
-// MATRIX AZUL-PLATEADO
+// MATRIX DENTRO DE PLAYER
 // --------------------
 function resizeCanvas(){
     canvas.width = canvas.offsetWidth;
@@ -85,8 +83,8 @@ resizeCanvas();
 const chars = "アァイィウヴエェオカガキギクグケゲコゴabcdefghijklmnopqrstuvwxyz0123456789".split("");
 
 function drawMatrix(){
-    ctx.fillStyle = "rgba(0,0,0,0.15)"; // solo ligera opacidad
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+    // Fondo semitransparente según overlay
+    ctx.clearRect(0,0,canvas.width,canvas.height);
 
     ctx.font = fontSize + "px monospace";
     for(let i=0;i<drops.length;i++){
@@ -94,13 +92,14 @@ function drawMatrix(){
         const x = i * fontSize;
         const y = drops[i] * fontSize;
 
-        ctx.fillStyle = "rgba(150, 220, 255, 1)"; // azul-plateado
+        // Azul-plata
+        ctx.fillStyle = "rgba(150,220,255,1)";
         ctx.fillText(text,x,y);
 
-        ctx.fillStyle = "rgba(150, 220, 255, 0.5)";
+        ctx.fillStyle = "rgba(150,220,255,0.5)";
         ctx.fillText(text,x,y-fontSize);
 
-        if(y > canvas.height && Math.random()>0.975) drops[i] = 0;
+        if(y > canvas.height && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
     }
     animationFrame = requestAnimationFrame(drawMatrix);

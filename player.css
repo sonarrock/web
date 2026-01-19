@@ -1,24 +1,25 @@
-/* =========================
-   REPRODUCTOR STREAMING + MATRIX
-   ========================= */
+/* REPRODUCTOR STREAMING + MATRIX */
 .player-container {
     position: relative;
     width: 100%;
     max-width: 1200px;
-    height: 600px; /* mucho más alto para ver casi toda la imagen */
+    height: 600px;
     margin: 40px auto;
     border-radius: 15px;
     overflow: hidden;
     background: none;
 }
 
+/* Imagen de fondo ajustada para que se vea toda la mujer */
 .player-bg {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    min-height: 100%;
+    transform: translate(-50%, -50%) scale(0.9);
+    object-fit: contain;
     z-index: 1;
 }
 
@@ -93,19 +94,11 @@
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-    .player-container {
-        height: 500px;
-    }
-    .player-content {
-        width: 95%;
-    }
+    .player-container { height: 500px; }
+    .player-content { width: 95%; }
 }
 
 @media (max-width: 480px) {
-    .player-container {
-        height: 400px;
-    }
-    .controls {
-        flex-wrap: wrap;
-    }
+    .player-container { height: 400px; }
+    .controls { flex-wrap: wrap; }
 }

@@ -97,77 +97,147 @@
 <!-- ========================= -->
 <!-- DISCO DE LA SEMANA -->
 <!-- ========================= -->
-const fileName = Bob Dylan - The Times They Are A-Changin'.mp3"; // <--- Reemplaza aquí el nombre del archivo cada semana
-const discoAudio = document.getElementById("disco-audio");
-const discoProgress = document.getElementById("disco-progress");
-const discoProgressContainer = document.getElementById("disco-progress-container");
-const cover = document.getElementById("cover");
-document.getElementById("track-title").textContent = fileName.replace(/\.mp3$/i,'');
-
-discoAudio.src = `https://sonarrock.github.io/web/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
-
-discoAudio.addEventListener('progress', () => {
-  if (discoAudio.buffered.length > 0) {
-    const bufferedEnd = discoAudio.buffered.end(0);
-    if (bufferedEnd < discoAudio.duration) {
-      console.log("Aún cargando buffer:", bufferedEnd);
-    }
-  }
-});
-
-discoProgressContainer.addEventListener('click',(e)=>{
-  const rect = discoProgressContainer.getBoundingClientRect();
-  const offsetX = e.clientX - rect.left;
-  discoAudio.currentTime = (offsetX/rect.width)*discoAudio.duration;
-});
-
-// Animación portada: respiración + resplandor
-let zoomDirection = 1;
-let zoomInterval;
-discoAudio.addEventListener('play', ()=>{
-  zoomInterval = setInterval(()=>{
-    let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g,'')) || 1;
-    scale += 0.0015*zoomDirection;
-    if(scale>=1.03) zoomDirection=-1;
-    if(scale<=0.97) zoomDirection=1;
-    cover.style.transform=`scale(${scale})`;
-    const shadowIntensity = 10 + (scale-0.97)*300; 
-    cover.style.boxShadow=`0 0 ${shadowIntensity}px rgba(255,102,0,0.6)`;
-  },20);
-});
-discoAudio.addEventListener('pause',()=>{
-  clearInterval(zoomInterval);
-  cover.style.transform='scale(1)';
-  cover.style.boxShadow='none';
-});
-discoAudio.addEventListener('ended',()=>{
-  clearInterval(zoomInterval);
-  cover.style.transform='scale(1)';
-  cover.style.boxShadow='none';
-});
-
-<!-- ========================= -->
-<!-- EMBED SPOTIFY & IVOOX -->
-<!-- ========================= -->
-<section class="embed-section">
-  <div class="container">
-    <h3 class="section-title">Escucha en Spotify</h3>
-    <iframe
-      src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
-      width="100%" height="170" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-      loading="lazy"></iframe>
-
-    <h3 class="section-title" style="margin-top:40px;">Escucha en iVoox</h3>
-    <div id="podcast-player"></div>
+<h2 class="section-title" style="margin-top:60px; margin-bottom:40px;">El Disco de la Semana</h2>
+<section class="disco-section" style="margin-top:50px; display:flex; align-items:center; gap:15px;">
+  <div class="container" style="display:flex; align-items:center; gap:15px;">
+    <img id="cover" src="El Disco De La Semana/portada.jpg" alt="Portada" style="width:120px; height:120px; border-radius:12px; box-shadow:0 0 10px rgba(255,102,0,0.6); transition: transform 0.2s, box-shadow 0.2s;">
+    <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+      <div id="track-title" style="color:#FFFFF; font-weight:bold; font-size:1.1rem;">Título del Disco</div>
+      <div id="disco-progress-container" class="progress-container">
+        <div id="disco-progress"></div>
+      </div>
+      <audio id="disco-audio" preload="auto" controls style="margin-top:5px;"></audio>
+    </div>
   </div>
 </section>
 
+
+<!-- ========================= -->
+<!-- EMBEDS SPOTIFY E IVOOX -->
+<!-- ========================= -->
+<section class="embed-section" style="margin-top:60px;">
+  <div class="container" style="max-width: 650px; margin: auto;">
+    <!-- Spotify -->
+    <div class="spotify-container">
+      <h3 class="section-title" style="margin-bottom:40px;">Escucha en Spotify</h3>
+      <iframe
+        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?si=TiadCqdlRCyd97QygWQWfA"
+        width="100%"
+        height="170"
+        frameborder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"
+        style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+      </iframe>
+    </div>
+
+    <h3 class="section-title" style="margin:40px 0 25px;">Escucha en iVoox</h3>
+    <div id="podcast-player" class="player-wrapper"></div>
+  </div>
+</section>
+
+<style>
+  .player-wrapper {
+    width: 100%;
+    max-width: 650px;
+    height: 170px;
+    background: #121212;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.6);
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    box-sizing: border-box;
+    color: #fff;
+    font-family: "Spotify Circular", Arial, sans-serif;
+    gap: 20px;
+  }
+  #podcast-player > div {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    align-items: center;
+  }
+  #podcast-player img {
+    width: 140px;
+    height: 140px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  #podcast-player h3 {
+    font-size: 14px;
+    margin: 0 0 6px 0;
+    font-weight: 700;
+    color: #FFFFFF; /* blanco */
+  }
+  #podcast-player p {
+    font-size: 10px;
+    color: #b3b3b3;
+    margin: 0 0 10px 0;
+  }
+  #podcast-player audio {
+    width: 100%;
+    outline: none;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
+    border-radius: 8px;
+    background: #222;
+  }
+  .section-title {
+    color: #FF6600 !important;
+    font-family: "Spotify Circular", Arial, sans-serif;
+  }
+</style>
+
+<script>
+  async function loadLatestIvooxEpisode() {
+    const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
+
+    try {
+      const response = await fetch(feedUrl);
+      const xmlText = await response.text();
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(xmlText, "text/xml");
+
+      const item = xml.querySelector("item");
+      if (!item) throw new Error("No se encontró ningún episodio");
+
+      const title = item.querySelector("title").textContent;
+      const audioUrl = item.querySelector("enclosure").getAttribute("url");
+      const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
+      const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
+
+      const playerHTML = `
+        <div>
+          <img src="${imageUrl}" alt="Carátula episodio" />
+          <div style="flex:1;">
+            <h3>${title}</h3>
+            <p>Publicado el ${pubDate}</p>
+            <audio controls preload="none">
+              <source src="${audioUrl}" type="audio/mpeg" />
+              Tu navegador no soporta audio HTML5.
+            </audio>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("podcast-player").innerHTML = playerHTML;
+    } catch (error) {
+      document.getElementById("podcast-player").innerHTML = `<p style="color:#f00;">No se pudo cargar el reproductor. Intenta más tarde.</p>`;
+      console.error("Error cargando el feed:", error);
+    }
+  }
+
+  loadLatestIvooxEpisode();
+</script>
+  </div>
+    </section>
 <!-- ========================= -->
 <!-- STAFF -->
 <!-- ========================= -->
 <section class="staff-section">
   <div class="container">
-    <h2 class="section-title">Staff</h2>
+    <h2 class="section-title" style="margin-bottom:40px;">Staff</h2>
     <div class="staff-grid">
       <div class="staff-member">
         <img src="attached_assets/Wendy_1749601460841.jpeg" alt="Wendy" class="staff-image">
@@ -190,25 +260,46 @@ discoAudio.addEventListener('ended',()=>{
 </section>
 
 <!-- ========================= -->
-<!-- QUIÉNES SOMOS -->
+<!-- ¿QUIÉNES SOMOS? -->
 <!-- ========================= -->
 <section class="about-section">
   <div class="container">
-    <h2 class="section-title">¿Quiénes Somos?</h2>
-    <p class="about-text">Sonar Rock es una trinchera sonora, un espacio libre y apasionado que nace en Guadalajara, Jalisco, México...</p>
+    <div class="about-content">
+      <h2 class="section-title">¿Quiénes Somos?</h2>
+      <p class="about-text">
+        Sonar Rock es una trinchera sonora, un espacio libre y apasionado que nace en Guadalajara, Jalisco, México.
+        Nuestra misión es simple pero poderosa: abrir un foro auténtico para las bandas emergentes, apoyar la escena local y mantener viva la esencia del rock en todas sus vertientes.
+
+        Creemos en la fuerza de la música como motor de cambio, como punto de encuentro y como refugio de quienes buscan algo distinto a lo convencional.
+        En Sonar Rock somos más que una radio: somos comunidad, resistencia y pasión por el sonido que nos une.
+      </p>
+    </div>
   </div>
 </section>
 
 <!-- ========================= -->
-<!-- QUÉ ES SONAR ROCK -->
+<!-- ¿QUÉ ES SONAR ROCK? -->
 <!-- ========================= -->
 <section class="about-section">
   <div class="container">
-    <h2 class="section-title">¿Qué es Sonar Rock?</h2>
-    <p class="about-text">Celebramos la esencia eterna del rock n’ roll...</p>
+    <div class="about-content">
+      <h2 class="section-title">¿Qué es Sonar Rock?</h2>
+      <p class="about-text">
+        Sonar Rock celebra la esencia eterna del rock n’ roll:
+
+        Su rebeldía frente a lo establecido.
+
+        Su poesía en cada letra y acorde.
+
+        Su energía que enciende escenarios y corazones.
+
+        Su capacidad de conectar almas más allá de fronteras y generaciones.
+
+        Aquí el rock no se escucha de fondo, se vive. Somos un canal donde conviven lo clásico, lo alternativo y lo emergente, siempre con la autenticidad como bandera.
+      </p>
+    </div>
   </div>
 </section>
-
 <!-- ========================= -->
 <!-- JS -->
 <!-- ========================= -->

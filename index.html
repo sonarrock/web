@@ -54,7 +54,7 @@
 <section class="main-section">
   <div class="container">
     <div class="main-image-container">
-      <img src="attached_assets/sonarrock.jpeg" alt="Sonar Rock" class="main-image" style="max-width:1220px; width:100%;">
+      <img src="attached_assets/Sonarrock_1749601460841.jpeg" alt="Sonar Rock" class="main-image" style="max-width:1220px; width:100%;">
     </div>
   </div>
 </section>
@@ -409,7 +409,8 @@ const discoProgressContainer = document.getElementById("disco-progress-container
 const cover = document.getElementById("cover");
 document.getElementById("track-title").textContent = fileName.replace(/\.mp3$/i,'');
 
-discoAudio.src = `https://sonarrock.github.io/web/El%20Disco%20De%20La%20Semana/${fileName}`;
+discoAudio.src = `https://sonarrock.github.io/web/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
+
 discoAudio.addEventListener('progress', () => {
   if (discoAudio.buffered.length > 0) {
     const bufferedEnd = discoAudio.buffered.end(0);

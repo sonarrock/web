@@ -402,22 +402,18 @@ function stopMatrix(){ if(animationRunning){ cancelAnimationFrame(animationFrame
 // ----------------------------
 // DISCO DE LA SEMANA
 // ----------------------------
-const fileName = "Bob Dylan - The Times They Are A-Changin'.mp3"; // <--- Reemplaza aquí el nombre del archivo cada semana
+const fileName = "Soda Stereo - Signos.mp3"; // <--- Reemplaza aquí el nombre del archivo cada semana
 const discoAudio = document.getElementById("disco-audio");
 const discoProgress = document.getElementById("disco-progress");
 const discoProgressContainer = document.getElementById("disco-progress-container");
 const cover = document.getElementById("cover");
 document.getElementById("track-title").textContent = fileName.replace(/\.mp3$/i,'');
 
-discoAudio.src = `https://sonarrock.github.io/web/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
+discoAudio.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
 
-discoAudio.addEventListener('progress', () => {
-  if (discoAudio.buffered.length > 0) {
-    const bufferedEnd = discoAudio.buffered.end(0);
-    if (bufferedEnd < discoAudio.duration) {
-      console.log("Aún cargando buffer:", bufferedEnd);
-    }
-  }
+discoAudio.addEventListener('timeupdate', ()=>{
+  const percent = (discoAudio.currentTime/discoAudio.duration)*100;
+  discoProgress.style.width = percent+'%';
 });
 
 discoProgressContainer.addEventListener('click',(e)=>{
@@ -450,7 +446,6 @@ discoAudio.addEventListener('ended',()=>{
   cover.style.transform='scale(1)';
   cover.style.boxShadow='none';
 });
-
 // ----------------------------
 // iVoox
 // ----------------------------

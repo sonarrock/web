@@ -471,3 +471,120 @@ async function loadIvoox(){
         console.error("Error cargando feed iVoox:", error);
     }
 }
+const audio = document.getElementById("radio-audio");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const stopBtn = document.getElementById("stop-btn");
+const muteBtn = document.getElementById("mute-btn");
+const progress = document.getElementById("radio-progress");
+const progressContainer = document.getElementById("radio-progress-container");
+const timeDisplay = document.getElementById("time-display");
+
+const canvas = document.getElementById("matrixCanvas");
+const ctx = canvas.getContext("2d");
+const overlay = document.querySelector(".overlay");
+
+let animationRunning = false;
+let animationFrame;
+let columns, drops, fontSize = 16;
+
+// Resize Canvas
+function resizeCanvas(){
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    columns = Math.floor(canvas.width / fontSize);
+    drops = Array(columns).fill(1);
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+// Matrix Characters
+const chars = "アァイィウヴエェオカガキギクグケゲコゴabcdefghijklmnopqrstuvwxyz0123456789".split("");
+
+// Draw Matrix
+function drawMatrix(){
+    ctx.fillStyle = "rgba(0,0,0,0.15)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.font = fontSize + "px monospace";
+    for(let i=0;i<drops.length;i++){
+        const text = chars[Math.floor(Math.random()*chars.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+
+        ctx.fillStyle = "rgba(150,220,255,1)";
+        ctx.fillText(text,x,y);
+
+        ctx.fillStyle = "rgba(150,220,255,0.5)";
+        ctx.fillText(text,x,y-fontSize);
+
+        if(y > canvas.height && Math.random()>0.975) drops[i] = 0;
+        drops[i]++;
+    }
+    animationFrame = requestAnimationFrame(drawMatrix);
+}
+
+function startMatrix(){
+    if(!animationRunning){
+        animationRunning = true;
+        drawMatrix();
+    }
+}
+
+function stopMatrix(){
+    if(animationRunning){
+        cancelAnimationFrame(animationFrame);
+        animationRunning = false;
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+    }
+}
+
+// Play/Pause
+playPauseBtn.addEventListener("click", () => {
+    if(audio.paused){
+        audio.play().then(() => {
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            canvas.style.opacity = 1;
+            overlay.style.background = "rgba(0,0,0,0.1)";
+            startMatrix();
+        }).catch(err => console.warn("Autoplay bloqueado:", err));
+    } else {
+        audio.pause();
+        playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+        canvas.style.opacity = 0;
+        overlay.style.background = "rgba(0,0,0,0)";
+        stopMatrix();
+    }
+});
+
+// Stop
+stopBtn.addEventListener("click", () => {
+    audio.pause();
+    audio.currentTime = 0;
+    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    canvas.style.opacity = 0;
+    overlay.style.background = "rgba(0,0,0,0)";
+    stopMatrix();
+});
+
+// Mute
+muteBtn.addEventListener("click", () => {
+    audio.muted = !audio.muted;
+    muteBtn.innerHTML = audio.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+    muteBtn.style.color = audio.muted ? '#ff0000' : '#ff6600';
+});
+
+// Progress
+audio.addEventListener("timeupdate", () => {
+    if(audio.duration){
+        progress.style.width = (audio.currentTime/audio.duration*100) + "%";
+        const hrs = Math.floor(audio.currentTime/3600);
+        const mins = Math.floor((audio.currentTime%3600)/60);
+        const secs = Math.floor(audio.currentTime%60);
+        timeDisplay.textContent = `${hrs.toString().padStart(2,"0")}:${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
+    }
+});
+
+progressContainer.addEventListener("click", e => {
+    const rect = progressContainer.getBoundingClientRect();
+    audio.currentTime = ((e.clientX - rect.left)/rect.width)*audio.duration;
+});

@@ -83,13 +83,12 @@ body {
 }
 
 .main-image {
-    width: 100%;
-    height: auto;
-    max-height: 600px;
-    object-fit: cover;
+    width: 100%;          /* ocupa todo el ancho del contenedor */
+    height: auto;         /* mantiene proporción real */
+    max-height: 750px;    /* más alta que antes, ajustable */
+    object-fit: cover;    /* cubre el contenedor sin deformarse */
     display: block;
 }
-
 /* =======================
    PLAYER STREAMING
    ======================= */

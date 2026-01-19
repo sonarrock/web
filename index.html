@@ -399,8 +399,6 @@ function drawMatrix(){ ctx.fillStyle="rgba(0,0,0,0.1)"; ctx.fillRect(0,0,canvas.
 function startMatrix(){ if(!animationRunning){ animationRunning=true; drawMatrix(); } }
 function stopMatrix(){ if(animationRunning){ cancelAnimationFrame(animationFrame); animationRunning=false; ctx.clearRect(0,0,canvas.width,canvas.height); }}
 
-// ----------------------------
-<!-- ========================= -->
 <!-- ========================= -->
 <!-- DISCO DE LA SEMANA -->
 <!-- ========================= -->
@@ -427,20 +425,25 @@ function stopMatrix(){ if(animationRunning){ cancelAnimationFrame(animationFrame
   const cover = document.getElementById("cover");
   const trackTitle = document.getElementById("track-title");
 
-  // Actualiza el título
   trackTitle.textContent = fileName.replace(/\.mp3$/i,'');
 
-  // Construye la URL
   const audioURL = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
-  discoAudio.src = audioURL;
 
-  // Control de error si no carga el MP3
-  discoAudio.addEventListener('error', () => {
-    console.error("No se pudo cargar el MP3 desde GitHub. Verifica nombre del archivo y existencia.");
-    trackTitle.textContent = "Error: disco no encontrado";
-  });
+  // fetch + blob para evitar bloqueos de GitHub
+  fetch(audioURL)
+    .then(response => {
+      if(!response.ok) throw new Error("No se pudo descargar el MP3 desde GitHub");
+      return response.blob();
+    })
+    .then(blob => {
+      discoAudio.src = URL.createObjectURL(blob);
+    })
+    .catch(err => {
+      console.error(err);
+      trackTitle.textContent = "Error: disco no encontrado";
+    });
 
-  // Barra de progreso
+  // barra de progreso
   discoAudio.addEventListener('timeupdate', () => {
     if(discoAudio.duration){
       const percent = (discoAudio.currentTime/discoAudio.duration)*100;
@@ -448,14 +451,13 @@ function stopMatrix(){ if(animationRunning){ cancelAnimationFrame(animationFrame
     }
   });
 
-  // Salto en la barra al hacer click
   discoProgressContainer.addEventListener('click', (e)=>{
     const rect = discoProgressContainer.getBoundingClientRect();
-    discoAudio.currentTime = (offsetX/rect.width)*discoAudio.duration;
     const offsetX = e.clientX - rect.left;
+    discoAudio.currentTime = (offsetX/rect.width)*discoAudio.duration;
   });
 
-  // Animación portada: respiración + resplandor
+  // Animación portada
   let zoomDirection = 1;
   let zoomInterval;
 

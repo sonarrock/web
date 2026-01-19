@@ -1,6 +1,6 @@
-/* ==============================
-   RESET Y BASE
-============================== */
+/* =======================
+   RESET Y BODY
+   ======================= */
 * {
     margin: 0;
     padding: 0;
@@ -15,62 +15,67 @@ body {
     min-height: 100vh;
 }
 
+/* =======================
+   CONTAINER GENERAL
+   ======================= */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* ==============================
+/* =======================
    HEADER
-============================== */
+   ======================= */
 .header {
     background: #0a0a0a;
-    padding: 20px 0;
-    border-bottom: 2px solid #ff6600;
+    padding: 40px 0;
+    border-bottom: 4px solid #ff6600;
 }
 
 .logo-section {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 30px;
+    flex-wrap: wrap;
 }
 
 .logo {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
+    width: 220px;
+    height: auto;
+    border-radius: 12px;
     object-fit: cover;
-    border: 3px solid #ff6600;
-    box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
+    border: 4px solid #ff6600;
+    box-shadow: 0 0 30px rgba(255, 102, 0, 0.5);
 }
 
 .title-section h1 {
-    font-size: 3rem;
+    font-size: 4rem;
     font-weight: bold;
     color: #ff6600;
-    text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
-    margin-bottom: 5px;
+    text-shadow: 0 0 15px rgba(255, 102, 0, 0.6);
+    margin: 0;
 }
 
 .subtitle {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     color: #cccccc;
     text-transform: uppercase;
     letter-spacing: 2px;
+    margin-top: 5px;
 }
 
-/* ==============================
-   MAIN IMAGE
-============================== */
+/* =======================
+   IMAGEN PRINCIPAL
+   ======================= */
 .main-section {
     padding: 40px 0;
+    position: relative;
 }
 
 .main-image-container {
-    position: relative;
-    max-width: 1120px;
+    max-width: 1200px;
     margin: 0 auto;
     border-radius: 15px;
     overflow: hidden;
@@ -85,18 +90,14 @@ body {
     display: block;
 }
 
-/* ==============================
-   PLAYER SECTION
-============================== */
-.player-section {
-    padding: 40px 0;
-}
-
+/* =======================
+   PLAYER STREAMING
+   ======================= */
 .player-container {
     position: relative;
     width: 100%;
     max-width: 1120px;
-    margin: 0 auto;
+    margin: 40px auto;
     border-radius: 15px;
     overflow: hidden;
     background: transparent;
@@ -125,39 +126,43 @@ canvas#matrixCanvas {
     background: transparent;
 }
 
-/* ==============================
-   CONTROLES PLAYER
-============================== */
+/* Controles del reproductor */
 .player-content {
     position: relative;
+    z-index: 2;
     padding: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 15px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 15px;
 }
 
 .controls {
     display: flex;
+    justify-content: center;
     gap: 15px;
 }
 
 .controls .btn {
-    font-size: 24px;
-    color: #ff6600;
-    background: none;
+    background: #ff6600;
     border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 20px;
+    width: 50px;
+    height: 50px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.3s ease;
 }
 
 .controls .btn:hover {
-    transform: scale(1.2);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(255, 102, 0, 0.5);
 }
 
+/* Barra de progreso */
 .progress-wrapper {
-    width: 100%;
-    max-width: 600px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -166,31 +171,54 @@ canvas#matrixCanvas {
 .progress-container {
     flex: 1;
     height: 6px;
-    background: rgba(255, 255, 255, 0.2);
+    background: #222;
     border-radius: 3px;
     cursor: pointer;
+    overflow: hidden;
 }
 
-#radio-progress {
+#radio-progress, #disco-progress {
     height: 100%;
+    width: 0;
     background: #ff6600;
-    width: 0%;
-    border-radius: 3px;
 }
 
 .time-display {
     font-size: 14px;
-    color: #ffffff;
-    min-width: 70px;
-    text-align: center;
+    width: 80px;
+    text-align: right;
 }
 
-/* ==============================
-   SOCIAL SECTION
-============================== */
+/* =======================
+   DISCO DE LA SEMANA
+   ======================= */
+.disco-section .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+#cover {
+    width: 300px;
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(255,102,0,0.5);
+}
+
+#track-title {
+    color: #ff6600;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+/* =======================
+   REDES SOCIALES
+   ======================= */
 .social-section {
     padding: 50px 0;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0,0,0,0.2);
 }
 
 .social-buttons {
@@ -211,12 +239,12 @@ canvas#matrixCanvas {
     color: white;
     text-decoration: none;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
 .social-btn:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
 }
 
 .whatsapp { background: linear-gradient(45deg, #25d366, #128c7e); }
@@ -225,88 +253,33 @@ canvas#matrixCanvas {
 .spotify { background: linear-gradient(45deg, #1db954, #1ed760); }
 .ivoox { background: linear-gradient(45deg, #ff6600, #ff8833); }
 
-/* ==============================
-   DISCO DE LA SEMANA
-============================== */
-.disco-section .container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    align-items: center;
-    justify-content: center;
-}
-
-#cover {
-    width: 300px;
-    max-width: 100%;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(255,102,0,0.5);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-#track-title {
-    color: #ff6600;
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-}
-
-/* ==============================
-   EMBED SPOTIFY / IVOOX
-============================== */
-.embed-section {
-    padding: 40px 0;
-}
-
-.section-title {
-    text-align: center;
-    font-size: 2.5rem;
-    color: #ff6600;
-    margin-bottom: 30px;
-    text-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
-}
-
-.embed-container {
-    max-width: 800px;
-    margin: 0 auto;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    border: 2px solid #ff6600;
-}
-
-.spotify-embed {
-    display: flex;
-    justify-content: center;
-}
-
-/* ==============================
-   STAFF SECTION
-============================== */
+/* =======================
+   STAFF
+   ======================= */
 .staff-section {
     padding: 60px 0;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0,0,0,0.2);
 }
 
 .staff-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 40px;
-    margin-top: 40px;
 }
 
 .staff-member {
     text-align: center;
-    background: rgba(26, 26, 26, 0.8);
+    background: rgba(26,26,26,0.8);
     padding: 30px;
     border-radius: 15px;
     border: 2px solid #ff6600;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .staff-member:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(255, 102, 0, 0.2);
+    box-shadow: 0 15px 30px rgba(255,102,0,0.2);
 }
 
 .staff-image {
@@ -316,18 +289,17 @@ canvas#matrixCanvas {
     object-fit: cover;
     margin-bottom: 20px;
     border: 3px solid #ff6600;
-    box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
+    box-shadow: 0 0 20px rgba(255,102,0,0.3);
 }
 
 .staff-member h3 {
     font-size: 1.5rem;
     color: #ff6600;
-    text-shadow: 0 0 5px rgba(255, 102, 0, 0.3);
 }
 
-/* ==============================
-   ABOUT / TEXT
-============================== */
+/* =======================
+   ABOUT
+   ======================= */
 .about-section {
     padding: 60px 0;
 }
@@ -345,36 +317,24 @@ canvas#matrixCanvas {
     margin-top: 20px;
 }
 
-/* ==============================
+/* =======================
    RESPONSIVE
-============================== */
+   ======================= */
 @media (max-width: 768px) {
-    .title-section h1 {
-        font-size: 2rem;
+    .logo {
+        width: 180px;
     }
-    
+    .title-section h1 {
+        font-size: 2.5rem;
+        text-align: center;
+    }
     .subtitle {
         font-size: 1rem;
+        text-align: center;
     }
-    
-    .logo-section {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
     .main-image {
         max-height: 400px;
     }
-    
-    .social-buttons {
-        gap: 15px;
-    }
-    
-    .staff-grid {
-        grid-template-columns: 1fr;
-        gap: 30px;
-    }
-    
     .disco-section .container {
         flex-direction: column;
         align-items: center;
@@ -382,30 +342,25 @@ canvas#matrixCanvas {
 }
 
 @media (max-width: 480px) {
-    .container {
-        padding: 0 15px;
+    .logo {
+        width: 140px;
     }
-    
     .title-section h1 {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
     }
-    
-    .section-title {
-        font-size: 2rem;
-    }
-    
     .player-content {
+        padding: 10px;
+    }
+    .controls {
         flex-direction: column;
         gap: 10px;
     }
-    
-    .controls {
-        flex-direction: row;
-        gap: 10px;
-    }
-    
     .progress-wrapper {
         flex-direction: column;
         gap: 5px;
+    }
+    .time-display {
+        width: 100%;
+        text-align: center;
     }
 }

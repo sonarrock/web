@@ -138,3 +138,13 @@ audio.addEventListener("stalled", () => {
   audio.load();
 });
 
+// --------------------
+// ESTADO VISUAL PLAY / PAUSE
+// --------------------
+audio.addEventListener("play", () => {
+  document.body.classList.add("playing");
+});
+
+audio.addEventListener("pause", () => {
+  document.body.classList.remove("playing");
+});

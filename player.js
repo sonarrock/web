@@ -16,26 +16,17 @@ audio.playsInline = true;
 audio.preload = "none";
 
 // ===============================
-// iOS AUDIO UNLOCK (1 SOLO GESTO)
+// AUDIO UNLOCK (iOS + CHROME SAFE)
 // ===============================
-let audioUnlocked = false;
+let userInteracted = false;
 
-function unlockIOSAudio() {
-  if (audioUnlocked) return;
-
-  audio.muted = true;
-  audio.play()
-    .then(() => {
-      audio.pause();
-      audio.muted = false;
-      audioUnlocked = true;
-      console.log("🔓 iOS audio unlocked");
-    })
-    .catch(() => {});
+function markUserInteraction() {
+  userInteracted = true;
 }
 
-document.addEventListener("touchstart", unlockIOSAudio, { once: true });
-document.addEventListener("click", unlockIOSAudio, { once: true });
+document.addEventListener("touchstart", markUserInteraction, { once: true });
+document.addEventListener("click", markUserInteraction, { once: true });
+
 
 // ===============================
 // MATRIX EFFECT (LLUVIA REAL)
@@ -170,42 +161,28 @@ function stopFakeTimer() {
 // ===============================
 // CONTROLES STREAM (ESTABLE)
 // ===============================
-playPauseBtn.addEventListener("click", async () => {
+playPauseBtn.addEventListener("click", () => {
+  if (!userInteracted) return;
+
   if (audio.paused) {
-    try {
-      audio.muted = false;
-      await audio.play();
+    audio.muted = false;
 
-      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-      document.body.classList.add("playing");
+    audio.play()
+      .then(() => {
+        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        document.body.classList.add("playing");
 
-      startMatrix();
-      startVU();
-      startFakeTimer();
-    } catch (e) {
-      console.warn("Bloqueo de reproducción");
-    }
+        startMatrix();
+        startFakeTimer();
+        startVU();
+      })
+      .catch(err => {
+        console.warn("Play bloqueado:", err);
+      });
+
   } else {
     audio.pause();
   }
-});
-
-stopBtn.addEventListener("click", () => {
-  audio.pause();
-
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  document.body.classList.remove("playing");
-
-  stopMatrix();
-  stopVU();
-  stopFakeTimer();
-});
-
-muteBtn.addEventListener("click", () => {
-  audio.muted = !audio.muted;
-  muteBtn.innerHTML = audio.muted
-    ? '<i class="fas fa-volume-mute"></i>'
-    : '<i class="fas fa-volume-up"></i>';
 });
 
 // ===============================

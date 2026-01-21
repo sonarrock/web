@@ -1,5 +1,6 @@
 // ==================================================
-// SONAR ROCK PLAYER — FINAL CLEAN (iOS + CHROME SAFE)
+// SONAR ROCK PLAYER — FINAL STABLE (1 CLICK REAL)
+// iOS + Chrome SAFE
 // ==================================================
 
 /* ===============================
@@ -13,18 +14,6 @@ const timeDisplay = document.getElementById("time-display");
 
 audio.playsInline = true;
 audio.preload = "none";
-
-/* ===============================
-   GESTO DE USUARIO (UNIVERSAL)
-================================ */
-let userInteracted = false;
-
-function registerInteraction() {
-  userInteracted = true;
-}
-
-document.addEventListener("click", registerInteraction, { once: true });
-document.addEventListener("touchstart", registerInteraction, { once: true });
 
 /* ===============================
    TIMER FAKE (STREAM EN VIVO)
@@ -55,7 +44,7 @@ function stopFakeTimer() {
 }
 
 /* ===============================
-   MATRIX EFFECT (LLUVIA REAL)
+   MATRIX — LLUVIA REAL (SIN OSCURECER)
 ================================ */
 const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
@@ -87,8 +76,7 @@ const chars =
 function drawMatrix() {
   if (!matrixRunning) return;
 
-  ctx.fillStyle = "rgba(0,0,0,0.08)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = `${fontSize}px monospace`;
 
   for (let i = 0; i < drops.length; i++) {
@@ -123,7 +111,7 @@ function stopMatrix() {
 }
 
 /* ===============================
-   VU METER (FAKE PRO)
+   VU METER (FAKE)
 ================================ */
 const vuBars = document.querySelectorAll(".vu-meter span");
 let vuActive = false;
@@ -152,35 +140,55 @@ function stopVU() {
   vuBars.forEach(bar => (bar.style.height = "20%"));
 }
 
-// ===============================
-// ===============================
-// CONTROLES STREAM — 1 CLICK REAL
-// ===============================
+/* ===============================
+   CONTROLES STREAM — 1 CLICK REAL
+================================ */
 let isPlaying = false;
+let playRequested = false;
 
 playPauseBtn.addEventListener("click", () => {
-  if (!isPlaying) {
-    audio.muted = false;
-    audio.volume = 1;
-
-    audio.play().then(() => {
-      isPlaying = true;
-
-      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-      document.body.classList.add("playing");
-
-      startMatrix();
-      startVU();
-      startFakeTimer();
-    }).catch(err => {
-      console.warn("Play bloqueado:", err);
-    });
-
-  } else {
+  if (isPlaying) {
     audio.pause();
+    return;
   }
+
+  if (playRequested) return; // evita multi-click
+  playRequested = true;
+
+  audio.muted = false;
+  audio.volume = 1;
+
+  audio.play().catch(() => {});
 });
 
+// 🔥 SOLO CUANDO EL AUDIO REALMENTE ARRANCA
+audio.addEventListener("playing", () => {
+  isPlaying = true;
+  playRequested = false;
+
+  playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+  document.body.classList.add("playing");
+
+  startMatrix();
+  startVU();
+  startFakeTimer();
+});
+
+audio.addEventListener("pause", () => {
+  isPlaying = false;
+  playRequested = false;
+
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+  document.body.classList.remove("playing");
+
+  stopMatrix();
+  stopVU();
+  stopFakeTimer();
+});
+
+/* ===============================
+   BOTONES
+================================ */
 stopBtn.addEventListener("click", () => {
   audio.pause();
   audio.currentTime = 0;
@@ -191,16 +199,4 @@ muteBtn.addEventListener("click", () => {
   muteBtn.innerHTML = audio.muted
     ? '<i class="fas fa-volume-mute"></i>'
     : '<i class="fas fa-volume-up"></i>';
-});
-
-
-/* ===============================
-   PROTECCIÓN GLOBAL
-================================ */
-audio.addEventListener("pause", () => {
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  document.body.classList.remove("playing");
-  stopMatrix();
-  stopVU();
-  stopFakeTimer();
 });

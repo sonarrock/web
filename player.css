@@ -19,6 +19,46 @@
 }
 
 /* =========================
+   VOLUMEN TÁCTIL
+   ========================= */
+.volume-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.volume-wrapper i {
+  color: #9be7ff;
+  font-size: 14px;
+}
+
+.volume-bar {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 6px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.volume-level {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    #4fd1ff,
+    #9be7ff
+  );
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(120,220,255,0.8);
+}
+
+
+/* =========================
    IMAGEN FONDO
    ========================= */
 .player-bg {

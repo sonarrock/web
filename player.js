@@ -1,79 +1,86 @@
 // ===============================
-// SONAR ROCK PLAYER + MATRIX
+// SONAR ROCK PLAYER PRO
 // ===============================
 
 const audio = document.getElementById("radio-audio");
 const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
+const progress = document.getElementById("radio-progress");
+const progressContainer = document.getElementById("radio-progress-container");
 const timeDisplay = document.getElementById("time-display");
+const overlay = document.querySelector(".overlay");
+const nowPlaying = document.getElementById("now-playing");
 
-// --------------------
-// AUDIO ANALYSER
-// --------------------
-let audioCtx;
-let analyser;
-let source;
-let dataArray;
-let bufferLength;
-let audioReady = false;
+// ===============================
+// CONFIG
+// ===============================
+const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
+const RECONNECT_TIME = 4000;
+const isMobile = window.innerWidth < 768;
 
-function initAudioAnalyser() {
-  if (audioCtx && audioCtx.state === "suspended") {
-  audioCtx.resume();
+// ===============================
+// AUDIO SETUP
+// ===============================
+audio.src = STREAM_URL;
+audio.preload = "none";
+audio.crossOrigin = "anonymous";
+
+let fadeInterval = null;
+let reconnectTimeout = null;
+
+// ===============================
+// FADE AUDIO
+// ===============================
+function fadeIn() {
+  clearInterval(fadeInterval);
+  audio.volume = 0;
+  fadeInterval = setInterval(() => {
+    if (audio.volume < 0.95) {
+      audio.volume += 0.05;
+    } else {
+      audio.volume = 1;
+      clearInterval(fadeInterval);
+    }
+  }, 80);
 }
 
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
-
-  bufferLength = analyser.frequencyBinCount;
-  dataArray = new Uint8Array(bufferLength);
-
-  source = audioCtx.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-
-  audioReady = true;
+function fadeOut(callback) {
+  clearInterval(fadeInterval);
+  fadeInterval = setInterval(() => {
+    if (audio.volume > 0.05) {
+      audio.volume -= 0.05;
+    } else {
+      audio.volume = 0;
+      clearInterval(fadeInterval);
+      if (callback) callback();
+    }
+  }, 60);
 }
 
-function getAudioLevel() {
-  if (!audioReady) return 0;
-
-  analyser.getByteFrequencyData(dataArray);
-  let sum = 0;
-  for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
-  return sum / bufferLength / 255; // 0 – 1
-}
-
-// --------------------
+// ===============================
 // CANVAS MATRIX
-// --------------------
+// ===============================
 const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
 const fontSize = 16;
 let columns = 0;
 let drops = [];
-let animationRunning = false;
 let animationFrameId = null;
+let animationRunning = false;
+let matrixColor = "blue";
 
 function resizeCanvas() {
   const container = document.querySelector(".player-container");
   if (!container) return;
-
   canvas.width = container.clientWidth;
   canvas.height = container.clientHeight;
-
   columns = Math.floor(canvas.width / fontSize);
   drops = Array(columns).fill(1);
 }
-
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-// --------------------
-// MATRIX AZUL / PLATA (REACTIVA)
-// --------------------
 const chars =
   "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split(
     ""
@@ -83,24 +90,22 @@ function drawMatrix() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = `${fontSize}px monospace`;
 
-  const level = getAudioLevel();
-  const glow = 12 + level * 40;
-  const alpha = 0.5 + level;
-
   for (let i = 0; i < drops.length; i++) {
     const text = chars[Math.floor(Math.random() * chars.length)];
     const x = i * fontSize;
     const y = drops[i] * fontSize;
 
-    ctx.shadowColor = `rgba(180,240,255,${alpha})`;
-    ctx.shadowBlur = glow;
+    if (matrixColor === "live") {
+      ctx.shadowColor = "rgba(255,60,60,1)";
+      ctx.fillStyle = "rgba(255,80,80,1)";
+    } else {
+      ctx.shadowColor = "rgba(120,220,255,1)";
+      ctx.fillStyle = "rgba(200,245,255,1)";
+    }
 
-    ctx.fillStyle = `rgba(200,245,255,${alpha})`;
+    ctx.shadowBlur = 14;
     ctx.fillText(text, x, y);
-
     ctx.shadowBlur = 0;
-    ctx.fillStyle = "rgba(120,200,255,0.25)";
-    ctx.fillText(text, x, y - fontSize);
 
     if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
     drops[i]++;
@@ -118,39 +123,34 @@ function startMatrix() {
 
 function stopMatrix() {
   animationRunning = false;
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId);
-    animationFrameId = null;
-  }
+  cancelAnimationFrame(animationFrameId);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-// --------------------
+// ===============================
 // CONTROLES
-// --------------------
+// ===============================
 playPauseBtn.addEventListener("click", async () => {
   try {
+    nowPlaying.textContent = "CONECTANDO…";
     audio.muted = false;
-    audio.volume = 1;
     await audio.play();
-
-    initAudioAnalyser();
-    if (audioCtx.state === "suspended") audioCtx.resume();
+    fadeIn();
 
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    document.querySelector(".overlay").style.background =
-      "rgba(0,0,0,0.05)";
+    overlay.style.background = "rgba(0,0,0,0.25)";
     startMatrix();
-  } catch (err) {
-    console.error("Error al reproducir el stream:", err);
+  } catch (e) {
+    console.warn("Autoplay bloqueado");
   }
 });
 
 stopBtn.addEventListener("click", () => {
-  audio.pause();
+  fadeOut(() => audio.pause());
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  document.querySelector(".overlay").style.background = "transparent";
+  overlay.style.background = "transparent";
   stopMatrix();
+  nowPlaying.textContent = "";
 });
 
 muteBtn.addEventListener("click", () => {
@@ -160,29 +160,30 @@ muteBtn.addEventListener("click", () => {
     : '<i class="fas fa-volume-up"></i>';
 });
 
-// --------------------
-// TIEMPO (STREAM)
-// --------------------
-audio.addEventListener("timeupdate", () => {
-  if (isFinite(audio.currentTime)) {
-    const mins = Math.floor(audio.currentTime / 60);
-    const secs = Math.floor(audio.currentTime % 60);
-    timeDisplay.textContent = `${mins
-      .toString()
-      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  }
-});
-
-// --------------------
-// ESTADO VISUAL
-// --------------------
-audio.addEventListener("play", () => {
+// ===============================
+// STREAM EVENTS
+// ===============================
+audio.addEventListener("playing", () => {
+  nowPlaying.textContent = "SONAR ROCK • EN EL AIRE";
   document.body.classList.add("playing");
 });
 
 audio.addEventListener("pause", () => {
   document.body.classList.remove("playing");
 });
+
+audio.addEventListener("stalled", reconnect);
+audio.addEventListener("error", reconnect);
+
+function reconnect() {
+  nowPlaying.textContent = "RECONectando…";
+  stopMatrix();
+  clearTimeout(reconnectTimeout);
+  reconnectTimeout = setTimeout(() => {
+    audio.load();
+    audio.play().catch(() => {});
+  }, RECONNECT_TIME);
+}
 
 // ===============================
 // LIVE STATUS ZENO
@@ -192,10 +193,10 @@ const liveText = liveIndicator.querySelector(".text");
 
 async function checkLiveStatus() {
   try {
-    const response = await fetch(
+    const res = await fetch(
       "https://corsproxy.io/?https://api.zeno.fm/mounts/metadata/ezq3fcuf5ehvv"
     );
-    const data = await response.json();
+    const data = await res.json();
     const title = (data.streamTitle || "").toUpperCase();
 
     const isLive =
@@ -204,17 +205,15 @@ async function checkLiveStatus() {
       title.includes("🔴");
 
     if (isLive) {
-      liveIndicator.classList.remove("auto");
-      liveIndicator.classList.add("live");
+      liveIndicator.className = "live";
       liveText.textContent = "EN VIVO";
+      matrixColor = "live";
     } else {
-      liveIndicator.classList.remove("live");
-      liveIndicator.classList.add("auto");
+      liveIndicator.className = "auto";
       liveText.textContent = "PROGRAMACIÓN";
+      matrixColor = "blue";
     }
-  } catch {
-    console.warn("Estado LIVE no disponible");
-  }
+  } catch {}
 }
 
 checkLiveStatus();

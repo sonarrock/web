@@ -36,7 +36,7 @@ window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 // --------------------
-// MATRIX AZUL / PLATA (SIN OSCURECER IMAGEN)
+// MATRIX AZUL / PLATA (NO OSCURECE)
 // --------------------
 const chars =
   "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split(
@@ -44,9 +44,7 @@ const chars =
   );
 
 function drawMatrix() {
-  // limpia el canvas en cada frame (no acumula negro)
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   ctx.font = `${fontSize}px monospace`;
 
   for (let i = 0; i < drops.length; i++) {
@@ -54,19 +52,12 @@ function drawMatrix() {
     const x = i * fontSize;
     const y = drops[i] * fontSize;
 
-    // carácter principal (azul-plateado)
-  ctx.shadowColor = "rgba(180,240,255,0.9)";
-ctx.shadowBlur = 12;
+    ctx.shadowColor = "rgba(180,240,255,0.9)";
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = "rgba(180,240,255,0.95)";
+    ctx.fillText(text, x, y);
 
-ctx.fillStyle = "rgba(180,240,255,1)";
-ctx.fillText(text, x, y);
-
-// sombra secundaria para profundidad
-ctx.shadowBlur = 0;
-
-    // rastro ligero
-    ctx.fillStyle = "rgba(150,220,255,0.35)";
-    ctx.fillText(text, x, y - fontSize);
+    ctx.shadowBlur = 0;
 
     if (y > canvas.height && Math.random() > 0.975) {
       drops[i] = 0;
@@ -93,7 +84,6 @@ function stopMatrix() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-
 // --------------------
 // CONTROLES
 // --------------------
@@ -109,7 +99,6 @@ playPauseBtn.addEventListener("click", async () => {
     startMatrix();
   } catch (err) {
     console.error("Error al reproducir el stream:", err);
-    alert("Da clic nuevamente para activar el audio");
   }
 });
 
@@ -128,7 +117,7 @@ muteBtn.addEventListener("click", () => {
 });
 
 // --------------------
-// TIEMPO (STREAM)
+// TIEMPO
 // --------------------
 audio.addEventListener("timeupdate", () => {
   if (isFinite(audio.currentTime)) {
@@ -140,18 +129,8 @@ audio.addEventListener("timeupdate", () => {
   }
 });
 
-audio.addEventListener("error", () => {
-  console.warn("Stream caído, intentando reconectar...");
-  stopMatrix();
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-});
-
-audio.addEventListener("stalled", () => {
-  audio.load();
-});
-
 // --------------------
-// ESTADO VISUAL PLAY / PAUSE
+// ESTADO VISUAL
 // --------------------
 audio.addEventListener("play", () => {
   document.body.classList.add("playing");
@@ -162,9 +141,8 @@ audio.addEventListener("pause", () => {
 });
 
 // ===============================
-// LIVE STATUS DESDE METADATA ZENO
+// LIVE STATUS ZENO
 // ===============================
-
 const liveIndicator = document.getElementById("live-indicator");
 const liveText = liveIndicator.querySelector(".text");
 
@@ -174,7 +152,6 @@ async function checkLiveStatus() {
       "https://corsproxy.io/?https://api.zeno.fm/mounts/metadata/ezq3fcuf5ehvv"
     );
     const data = await response.json();
-
     const title = (data.streamTitle || "").toUpperCase();
 
     const isLive =
@@ -192,10 +169,10 @@ async function checkLiveStatus() {
       liveText.textContent = "PROGRAMACIÓN";
     }
   } catch (err) {
-    console.warn("No se pudo verificar estado LIVE:", err);
+    console.warn("Estado LIVE no disponible");
   }
 }
 
-// Revisar cada 20 segundos
 checkLiveStatus();
 setInterval(checkLiveStatus, 20000);
+

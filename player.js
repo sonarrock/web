@@ -136,22 +136,24 @@ function stopMatrix() {
 }
 
 // ===============================
-// STREAM CONTROLS
+// STREAM CONTROLS (iOS SAFE)
 // ===============================
-async function playStream() {
-  try {
+playPauseBtn.addEventListener("click", () => {
+  if (audio.paused) {
     audio.muted = false;
-    audio.volume = audio.volume || 1;
-
-    await audio.play(); // 👈 ACTIVACIÓN CLAVE
+    audio.play(); // 👈 DIRECTO, SIN async
 
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     document.body.classList.add("playing");
     startMatrix();
-  } catch (err) {
-    console.warn("Bloqueo de audio, reintentando...");
+  } else {
+    audio.pause();
+
+    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    document.body.classList.remove("playing");
+    stopMatrix();
   }
-}
+});
 
 
     // 🔥 MATRIX + VU

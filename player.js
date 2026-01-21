@@ -44,7 +44,7 @@ const chars =
   );
 
 function drawMatrix() {
-  ctx.fillStyle = "rgba(0,0,0,0.08)";
+  ctx.fillStyle = "rgba(0,0,0,0.05)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.font = `${fontSize}px monospace`;
@@ -93,7 +93,7 @@ playPauseBtn.addEventListener("click", async () => {
 
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     document.querySelector(".overlay").style.background =
-      "rgba(0,0,0,0.1)";
+      "rgba(0,0,0,0.05)";
     startMatrix();
   } catch (err) {
     console.error("Error al reproducir el stream:", err);

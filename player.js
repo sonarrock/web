@@ -15,15 +15,19 @@ const timeDisplay = document.getElementById("time-display");
 // --------------------
 const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
-let columns, drops;
 const fontSize = 16;
+let columns = 0;
+let drops = [];
 let animationRunning = false;
-let animationFrame;
+let animationFrameId = null;
 
 function resizeCanvas() {
   const container = document.querySelector(".player-container");
+  if (!container) return;
+
   canvas.width = container.clientWidth;
   canvas.height = container.clientHeight;
+
   columns = Math.floor(canvas.width / fontSize);
   drops = Array(columns).fill(1);
 }
@@ -32,15 +36,18 @@ window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 // --------------------
-// MATRIX AZUL PLATA
+// MATRIX AZUL / PLATA
 // --------------------
-const chars = "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split("");
+const chars =
+  "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split(
+    ""
+  );
 
 function drawMatrix() {
   ctx.fillStyle = "rgba(0,0,0,0.08)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.font = fontSize + "px monospace";
+  ctx.font = `${fontSize}px monospace`;
 
   for (let i = 0; i < drops.length; i++) {
     const text = chars[Math.floor(Math.random() * chars.length)];
@@ -50,11 +57,13 @@ function drawMatrix() {
     ctx.fillStyle = "rgba(150,220,255,1)";
     ctx.fillText(text, x, y);
 
-    if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    if (y > canvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
+    }
     drops[i]++;
   }
 
-  animationFrame = requestAnimationFrame(drawMatrix);
+  animationFrameId = requestAnimationFrame(drawMatrix);
 }
 
 function startMatrix() {
@@ -66,7 +75,10 @@ function startMatrix() {
 
 function stopMatrix() {
   animationRunning = false;
-  cancelAnimationFrame(animationFrame);
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+  }
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -80,11 +92,11 @@ playPauseBtn.addEventListener("click", async () => {
     await audio.play();
 
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    document.querySelector(".overlay").style.background = "rgba(0,0,0,0.1)";
+    document.querySelector(".overlay").style.background =
+      "rgba(0,0,0,0.1)";
     startMatrix();
-
   } catch (err) {
-    console.error("No se pudo reproducir el stream:", err);
+    console.error("Error al reproducir el stream:", err);
     alert("Da clic nuevamente para activar el audio");
   }
 });
@@ -104,13 +116,14 @@ muteBtn.addEventListener("click", () => {
 });
 
 // --------------------
-// PROGRESO (LIMITADO EN STREAM)
+// TIEMPO (STREAM)
 // --------------------
 audio.addEventListener("timeupdate", () => {
   if (isFinite(audio.currentTime)) {
     const mins = Math.floor(audio.currentTime / 60);
     const secs = Math.floor(audio.currentTime % 60);
-    timeDisplay.textContent =
-      `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    timeDisplay.textContent = `${mins
+      .toString()
+      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   }
 });

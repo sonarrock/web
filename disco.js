@@ -8,7 +8,7 @@ const discoProgressContainer = document.getElementById("disco-progress-container
 const cover = document.getElementById("cover");
 const trackTitle = document.getElementById("track-title");
 
-trackTitle.textContent = "Fleetwood Mac – Gold Dust Woman";
+trackTitle.textContent = "Fleetwood Mac – Rumours";
 
 cover.src =
   "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" + Date.now();

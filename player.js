@@ -120,10 +120,18 @@ function stopMatrix() {
 async function playStream() {
   try {
     audio.muted = false;
-    await audio.play();
+    audio.volume = audio.volume || 1;
+
+    await audio.play(); // 👈 ACTIVACIÓN CLAVE
 
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     document.body.classList.add("playing");
+    startMatrix();
+  } catch (err) {
+    console.warn("Bloqueo de audio, reintentando...");
+  }
+}
+
 
     // 🔥 MATRIX + VU
     startMatrix();

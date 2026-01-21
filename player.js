@@ -124,7 +124,12 @@ async function playStream() {
 
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     document.body.classList.add("playing");
+
+    // 🔥 MATRIX + VU
     startMatrix();
+    vuActive = true;
+    animateVU();
+
   } catch (err) {
     console.warn("Bloqueo de audio, reintentando...");
   }
@@ -141,7 +146,16 @@ playPauseBtn.addEventListener("click", () => {
 stopBtn.addEventListener("click", () => {
   audio.pause();
   audio.currentTime = 0;
+
+  // ⛔ MATRIX + VU
   stopMatrix();
+  vuActive = false;
+
+  vuBars.forEach(bar => {
+    bar.style.height = "20%";
+  });
+
+  document.body.classList.remove("playing");
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
 });
 
@@ -151,6 +165,7 @@ muteBtn.addEventListener("click", () => {
     ? '<i class="fas fa-volume-mute"></i>'
     : '<i class="fas fa-volume-up"></i>';
 });
+
 
 // ===============================
 // TIEMPO (STREAM)

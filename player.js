@@ -250,46 +250,46 @@ setInterval(checkLiveStatus, 20000);
 
 
 // ===============================
-// VOLUMEN TÁCTIL
+// VOLUMEN UNIVERSAL (MOUSE + TOUCH)
 // ===============================
 const volumeBar = document.getElementById("volume-bar");
 const volumeLevel = document.getElementById("volume-level");
+
+let isDraggingVolume = false;
 
 // volumen inicial
 audio.volume = 1;
 volumeLevel.style.width = "100%";
 
-function setVolume(clientX) {
+function updateVolume(clientX) {
   const rect = volumeBar.getBoundingClientRect();
   let percent = (clientX - rect.left) / rect.width;
+
   percent = Math.max(0, Math.min(1, percent));
 
   audio.volume = percent;
   volumeLevel.style.width = `${percent * 100}%`;
 }
 
-// mouse
-volumeBar.addEventListener("mousedown", (e) => {
-  setVolume(e.clientX);
-  document.addEventListener("mousemove", move);
-  document.addEventListener("mouseup", stop);
+// pointer down
+volumeBar.addEventListener("pointerdown", (e) => {
+  isDraggingVolume = true;
+  volumeBar.setPointerCapture(e.pointerId);
+
+  updateVolume(e.clientX);
 });
 
-function move(e) {
-  setVolume(e.clientX);
-}
-
-function stop() {
-  document.removeEventListener("mousemove", move);
-  document.removeEventListener("mouseup", stop);
-}
-
-// touch (mobile)
-volumeBar.addEventListener("touchstart", (e) => {
-  setVolume(e.touches[0].clientX);
+// pointer move
+volumeBar.addEventListener("pointermove", (e) => {
+  if (!isDraggingVolume) return;
+  updateVolume(e.clientX);
 });
 
-volumeBar.addEventListener("touchmove", (e) => {
-  setVolume(e.touches[0].clientX);
+// pointer up / cancel
+volumeBar.addEventListener("pointerup", () => {
+  isDraggingVolume = false;
 });
 
+volumeBar.addEventListener("pointercancel", () => {
+  isDraggingVolume = false;
+});

@@ -19,6 +19,7 @@
 }
 
 /* =========================
+ /* =========================
    VOLUMEN TÁCTIL
    ========================= */
 .volume-wrapper {
@@ -32,6 +33,7 @@
   font-size: 14px;
 }
 
+/* Barra */
 .volume-bar {
   position: relative;
   flex: 1;
@@ -39,23 +41,31 @@
   background: rgba(255,255,255,0.25);
   border-radius: 6px;
   cursor: pointer;
+
+  /* CLAVES para touch + mouse */
   touch-action: none;
+  user-select: none;
 }
 
+/* Nivel */
 .volume-level {
   position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
+  inset: 0;
   width: 100%;
+
   background: linear-gradient(
     to right,
     #4fd1ff,
     #9be7ff
   );
+
   border-radius: 6px;
   box-shadow: 0 0 10px rgba(120,220,255,0.8);
+
+  /* NO bloquea eventos */
+  pointer-events: none;
 }
+
 
 
 /* =========================

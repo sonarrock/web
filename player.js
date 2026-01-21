@@ -1,18 +1,22 @@
 // ===============================
-// SONAR ROCK PLAYER — CLEAN & iOS SAFE
+// SONAR ROCK PLAYER 
 // ===============================
 
+// ELEMENTOS
 const audio = document.getElementById("radio-audio");
 const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
 const timeDisplay = document.getElementById("time-display");
+const canvas = document.getElementById("matrixCanvas");
+const ctx = canvas.getContext("2d");
 
+// CONFIG AUDIO iOS
 audio.playsInline = true;
 audio.preload = "none";
 
 // ===============================
-// iOS AUDIO UNLOCK
+// iOS AUDIO UNLOCK (1 SOLO GESTO)
 // ===============================
 let audioUnlocked = false;
 
@@ -20,26 +24,29 @@ function unlockIOSAudio() {
   if (audioUnlocked) return;
 
   audio.muted = true;
-  audio.play().then(() => {
-    audio.pause();
-    audio.muted = false;
-    audioUnlocked = true;
-  }).catch(() => {});
+  audio.play()
+    .then(() => {
+      audio.pause();
+      audio.muted = false;
+      audioUnlocked = true;
+      console.log("🔓 iOS audio unlocked");
+    })
+    .catch(() => {});
 }
 
 document.addEventListener("touchstart", unlockIOSAudio, { once: true });
 document.addEventListener("click", unlockIOSAudio, { once: true });
 
 // ===============================
-// MATRIX
+// MATRIX EFFECT (LLUVIA REAL)
 // ===============================
-const canvas = document.getElementById("matrixCanvas");
-const ctx = canvas.getContext("2d");
 const fontSize = 16;
-
 let drops = [];
 let matrixRunning = false;
 let matrixFrame;
+
+const chars =
+  "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split("");
 
 function resizeCanvas() {
   const container = document.querySelector(".player-container");
@@ -49,13 +56,14 @@ function resizeCanvas() {
   canvas.height = container.clientHeight;
 
   const columns = Math.floor(canvas.width / fontSize);
-  drops = Array(columns).fill(1);
+  drops = Array.from(
+    { length: columns },
+    () => Math.floor(Math.random() * canvas.height / fontSize)
+  );
 }
 
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
-
-const chars = "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split("");
 
 function drawMatrix() {
   if (!matrixRunning) return;
@@ -63,17 +71,25 @@ function drawMatrix() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = `${fontSize}px monospace`;
 
-  drops.forEach((y, i) => {
+  for (let i = 0; i < drops.length; i++) {
     const char = chars[Math.floor(Math.random() * chars.length)];
     const x = i * fontSize;
+    const y = drops[i] * fontSize;
 
     ctx.shadowColor = "rgba(120,220,255,1)";
     ctx.shadowBlur = 16;
     ctx.fillStyle = "rgba(200,245,255,1)";
     ctx.fillText(char, x, y);
 
-    drops[i] = y > canvas.height ? 0 : y + 1.2;
-  });
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "rgba(120,200,255,0.35)";
+    ctx.fillText(char, x, y - fontSize);
+
+    if (y > canvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
+    }
+    drops[i]++;
+  }
 
   matrixFrame = requestAnimationFrame(drawMatrix);
 }
@@ -91,7 +107,7 @@ function stopMatrix() {
 }
 
 // ===============================
-// VU METER FAKE
+// VU METER FAKE (AZUL)
 // ===============================
 const vuBars = document.querySelectorAll(".vu-meter span");
 let vuActive = false;
@@ -103,7 +119,8 @@ function animateVU() {
 
   vuBars.forEach((bar, i) => {
     const target = Math.random() * 0.8 + 0.2;
-    vuLevels[i] += (target - vuLevels[i]) * 0.3;
+    vuLevels[i] += (target - vuLevels[i]) * 0.25;
+    vuLevels[i] = Math.max(0.15, vuLevels[i]);
     bar.style.height = `${vuLevels[i] * 100}%`;
   });
 
@@ -123,22 +140,24 @@ function stopVU() {
 }
 
 // ===============================
-// TIMER FAKE STREAM
+// TIMER FAKE (STREAM EN VIVO)
 // ===============================
+let playStartTime = null;
 let timerInterval = null;
-let playStartTime = 0;
 
 function startFakeTimer() {
-  stopFakeTimer();
-  playStartTime = Date.now();
+  if (timerInterval) return;
 
+  playStartTime = Date.now();
   timerInterval = setInterval(() => {
     const elapsed = Math.floor((Date.now() - playStartTime) / 1000);
     const mins = Math.floor(elapsed / 60);
     const secs = elapsed % 60;
 
     timeDisplay.textContent =
-      `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+      `${mins.toString().padStart(2, "0")}:${secs
+        .toString()
+        .padStart(2, "0")}`;
   }, 1000);
 }
 
@@ -149,19 +168,23 @@ function stopFakeTimer() {
 }
 
 // ===============================
-// CONTROLES STREAM
+// CONTROLES STREAM (ESTABLE)
 // ===============================
-playPauseBtn.addEventListener("click", () => {
+playPauseBtn.addEventListener("click", async () => {
   if (audio.paused) {
-    audio.muted = false;
-    audio.play();
+    try {
+      audio.muted = false;
+      await audio.play();
 
-    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    document.body.classList.add("playing");
+      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+      document.body.classList.add("playing");
 
-    startMatrix();
-    startVU();
-    startFakeTimer();
+      startMatrix();
+      startVU();
+      startFakeTimer();
+    } catch (e) {
+      console.warn("Bloqueo de reproducción");
+    }
   } else {
     audio.pause();
   }
@@ -185,6 +208,9 @@ muteBtn.addEventListener("click", () => {
     : '<i class="fas fa-volume-up"></i>';
 });
 
+// ===============================
+// PROTECCIÓN GLOBAL
+// ===============================
 audio.addEventListener("pause", () => {
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
   document.body.classList.remove("playing");

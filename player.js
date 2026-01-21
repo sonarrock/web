@@ -1,20 +1,3 @@
-let audioUnlocked = false;
-
-function unlockAudio() {
-  if (audioUnlocked) return;
-
-  audio.muted = true;
-  audio.play().then(() => {
-    audio.pause();
-    audio.muted = false;
-    audioUnlocked = true;
-    console.log("Audio desbloqueado");
-  }).catch(() => {});
-}
-
-document.addEventListener("click", unlockAudio, { once: true });
-
-
 // ===============================
 // SONAR ROCK PLAYER + MATRIX
 // ===============================
@@ -27,127 +10,107 @@ const progress = document.getElementById("radio-progress");
 const progressContainer = document.getElementById("radio-progress-container");
 const timeDisplay = document.getElementById("time-display");
 
-// Canvas Matrix dentro de la imagen
+// --------------------
+// CANVAS MATRIX
+// --------------------
 const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
-let columns, drops, fontSize = 16;
+let columns, drops;
+const fontSize = 16;
 let animationRunning = false;
 let animationFrame;
 
-// --------------------
-// RESIZE CANVAS AL CONTENEDOR
-// --------------------
-function resizeCanvas(){
-    const container = document.querySelector(".player-container");
-    canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
-    columns = Math.floor(canvas.width / fontSize);
-    drops = Array(columns).fill(1);
+function resizeCanvas() {
+  const container = document.querySelector(".player-container");
+  canvas.width = container.clientWidth;
+  canvas.height = container.clientHeight;
+  columns = Math.floor(canvas.width / fontSize);
+  drops = Array(columns).fill(1);
 }
+
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 // --------------------
-// MATRIX AZUL-PLATEADO
+// MATRIX AZUL PLATA
 // --------------------
-const chars = "アァイィウヴエェオカガキギクグケゲコゴabcdefghijklmnopqrstuvwxyz0123456789".split("");
+const chars = "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split("");
 
-function drawMatrix(){
-    // Fondo semitransparente ligero
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = "rgba(0,0,0,0.1)"; // overlay muy ligero
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+function drawMatrix() {
+  ctx.fillStyle = "rgba(0,0,0,0.08)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.font = fontSize + "px monospace";
-    for(let i=0;i<drops.length;i++){
-        const text = chars[Math.floor(Math.random()*chars.length)];
-        const x = i * fontSize;
-        const y = drops[i] * fontSize;
+  ctx.font = fontSize + "px monospace";
 
-        ctx.fillStyle = "rgba(150,220,255,1)";
-        ctx.fillText(text,x,y);
-        ctx.fillStyle = "rgba(150,220,255,0.5)";
-        ctx.fillText(text,x,y-fontSize);
+  for (let i = 0; i < drops.length; i++) {
+    const text = chars[Math.floor(Math.random() * chars.length)];
+    const x = i * fontSize;
+    const y = drops[i] * fontSize;
 
-        if(y > canvas.height && Math.random()>0.975) drops[i] = 0;
-        drops[i]++;
-    }
-    animationFrame = requestAnimationFrame(drawMatrix);
+    ctx.fillStyle = "rgba(150,220,255,1)";
+    ctx.fillText(text, x, y);
+
+    if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+
+  animationFrame = requestAnimationFrame(drawMatrix);
 }
 
-function startMatrix(){
-    if(!animationRunning){
-        animationRunning = true;
-        drawMatrix();
-    }
+function startMatrix() {
+  if (!animationRunning) {
+    animationRunning = true;
+    drawMatrix();
+  }
 }
 
-function stopMatrix(){
-    if(animationRunning){
-        cancelAnimationFrame(animationFrame);
-        animationRunning = false;
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-    }
+function stopMatrix() {
+  animationRunning = false;
+  cancelAnimationFrame(animationFrame);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 // --------------------
-// CONTROLES REPRODUCTOR
+// CONTROLES
 // --------------------
 playPauseBtn.addEventListener("click", async () => {
   try {
     audio.muted = false;
     audio.volume = 1;
-
-    await audio.play(); // 👈 ESTO ES CLAVE
+    await audio.play();
 
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    document.querySelector(".overlay").style.background = "rgba(0,0,0,0.1)";
     startMatrix();
 
   } catch (err) {
-    console.error("Chrome bloqueó el audio:", err);
-    alert("Toca de nuevo para activar el audio");
+    console.error("No se pudo reproducir el stream:", err);
+    alert("Da clic nuevamente para activar el audio");
   }
 });
 
-            // Overlay ligero al play
-            document.querySelector(".overlay").style.background = "rgba(0,0,0,0.1)";
-        }).catch(err => console.warn("Autoplay bloqueado:", err));
-    } else {
-        audio.pause();
-        playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-        stopMatrix();
-        document.querySelector(".overlay").style.background = "transparent";
-    }
-});
-
 stopBtn.addEventListener("click", () => {
-    audio.pause();
-    audio.currentTime = 0;
-    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-    stopMatrix();
-    document.querySelector(".overlay").style.background = "transparent";
+  audio.pause();
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+  document.querySelector(".overlay").style.background = "transparent";
+  stopMatrix();
 });
 
 muteBtn.addEventListener("click", () => {
-    audio.muted = !audio.muted;
-    muteBtn.innerHTML = audio.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
-    muteBtn.style.color = audio.muted ? '#ff0000' : '#ff6600';
+  audio.muted = !audio.muted;
+  muteBtn.innerHTML = audio.muted
+    ? '<i class="fas fa-volume-mute"></i>'
+    : '<i class="fas fa-volume-up"></i>';
 });
 
 // --------------------
-// PROGRESO STREAMING
+// PROGRESO (LIMITADO EN STREAM)
 // --------------------
 audio.addEventListener("timeupdate", () => {
-    if(audio.duration){
-        progress.style.width = (audio.currentTime / audio.duration * 100) + "%";
-        const hrs = Math.floor(audio.currentTime / 3600);
-        const mins = Math.floor((audio.currentTime % 3600)/60);
-        const secs = Math.floor(audio.currentTime % 60);
-        timeDisplay.textContent = `${hrs.toString().padStart(2,"0")}:${mins.toString().padStart(2,"0")}:${secs.toString().padStart(2,"0")}`;
-    }
-});
-
-progressContainer.addEventListener("click", e => {
-    const rect = progressContainer.getBoundingClientRect();
-    audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+  if (isFinite(audio.currentTime)) {
+    const mins = Math.floor(audio.currentTime / 60);
+    const secs = Math.floor(audio.currentTime % 60);
+    timeDisplay.textContent =
+      `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  }
 });

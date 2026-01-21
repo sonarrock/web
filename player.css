@@ -12,6 +12,7 @@
   position: relative;
   width: 90%;
   max-width: 650px;
+  aspect-ratio: 3 / 4; /* 👈 ESTO ES LA CLAVE */
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0,0,0,0.6);
@@ -19,11 +20,10 @@
 
 /* Imagen fondo */
 .player-bg {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top; /* 👈 prioriza rostro */
   z-index: 1;
 }
 
@@ -148,3 +148,10 @@ body.playing .player-container {
 
 /* LIVE */
 #live-indicator.
+
+@media (max-width: 768px) {
+  .player-container {
+    aspect-ratio: 2 / 3; /* más alto en móvil */
+  }
+}
+

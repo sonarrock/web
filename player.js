@@ -247,3 +247,49 @@ async function checkLiveStatus() {
 
 checkLiveStatus();
 setInterval(checkLiveStatus, 20000);
+
+
+// ===============================
+// VOLUMEN TÁCTIL
+// ===============================
+const volumeBar = document.getElementById("volume-bar");
+const volumeLevel = document.getElementById("volume-level");
+
+// volumen inicial
+audio.volume = 1;
+volumeLevel.style.width = "100%";
+
+function setVolume(clientX) {
+  const rect = volumeBar.getBoundingClientRect();
+  let percent = (clientX - rect.left) / rect.width;
+  percent = Math.max(0, Math.min(1, percent));
+
+  audio.volume = percent;
+  volumeLevel.style.width = `${percent * 100}%`;
+}
+
+// mouse
+volumeBar.addEventListener("mousedown", (e) => {
+  setVolume(e.clientX);
+  document.addEventListener("mousemove", move);
+  document.addEventListener("mouseup", stop);
+});
+
+function move(e) {
+  setVolume(e.clientX);
+}
+
+function stop() {
+  document.removeEventListener("mousemove", move);
+  document.removeEventListener("mouseup", stop);
+}
+
+// touch (mobile)
+volumeBar.addEventListener("touchstart", (e) => {
+  setVolume(e.touches[0].clientX);
+});
+
+volumeBar.addEventListener("touchmove", (e) => {
+  setVolume(e.touches[0].clientX);
+});
+

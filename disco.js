@@ -8,45 +8,49 @@ const discoProgressContainer = document.getElementById("disco-progress-container
 const cover = document.getElementById("cover");
 const trackTitle = document.getElementById("track-title");
 
-trackTitle.textContent = fileName.replace(/\.mp3$/i,'');
+trackTitle.textContent = "Fleetwood Mac – Gold Dust Woman";
 
-discoAudio.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
+cover.src =
+  "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" + Date.now();
+
+discoAudio.src =
+  "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/" + fileName;
 
 // PROGRESO
-discoAudio.addEventListener('timeupdate', ()=>{
-  if(discoAudio.duration){
-    discoProgress.style.width = (discoAudio.currentTime/discoAudio.duration)*100 + '%';
+discoAudio.addEventListener("timeupdate", () => {
+  if (discoAudio.duration) {
+    discoProgress.style.width =
+      (discoAudio.currentTime / discoAudio.duration) * 100 + "%";
   }
 });
 
-discoProgressContainer.addEventListener('click', e => {
+discoProgressContainer.addEventListener("click", e => {
   const rect = discoProgressContainer.getBoundingClientRect();
-  discoAudio.currentTime = ((e.clientX - rect.left)/rect.width)*discoAudio.duration;
+  discoAudio.currentTime =
+    ((e.clientX - rect.left) / rect.width) * discoAudio.duration;
 });
 
 // ANIMACIÓN PORTADA
 let zoomDirection = 1;
 let zoomInterval;
-discoAudio.addEventListener('play', ()=>{
-  zoomInterval = setInterval(()=>{
-    let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g,'')) || 1;
+
+discoAudio.addEventListener("play", () => {
+  zoomInterval = setInterval(() => {
+    let scale =
+      parseFloat(cover.style.transform.replace(/[^\d.]/g, "")) || 1;
     scale += 0.0015 * zoomDirection;
-    if(scale >= 1.03) zoomDirection = -1;
-    if(scale <= 0.97) zoomDirection = 1;
+    if (scale >= 1.03) zoomDirection = -1;
+    if (scale <= 0.97) zoomDirection = 1;
     cover.style.transform = `scale(${scale})`;
-    const shadowIntensity = 10 + (scale-0.97)*300;
-    cover.style.boxShadow = `0 0 ${shadowIntensity}px rgba(255,102,0,0.6)`;
+    cover.style.boxShadow = `0 0 18px rgba(255,102,0,0.6)`;
   }, 20);
 });
 
-discoAudio.addEventListener('pause', ()=>{
-  clearInterval(zoomInterval);
-  cover.style.transform='scale(1)';
-  cover.style.boxShadow='none';
-});
+discoAudio.addEventListener("pause", resetCover);
+discoAudio.addEventListener("ended", resetCover);
 
-discoAudio.addEventListener('ended', ()=>{
+function resetCover() {
   clearInterval(zoomInterval);
-  cover.style.transform='scale(1)';
-  cover.style.boxShadow='none';
-});
+  cover.style.transform = "scale(1)";
+  cover.style.boxShadow = "none";
+}

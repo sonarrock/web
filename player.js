@@ -1,14 +1,15 @@
 // ===============================
-// SONAR ROCK PLAYER + MATRIX (iOS FIX FINAL)
+// SONAR ROCK PLAYER — CLEAN & iOS SAFE
 // ===============================
 
 const audio = document.getElementById("radio-audio");
 const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
+const timeDisplay = document.getElementById("time-display");
 
 // ===============================
-// DESBLOQUEO iOS (CORRECTO)
+// iOS AUDIO UNLOCK
 // ===============================
 let audioUnlocked = false;
 
@@ -16,12 +17,14 @@ function unlockIOSAudio() {
   if (audioUnlocked) return;
 
   audio.muted = true;
-  audio.play().then(() => {
-    audio.pause();
-    audio.muted = false;
-    audioUnlocked = true;
-    console.log("🔓 iOS Audio Unlocked");
-  }).catch(() => {});
+  audio.play()
+    .then(() => {
+      audio.pause();
+      audio.muted = false;
+      audioUnlocked = true;
+      console.log("🔓 iOS audio unlocked");
+    })
+    .catch(() => {});
 }
 
 document.addEventListener("touchstart", unlockIOSAudio, { once: true });
@@ -33,11 +36,10 @@ document.addEventListener("click", unlockIOSAudio, { once: true });
 const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
 const fontSize = 16;
-
 let columns = 0;
 let drops = [];
-let animationRunning = false;
-let animationFrameId = null;
+let matrixRunning = false;
+let matrixFrame;
 
 function resizeCanvas() {
   const container = document.querySelector(".player-container");
@@ -48,62 +50,119 @@ function resizeCanvas() {
   columns = Math.floor(canvas.width / fontSize);
   drops = Array(columns).fill(1);
 }
-
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-const chars =
-  "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split("");
+const chars = "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split("");
 
 function drawMatrix() {
+  if (!matrixRunning) return;
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = `${fontSize}px monospace`;
 
   for (let i = 0; i < drops.length; i++) {
-    const text = chars[Math.floor(Math.random() * chars.length)];
+    const char = chars[Math.floor(Math.random() * chars.length)];
     const x = i * fontSize;
     const y = drops[i] * fontSize;
 
     ctx.shadowColor = "rgba(120,220,255,1)";
     ctx.shadowBlur = 16;
     ctx.fillStyle = "rgba(200,245,255,1)";
-    ctx.fillText(text, x, y);
+    ctx.fillText(char, x, y);
 
     ctx.shadowBlur = 0;
     ctx.fillStyle = "rgba(120,200,255,0.35)";
-    ctx.fillText(text, x, y - fontSize);
+    ctx.fillText(char, x, y - fontSize);
 
     if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
     drops[i]++;
   }
 
-  animationFrameId = requestAnimationFrame(drawMatrix);
+  matrixFrame = requestAnimationFrame(drawMatrix);
 }
 
 function startMatrix() {
-  if (!animationRunning) {
-    animationRunning = true;
-    drawMatrix();
-  }
+  if (matrixRunning) return;
+  matrixRunning = true;
+  drawMatrix();
 }
 
 function stopMatrix() {
-  animationRunning = false;
-  cancelAnimationFrame(animationFrameId);
+  matrixRunning = false;
+  cancelAnimationFrame(matrixFrame);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 // ===============================
-// CONTROLES STREAM (100% iOS SAFE)
+// VU METER FAKE (ESTABLE)
+// ===============================
+const vuBars = document.querySelectorAll(".vu-meter span");
+let vuActive = false;
+let vuFrame;
+
+function animateVU() {
+  if (!vuActive) return;
+
+  vuBars.forEach(bar => {
+    const level = Math.random() * 0.8 + 0.2;
+    bar.style.height = `${level * 100}%`;
+  });
+
+  vuFrame = requestAnimationFrame(animateVU);
+}
+
+function startVU() {
+  if (vuActive) return;
+  vuActive = true;
+  animateVU();
+}
+
+function stopVU() {
+  vuActive = false;
+  cancelAnimationFrame(vuFrame);
+  vuBars.forEach(bar => bar.style.height = "20%");
+}
+
+// ===============================
+// TIEMPO FAKE (DESDE PLAY)
+// ===============================
+let playSeconds = 0;
+let timeTimer = null;
+
+function startTimer() {
+  stopTimer();
+  playSeconds = 0;
+  timeDisplay.textContent = "00:00";
+
+  timeTimer = setInterval(() => {
+    playSeconds++;
+    const m = Math.floor(playSeconds / 60);
+    const s = playSeconds % 60;
+    timeDisplay.textContent =
+      `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timeTimer);
+  timeTimer = null;
+}
+
+// ===============================
+// CONTROLES STREAM (iOS SAFE)
 // ===============================
 playPauseBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.muted = false;
-    audio.play(); // 👈 SOLO AQUÍ SE REPRODUCE
+    audio.play();
 
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     document.body.classList.add("playing");
+
     startMatrix();
+    startVU();
+    startTimer();
   } else {
     audio.pause();
   }
@@ -111,9 +170,15 @@ playPauseBtn.addEventListener("click", () => {
 
 stopBtn.addEventListener("click", () => {
   audio.pause();
+  audio.currentTime = 0;
+
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
   document.body.classList.remove("playing");
+
   stopMatrix();
+  stopVU();
+  stopTimer();
+  timeDisplay.textContent = "00:00";
 });
 
 muteBtn.addEventListener("click", () => {
@@ -124,10 +189,12 @@ muteBtn.addEventListener("click", () => {
 });
 
 // ===============================
-// PROTECCIÓN iOS
+// PROTECCIÓN GLOBAL
 // ===============================
 audio.addEventListener("pause", () => {
-  stopMatrix();
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
   document.body.classList.remove("playing");
+  stopMatrix();
+  stopVU();
+  stopTimer();
 });

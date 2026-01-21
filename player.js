@@ -19,7 +19,9 @@ let bufferLength;
 let audioReady = false;
 
 function initAudioAnalyser() {
-  if (audioReady) return;
+  if (audioCtx && audioCtx.state === "suspended") {
+  audioCtx.resume();
+}
 
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioCtx.createAnalyser();

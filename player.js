@@ -1,4 +1,25 @@
 // ===============================
+// DESBLOQUEO iOS AUDIO (OBLIGATORIO)
+// ===============================
+let audioUnlocked = false;
+
+function unlockIOSAudio() {
+  if (audioUnlocked) return;
+
+  audio.muted = true;
+  audio.play().then(() => {
+    audio.pause();
+    audio.muted = false;
+    audioUnlocked = true;
+    console.log("🔓 Audio desbloqueado iOS");
+  }).catch(() => {});
+}
+
+document.addEventListener("touchstart", unlockIOSAudio, { once: true });
+document.addEventListener("click", unlockIOSAudio, { once: true });
+
+
+// ===============================
 // SONAR ROCK PLAYER + MATRIX PRO
 // ===============================
 

@@ -1,4 +1,35 @@
 // ===============================
+// TIMER FAKE PARA STREAM EN VIVO
+// ===============================
+let playStartTime = null;
+let timerInterval = null;
+
+function startFakeTimer() {
+  if (timerInterval) return;
+
+  playStartTime = Date.now();
+
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - playStartTime) / 1000);
+    const mins = Math.floor(elapsed / 60);
+    const secs = elapsed % 60;
+
+    timeDisplay.textContent =
+      `${mins.toString().padStart(2, "0")}:${secs
+        .toString()
+        .padStart(2, "0")}`;
+  }, 1000);
+}
+
+function stopFakeTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timeDisplay.textContent = "00:00";
+}
+
+
+
+// ===============================
 // SONAR ROCK PLAYER — CLEAN & iOS SAFE
 // ===============================
 
@@ -7,6 +38,10 @@ const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
 const timeDisplay = document.getElementById("time-display");
+
+audio.playsInline = true;
+audio.preload = "none";
+
 
 // ===============================
 // iOS AUDIO UNLOCK
@@ -153,27 +188,33 @@ function stopVU() {
 // ===============================
 // TIEMPO FAKE (DESDE PLAY)
 // ===============================
-let playSeconds = 0;
-let timeTimer = null;
+// ===============================
+// TIMER FAKE PARA STREAM EN VIVO
+// ===============================
+let playStartTime = null;
+let timerInterval = null;
 
-function startTimer() {
-  stopTimer();
-  playSeconds = 0;
-  timeDisplay.textContent = "00:00";
+function startFakeTimer() {
+  playStartTime = Date.now();
 
-  timeTimer = setInterval(() => {
-    playSeconds++;
-    const m = Math.floor(playSeconds / 60);
-    const s = playSeconds % 60;
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - playStartTime) / 1000);
+    const mins = Math.floor(elapsed / 60);
+    const secs = elapsed % 60;
+
     timeDisplay.textContent =
-      `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+      `${mins.toString().padStart(2, "0")}:${secs
+        .toString()
+        .padStart(2, "0")}`;
   }, 1000);
 }
 
-function stopTimer() {
-  clearInterval(timeTimer);
-  timeTimer = null;
+function stopFakeTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timeDisplay.textContent = "00:00";
 }
+
 
 // ===============================
 // CONTROLES STREAM (iOS SAFE)
@@ -181,7 +222,66 @@ function stopTimer() {
 playPauseBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.muted = false;
-    audio.play();
+    audio.play(); // iOS-safe (gesto directo)
+
+    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    document.body.classList.add("playing");
+
+    startMatrix();
+    startVU();
+    startFakeTimer();
+
+  } else {
+    audio.pause();
+  }
+});
+
+stopBtn.addEventListener("click", () => {
+  audio.pause();
+
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+  document.body.classList.remove("playing");
+
+  stopMatrix();
+  stopVU();
+  stopFakeTimer();
+});
+
+muteBtn.addEventListener("click", () => {
+  audio.muted = !audio.muted;
+  muteBtn.innerHTML = audio.muted
+    ? '<i class="fas fa-volume-mute"></i>'
+    : '<i class="fas fa-volume-up"></i>';
+});
+
+
+ // ===============================
+// TIMER FAKE PARA STREAM EN VIVO
+// ===============================
+let playStartTime = null;
+let timerInterval = null;
+
+function startFakeTimer() {
+  playStartTime = Date.now();
+
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - playStartTime) / 1000);
+    const mins = Math.floor(elapsed / 60);
+    const secs = elapsed % 60;
+
+    timeDisplay.textContent =
+      `${mins.toString().padStart(2, "0")}:${secs
+        .toString()
+        .padStart(2, "0")}`;
+  }, 1000);
+}
+
+function stopFakeTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timeDisplay.textContent = "00:00";
+}
+
 
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     document.body.classList.add("playing");

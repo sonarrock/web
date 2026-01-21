@@ -21,11 +21,55 @@
 /* Imagen fondo */
 .player-bg {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top; /* 👈 prioriza rostro */
+  height: 75%;              /* 👈 25% más pequeña */
+  object-fit: cover;        /* recorta abajo */
+  object-position: center top; /* mantiene rostro visible */
+  display: block;
+}
+
+/* Asegura capas correctas */
+.player-bg {
   z-index: 1;
 }
+
+#matrixCanvas {
+  z-index: 2;
+}
+
+.overlay {
+  z-index: 3;
+}
+
+.player-content {
+  position: absolute;
+  z-index: 4; /* 👈 CONTROLES SIEMPRE VISIBLES */
+}
+.player-bg {
+  width: 100%;
+  height: 75%;              /* 👈 25% más pequeña */
+  object-fit: cover;        /* recorta abajo */
+  object-position: center top; /* mantiene rostro visible */
+  display: block;
+}
+
+/* Asegura capas correctas */
+.player-bg {
+  z-index: 1;
+}
+
+#matrixCanvas {
+  z-index: 2;
+}
+
+.overlay {
+  z-index: 3;
+}
+
+.player-content {
+  position: absolute;
+  z-index: 4; /* 👈 CONTROLES SIEMPRE VISIBLES */
+}
+
 
 /* Overlay (oscurece SOLO fondo + matrix) */
 .overlay {

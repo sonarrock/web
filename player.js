@@ -236,5 +236,27 @@ async function checkLiveStatus() {
 
     const isLive =
       title.includes("LIVE") ||
-      title.includes("
+      title.includes("EN VIVO") ||
+      title.includes("🔴");
 
+    if (isLive) {
+      liveIndicator.classList.add("live");
+      liveIndicator.classList.remove("auto");
+      liveText.textContent = "EN VIVO";
+      document.body.classList.add("live");
+    } else {
+      liveIndicator.classList.add("auto");
+      liveIndicator.classList.remove("live");
+      liveText.textContent = "PROGRAMACIÓN";
+      document.body.classList.remove("live");
+    }
+  } catch (e) {
+    console.warn("Metadata no disponible");
+  }
+}
+
+// primera verificación
+checkLiveStatus();
+
+// refresco cada 20s
+setInterval(checkLiveStatus, 20000);

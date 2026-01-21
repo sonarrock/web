@@ -216,31 +216,25 @@ body.playing .controls .btn {
 
 
 /* =========================
-   VU METER FAKE
+   VU METER AZUL
    ========================= */
 .vu-meter {
   display: flex;
+  gap: 3px;
+  height: 30px;
   align-items: flex-end;
-  gap: 4px;
-  height: 28px;
-  width: 100%;
-  max-width: 220px;
 }
 
 .vu-meter span {
-  flex: 1;
+  width: 4px;
   height: 20%;
   background: linear-gradient(
     to top,
-    #ff6600,
-    #ffd27d
+    #4fd1ff,
+    #9be7ff
   );
+  box-shadow: 0 0 8px rgba(120,220,255,0.9);
   border-radius: 2px;
-  opacity: 0.85;
-  transition: height 0.12s linear;
+  transition: height 0.1s linear;
 }
 
-/* brillo cuando está en play */
-body.playing .vu-meter span {
-  box-shadow: 0 0 10px rgba(255,160,60,0.8);
-}

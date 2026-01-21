@@ -153,6 +153,7 @@ function stopVU() {
 }
 
 // ===============================
+// ===============================
 // CONTROLES STREAM — 1 CLICK REAL
 // ===============================
 let isPlaying = false;
@@ -191,6 +192,7 @@ muteBtn.addEventListener("click", () => {
     ? '<i class="fas fa-volume-mute"></i>'
     : '<i class="fas fa-volume-up"></i>';
 });
+
 
 /* ===============================
    PROTECCIÓN GLOBAL

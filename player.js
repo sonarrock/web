@@ -1,3 +1,20 @@
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+
+  audio.muted = true;
+  audio.play().then(() => {
+    audio.pause();
+    audio.muted = false;
+    audioUnlocked = true;
+    console.log("Audio desbloqueado");
+  }).catch(() => {});
+}
+
+document.addEventListener("click", unlockAudio, { once: true });
+
+
 // ===============================
 // SONAR ROCK PLAYER + MATRIX
 // ===============================

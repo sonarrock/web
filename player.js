@@ -1,35 +1,4 @@
 // ===============================
-// TIMER FAKE PARA STREAM EN VIVO
-// ===============================
-let playStartTime = null;
-let timerInterval = null;
-
-function startFakeTimer() {
-  if (timerInterval) return;
-
-  playStartTime = Date.now();
-
-  timerInterval = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - playStartTime) / 1000);
-    const mins = Math.floor(elapsed / 60);
-    const secs = elapsed % 60;
-
-    timeDisplay.textContent =
-      `${mins.toString().padStart(2, "0")}:${secs
-        .toString()
-        .padStart(2, "0")}`;
-  }, 1000);
-}
-
-function stopFakeTimer() {
-  clearInterval(timerInterval);
-  timerInterval = null;
-  timeDisplay.textContent = "00:00";
-}
-
-
-
-// ===============================
 // SONAR ROCK PLAYER — CLEAN & iOS SAFE
 // ===============================
 
@@ -42,7 +11,6 @@ const timeDisplay = document.getElementById("time-display");
 audio.playsInline = true;
 audio.preload = "none";
 
-
 // ===============================
 // iOS AUDIO UNLOCK
 // ===============================
@@ -52,14 +20,11 @@ function unlockIOSAudio() {
   if (audioUnlocked) return;
 
   audio.muted = true;
-  audio.play()
-    .then(() => {
-      audio.pause();
-      audio.muted = false;
-      audioUnlocked = true;
-      console.log("🔓 iOS audio unlocked");
-    })
-    .catch(() => {});
+  audio.play().then(() => {
+    audio.pause();
+    audio.muted = false;
+    audioUnlocked = true;
+  }).catch(() => {});
 }
 
 document.addEventListener("touchstart", unlockIOSAudio, { once: true });
@@ -71,7 +36,7 @@ document.addEventListener("click", unlockIOSAudio, { once: true });
 const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
 const fontSize = 16;
-let columns = 0;
+
 let drops = [];
 let matrixRunning = false;
 let matrixFrame;
@@ -82,9 +47,11 @@ function resizeCanvas() {
 
   canvas.width = container.clientWidth;
   canvas.height = container.clientHeight;
-  columns = Math.floor(canvas.width / fontSize);
+
+  const columns = Math.floor(canvas.width / fontSize);
   drops = Array(columns).fill(1);
 }
+
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
@@ -96,24 +63,17 @@ function drawMatrix() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = `${fontSize}px monospace`;
 
-  for (let i = 0; i < drops.length; i++) {
+  drops.forEach((y, i) => {
     const char = chars[Math.floor(Math.random() * chars.length)];
     const x = i * fontSize;
-    const y = drops[i] * fontSize;
 
     ctx.shadowColor = "rgba(120,220,255,1)";
     ctx.shadowBlur = 16;
     ctx.fillStyle = "rgba(200,245,255,1)";
     ctx.fillText(char, x, y);
 
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = "rgba(120,200,255,0.35)";
-    ctx.fillText(char, x, y - fontSize);
-
-    if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
-    drops[i] += matrixRunning ? 1.2 : 0.5;
-
-  }
+    drops[i] = y > canvas.height ? 0 : y + 1.2;
+  });
 
   matrixFrame = requestAnimationFrame(drawMatrix);
 }
@@ -131,25 +91,7 @@ function stopMatrix() {
 }
 
 // ===============================
-// REACCIÓN AL ESTADO DEL STREAM
-// ===============================
-audio.addEventListener("playing", () => {
-  startMatrix();
-  startVU();
-});
-
-audio.addEventListener("waiting", () => {
-  // buffer: matrix más lenta + VU más bajo
-  vuLevels = vuLevels.map(() => 0.25);
-});
-
-audio.addEventListener("pause", () => {
-  stopMatrix();
-  stopVU();
-});
-
-// ===============================
-// VU METER ANALÓGICO (FAKE PRO)
+// VU METER FAKE
 // ===============================
 const vuBars = document.querySelectorAll(".vu-meter span");
 let vuActive = false;
@@ -160,13 +102,8 @@ function animateVU() {
   if (!vuActive) return;
 
   vuBars.forEach((bar, i) => {
-    // subida rápida
     const target = Math.random() * 0.8 + 0.2;
-
-    // caída lenta tipo analógico
-    vuLevels[i] += (target - vuLevels[i]) * 0.25;
-    vuLevels[i] = Math.max(0.15, vuLevels[i]);
-
+    vuLevels[i] += (target - vuLevels[i]) * 0.3;
     bar.style.height = `${vuLevels[i] * 100}%`;
   });
 
@@ -186,15 +123,13 @@ function stopVU() {
 }
 
 // ===============================
-// TIEMPO FAKE (DESDE PLAY)
+// TIMER FAKE STREAM
 // ===============================
-// ===============================
-// TIMER FAKE PARA STREAM EN VIVO
-// ===============================
-let playStartTime = null;
 let timerInterval = null;
+let playStartTime = 0;
 
 function startFakeTimer() {
+  stopFakeTimer();
   playStartTime = Date.now();
 
   timerInterval = setInterval(() => {
@@ -203,9 +138,7 @@ function startFakeTimer() {
     const secs = elapsed % 60;
 
     timeDisplay.textContent =
-      `${mins.toString().padStart(2, "0")}:${secs
-        .toString()
-        .padStart(2, "0")}`;
+      `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   }, 1000);
 }
 
@@ -215,21 +148,20 @@ function stopFakeTimer() {
   timeDisplay.textContent = "00:00";
 }
 
-
 // ===============================
-// CONTROLES STREAM (iOS SAFE)
+// CONTROLES STREAM
 // ===============================
 playPauseBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.muted = false;
-    audio.play(); // iOS-safe
+    audio.play();
 
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     document.body.classList.add("playing");
 
     startMatrix();
+    startVU();
     startFakeTimer();
-
   } else {
     audio.pause();
   }
@@ -242,6 +174,7 @@ stopBtn.addEventListener("click", () => {
   document.body.classList.remove("playing");
 
   stopMatrix();
+  stopVU();
   stopFakeTimer();
 });
 
@@ -252,72 +185,10 @@ muteBtn.addEventListener("click", () => {
     : '<i class="fas fa-volume-up"></i>';
 });
 
- // ===============================
-// TIMER FAKE PARA STREAM EN VIVO
-// ===============================
-let playStartTime = null;
-let timerInterval = null;
-
-function startFakeTimer() {
-  playStartTime = Date.now();
-
-  timerInterval = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - playStartTime) / 1000);
-    const mins = Math.floor(elapsed / 60);
-    const secs = elapsed % 60;
-
-    timeDisplay.textContent =
-      `${mins.toString().padStart(2, "0")}:${secs
-        .toString()
-        .padStart(2, "0")}`;
-  }, 1000);
-}
-
-function stopFakeTimer() {
-  clearInterval(timerInterval);
-  timerInterval = null;
-  timeDisplay.textContent = "00:00";
-}
-
-
-    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    document.body.classList.add("playing");
-
-    startMatrix();
-    startVU();
-    startTimer();
-  } else {
-    audio.pause();
-  }
-});
-
-stopBtn.addEventListener("click", () => {
-  audio.pause();
-  audio.currentTime = 0;
-
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  document.body.classList.remove("playing");
-
-  stopMatrix();
-  stopVU();
-  stopTimer();
-  timeDisplay.textContent = "00:00";
-});
-
-muteBtn.addEventListener("click", () => {
-  audio.muted = !audio.muted;
-  muteBtn.innerHTML = audio.muted
-    ? '<i class="fas fa-volume-mute"></i>'
-    : '<i class="fas fa-volume-up"></i>';
-});
-
-// ===============================
-// PROTECCIÓN GLOBAL
-// ===============================
 audio.addEventListener("pause", () => {
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
   document.body.classList.remove("playing");
   stopMatrix();
   stopVU();
-  stopTimer();
+  stopFakeTimer();
 });

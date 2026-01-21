@@ -147,3 +147,11 @@
     font-size: 0.7rem;
   }
 }
+
+/* =========================
+   ESTADO PLAYING
+   ========================= */
+
+body.playing .player-container {
+  box-shadow: 0 0 25px rgba(150, 220, 255, 0.35);
+}

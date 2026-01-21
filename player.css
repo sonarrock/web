@@ -197,3 +197,19 @@ body.playing .player-container {
   font-weight: 600;
 }
 
+
+/* =========================
+   CONTROLES REACTIVOS AL AUDIO
+   ========================= */
+body.playing .controls .btn {
+  animation: pulseGlow 1.2s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  from {
+    box-shadow: 0 0 10px rgba(255,102,0,0.6);
+  }
+  to {
+    box-shadow: 0 0 22px rgba(255,102,0,0.95);
+  }
+}

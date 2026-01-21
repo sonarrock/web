@@ -55,8 +55,14 @@ function drawMatrix() {
     const y = drops[i] * fontSize;
 
     // carácter principal (azul-plateado)
-    ctx.fillStyle = "rgba(150,220,255,0.9)";
-    ctx.fillText(text, x, y);
+  ctx.shadowColor = "rgba(180,240,255,0.9)";
+ctx.shadowBlur = 12;
+
+ctx.fillStyle = "rgba(180,240,255,1)";
+ctx.fillText(text, x, y);
+
+// sombra secundaria para profundidad
+ctx.shadowBlur = 0;
 
     // rastro ligero
     ctx.fillStyle = "rgba(150,220,255,0.35)";

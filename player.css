@@ -12,7 +12,7 @@
   position: relative;
   width: 90%;
   max-width: 650px;
-  aspect-ratio: 3 / 4; /* 👈 ESTO ES LA CLAVE */
+  aspect-ratio: 3 / 4;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0,0,0,0.6);
@@ -20,12 +20,15 @@
 
 /* Imagen fondo */
 .player-bg {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 75%;              /* 👈 25% más pequeña */
-  object-fit: cover;        /* recorta abajo */
-  object-position: center top; /* mantiene rostro visible */
-  display: block;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%; /* sube el encuadre, se ve rostro y torso */
+  z-index: 1;
 }
+
 
 /* Asegura capas correctas */
 .player-bg {
@@ -42,8 +45,18 @@
 
 .player-content {
   position: absolute;
-  z-index: 4; /* 👈 CONTROLES SIEMPRE VISIBLES */
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 5;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  color: #fff;
 }
+
 .player-bg {
   width: 100%;
   height: 75%;              /* 👈 25% más pequeña */
@@ -58,11 +71,17 @@
 }
 
 #matrixCanvas {
+  position: absolute;
+  inset: 0;
   z-index: 2;
+  pointer-events: none;
 }
 
 .overlay {
+  position: absolute;
+  inset: 0;
   z-index: 3;
+  pointer-events: none;
 }
 
 .player-content {
@@ -195,7 +214,10 @@ body.playing .player-container {
 
 @media (max-width: 768px) {
   .player-container {
-    aspect-ratio: 2 / 3; /* más alto en móvil */
+    aspect-ratio: 2 / 3;
+  }
+
+  .player-content {
+    bottom: 10px;
   }
 }
-

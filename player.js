@@ -148,3 +148,42 @@ audio.addEventListener("play", () => {
 audio.addEventListener("pause", () => {
   document.body.classList.remove("playing");
 });
+
+// ===============================
+// LIVE STATUS DESDE METADATA ZENO
+// ===============================
+
+const liveIndicator = document.getElementById("live-indicator");
+const liveText = liveIndicator.querySelector(".text");
+
+async function checkLiveStatus() {
+  try {
+    const response = await fetch(
+      "https://corsproxy.io/?https://api.zeno.fm/mounts/metadata/ezq3fcuf5ehvv"
+    );
+    const data = await response.json();
+
+    const title = (data.streamTitle || "").toUpperCase();
+
+    const isLive =
+      title.includes("LIVE") ||
+      title.includes("EN VIVO") ||
+      title.includes("🔴");
+
+    if (isLive) {
+      liveIndicator.classList.remove("auto");
+      liveIndicator.classList.add("live");
+      liveText.textContent = "EN VIVO";
+    } else {
+      liveIndicator.classList.remove("live");
+      liveIndicator.classList.add("auto");
+      liveText.textContent = "PROGRAMACIÓN";
+    }
+  } catch (err) {
+    console.warn("No se pudo verificar estado LIVE:", err);
+  }
+}
+
+// Revisar cada 20 segundos
+checkLiveStatus();
+setInterval(checkLiveStatus, 20000);

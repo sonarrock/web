@@ -36,7 +36,7 @@ window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 // --------------------
-// MATRIX AZUL / PLATA
+// MATRIX AZUL / PLATA (SIN OSCURECER IMAGEN)
 // --------------------
 const chars =
   "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split(
@@ -44,8 +44,8 @@ const chars =
   );
 
 function drawMatrix() {
-  ctx.fillStyle = "rgba(0,0,0,0.05)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // limpia el canvas en cada frame (no acumula negro)
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   ctx.font = `${fontSize}px monospace`;
 
@@ -54,8 +54,13 @@ function drawMatrix() {
     const x = i * fontSize;
     const y = drops[i] * fontSize;
 
-    ctx.fillStyle = "rgba(150,220,255,1)";
+    // carácter principal (azul-plateado)
+    ctx.fillStyle = "rgba(150,220,255,0.9)";
     ctx.fillText(text, x, y);
+
+    // rastro ligero
+    ctx.fillStyle = "rgba(150,220,255,0.35)";
+    ctx.fillText(text, x, y - fontSize);
 
     if (y > canvas.height && Math.random() > 0.975) {
       drops[i] = 0;
@@ -81,6 +86,7 @@ function stopMatrix() {
   }
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
+
 
 // --------------------
 // CONTROLES

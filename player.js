@@ -1,5 +1,5 @@
 // ===============================
-// SONAR ROCK PLAYER PRO
+// SONAR ROCK PLAYER + MATRIX PRO
 // ===============================
 
 const audio = document.getElementById("radio-audio");
@@ -9,54 +9,16 @@ const muteBtn = document.getElementById("mute-btn");
 const progress = document.getElementById("radio-progress");
 const progressContainer = document.getElementById("radio-progress-container");
 const timeDisplay = document.getElementById("time-display");
-const overlay = document.querySelector(".overlay");
-const nowPlaying = document.getElementById("now-playing");
 
 // ===============================
-// CONFIG
+// VOLUMEN PERSISTENTE
 // ===============================
-const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
-const RECONNECT_TIME = 4000;
-const isMobile = window.innerWidth < 768;
+const savedVolume = localStorage.getItem("sr-volume");
+audio.volume = savedVolume !== null ? parseFloat(savedVolume) : 1;
 
-// ===============================
-// AUDIO SETUP
-// ===============================
-audio.src = STREAM_URL;
-audio.preload = "none";
-audio.crossOrigin = "anonymous";
-
-let fadeInterval = null;
-let reconnectTimeout = null;
-
-// ===============================
-// FADE AUDIO
-// ===============================
-function fadeIn() {
-  clearInterval(fadeInterval);
-  audio.volume = 0;
-  fadeInterval = setInterval(() => {
-    if (audio.volume < 0.95) {
-      audio.volume += 0.05;
-    } else {
-      audio.volume = 1;
-      clearInterval(fadeInterval);
-    }
-  }, 80);
-}
-
-function fadeOut(callback) {
-  clearInterval(fadeInterval);
-  fadeInterval = setInterval(() => {
-    if (audio.volume > 0.05) {
-      audio.volume -= 0.05;
-    } else {
-      audio.volume = 0;
-      clearInterval(fadeInterval);
-      if (callback) callback();
-    }
-  }, 60);
-}
+audio.addEventListener("volumechange", () => {
+  localStorage.setItem("sr-volume", audio.volume);
+});
 
 // ===============================
 // CANVAS MATRIX
@@ -64,23 +26,32 @@ function fadeOut(callback) {
 const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
 const fontSize = 16;
+
 let columns = 0;
 let drops = [];
-let animationFrameId = null;
 let animationRunning = false;
-let matrixColor = "blue";
+let animationFrameId = null;
+let matrixSpeed = 1;
 
+// --------------------
+// RESIZE
+// --------------------
 function resizeCanvas() {
   const container = document.querySelector(".player-container");
   if (!container) return;
+
   canvas.width = container.clientWidth;
   canvas.height = container.clientHeight;
+
   columns = Math.floor(canvas.width / fontSize);
   drops = Array(columns).fill(1);
 }
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
+// ===============================
+// MATRIX AZUL ELÉCTRICO
+// ===============================
 const chars =
   "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split(
     ""
@@ -95,20 +66,17 @@ function drawMatrix() {
     const x = i * fontSize;
     const y = drops[i] * fontSize;
 
-    if (matrixColor === "live") {
-      ctx.shadowColor = "rgba(255,60,60,1)";
-      ctx.fillStyle = "rgba(255,80,80,1)";
-    } else {
-      ctx.shadowColor = "rgba(120,220,255,1)";
-      ctx.fillStyle = "rgba(200,245,255,1)";
-    }
-
-    ctx.shadowBlur = 14;
+    ctx.shadowColor = "rgba(120,220,255,1)";
+    ctx.shadowBlur = 18;
+    ctx.fillStyle = "rgba(200,245,255,1)";
     ctx.fillText(text, x, y);
+
     ctx.shadowBlur = 0;
+    ctx.fillStyle = "rgba(120,200,255,0.35)";
+    ctx.fillText(text, x, y - fontSize);
 
     if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
-    drops[i]++;
+    drops[i] += matrixSpeed;
   }
 
   animationFrameId = requestAnimationFrame(drawMatrix);
@@ -128,29 +96,34 @@ function stopMatrix() {
 }
 
 // ===============================
-// CONTROLES
+// STREAM CONTROLS
 // ===============================
-playPauseBtn.addEventListener("click", async () => {
+async function playStream() {
   try {
-    nowPlaying.textContent = "CONECTANDO…";
     audio.muted = false;
     await audio.play();
-    fadeIn();
 
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    overlay.style.background = "rgba(0,0,0,0.25)";
+    document.body.classList.add("playing");
     startMatrix();
-  } catch (e) {
-    console.warn("Autoplay bloqueado");
+  } catch (err) {
+    console.warn("Bloqueo de audio, reintentando...");
+  }
+}
+
+playPauseBtn.addEventListener("click", () => {
+  if (audio.paused) {
+    playStream();
+  } else {
+    audio.pause();
   }
 });
 
 stopBtn.addEventListener("click", () => {
-  fadeOut(() => audio.pause());
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  overlay.style.background = "transparent";
+  audio.pause();
+  audio.currentTime = 0;
   stopMatrix();
-  nowPlaying.textContent = "";
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
 });
 
 muteBtn.addEventListener("click", () => {
@@ -161,42 +134,62 @@ muteBtn.addEventListener("click", () => {
 });
 
 // ===============================
-// STREAM EVENTS
+// TIEMPO (STREAM)
+// ===============================
+audio.addEventListener("timeupdate", () => {
+  if (isFinite(audio.currentTime)) {
+    const mins = Math.floor(audio.currentTime / 60);
+    const secs = Math.floor(audio.currentTime % 60);
+    timeDisplay.textContent = `${mins
+      .toString()
+      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  }
+});
+
+// ===============================
+// MATRIX INTELIGENTE
 // ===============================
 audio.addEventListener("playing", () => {
-  nowPlaying.textContent = "SONAR ROCK • EN EL AIRE";
-  document.body.classList.add("playing");
+  matrixSpeed = 1.5;
+});
+
+audio.addEventListener("waiting", () => {
+  matrixSpeed = 0.4;
 });
 
 audio.addEventListener("pause", () => {
   document.body.classList.remove("playing");
+  stopMatrix();
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
 });
 
+// ===============================
+// AUTO-RECONEXIÓN STREAM
+// ===============================
 audio.addEventListener("stalled", reconnect);
 audio.addEventListener("error", reconnect);
 
 function reconnect() {
-  nowPlaying.textContent = "RECONectando…";
+  console.warn("Stream inestable, reconectando...");
   stopMatrix();
-  clearTimeout(reconnectTimeout);
-  reconnectTimeout = setTimeout(() => {
+  setTimeout(() => {
     audio.load();
-    audio.play().catch(() => {});
-  }, RECONNECT_TIME);
+    playStream();
+  }, 2000);
 }
 
 // ===============================
-// LIVE STATUS ZENO
+// LIVE STATUS DESDE ZENO
 // ===============================
 const liveIndicator = document.getElementById("live-indicator");
 const liveText = liveIndicator.querySelector(".text");
 
 async function checkLiveStatus() {
   try {
-    const res = await fetch(
+    const response = await fetch(
       "https://corsproxy.io/?https://api.zeno.fm/mounts/metadata/ezq3fcuf5ehvv"
     );
-    const data = await res.json();
+    const data = await response.json();
     const title = (data.streamTitle || "").toUpperCase();
 
     const isLive =
@@ -205,15 +198,17 @@ async function checkLiveStatus() {
       title.includes("🔴");
 
     if (isLive) {
-      liveIndicator.className = "live";
+      liveIndicator.classList.add("live");
+      liveIndicator.classList.remove("auto");
       liveText.textContent = "EN VIVO";
-      matrixColor = "live";
     } else {
-      liveIndicator.className = "auto";
+      liveIndicator.classList.add("auto");
+      liveIndicator.classList.remove("live");
       liveText.textContent = "PROGRAMACIÓN";
-      matrixColor = "blue";
     }
-  } catch {}
+  } catch (e) {
+    console.warn("Metadata no disponible");
+  }
 }
 
 checkLiveStatus();

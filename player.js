@@ -76,7 +76,8 @@ function drawMatrix() {
     ctx.fillText(char, x, y - fontSize);
 
     if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
-    drops[i]++;
+    drops[i] += matrixRunning ? 1.2 : 0.5;
+
   }
 
   matrixFrame = requestAnimationFrame(drawMatrix);
@@ -95,18 +96,43 @@ function stopMatrix() {
 }
 
 // ===============================
-// VU METER FAKE (ESTABLE)
+// REACCIÓN AL ESTADO DEL STREAM
+// ===============================
+audio.addEventListener("playing", () => {
+  startMatrix();
+  startVU();
+});
+
+audio.addEventListener("waiting", () => {
+  // buffer: matrix más lenta + VU más bajo
+  vuLevels = vuLevels.map(() => 0.25);
+});
+
+audio.addEventListener("pause", () => {
+  stopMatrix();
+  stopVU();
+});
+
+// ===============================
+// VU METER ANALÓGICO (FAKE PRO)
 // ===============================
 const vuBars = document.querySelectorAll(".vu-meter span");
 let vuActive = false;
 let vuFrame;
+let vuLevels = Array(vuBars.length).fill(0.2);
 
 function animateVU() {
   if (!vuActive) return;
 
-  vuBars.forEach(bar => {
-    const level = Math.random() * 0.8 + 0.2;
-    bar.style.height = `${level * 100}%`;
+  vuBars.forEach((bar, i) => {
+    // subida rápida
+    const target = Math.random() * 0.8 + 0.2;
+
+    // caída lenta tipo analógico
+    vuLevels[i] += (target - vuLevels[i]) * 0.25;
+    vuLevels[i] = Math.max(0.15, vuLevels[i]);
+
+    bar.style.height = `${vuLevels[i] * 100}%`;
   });
 
   vuFrame = requestAnimationFrame(animateVU);

@@ -1,7 +1,7 @@
 // ----------------------------
 // DISCO DE LA SEMANA
 // ----------------------------
-const fileName = "Bob Dylan - The Times They Are A-Changin'.mp3"; // cambiar cada semana
+const fileName = "Fleetwood Mac - Gold Dust Woman.mp3"; // cambiar cada semana
 const discoAudio = document.getElementById("disco-audio");
 const discoProgress = document.getElementById("disco-progress");
 const discoProgressContainer = document.getElementById("disco-progress-container");

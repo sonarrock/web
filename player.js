@@ -52,12 +52,18 @@ function drawMatrix() {
     const x = i * fontSize;
     const y = drops[i] * fontSize;
 
-    ctx.shadowColor = "rgba(180,240,255,0.9)";
-    ctx.shadowBlur = 10;
-    ctx.fillStyle = "rgba(180,240,255,0.95)";
-    ctx.fillText(text, x, y);
+    // carácter principal (azul eléctrico)
+ctx.shadowColor = "rgba(120,220,255,1)";
+ctx.shadowBlur = 18;
 
-    ctx.shadowBlur = 0;
+ctx.fillStyle = "rgba(200,245,255,1)";
+ctx.fillText(text, x, y);
+
+// rastro
+ctx.shadowBlur = 0;
+ctx.fillStyle = "rgba(120,200,255,0.35)";
+ctx.fillText(text, x, y - fontSize);
+
 
     if (y > canvas.height && Math.random() > 0.975) {
       drops[i] = 0;

@@ -34,6 +34,25 @@ let animationFrameId = null;
 let matrixSpeed = 1;
 
 // --------------------
+// VU METER FAKE
+// --------------------
+const vuBars = document.querySelectorAll(".vu-meter span");
+let vuActive = false;
+
+function animateVU() {
+  if (!vuActive) return;
+
+  vuBars.forEach((bar, i) => {
+    // sincronía visual con matrix
+    const intensity = Math.random() * 0.8 + 0.2;
+    bar.style.height = `${intensity * 100}%`;
+  });
+
+  requestAnimationFrame(animateVU);
+}
+
+
+// --------------------
 // RESIZE
 // --------------------
 function resizeCanvas() {

@@ -218,3 +218,23 @@ audio.addEventListener("pause", () => {
   stopVU();
   stopFakeTimer();
 });
+
+// ===============================
+// LIVE STATUS (PROGRAMACIÓN / EN VIVO)
+// ===============================
+const liveIndicator = document.getElementById("live-indicator");
+const liveText = liveIndicator.querySelector(".text");
+
+async function checkLiveStatus() {
+  try {
+    const response = await fetch(
+      "https://corsproxy.io/?https://api.zeno.fm/mounts/metadata/ezq3fcuf5ehvv"
+    );
+
+    const data = await response.json();
+    const title = (data.streamTitle || "").toUpperCase();
+
+    const isLive =
+      title.includes("LIVE") ||
+      title.includes("
+

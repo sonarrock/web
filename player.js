@@ -93,11 +93,22 @@ function stopMatrix(){
 // --------------------
 // CONTROLES REPRODUCTOR
 // --------------------
-playPauseBtn.addEventListener("click", () => {
-    if(audio.paused){
-        audio.play().then(() => {
-            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-            startMatrix();
+playPauseBtn.addEventListener("click", async () => {
+  try {
+    audio.muted = false;
+    audio.volume = 1;
+
+    await audio.play(); // 👈 ESTO ES CLAVE
+
+    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    startMatrix();
+
+  } catch (err) {
+    console.error("Chrome bloqueó el audio:", err);
+    alert("Toca de nuevo para activar el audio");
+  }
+});
+
             // Overlay ligero al play
             document.querySelector(".overlay").style.background = "rgba(0,0,0,0.1)";
         }).catch(err => console.warn("Autoplay bloqueado:", err));

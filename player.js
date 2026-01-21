@@ -127,3 +127,14 @@ audio.addEventListener("timeupdate", () => {
       .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   }
 });
+
+audio.addEventListener("error", () => {
+  console.warn("Stream caído, intentando reconectar...");
+  stopMatrix();
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+});
+
+audio.addEventListener("stalled", () => {
+  audio.load();
+});
+

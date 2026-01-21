@@ -152,16 +152,19 @@ function stopVU() {
   vuBars.forEach(bar => (bar.style.height = "20%"));
 }
 
-/* ===============================
-   CONTROLES STREAM (CLAVE)
-================================ */
-playPauseBtn.addEventListener("click", () => {
-  if (!userInteracted) return;
+// ===============================
+// CONTROLES STREAM — 1 CLICK REAL
+// ===============================
+let isPlaying = false;
 
-  if (audio.paused) {
+playPauseBtn.addEventListener("click", () => {
+  if (!isPlaying) {
     audio.muted = false;
+    audio.volume = 1;
 
     audio.play().then(() => {
+      isPlaying = true;
+
       playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
       document.body.classList.add("playing");
 
@@ -179,14 +182,7 @@ playPauseBtn.addEventListener("click", () => {
 
 stopBtn.addEventListener("click", () => {
   audio.pause();
-  audio.load();
-
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  document.body.classList.remove("playing");
-
-  stopMatrix();
-  stopVU();
-  stopFakeTimer();
+  audio.currentTime = 0;
 });
 
 muteBtn.addEventListener("click", () => {

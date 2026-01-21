@@ -222,13 +222,12 @@ function stopFakeTimer() {
 playPauseBtn.addEventListener("click", () => {
   if (audio.paused) {
     audio.muted = false;
-    audio.play(); // iOS-safe (gesto directo)
+    audio.play(); // iOS-safe
 
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     document.body.classList.add("playing");
 
     startMatrix();
-    startVU();
     startFakeTimer();
 
   } else {
@@ -243,7 +242,6 @@ stopBtn.addEventListener("click", () => {
   document.body.classList.remove("playing");
 
   stopMatrix();
-  stopVU();
   stopFakeTimer();
 });
 
@@ -253,7 +251,6 @@ muteBtn.addEventListener("click", () => {
     ? '<i class="fas fa-volume-mute"></i>'
     : '<i class="fas fa-volume-up"></i>';
 });
-
 
  // ===============================
 // TIMER FAKE PARA STREAM EN VIVO

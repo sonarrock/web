@@ -1,7 +1,6 @@
-// ==================================================
-// SONAR ROCK PLAYER — FINAL STABLE (1 CLICK REAL)
-// iOS + Chrome SAFE
-// ==================================================
+// ===================
+// SONAR ROCK PLAYER 
+// ===================
 
 /* ===============================
    ELEMENTOS
@@ -71,7 +70,7 @@ window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 const chars =
-  "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split("");
+  "アァイィウヴエェオカガキギクグا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و يabcdefghijklmnopqrstuvwxyz0123456789".split("");
 
 function drawMatrix() {
   if (!matrixRunning) return;
@@ -98,10 +97,40 @@ function drawMatrix() {
   matrixFrame = requestAnimationFrame(drawMatrix);
 }
 
-function startMatrix() {
-  if (matrixRunning) return;
-  matrixRunning = true;
-  drawMatrix();
+function drawMatrix() {
+  if (!matrixRunning) return;
+
+  // limpieza transparente (NO tapa la imagen)
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.font = `${fontSize}px monospace`;
+
+  for (let i = 0; i < drops.length; i++) {
+    const char = chars[Math.floor(Math.random() * chars.length)];
+    const x = i * fontSize;
+    const y = drops[i] * fontSize;
+
+    // color agresivo pero oscuro
+    ctx.shadowColor = "rgba(0,180,255,0.9)";
+    ctx.shadowBlur = 10;
+
+    ctx.fillStyle = "rgba(80,160,255,0.85)";
+    ctx.fillText(char, x, y);
+
+    // cola más oscura
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "rgba(40,80,140,0.35)";
+    ctx.fillText(char, x, y - fontSize);
+
+    // velocidad irregular (agresiva)
+    drops[i] += Math.random() * 1.5 + 0.5;
+
+    if (y > canvas.height && Math.random() > 0.96) {
+      drops[i] = 0;
+    }
+  }
+
+  matrixFrame = requestAnimationFrame(drawMatrix);
 }
 
 function stopMatrix() {

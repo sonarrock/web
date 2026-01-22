@@ -18,7 +18,6 @@
   box-shadow: 0 8px 24px rgba(0,0,0,0.6);
 }
 
-/* =========================
  /* =========================
    VOLUMEN TÁCTIL
    ========================= */
@@ -181,7 +180,7 @@
    ESTADO PLAYING
    ========================= */
 body.playing .overlay {
-  background: rgba(0,0,0,0.5); /* 50% exacto */
+  background: rgba(0,0,0,0.25);
 }
 
 body.playing .player-container {
@@ -339,5 +338,9 @@ body.live #playPauseBtn {
 canvas#matrixCanvas {
   pointer-events: none;
   mix-blend-mode: screen;
+}
+
+canvas#matrixCanvas {
+  filter: contrast(1.3) brightness(0.9);
 }
 

@@ -1,3 +1,8 @@
+const isNight = () => {
+  const h = new Date().getHours();
+  return h >= 19 || h <= 6;
+};
+
 // ===================
 // SONAR ROCK PLAYER 
 // ===================

@@ -331,3 +331,13 @@ body.live #playPauseBtn {
   border-color: #ff3b3b;
 }
 
+
+.player-bg {
+  opacity: 0.15 !important;
+}
+
+canvas#matrixCanvas {
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+

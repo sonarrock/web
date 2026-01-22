@@ -78,54 +78,40 @@ function drawMatrix() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = `${fontSize}px monospace`;
 
-  for (let i = 0; i < drops.length; i++) {
-    const char = chars[Math.floor(Math.random() * chars.length)];
-    const x = i * fontSize;
-    const y = drops[i] * fontSize;
-
-    ctx.shadowColor = "rgba(120,220,255,1)";
-    ctx.shadowBlur = 12;
-    ctx.fillStyle = "rgba(200,245,255,1)";
-    ctx.fillText(char, x, y);
-
-    if (y > canvas.height && Math.random() > 0.975) {
-      drops[i] = 0;
-    }
-    drops[i]++;
-  }
-
-  matrixFrame = requestAnimationFrame(drawMatrix);
-}
-
-function drawMatrix() {
-  if (!matrixRunning) return;
-
-  // limpieza transparente (NO tapa la imagen)
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  ctx.font = `${fontSize}px monospace`;
+  const night = isNight();
 
   for (let i = 0; i < drops.length; i++) {
     const char = chars[Math.floor(Math.random() * chars.length)];
     const x = i * fontSize;
     const y = drops[i] * fontSize;
 
-    // color agresivo pero oscuro
-    ctx.shadowColor = "rgba(0,180,255,0.9)";
-    ctx.shadowBlur = 10;
+    // 🔥 colores dinámicos
+    ctx.shadowColor = night
+      ? "rgba(0,140,255,1)"
+      : "rgba(120,220,255,0.9)";
 
-    ctx.fillStyle = "rgba(80,160,255,0.85)";
+    ctx.shadowBlur = night ? 16 : 10;
+
+    ctx.fillStyle = night
+      ? "rgba(40,120,220,0.9)"   // más oscuro, más agresivo
+      : "rgba(120,200,255,0.85)";
+
     ctx.fillText(char, x, y);
 
-    // cola más oscura
+    // cola
     ctx.shadowBlur = 0;
-    ctx.fillStyle = "rgba(40,80,140,0.35)";
+    ctx.fillStyle = night
+      ? "rgba(20,60,120,0.35)"
+      : "rgba(60,120,180,0.3)";
+
     ctx.fillText(char, x, y - fontSize);
 
-    // velocidad irregular (agresiva)
-    drops[i] += Math.random() * 1.5 + 0.5;
+    // velocidad brutal
+    drops[i] += night
+      ? Math.random() * 2.2 + 1.1
+      : Math.random() * 1.5 + 0.7;
 
-    if (y > canvas.height && Math.random() > 0.96) {
+    if (y > canvas.height && Math.random() > 0.965) {
       drops[i] = 0;
     }
   }
@@ -133,11 +119,6 @@ function drawMatrix() {
   matrixFrame = requestAnimationFrame(drawMatrix);
 }
 
-function stopMatrix() {
-  matrixRunning = false;
-  cancelAnimationFrame(matrixFrame);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
 
 /* ===============================
    VU METER (FAKE)

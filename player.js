@@ -208,3 +208,78 @@ audio.addEventListener("pause", () => {
   stopVU();
   stopFakeTimer();
 });
+
+
+/* ===============================
+   AUTO RECOVERY STREAM (PRO)
+================================ */
+
+let reconnectTimer = null;
+let silenceTimer = null;
+let lastCurrentTime = 0;
+let reconnecting = false;
+
+const RECONNECT_DELAY = 3000; // 3 segundos
+const SILENCE_LIMIT = 6000;   // 6 segundos sin avance
+
+function startWatchdog() {
+  stopWatchdog();
+
+  silenceTimer = setInterval(() => {
+    if (audio.paused || audio.readyState < 2) return;
+
+    if (audio.currentTime === lastCurrentTime) {
+      console.warn("⛔ Stream congelado, reconectando...");
+      reconnectStream();
+    }
+
+    lastCurrentTime = audio.currentTime;
+  }, SILENCE_LIMIT);
+}
+
+function stopWatchdog() {
+  clearInterval(silenceTimer);
+  silenceTimer = null;
+}
+
+async function reconnectStream() {
+  if (reconnecting) return;
+  reconnecting = true;
+
+  document.body.classList.add("reconnecting");
+
+  try {
+    audio.pause();
+    audio.src = audio.src; // fuerza reload
+    await audio.play();
+  } catch (e) {
+    console.warn("⏳ Reintento fallido, nuevo intento...");
+  }
+
+  reconnectTimer = setTimeout(() => {
+    reconnecting = false;
+    document.body.classList.remove("reconnecting");
+  }, RECONNECT_DELAY);
+}
+
+/* ===============================
+   EVENTOS CRÍTICOS
+================================ */
+
+audio.addEventListener("playing", () => {
+  startWatchdog();
+});
+
+audio.addEventListener("pause", () => {
+  stopWatchdog();
+});
+
+audio.addEventListener("stalled", () => {
+  console.warn("⚠️ Stream stalled");
+  reconnectStream();
+});
+
+audio.addEventListener("error", () => {
+  console.warn("🔥 Error de stream");
+  reconnectStream();
+});

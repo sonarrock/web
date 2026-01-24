@@ -258,5 +258,30 @@ checkLiveFromZeno();
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* ===============================
+   VU METER REAL
+================================ */
+.vu-meter {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 40px;
+  margin-top: 12px;
+}
+
+.vu-meter span {
+  width: 6px;
+  height: 15%;
+  background: linear-gradient(
+    to top,
+    #00ffb3,
+    #00d4ff
+  );
+  border-radius: 3px;
+  transition: height 0.08s linear;
+  box-shadow: 0 0 6px rgba(0, 255, 200, 0.6);
+}
+
+
 });
                           

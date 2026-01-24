@@ -207,6 +207,56 @@ setInterval(checkLiveFromZeno, 20000);
 // primer check al cargar
 checkLiveFromZeno();
 
+/* ===============================
+   LIVE BADGE
+================================ */
+.live-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  color: #aaa;
+  text-transform: uppercase;
+  z-index: 20;
+}
+
+.live-badge .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #666;
+}
+
+/* 🔴 EN VIVO */
+.live-badge.live {
+  color: #ff2b2b;
+  box-shadow: 0 0 15px rgba(255, 50, 50, 0.6);
+}
+
+.live-badge.live .dot {
+  background: #ff2b2b;
+  animation: livePulse 1.2s infinite;
+}
+
+/* ⚪ PROGRAMACIÓN */
+.live-badge.auto {
+  color: #aaa;
+}
+
+@keyframes livePulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 1; }
+}
 
 });
                           

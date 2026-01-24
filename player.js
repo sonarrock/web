@@ -138,24 +138,17 @@ let vuFrame = null;
 function animateVU() {
   if (!vuActive) return;
 
+  // suavizado tipo compresor
+  beatLevel += (beatTarget - beatLevel) * 0.25;
+
   vuBars.forEach(bar => {
-    const level = Math.random() * 0.7 + 0.25;
+    const random = Math.random() * 0.3;
+    const level = Math.min(1, beatLevel + random);
+
     bar.style.height = `${level * 100}%`;
   });
 
   vuFrame = requestAnimationFrame(animateVU);
-}
-
-function startVU() {
-  if (vuActive) return;
-  vuActive = true;
-  animateVU();
-}
-
-function stopVU() {
-  vuActive = false;
-  cancelAnimationFrame(vuFrame);
-  vuBars.forEach(bar => (bar.style.height = "20%"));
 }
 
 /* ===============================

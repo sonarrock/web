@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  let audioCtx, analyser, source;
+
   // ===============================
   // ELEMENTOS
   // ===============================
@@ -145,11 +147,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startSpectrum() {
-    initSpectrum();
-    audioCtx.resume();
-    cancelAnimationFrame(spectrumRAF);
-    drawSpectrum();
-  }
+  if (!analyser) return;
+  cancelAnimationFrame(spectrumRAF);
+  drawSpectrum();
+}
+
 
   function stopSpectrum() {
     cancelAnimationFrame(spectrumRAF);
@@ -170,10 +172,30 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===============================
   // CONTROLES
   // ===============================
-  playPauseBtn.addEventListener("click", async () => {
-    if (!audio.paused) return audio.pause();
+ playPauseBtn.addEventListener("click", async () => {
+
+  // 🔥 CREAR AudioContext SOLO EN INTERACCIÓN HUMANA
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
+
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+
+  if (audioCtx.state === "suspended") {
+    await audioCtx.resume();
+  }
+
+  if (audio.paused) {
     await audio.play();
-  });
+  } else {
+    audio.pause();
+  }
+});
+
 
   stopBtn.addEventListener("click", () => {
     audio.pause();

@@ -58,57 +58,21 @@
 
     <div class="player-content">
       <div id="now-playing"></div>
-<div id="live-indicator" class="auto">
-  <span class="dot"></span>
-  <span class="text">PROGRAMACIÓN</span>
-</div>
-
-      <div class="vu-meter">
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span
-  <span></span>
-  <span></span>
-  <span></span>
-  <span></span>
-</div>
 
       <div class="controls">
         <button id="playPauseBtn" class="btn"><i class="fas fa-play"></i></button>
         <button id="stop-btn" class="btn"><i class="fas fa-stop"></i></button>
         <button id="mute-btn" class="btn"><i class="fas fa-volume-up"></i></button>
       </div>
-
-      <div class="volume-wrapper">
-  <i class="fas fa-volume-down"></i>
-
-  <div class="volume-bar" id="volume-bar">
-    <div class="volume-level" id="volume-level"></div>
-  </div>
-
-  <i class="fas fa-volume-up"></i>
-</div>
       <div class="progress-wrapper">
         <div id="radio-progress-container" class="progress-container">
           <div id="radio-progress"></div>
         </div>
         <div id="time-display" class="time-display">00:00:00</div>
       </div>
-
-    <audio
-  id="radio-audio"
-  src="https://stream.zeno.fm/ezq3fcuf5ehvv"
-  preload="none"
-  playsinline
-  crossorigin="anonymous">
-</audio>
-
-
+      <audio id="radio-audio" preload="auto">
+        <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+      </audio>
     </div>
   </div>
 </section>

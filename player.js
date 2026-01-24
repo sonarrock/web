@@ -8,12 +8,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const stopBtn = document.getElementById("stop-btn");
   const muteBtn = document.getElementById("mute-btn");
   const timeDisplay = document.getElementById("time-display");
-  const progressBar = document.getElementById("radio-progress");
+  const canvas = document.getElementById("matrixCanvas");
+  const liveIndicator = document.getElementById("live-indicator");
 
-  if (!audio || !playPauseBtn) {
-    console.error("❌ Elementos del reproductor no encontrados");
+  if (!audio || !playPauseBtn || !canvas || !liveIndicator) {
+    console.error("❌ Elementos críticos no encontrados");
     return;
   }
+
+  const liveText = liveIndicator.querySelector(".text");
 
   audio.playsInline = true;
   audio.preload = "auto";
@@ -29,23 +32,21 @@ document.addEventListener("DOMContentLoaded", () => {
     startTime = Date.now();
     timer = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      const h = String(Math.floor(elapsed / 3600)).padStart(2, "0");
-      const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, "0");
+      const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
       const s = String(elapsed % 60).padStart(2, "0");
-      timeDisplay.textContent = `${h}:${m}:${s}`;
+      timeDisplay.textContent = `${m}:${s}`;
     }, 1000);
   }
 
   function stopTimer() {
     clearInterval(timer);
     timer = null;
-    timeDisplay.textContent = "00:00:00";
+    timeDisplay.textContent = "00:00";
   }
 
   // ===============================
   // MATRIX
   // ===============================
-  const canvas = document.getElementById("matrixCanvas");
   const ctx = canvas.getContext("2d");
   const fontSize = 16;
   let drops = [];
@@ -61,14 +62,14 @@ document.addEventListener("DOMContentLoaded", () => {
   resizeCanvas();
   window.addEventListener("resize", resizeCanvas);
 
-  const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   function drawMatrix() {
     if (!matrixRunning) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = `${fontSize}px monospace`;
-    ctx.fillStyle = "rgba(0,255,180,0.75)";
+    ctx.fillStyle = "rgba(0,255,180,0.8)";
 
     drops.forEach((y, i) => {
       const char = chars[Math.floor(Math.random() * chars.length)];
@@ -91,7 +92,30 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===============================
-  // CONTROLES
+  // LIVE STATUS
+  // ===============================
+  let liveActive = false;
+
+  function setLive(on) {
+    if (!liveText) return;
+
+    if (on && !liveActive) {
+      liveActive = true;
+      liveIndicator.classList.remove("auto");
+      liveIndicator.classList.add("live");
+      liveText.textContent = "EN VIVO";
+    }
+
+    if (!on && liveActive) {
+      liveActive = false;
+      liveIndicator.classList.remove("live");
+      liveIndicator.classList.add("auto");
+      liveText.textContent = "PROGRAMACIÓN";
+    }
+  }
+
+  // ===============================
+  // CONTROLES (ÚNICO PLAY)
   // ===============================
   playPauseBtn.addEventListener("click", async () => {
     if (!audio.paused) {
@@ -118,13 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
       : '<i class="fas fa-volume-up"></i>';
   });
 
-  const volumeSlider = document.getElementById("volume");
-
-volumeSlider.addEventListener("input", () => {
-  audio.volume = volumeSlider.value;
-});
-
-
   // ===============================
   // EVENTOS AUDIO
   // ===============================
@@ -132,62 +149,19 @@ volumeSlider.addEventListener("input", () => {
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     startTimer();
     startMatrix();
+    setLive(true);
   });
 
   audio.addEventListener("pause", () => {
     playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
     stopTimer();
     stopMatrix();
+    setLive(false);
   });
 
-// ===============================
-// LIVE STATUS (ROBUSTO)
-// ===============================
-const liveIndicator = document.getElementById("live-indicator");
-const liveText = liveIndicator.querySelector(".text");
-let liveActive = false;
-
-function setLive(on) {
-  if (on && !liveActive) {
-    liveActive = true;
-    liveIndicator.classList.remove("auto");
-    liveIndicator.classList.add("live");
-    liveText.textContent = "EN VIVO";
-  }
-
-  if (!on && liveActive) {
-    liveActive = false;
-    liveIndicator.classList.remove("live");
-    liveIndicator.classList.add("auto");
-    liveText.textContent = "PROGRAMACIÓN";
-  }
-}
-
-// PLAY → fuerza EN VIVO
-playPauseBtn.addEventListener("click", async () => {
-  if (!audio.paused) {
-    audio.pause();
+  audio.addEventListener("error", () => {
     setLive(false);
-    return;
-  }
+  });
 
-  try {
-    await audio.play();
-    setLive(true);
-  } catch (e) {
-    console.warn("Play bloqueado", e);
-  }
 });
 
-// RESPALDOS REALES
-audio.addEventListener("timeupdate", () => {
-  if (!audio.paused) setLive(true);
-});
-
-audio.addEventListener("pause", () => {
-  setLive(false);
-});
-
-audio.addEventListener("error", () => {
-  setLive(false);
-});

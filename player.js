@@ -80,7 +80,10 @@ const chars =
 function drawMatrix() {
   if (!matrixRunning) return;
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // 🔑 NO limpiar en negro, solo desvanecer MUY ligero
+  ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
   ctx.font = `${fontSize}px monospace`;
 
   const night = isNight();
@@ -90,47 +93,27 @@ function drawMatrix() {
     const x = i * fontSize;
     const y = drops[i] * fontSize;
 
-    ctx.shadowColor = night ? "rgba(0,140,255,1)" : "rgba(120,220,255,0.9)";
-    ctx.shadowBlur = night ? 14 : 8;
+    // ✨ Color Matrix visible pero NO opaco
+    ctx.shadowColor = night
+      ? "rgba(0,180,255,0.9)"
+      : "rgba(120,220,255,0.8)";
+
+    ctx.shadowBlur = night ? 10 : 6;
 
     ctx.fillStyle = night
-      ? "rgba(40,120,220,0.9)"
-      : "rgba(120,200,255,0.85)";
+      ? "rgba(0,140,255,0.65)"
+      : "rgba(140,220,255,0.6)";
 
     ctx.fillText(char, x, y);
 
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = night
-      ? "rgba(20,60,120,0.35)"
-      : "rgba(60,120,180,0.3)";
+    drops[i] += night ? 1.4 : 1.1;
 
-    ctx.fillText(char, x, y - fontSize);
-
-   const speedBoost = beatLevel * 2.5;
-
-drops[i] += night
-  ? Math.random() * (2.2 + speedBoost) + 1.1
-  : Math.random() * (1.5 + speedBoost) + 0.7;
-
-
-    if (y > canvas.height && Math.random() > 0.97) {
+    if (y > canvas.height && Math.random() > 0.975) {
       drops[i] = 0;
     }
   }
 
   matrixFrame = requestAnimationFrame(drawMatrix);
-}
-
-function startMatrix() {
-  if (matrixRunning) return;
-  matrixRunning = true;
-  drawMatrix();
-}
-
-function stopMatrix() {
-  matrixRunning = false;
-  cancelAnimationFrame(matrixFrame);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 // ===================

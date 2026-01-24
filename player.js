@@ -140,25 +140,30 @@ volumeSlider.addEventListener("input", () => {
     stopMatrix();
   });
 
-});
-
+// ===============================
+// LIVE STATUS (ROBUSTO)
+// ===============================
 const liveIndicator = document.getElementById("live-indicator");
+const liveText = liveIndicator.querySelector(".text");
 let liveActive = false;
 
 function setLive(on) {
   if (on && !liveActive) {
     liveActive = true;
+    liveIndicator.classList.remove("auto");
     liveIndicator.classList.add("live");
-    liveIndicator.querySelector(".text").textContent = "EN VIVO";
+    liveText.textContent = "EN VIVO";
   }
 
   if (!on && liveActive) {
     liveActive = false;
     liveIndicator.classList.remove("live");
-    liveIndicator.querySelector(".text").textContent = "PROGRAMACIÓN";
+    liveIndicator.classList.add("auto");
+    liveText.textContent = "PROGRAMACIÓN";
   }
 }
 
+// PLAY → fuerza EN VIVO
 playPauseBtn.addEventListener("click", async () => {
   if (!audio.paused) {
     audio.pause();
@@ -168,16 +173,13 @@ playPauseBtn.addEventListener("click", async () => {
 
   try {
     await audio.play();
-    setLive(true); // 👈 fuerza EN VIVO al reproducir
+    setLive(true);
   } catch (e) {
     console.warn("Play bloqueado", e);
   }
 });
 
-audio.addEventListener("canplay", () => {
-  setLive(true);
-});
-
+// RESPALDOS REALES
 audio.addEventListener("timeupdate", () => {
   if (!audio.paused) setLive(true);
 });
@@ -189,4 +191,3 @@ audio.addEventListener("pause", () => {
 audio.addEventListener("error", () => {
   setLive(false);
 });
-

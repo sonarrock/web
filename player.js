@@ -159,3 +159,34 @@ function setLive(on) {
   }
 }
 
+playPauseBtn.addEventListener("click", async () => {
+  if (!audio.paused) {
+    audio.pause();
+    setLive(false);
+    return;
+  }
+
+  try {
+    await audio.play();
+    setLive(true); // 👈 fuerza EN VIVO al reproducir
+  } catch (e) {
+    console.warn("Play bloqueado", e);
+  }
+});
+
+audio.addEventListener("canplay", () => {
+  setLive(true);
+});
+
+audio.addEventListener("timeupdate", () => {
+  if (!audio.paused) setLive(true);
+});
+
+audio.addEventListener("pause", () => {
+  setLive(false);
+});
+
+audio.addEventListener("error", () => {
+  setLive(false);
+});
+

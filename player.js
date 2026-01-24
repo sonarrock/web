@@ -143,14 +143,19 @@ volumeSlider.addEventListener("input", () => {
 });
 
 const liveIndicator = document.getElementById("live-indicator");
+let liveActive = false;
 
-audio.addEventListener("playing", () => {
-  liveIndicator.classList.add("live");
-  liveIndicator.querySelector(".text").textContent = "EN VIVO";
-});
+function setLive(on) {
+  if (on && !liveActive) {
+    liveActive = true;
+    liveIndicator.classList.add("live");
+    liveIndicator.querySelector(".text").textContent = "EN VIVO";
+  }
 
-audio.addEventListener("pause", () => {
-  liveIndicator.classList.remove("live");
-  liveIndicator.querySelector(".text").textContent = "PROGRAMACIÓN";
-});
+  if (!on && liveActive) {
+    liveActive = false;
+    liveIndicator.classList.remove("live");
+    liveIndicator.querySelector(".text").textContent = "PROGRAMACIÓN";
+  }
+}
 

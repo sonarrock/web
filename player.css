@@ -49,6 +49,7 @@
   z-index: 2;
   pointer-events: none;
   mix-blend-mode: screen;
+  background: transparent;
 }
 
 /* =========================
@@ -57,10 +58,10 @@
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.0);
   z-index: 3;
   pointer-events: none;
-  transition: background 0.4s ease;
+  transition: background 0.7s ease;
 }
 
 body.playing .overlay {
@@ -247,11 +248,11 @@ body.playing .controls .btn {
 
 
 /* ===============================
-   ESCALA REPRODUCTOR 65%
+   ESCALA REPRODUCTOR 75%
 ================================ */
 
 .player-container {
-  transform: scale(0.65);
+  transform: scale(0.75);
   transform-origin: top center;
 }
 

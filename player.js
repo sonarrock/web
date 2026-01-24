@@ -149,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     startTimer();
     startMatrix();
-    setLive(true);
   });
 
   audio.addEventListener("pause", () => {

@@ -8,10 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const stopBtn = document.getElementById("stop-btn");
   const muteBtn = document.getElementById("mute-btn");
   const timeDisplay = document.getElementById("time-display");
-  const canvas = document.getElementById("matrixCanvas");
+  const matrixCanvas = document.getElementById("matrixCanvas");
+  const spectrumCanvas = document.getElementById("spectrumCanvas");
   const liveIndicator = document.getElementById("live-indicator");
 
-  if (!audio || !playPauseBtn || !canvas || !liveIndicator) {
+  if (!audio || !playPauseBtn || !matrixCanvas || !spectrumCanvas || !liveIndicator) {
     console.error("❌ Elementos críticos no encontrados");
     return;
   }
@@ -22,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.preload = "auto";
 
   // ===============================
-  // TIMER FAKE
+  // TIMER
   // ===============================
   let timer = null;
   let startTime = 0;
@@ -47,34 +48,34 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===============================
   // MATRIX
   // ===============================
-  const ctx = canvas.getContext("2d");
+  const mctx = matrixCanvas.getContext("2d");
   const fontSize = 16;
   let drops = [];
   let matrixRunning = false;
 
-  function resizeCanvas() {
-    const container = document.querySelector(".player-container");
-    canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
-    drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+  function resizeMatrix() {
+    const c = document.querySelector(".player-container");
+    matrixCanvas.width = c.clientWidth;
+    matrixCanvas.height = c.clientHeight;
+    drops = Array(Math.floor(matrixCanvas.width / fontSize)).fill(1);
   }
 
-  resizeCanvas();
-  window.addEventListener("resize", resizeCanvas);
+  resizeMatrix();
+  window.addEventListener("resize", resizeMatrix);
 
   const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   function drawMatrix() {
     if (!matrixRunning) return;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = `${fontSize}px monospace`;
-    ctx.fillStyle = "rgba(0,255,180,0.8)";
+    mctx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+    mctx.font = `${fontSize}px monospace`;
+    mctx.fillStyle = "rgba(0,255,180,0.6)";
 
     drops.forEach((y, i) => {
       const char = chars[Math.floor(Math.random() * chars.length)];
-      ctx.fillText(char, i * fontSize, y * fontSize);
-      drops[i] = y * fontSize > canvas.height && Math.random() > 0.97 ? 0 : y + 1;
+      mctx.fillText(char, i * fontSize, y * fontSize);
+      drops[i] = y * fontSize > matrixCanvas.height ? 0 : y + 1;
     });
 
     requestAnimationFrame(drawMatrix);
@@ -88,46 +89,90 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function stopMatrix() {
     matrixRunning = false;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    mctx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+  }
+
+  // ===============================
+  // ANALIZADOR CIRCULAR REAL
+  // ===============================
+  let audioCtx, analyser, source, spectrumRAF;
+  const sctx = spectrumCanvas.getContext("2d");
+
+  function resizeSpectrum() {
+    const c = document.querySelector(".player-container");
+    spectrumCanvas.width = c.clientWidth;
+    spectrumCanvas.height = c.clientHeight;
+  }
+
+  resizeSpectrum();
+  window.addEventListener("resize", resizeSpectrum);
+
+  function initSpectrum() {
+    if (audioCtx) return;
+
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
+
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+
+  function drawSpectrum() {
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(data);
+
+    sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
+
+    const cx = spectrumCanvas.width / 2;
+    const cy = spectrumCanvas.height / 2;
+    const r = Math.min(cx, cy) * 0.35;
+
+    for (let i = 0; i < 120; i++) {
+      const v = data[i] / 255;
+      const a = (i / 120) * Math.PI * 2;
+
+      sctx.strokeStyle = `rgba(0,255,200,${0.3 + v})`;
+      sctx.lineWidth = 2;
+      sctx.beginPath();
+      sctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+      sctx.lineTo(cx + Math.cos(a) * (r + v * r), cy + Math.sin(a) * (r + v * r));
+      sctx.stroke();
+    }
+
+    spectrumRAF = requestAnimationFrame(drawSpectrum);
+  }
+
+  function startSpectrum() {
+    initSpectrum();
+    audioCtx.resume();
+    cancelAnimationFrame(spectrumRAF);
+    drawSpectrum();
+  }
+
+  function stopSpectrum() {
+    cancelAnimationFrame(spectrumRAF);
+    sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
   }
 
   // ===============================
   // LIVE STATUS
   // ===============================
-  let liveActive = false;
-
   function setLive(on) {
     if (!liveText) return;
 
-    if (on && !liveActive) {
-      liveActive = true;
-      liveIndicator.classList.remove("auto");
-      liveIndicator.classList.add("live");
-      liveText.textContent = "EN VIVO";
-    }
-
-    if (!on && liveActive) {
-      liveActive = false;
-      liveIndicator.classList.remove("live");
-      liveIndicator.classList.add("auto");
-      liveText.textContent = "PROGRAMACIÓN";
-    }
+    liveIndicator.classList.toggle("live", on);
+    liveIndicator.classList.toggle("auto", !on);
+    liveText.textContent = on ? "EN VIVO" : "PROGRAMACIÓN";
   }
 
   // ===============================
-  // CONTROLES (ÚNICO PLAY)
+  // CONTROLES
   // ===============================
   playPauseBtn.addEventListener("click", async () => {
-    if (!audio.paused) {
-      audio.pause();
-      return;
-    }
-
-    try {
-      await audio.play();
-    } catch (err) {
-      console.warn("⚠️ Play bloqueado", err);
-    }
+    if (!audio.paused) return audio.pause();
+    await audio.play();
   });
 
   stopBtn.addEventListener("click", () => {
@@ -149,194 +194,33 @@ document.addEventListener("DOMContentLoaded", () => {
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     startTimer();
     startMatrix();
+    startSpectrum();
   });
 
   audio.addEventListener("pause", () => {
     playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
     stopTimer();
     stopMatrix();
-    setLive(false);
+    stopSpectrum();
   });
 
-  audio.addEventListener("error", () => {
-    setLive(false);
-  });
+  // ===============================
+  // ZENO LIVE REAL
+  // ===============================
+  const ZENO_META =
+    "https://corsproxy.io/?https://api.zeno.fm/mounts/metadata/ezq3fcuf5ehvv";
 
-
-// ===============================
-// LIVE STATUS DESDE ZENO (REAL)
-// ===============================
-const ZENO_META =
-  "https://corsproxy.io/?https://api.zeno.fm/mounts/metadata/ezq3fcuf5ehvv";
-
-let lastLiveState = null;
-
-async function checkLiveFromZeno() {
-  try {
-    const res = await fetch(ZENO_META, { cache: "no-store" });
-    const data = await res.json();
-
-    const listeners = Number(data.listeners || 0);
-    const title = (data.streamTitle || "").toUpperCase();
-
-    // 🔴 Zeno REAL logic
-    const isLive =
-      listeners > 0 ||
-      title.includes("LIVE") ||
-      title.includes("DJ") ||
-      title.includes("EN VIVO");
-
-    if (isLive !== lastLiveState) {
-      lastLiveState = isLive;
-      setLive(isLive);
-      console.log(
-        "🎙️ Estado Zeno:",
-        isLive ? "EN VIVO" : "PROGRAMACIÓN",
-        "| listeners:", listeners
-      );
+  async function checkLiveFromZeno() {
+    try {
+      const res = await fetch(ZENO_META, { cache: "no-store" });
+      const data = await res.json();
+      const listeners = Number(data.listeners || 0);
+      setLive(listeners > 0);
+    } catch {
+      setLive(false);
     }
-  } catch (err) {
-    console.warn("⚠️ No se pudo consultar Zeno");
-    setLive(false);
-  }
-}
-
-// revisar cada 20 segundos
-setInterval(checkLiveFromZeno, 20000);
-
-// primer check al cargar
-checkLiveFromZeno();
-
-/* ===============================
-   LIVE BADGE
-================================ */
-.live-badge {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  font-size: 12px;
-  letter-spacing: 1px;
-  font-weight: 700;
-  border-radius: 20px;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(6px);
-  color: #aaa;
-  text-transform: uppercase;
-  z-index: 20;
-}
-
-.live-badge .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #666;
-}
-
-/* 🔴 EN VIVO */
-.live-badge.live {
-  color: #ff2b2b;
-  box-shadow: 0 0 15px rgba(255, 50, 50, 0.6);
-}
-
-.live-badge.live .dot {
-  background: #ff2b2b;
-  animation: livePulse 1.2s infinite;
-}
-
-/* ⚪ PROGRAMACIÓN */
-.live-badge.auto {
-  color: #aaa;
-}
-
-@keyframes livePulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.6); opacity: 0.4; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-// ===============================
-// ANALIZADOR CIRCULAR TIPO WINAMP
-// ===============================
-let audioCtx, analyser, source;
-let spectrumRAF;
-
-const spectrumCanvas = document.getElementById("spectrumCanvas");
-const sctx = spectrumCanvas.getContext("2d");
-
-function resizeSpectrum() {
-  const container = document.querySelector(".player-container");
-  spectrumCanvas.width = container.clientWidth;
-  spectrumCanvas.height = container.clientHeight;
-}
-
-resizeSpectrum();
-window.addEventListener("resize", resizeSpectrum);
-
-function initSpectrum() {
-  if (audioCtx) return;
-
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 512;
-
-  source = audioCtx.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-}
-
-function drawSpectrum() {
-  const bufferLength = analyser.frequencyBinCount;
-  const data = new Uint8Array(bufferLength);
-  analyser.getByteFrequencyData(data);
-
-  sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
-
-  const cx = spectrumCanvas.width / 2;
-  const cy = spectrumCanvas.height / 2;
-  const radius = Math.min(cx, cy) * 0.35;
-  const bars = 120;
-
-  for (let i = 0; i < bars; i++) {
-    const angle = (i / bars) * Math.PI * 2;
-    const value = data[i] / 255;
-
-    const barLength = value * radius * 1.4;
-
-    const x1 = cx + Math.cos(angle) * radius;
-    const y1 = cy + Math.sin(angle) * radius;
-    const x2 = cx + Math.cos(angle) * (radius + barLength);
-    const y2 = cy + Math.sin(angle) * (radius + barLength);
-
-    sctx.strokeStyle = `rgba(0, 255, 200, ${0.25 + value})`;
-    sctx.lineWidth = 2;
-    sctx.beginPath();
-    sctx.moveTo(x1, y1);
-    sctx.lineTo(x2, y2);
-    sctx.stroke();
   }
 
-  spectrumRAF = requestAnimationFrame(drawSpectrum);
-}
-
-function startSpectrum() {
-  initSpectrum();
-
-  if (audioCtx.state === "suspended") {
-    audioCtx.resume();
-  }
-
-  cancelAnimationFrame(spectrumRAF);
-  drawSpectrum();
-}
-
-function stopSpectrum() {
-  cancelAnimationFrame(spectrumRAF);
-  sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
-}
-
+  setInterval(checkLiveFromZeno, 20000);
+  checkLiveFromZeno();
 });
-                          

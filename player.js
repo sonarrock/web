@@ -126,20 +126,18 @@ let vuActive = false;
 let vuFrame = null;
 
 function animateVU() {
-  if (!vuActive) return;
+  if (!vuActive || !analyser) return;
 
-  // suavizado tipo compresor
-  beatLevel += (beatTarget - beatLevel) * 0.25;
+  analyser.getByteFrequencyData(dataArray);
 
-  vuBars.forEach(bar => {
-    const random = Math.random() * 0.3;
-    const level = Math.min(1, beatLevel + random);
-
-    bar.style.height = `${level * 100}%`;
+  vuBars.forEach((bar, i) => {
+    const value = dataArray[i % dataArray.length] / 255;
+    bar.style.height = `${Math.max(0.15, value) * 100}%`;
   });
 
   vuFrame = requestAnimationFrame(animateVU);
 }
+
 
 /* ===============================
    BEAT FAKE ENGINE (PRO)
@@ -190,6 +188,18 @@ muteBtn.addEventListener("click", () => {
 audio.addEventListener("playing", () => {
   document.body.classList.add("playing");
   playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+
+  if (!audioCtx) {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+
+  sourceNode = audioCtx.createMediaElementSource(audio);
+  sourceNode.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
+}
 
   startMatrix();
   startVU();

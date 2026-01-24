@@ -80,10 +80,8 @@ const chars =
 function drawMatrix() {
   if (!matrixRunning) return;
 
-  // 🔑 NO limpiar en negro, solo desvanecer MUY ligero
-  ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+  // 🔑 limpiar transparente (NO negro)
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = `${fontSize}px monospace`;
 
   const night = isNight();
@@ -93,22 +91,21 @@ function drawMatrix() {
     const x = i * fontSize;
     const y = drops[i] * fontSize;
 
-    // ✨ Color Matrix visible pero NO opaco
     ctx.shadowColor = night
       ? "rgba(0,180,255,0.9)"
-      : "rgba(120,220,255,0.8)";
+      : "rgba(120,220,255,0.85)";
 
-    ctx.shadowBlur = night ? 10 : 6;
+    ctx.shadowBlur = night ? 8 : 6;
 
     ctx.fillStyle = night
-      ? "rgba(0,140,255,0.65)"
-      : "rgba(140,220,255,0.6)";
+      ? "rgba(0,150,255,0.75)"
+      : "rgba(140,220,255,0.7)";
 
     ctx.fillText(char, x, y);
 
     drops[i] += night ? 1.4 : 1.1;
 
-    if (y > canvas.height && Math.random() > 0.975) {
+    if (y > canvas.height && Math.random() > 0.98) {
       drops[i] = 0;
     }
   }

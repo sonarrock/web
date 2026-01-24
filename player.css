@@ -254,3 +254,34 @@ body.playing .controls .btn {
   transform: scale(0.65);
   transform-origin: top center;
 }
+
+/* ===============================
+   FIX FINAL IMAGEN OSCURA
+================================ */
+
+/* Fuerza imagen clara */
+.player-container img,
+.player-bg,
+.player-image {
+  opacity: 0.22 !important;
+  filter: brightness(1.15) contrast(1.05) saturate(1.1) !important;
+}
+
+/* Canvas 100% transparente */
+#matrixCanvas {
+  background: rgba(0,0,0,0) !important;
+}
+
+/* Elimina overlays fantasma */
+.player-container::before,
+.player-container::after {
+  display: none !important;
+}
+
+/* Si usas backdrop-filter */
+.overlay,
+.glass,
+.blur {
+  backdrop-filter: none !important;
+  background: rgba(0,0,0,0.18) !important;
+}

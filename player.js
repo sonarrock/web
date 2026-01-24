@@ -1,15 +1,14 @@
-const isNight = () => {
+// ===============================
+// UTILIDAD HORARIO (NOCHE / DÍA)
+// ===============================
+function isNight() {
   const h = new Date().getHours();
   return h >= 19 || h <= 6;
-};
+}
 
-// ===================
-// SONAR ROCK PLAYER 
-// ===================
-
-/* ===============================
-   ELEMENTOS
-================================ */
+// ===============================
+// ELEMENTOS
+// ===============================
 const audio = document.getElementById("radio-audio");
 const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
@@ -19,9 +18,9 @@ const timeDisplay = document.getElementById("time-display");
 audio.playsInline = true;
 audio.preload = "none";
 
-/* ===============================
-   TIMER FAKE (STREAM EN VIVO)
-================================ */
+// ===============================
+// TIMER FAKE (STREAM EN VIVO)
+// ===============================
 let timerInterval = null;
 let playStartTime = null;
 
@@ -47,12 +46,13 @@ function stopFakeTimer() {
   timeDisplay.textContent = "00:00";
 }
 
-/* ===============================
-   MATRIX — LLUVIA REAL (SIN OSCURECER)
-================================ */
+// ===============================
+// MATRIX — LLUVIA REAL
+// ===============================
 const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
 const fontSize = 16;
+
 let columns = 0;
 let drops = [];
 let matrixRunning = false;
@@ -75,7 +75,7 @@ window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 const chars =
-  "アァイィウヴエェオカガキギクグا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و يabcdefghijklmnopqrstuvwxyz0123456789".split("");
+  "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split("");
 
 function drawMatrix() {
   if (!matrixRunning) return;
@@ -90,33 +90,21 @@ function drawMatrix() {
     const x = i * fontSize;
     const y = drops[i] * fontSize;
 
-    // 🔥 colores dinámicos
     ctx.shadowColor = night
-      ? "rgba(0,140,255,1)"
+      ? "rgba(0,140,255,0.9)"
       : "rgba(120,220,255,0.9)";
 
-    ctx.shadowBlur = night ? 16 : 10;
+    ctx.shadowBlur = night ? 14 : 10;
 
     ctx.fillStyle = night
-      ? "rgba(40,120,220,0.9)"   // más oscuro, más agresivo
+      ? "rgba(40,120,220,0.9)"
       : "rgba(120,200,255,0.85)";
 
     ctx.fillText(char, x, y);
 
-    // cola
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = night
-      ? "rgba(20,60,120,0.35)"
-      : "rgba(60,120,180,0.3)";
+    drops[i] += night ? 1.8 : 1.1;
 
-    ctx.fillText(char, x, y - fontSize);
-
-    // velocidad brutal
-    drops[i] += night
-      ? Math.random() * 2.2 + 1.1
-      : Math.random() * 1.5 + 0.7;
-
-    if (y > canvas.height && Math.random() > 0.965) {
+    if (y > canvas.height && Math.random() > 0.97) {
       drops[i] = 0;
     }
   }
@@ -124,10 +112,21 @@ function drawMatrix() {
   matrixFrame = requestAnimationFrame(drawMatrix);
 }
 
+function startMatrix() {
+  if (matrixRunning) return;
+  matrixRunning = true;
+  drawMatrix();
+}
 
-/* ===============================
-   VU METER (FAKE)
-================================ */
+function stopMatrix() {
+  matrixRunning = false;
+  cancelAnimationFrame(matrixFrame);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// ===============================
+// VU METER (FAKE PRO)
+// ===============================
 const vuBars = document.querySelectorAll(".vu-meter span");
 let vuActive = false;
 let vuFrame;
@@ -136,7 +135,7 @@ function animateVU() {
   if (!vuActive) return;
 
   vuBars.forEach(bar => {
-    const level = Math.random() * 0.7 + 0.2;
+    const level = Math.random() * 0.7 + 0.25;
     bar.style.height = `${level * 100}%`;
   });
 
@@ -155,10 +154,9 @@ function stopVU() {
   vuBars.forEach(bar => (bar.style.height = "20%"));
 }
 
-/* ===============================
-   CONTROLES STREAM 
-================================ */
-
+// ===============================
+// CONTROLES — 1 CLICK REAL
+// ===============================
 playPauseBtn.addEventListener("click", async () => {
   if (!audio.paused) {
     audio.pause();
@@ -168,16 +166,12 @@ playPauseBtn.addEventListener("click", async () => {
   try {
     audio.muted = false;
     audio.volume = 1;
-    await audio.play(); // 👈 un solo play real
-  } catch (e) {
-    console.warn("Play bloqueado", e);
+    await audio.play(); // 🔥 UN SOLO CLICK
+  } catch (err) {
+    console.warn("Play bloqueado:", err);
   }
 });
 
-
-/* ===============================
-   BOTONES
-================================ */
 stopBtn.addEventListener("click", () => {
   audio.pause();
   audio.currentTime = 0;
@@ -190,7 +184,9 @@ muteBtn.addEventListener("click", () => {
     : '<i class="fas fa-volume-up"></i>';
 });
 
-
+// ===============================
+// REACCIÓN AL ESTADO DEL AUDIO
+// ===============================
 audio.addEventListener("playing", () => {
   document.body.classList.add("playing");
   playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
@@ -206,4 +202,3 @@ audio.addEventListener("pause", () => {
   stopVU();
   stopFakeTimer();
 });
-

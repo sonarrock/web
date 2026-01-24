@@ -34,7 +34,7 @@
   object-fit: cover;
   object-position: center 15%;
   z-index: 1;
-  opacity: 0.15;
+  opacity: 0.0;
   filter: contrast(1.1) saturate(1.05);
 }
 

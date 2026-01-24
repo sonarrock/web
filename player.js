@@ -1,3 +1,8 @@
+let audioCtx;
+let analyser;
+let sourceNode;
+let dataArray;
+
 // ===================
 // UTILIDADES
 // ===================

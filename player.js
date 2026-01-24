@@ -258,29 +258,59 @@ checkLiveFromZeno();
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* ===============================
-   VU METER REAL
-================================ */
-.vu-meter {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  height: 40px;
-  margin-top: 12px;
+// ===============================
+// VU REAL - WEB AUDIO API
+// ===============================
+let audioCtx;
+let analyser;
+let source;
+let vuRAF;
+const vuBars = document.querySelectorAll("#vu span");
+
+function initVU() {
+  if (audioCtx) return;
+
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+
+  source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
 }
 
-.vu-meter span {
-  width: 6px;
-  height: 15%;
-  background: linear-gradient(
-    to top,
-    #00ffb3,
-    #00d4ff
-  );
-  border-radius: 3px;
-  transition: height 0.08s linear;
-  box-shadow: 0 0 6px rgba(0, 255, 200, 0.6);
+function animateVU() {
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  analyser.getByteFrequencyData(data);
+
+  const avg =
+    data.reduce((a, b) => a + b, 0) / data.length / 255;
+
+  vuBars.forEach((bar, i) => {
+    const boost = Math.random() * 0.4 + 0.6; // movimiento natural
+    const level = Math.min(1, avg * boost * 1.8);
+    bar.style.height = `${Math.max(10, level * 100)}%`;
+  });
+
+  vuRAF = requestAnimationFrame(animateVU);
 }
+
+function startVU() {
+  initVU();
+
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+
+  cancelAnimationFrame(vuRAF);
+  animateVU();
+}
+
+function stopVU() {
+  cancelAnimationFrame(vuRAF);
+  vuBars.forEach(bar => (bar.style.height = "15%"));
+}
+
 
 
 });

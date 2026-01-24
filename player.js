@@ -158,6 +158,19 @@ function stopVU() {
   vuBars.forEach(bar => (bar.style.height = "20%"));
 }
 
+/* ===============================
+   BEAT FAKE ENGINE (PRO)
+================================ */
+let beatLevel = 0;
+let beatTarget = 0;
+
+setInterval(() => {
+  // golpe aleatorio tipo beat
+  beatTarget = Math.random() > 0.6
+    ? Math.random() * 0.8 + 0.6
+    : Math.random() * 0.3;
+}, 420); // ~140 BPM feel
+
 // ===================
 // CONTROLES
 // ===================

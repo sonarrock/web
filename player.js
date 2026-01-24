@@ -176,9 +176,12 @@ async function checkLiveFromZeno() {
     const res = await fetch(ZENO_META, { cache: "no-store" });
     const data = await res.json();
 
+    const listeners = Number(data.listeners || 0);
     const title = (data.streamTitle || "").toUpperCase();
 
+    // 🔴 Zeno REAL logic
     const isLive =
+      listeners > 0 ||
       title.includes("LIVE") ||
       title.includes("DJ") ||
       title.includes("EN VIVO");
@@ -186,10 +189,15 @@ async function checkLiveFromZeno() {
     if (isLive !== lastLiveState) {
       lastLiveState = isLive;
       setLive(isLive);
-      console.log("🎙️ Estado Zeno:", isLive ? "EN VIVO" : "PROGRAMACIÓN");
+      console.log(
+        "🎙️ Estado Zeno:",
+        isLive ? "EN VIVO" : "PROGRAMACIÓN",
+        "| listeners:", listeners
+      );
     }
   } catch (err) {
     console.warn("⚠️ No se pudo consultar Zeno");
+    setLive(false);
   }
 }
 

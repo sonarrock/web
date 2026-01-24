@@ -156,50 +156,24 @@ function stopVU() {
 }
 
 /* ===============================
-   CONTROLES STREAM — 1 CLICK REAL
+   CONTROLES STREAM 
 ================================ */
-let isPlaying = false;
-let playRequested = false;
 
-playPauseBtn.addEventListener("click", () => {
-  if (isPlaying) {
+playPauseBtn.addEventListener("click", async () => {
+  if (!audio.paused) {
     audio.pause();
     return;
   }
 
-  if (playRequested) return; // evita multi-click
-  playRequested = true;
-
-  audio.muted = false;
-  audio.volume = 1;
-
-  audio.play().catch(() => {});
+  try {
+    audio.muted = false;
+    audio.volume = 1;
+    await audio.play(); // 👈 un solo play real
+  } catch (e) {
+    console.warn("Play bloqueado", e);
+  }
 });
 
-// 🔥 SOLO CUANDO EL AUDIO REALMENTE ARRANCA
-audio.addEventListener("playing", () => {
-  isPlaying = true;
-  playRequested = false;
-
-  playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-  document.body.classList.add("playing");
-
-  startMatrix();
-  startVU();
-  startFakeTimer();
-});
-
-audio.addEventListener("pause", () => {
-  isPlaying = false;
-  playRequested = false;
-
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  document.body.classList.remove("playing");
-
-  stopMatrix();
-  stopVU();
-  stopFakeTimer();
-});
 
 /* ===============================
    BOTONES
@@ -215,3 +189,21 @@ muteBtn.addEventListener("click", () => {
     ? '<i class="fas fa-volume-mute"></i>'
     : '<i class="fas fa-volume-up"></i>';
 });
+
+
+audio.addEventListener("playing", () => {
+  document.body.classList.add("playing");
+  playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+  startMatrix();
+  startVU();
+  startFakeTimer();
+});
+
+audio.addEventListener("pause", () => {
+  document.body.classList.remove("playing");
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+  stopMatrix();
+  stopVU();
+  stopFakeTimer();
+});
+

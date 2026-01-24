@@ -106,7 +106,12 @@ function drawMatrix() {
 
     ctx.fillText(char, x, y - fontSize);
 
-    drops[i] += night ? Math.random() * 2 + 1 : Math.random() * 1.3 + 0.6;
+   const speedBoost = beatLevel * 2.5;
+
+drops[i] += night
+  ? Math.random() * (2.2 + speedBoost) + 1.1
+  : Math.random() * (1.5 + speedBoost) + 0.7;
+
 
     if (y > canvas.height && Math.random() > 0.97) {
       drops[i] = 0;

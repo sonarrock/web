@@ -163,5 +163,43 @@ document.addEventListener("DOMContentLoaded", () => {
     setLive(false);
   });
 
-});
 
+// ===============================
+// LIVE STATUS DESDE ZENO (REAL)
+// ===============================
+const ZENO_META =
+  "https://corsproxy.io/?https://api.zeno.fm/mounts/metadata/ezq3fcuf5ehvv";
+
+let lastLiveState = null;
+
+async function checkLiveFromZeno() {
+  try {
+    const res = await fetch(ZENO_META, { cache: "no-store" });
+    const data = await res.json();
+
+    const title = (data.streamTitle || "").toUpperCase();
+
+    const isLive =
+      title.includes("LIVE") ||
+      title.includes("DJ") ||
+      title.includes("EN VIVO");
+
+    if (isLive !== lastLiveState) {
+      lastLiveState = isLive;
+      setLive(isLive);
+      console.log("🎙️ Estado Zeno:", isLive ? "EN VIVO" : "PROGRAMACIÓN");
+    }
+  } catch (err) {
+    console.warn("⚠️ No se pudo consultar Zeno");
+  }
+}
+
+// revisar cada 20 segundos
+setInterval(checkLiveFromZeno, 20000);
+
+// primer check al cargar
+checkLiveFromZeno();
+
+
+});
+                          

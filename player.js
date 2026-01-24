@@ -141,3 +141,16 @@ volumeSlider.addEventListener("input", () => {
   });
 
 });
+
+const liveIndicator = document.getElementById("live-indicator");
+
+audio.addEventListener("playing", () => {
+  liveIndicator.classList.add("live");
+  liveIndicator.querySelector(".text").textContent = "EN VIVO";
+});
+
+audio.addEventListener("pause", () => {
+  liveIndicator.classList.remove("live");
+  liveIndicator.querySelector(".text").textContent = "PROGRAMACIÓN";
+});
+

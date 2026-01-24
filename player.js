@@ -259,59 +259,84 @@ checkLiveFromZeno();
 }
 
 // ===============================
-// VU REAL - WEB AUDIO API
+// ANALIZADOR CIRCULAR TIPO WINAMP
 // ===============================
-let audioCtx;
-let analyser;
-let source;
-let vuRAF;
-const vuBars = document.querySelectorAll("#vu span");
+let audioCtx, analyser, source;
+let spectrumRAF;
 
-function initVU() {
+const spectrumCanvas = document.getElementById("spectrumCanvas");
+const sctx = spectrumCanvas.getContext("2d");
+
+function resizeSpectrum() {
+  const container = document.querySelector(".player-container");
+  spectrumCanvas.width = container.clientWidth;
+  spectrumCanvas.height = container.clientHeight;
+}
+
+resizeSpectrum();
+window.addEventListener("resize", resizeSpectrum);
+
+function initSpectrum() {
   if (audioCtx) return;
 
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
+  analyser.fftSize = 512;
 
   source = audioCtx.createMediaElementSource(audio);
   source.connect(analyser);
   analyser.connect(audioCtx.destination);
 }
 
-function animateVU() {
-  const data = new Uint8Array(analyser.frequencyBinCount);
+function drawSpectrum() {
+  const bufferLength = analyser.frequencyBinCount;
+  const data = new Uint8Array(bufferLength);
   analyser.getByteFrequencyData(data);
 
-  const avg =
-    data.reduce((a, b) => a + b, 0) / data.length / 255;
+  sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
 
-  vuBars.forEach((bar, i) => {
-    const boost = Math.random() * 0.4 + 0.6; // movimiento natural
-    const level = Math.min(1, avg * boost * 1.8);
-    bar.style.height = `${Math.max(10, level * 100)}%`;
-  });
+  const cx = spectrumCanvas.width / 2;
+  const cy = spectrumCanvas.height / 2;
+  const radius = Math.min(cx, cy) * 0.35;
+  const bars = 120;
 
-  vuRAF = requestAnimationFrame(animateVU);
+  for (let i = 0; i < bars; i++) {
+    const angle = (i / bars) * Math.PI * 2;
+    const value = data[i] / 255;
+
+    const barLength = value * radius * 1.4;
+
+    const x1 = cx + Math.cos(angle) * radius;
+    const y1 = cy + Math.sin(angle) * radius;
+    const x2 = cx + Math.cos(angle) * (radius + barLength);
+    const y2 = cy + Math.sin(angle) * (radius + barLength);
+
+    sctx.strokeStyle = `rgba(0, 255, 200, ${0.25 + value})`;
+    sctx.lineWidth = 2;
+    sctx.beginPath();
+    sctx.moveTo(x1, y1);
+    sctx.lineTo(x2, y2);
+    sctx.stroke();
+  }
+
+  spectrumRAF = requestAnimationFrame(drawSpectrum);
 }
 
-function startVU() {
-  initVU();
+function startSpectrum() {
+  initSpectrum();
 
   if (audioCtx.state === "suspended") {
     audioCtx.resume();
   }
 
-  cancelAnimationFrame(vuRAF);
-  animateVU();
+  cancelAnimationFrame(spectrumRAF);
+  drawSpectrum();
 }
 
-function stopVU() {
-  cancelAnimationFrame(vuRAF);
-  vuBars.forEach(bar => (bar.style.height = "15%"));
+function stopSpectrum() {
+  cancelAnimationFrame(spectrumRAF);
+  sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
 }
-
-
 
 });
                           

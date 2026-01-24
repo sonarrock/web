@@ -210,17 +210,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const ZENO_META =
     "https://corsproxy.io/?https://api.zeno.fm/mounts/metadata/ezq3fcuf5ehvv";
 
-  async function checkLiveFromZeno() {
-    try {
-      const res = await fetch(ZENO_META, { cache: "no-store" });
-      const data = await res.json();
-      const listeners = Number(data.listeners || 0);
-      setLive(listeners > 0);
-    } catch {
-      setLive(false);
-    }
-  }
+ async function checkLiveFromZeno() {
+  try {
+    const res = await fetch(ZENO_META, { cache: "no-store" });
+    const data = await res.json();
 
-  setInterval(checkLiveFromZeno, 20000);
+    const isLive =
+      data.stream_active === true ||
+      data.stream_active === "true";
+
+    setLive(isLive);
+
+  } catch (e) {
+    console.warn("Zeno no responde, asumiendo OFF");
+    setLive(false);
+  }
+}
+
+
+  setInterval(checkLiveFromZeno, 10000);
   checkLiveFromZeno();
 });

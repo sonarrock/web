@@ -1,14 +1,14 @@
-// ===============================
-// UTILIDAD HORARIO (NOCHE / DÍA)
-// ===============================
-function isNight() {
+// ===================
+// UTILIDADES
+// ===================
+const isNight = () => {
   const h = new Date().getHours();
   return h >= 19 || h <= 6;
-}
+};
 
-// ===============================
+// ===================
 // ELEMENTOS
-// ===============================
+// ===================
 const audio = document.getElementById("radio-audio");
 const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
@@ -18,9 +18,9 @@ const timeDisplay = document.getElementById("time-display");
 audio.playsInline = true;
 audio.preload = "none";
 
-// ===============================
-// TIMER FAKE (STREAM EN VIVO)
-// ===============================
+// ===================
+// TIMER FAKE
+// ===================
 let timerInterval = null;
 let playStartTime = null;
 
@@ -46,17 +46,17 @@ function stopFakeTimer() {
   timeDisplay.textContent = "00:00";
 }
 
-// ===============================
-// MATRIX — LLUVIA REAL
-// ===============================
+// ===================
+// MATRIX CANVAS
+// ===================
 const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
-const fontSize = 16;
 
+const fontSize = 16;
 let columns = 0;
 let drops = [];
 let matrixRunning = false;
-let matrixFrame;
+let matrixFrame = null;
 
 function resizeCanvas() {
   const container = document.querySelector(".player-container");
@@ -90,11 +90,8 @@ function drawMatrix() {
     const x = i * fontSize;
     const y = drops[i] * fontSize;
 
-    ctx.shadowColor = night
-      ? "rgba(0,140,255,0.9)"
-      : "rgba(120,220,255,0.9)";
-
-    ctx.shadowBlur = night ? 14 : 10;
+    ctx.shadowColor = night ? "rgba(0,140,255,1)" : "rgba(120,220,255,0.9)";
+    ctx.shadowBlur = night ? 14 : 8;
 
     ctx.fillStyle = night
       ? "rgba(40,120,220,0.9)"
@@ -102,7 +99,14 @@ function drawMatrix() {
 
     ctx.fillText(char, x, y);
 
-    drops[i] += night ? 1.8 : 1.1;
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = night
+      ? "rgba(20,60,120,0.35)"
+      : "rgba(60,120,180,0.3)";
+
+    ctx.fillText(char, x, y - fontSize);
+
+    drops[i] += night ? Math.random() * 2 + 1 : Math.random() * 1.3 + 0.6;
 
     if (y > canvas.height && Math.random() > 0.97) {
       drops[i] = 0;
@@ -124,12 +128,12 @@ function stopMatrix() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-// ===============================
-// VU METER (FAKE PRO)
-// ===============================
+// ===================
+// VU METER (FAKE)
+// ===================
 const vuBars = document.querySelectorAll(".vu-meter span");
 let vuActive = false;
-let vuFrame;
+let vuFrame = null;
 
 function animateVU() {
   if (!vuActive) return;
@@ -154,9 +158,9 @@ function stopVU() {
   vuBars.forEach(bar => (bar.style.height = "20%"));
 }
 
-// ===============================
-// CONTROLES — 1 CLICK REAL
-// ===============================
+// ===================
+// CONTROLES
+// ===================
 playPauseBtn.addEventListener("click", async () => {
   if (!audio.paused) {
     audio.pause();
@@ -166,9 +170,9 @@ playPauseBtn.addEventListener("click", async () => {
   try {
     audio.muted = false;
     audio.volume = 1;
-    await audio.play(); // 🔥 UN SOLO CLICK
+    await audio.play();
   } catch (err) {
-    console.warn("Play bloqueado:", err);
+    console.warn("Play bloqueado por el navegador", err);
   }
 });
 
@@ -184,12 +188,13 @@ muteBtn.addEventListener("click", () => {
     : '<i class="fas fa-volume-up"></i>';
 });
 
-// ===============================
-// REACCIÓN AL ESTADO DEL AUDIO
-// ===============================
+// ===================
+// EVENTOS AUDIO
+// ===================
 audio.addEventListener("playing", () => {
   document.body.classList.add("playing");
   playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+
   startMatrix();
   startVU();
   startFakeTimer();
@@ -198,6 +203,7 @@ audio.addEventListener("playing", () => {
 audio.addEventListener("pause", () => {
   document.body.classList.remove("playing");
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+
   stopMatrix();
   stopVU();
   stopFakeTimer();

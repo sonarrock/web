@@ -118,6 +118,13 @@ document.addEventListener("DOMContentLoaded", () => {
       : '<i class="fas fa-volume-up"></i>';
   });
 
+  const volumeSlider = document.getElementById("volume");
+
+volumeSlider.addEventListener("input", () => {
+  audio.volume = volumeSlider.value;
+});
+
+
   // ===============================
   // EVENTOS AUDIO
   // ===============================

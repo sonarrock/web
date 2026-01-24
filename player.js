@@ -1,160 +1,98 @@
-let audioCtx;
-let analyser;
-let sourceNode;
-let dataArray;
+// ===============================
+// SONAR ROCK PLAYER – FINAL
+// ===============================
 
-// ===================
-// UTILIDADES
-// ===================
-const isNight = () => {
-  const h = new Date().getHours();
-  return h >= 19 || h <= 6;
-};
-
-// ===================
-// ELEMENTOS
-// ===================
 const audio = document.getElementById("radio-audio");
 const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
 const timeDisplay = document.getElementById("time-display");
+const progressBar = document.getElementById("radio-progress");
 
+// iOS safe
 audio.playsInline = true;
-audio.preload = "none";
+audio.preload = "auto";
 
-// ===================
-// TIMER FAKE
-// ===================
+// ===============================
+// CONTADOR FAKE (STREAM)
+// ===============================
 let timerInterval = null;
-let playStartTime = null;
+let startTime = 0;
 
-function startFakeTimer() {
-  if (timerInterval) return;
+function startTimer() {
+  stopTimer();
+  startTime = Date.now();
 
-  playStartTime = Date.now();
   timerInterval = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - playStartTime) / 1000);
-    const mins = Math.floor(elapsed / 60);
-    const secs = elapsed % 60;
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const h = Math.floor(elapsed / 3600);
+    const m = Math.floor((elapsed % 3600) / 60);
+    const s = elapsed % 60;
 
     timeDisplay.textContent =
-      `${mins.toString().padStart(2, "0")}:${secs
-        .toString()
-        .padStart(2, "0")}`;
+      `${h.toString().padStart(2, "0")}:` +
+      `${m.toString().padStart(2, "0")}:` +
+      `${s.toString().padStart(2, "0")}`;
   }, 1000);
 }
 
-function stopFakeTimer() {
+function stopTimer() {
   clearInterval(timerInterval);
   timerInterval = null;
-  timeDisplay.textContent = "00:00";
+  timeDisplay.textContent = "00:00:00";
 }
 
-// ===================
-// MATRIX CANVAS
-// ===================
+// ===============================
+// MATRIX
+// ===============================
 const canvas = document.getElementById("matrixCanvas");
 const ctx = canvas.getContext("2d");
-
 const fontSize = 16;
-let columns = 0;
 let drops = [];
-let matrixRunning = false;
-let matrixFrame = null;
+let running = false;
 
 function resizeCanvas() {
   const container = document.querySelector(".player-container");
-  if (!container) return;
-
   canvas.width = container.clientWidth;
   canvas.height = container.clientHeight;
-
-  columns = Math.floor(canvas.width / fontSize);
-  drops = Array.from({ length: columns }, () =>
-    Math.floor(Math.random() * canvas.height / fontSize)
-  );
+  const columns = Math.floor(canvas.width / fontSize);
+  drops = Array(columns).fill(1);
 }
-
-window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-const chars =
-  "アァイィウヴエェオカガキギクグabcdefghijklmnopqrstuvwxyz0123456789".split("");
+const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 function drawMatrix() {
-  if (!matrixRunning) return;
+  if (!running) return;
 
-  // 🔑 limpiar transparente (NO negro)
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = `${fontSize}px monospace`;
+  ctx.fillStyle = "rgba(0,255,180,0.75)";
 
-  const night = isNight();
-
-  for (let i = 0; i < drops.length; i++) {
-    const char = chars[Math.floor(Math.random() * chars.length)];
-    const x = i * fontSize;
-    const y = drops[i] * fontSize;
-
-    ctx.shadowColor = night
-      ? "rgba(0,180,255,0.9)"
-      : "rgba(120,220,255,0.85)";
-
-    ctx.shadowBlur = night ? 8 : 6;
-
-    ctx.fillStyle = night
-      ? "rgba(0,150,255,0.75)"
-      : "rgba(140,220,255,0.7)";
-
-    ctx.fillText(char, x, y);
-
-    drops[i] += night ? 1.4 : 1.1;
-
-    if (y > canvas.height && Math.random() > 0.98) {
-      drops[i] = 0;
-    }
-  }
-
-  matrixFrame = requestAnimationFrame(drawMatrix);
-}
-
-// ===================
-// VU METER (FAKE)
-// ===================
-const vuBars = document.querySelectorAll(".vu-meter span");
-let vuActive = false;
-let vuFrame = null;
-
-function animateVU() {
-  if (!vuActive || !analyser) return;
-
-  analyser.getByteFrequencyData(dataArray);
-
-  vuBars.forEach((bar, i) => {
-    const value = dataArray[i % dataArray.length] / 255;
-    bar.style.height = `${Math.max(0.15, value) * 100}%`;
+  drops.forEach((y, i) => {
+    const text = chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(text, i * fontSize, y * fontSize);
+    drops[i] = y * fontSize > canvas.height && Math.random() > 0.975 ? 0 : y + 1;
   });
 
-  vuFrame = requestAnimationFrame(animateVU);
+  requestAnimationFrame(drawMatrix);
 }
 
+function startMatrix() {
+  if (running) return;
+  running = true;
+  drawMatrix();
+}
 
-/* ===============================
-   BEAT FAKE ENGINE (PRO)
-================================ */
-let beatLevel = 0;
-let beatTarget = 0;
+function stopMatrix() {
+  running = false;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
 
-setInterval(() => {
-  // golpe aleatorio tipo beat
-  beatTarget = Math.random() > 0.6
-    ? Math.random() * 0.8 + 0.6
-    : Math.random() * 0.3;
-}, 420); // ~140 BPM feel
-
-// ===================
+// ===============================
 // CONTROLES
-// ===================
+// ===============================
 playPauseBtn.addEventListener("click", async () => {
   if (!audio.paused) {
     audio.pause();
@@ -162,17 +100,21 @@ playPauseBtn.addEventListener("click", async () => {
   }
 
   try {
-    audio.muted = false;
-    audio.volume = 1;
     await audio.play();
+    startTimer();
+    startMatrix();
+    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
   } catch (err) {
-    console.warn("Play bloqueado por el navegador", err);
+    console.warn("Play bloqueado:", err);
   }
 });
 
 stopBtn.addEventListener("click", () => {
   audio.pause();
   audio.currentTime = 0;
+  stopTimer();
+  stopMatrix();
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
 });
 
 muteBtn.addEventListener("click", () => {
@@ -182,110 +124,11 @@ muteBtn.addEventListener("click", () => {
     : '<i class="fas fa-volume-up"></i>';
 });
 
-// ===================
-// EVENTOS AUDIO
-// ===================
-audio.addEventListener("playing", () => {
-  document.body.classList.add("playing");
-  playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-
-  if (!audioCtx) {
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
-
-  sourceNode = audioCtx.createMediaElementSource(audio);
-  sourceNode.connect(analyser);
-  analyser.connect(audioCtx.destination);
-
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
-}
-
-  startMatrix();
-  startVU();
-  startFakeTimer();
-});
-
+// ===============================
+// ESTADOS AUDIO
+// ===============================
 audio.addEventListener("pause", () => {
-  document.body.classList.remove("playing");
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-
   stopMatrix();
-  stopVU();
-  stopFakeTimer();
-});
-
-
-/* ===============================
-   AUTO RECOVERY STREAM (PRO)
-================================ */
-
-let reconnectTimer = null;
-let silenceTimer = null;
-let lastCurrentTime = 0;
-let reconnecting = false;
-
-const RECONNECT_DELAY = 3000; // 3 segundos
-const SILENCE_LIMIT = 6000;   // 6 segundos sin avance
-
-function startWatchdog() {
-  stopWatchdog();
-
-  silenceTimer = setInterval(() => {
-    if (audio.paused || audio.readyState < 2) return;
-
-    if (audio.currentTime === lastCurrentTime) {
-      console.warn("⛔ Stream congelado, reconectando...");
-      reconnectStream();
-    }
-
-    lastCurrentTime = audio.currentTime;
-  }, SILENCE_LIMIT);
-}
-
-function stopWatchdog() {
-  clearInterval(silenceTimer);
-  silenceTimer = null;
-}
-
-async function reconnectStream() {
-  if (reconnecting) return;
-  reconnecting = true;
-
-  document.body.classList.add("reconnecting");
-
-  try {
-    audio.pause();
-    audio.src = audio.src; // fuerza reload
-    await audio.play();
-  } catch (e) {
-    console.warn("⏳ Reintento fallido, nuevo intento...");
-  }
-
-  reconnectTimer = setTimeout(() => {
-    reconnecting = false;
-    document.body.classList.remove("reconnecting");
-  }, RECONNECT_DELAY);
-}
-
-/* ===============================
-   EVENTOS CRÍTICOS
-================================ */
-
-audio.addEventListener("playing", () => {
-  startWatchdog();
-});
-
-audio.addEventListener("pause", () => {
-  stopWatchdog();
-});
-
-audio.addEventListener("stalled", () => {
-  console.warn("⚠️ Stream stalled");
-  reconnectStream();
-});
-
-audio.addEventListener("error", () => {
-  console.warn("🔥 Error de stream");
-  reconnectStream();
+  stopTimer();
+  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
 });

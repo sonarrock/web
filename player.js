@@ -1,6 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  let audioCtx, analyser, source;
+  // ===============================
+  // AUDIO CONTEXT (UNA SOLA VEZ)
+  // ===============================
+  let audioCtx = null;
+  let analyser = null;
+  let source = null;
+  let spectrumRAF = null;
 
   // ===============================
   // ELEMENTOS
@@ -13,11 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const matrixCanvas = document.getElementById("matrixCanvas");
   const spectrumCanvas = document.getElementById("spectrumCanvas");
   const liveIndicator = document.getElementById("live-indicator");
-
-  if (!audio || !playPauseBtn || !matrixCanvas || !spectrumCanvas || !liveIndicator) {
-    console.error("❌ Elementos críticos no encontrados");
-    return;
-  }
+  const player = document.querySelector(".player-container");
 
   const liveText = liveIndicator.querySelector(".text");
 
@@ -34,48 +36,47 @@ document.addEventListener("DOMContentLoaded", () => {
     stopTimer();
     startTime = Date.now();
     timer = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
-      const s = String(elapsed % 60).padStart(2, "0");
-      timeDisplay.textContent = `${m}:${s}`;
+      const t = Math.floor((Date.now() - startTime) / 1000);
+      timeDisplay.textContent =
+        `${String(t / 60 | 0).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
     }, 1000);
   }
 
   function stopTimer() {
     clearInterval(timer);
-    timer = null;
     timeDisplay.textContent = "00:00";
   }
 
   // ===============================
-  // MATRIX
+  // MATRIX REAL (LLUVIA)
   // ===============================
   const mctx = matrixCanvas.getContext("2d");
   const fontSize = 16;
   let drops = [];
   let matrixRunning = false;
+  const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   function resizeMatrix() {
-    const c = document.querySelector(".player-container");
-    matrixCanvas.width = c.clientWidth;
-    matrixCanvas.height = c.clientHeight;
+    matrixCanvas.width = player.clientWidth;
+    matrixCanvas.height = player.clientHeight;
     drops = Array(Math.floor(matrixCanvas.width / fontSize)).fill(1);
   }
 
   resizeMatrix();
   window.addEventListener("resize", resizeMatrix);
 
-  const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
   function drawMatrix() {
     if (!matrixRunning) return;
 
-    mctx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+    // 🔥 fade, NO clear total
+    mctx.fillStyle = "rgba(0,0,0,0.15)";
+    mctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+
     mctx.font = `${fontSize}px monospace`;
-    mctx.fillStyle = "rgba(0,255,180,0.6)";
+    mctx.fillStyle = "rgba(0,255,180,0.9)";
 
     drops.forEach((y, i) => {
-      const char = chars[Math.floor(Math.random() * chars.length)];
+      const char = chars[Math.random() * chars.length | 0];
       mctx.fillText(char, i * fontSize, y * fontSize);
       drops[i] = y * fontSize > matrixCanvas.height ? 0 : y + 1;
     });
@@ -95,31 +96,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===============================
-  // ANALIZADOR CIRCULAR REAL
+  // SPECTRUM REAL
   // ===============================
-  let audioCtx, analyser, source, spectrumRAF;
   const sctx = spectrumCanvas.getContext("2d");
 
   function resizeSpectrum() {
-    const c = document.querySelector(".player-container");
-    spectrumCanvas.width = c.clientWidth;
-    spectrumCanvas.height = c.clientHeight;
+    spectrumCanvas.width = player.clientWidth;
+    spectrumCanvas.height = player.clientHeight;
   }
 
   resizeSpectrum();
   window.addEventListener("resize", resizeSpectrum);
-
-  function initSpectrum() {
-    if (audioCtx) return;
-
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 512;
-
-    source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-  }
 
   function drawSpectrum() {
     const data = new Uint8Array(analyser.frequencyBinCount);
@@ -135,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const v = data[i] / 255;
       const a = (i / 120) * Math.PI * 2;
 
-      sctx.strokeStyle = `rgba(0,255,200,${0.3 + v})`;
+      sctx.strokeStyle = `rgba(0,180,255,${0.4 + v})`;
       sctx.lineWidth = 2;
       sctx.beginPath();
       sctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
@@ -146,56 +133,39 @@ document.addEventListener("DOMContentLoaded", () => {
     spectrumRAF = requestAnimationFrame(drawSpectrum);
   }
 
-  function startSpectrum() {
-  if (!analyser) return;
-  cancelAnimationFrame(spectrumRAF);
-  drawSpectrum();
-}
-
-
-  function stopSpectrum() {
-    cancelAnimationFrame(spectrumRAF);
-    sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
-  }
-
   // ===============================
   // LIVE STATUS
   // ===============================
   function setLive(on) {
-    if (!liveText) return;
-
     liveIndicator.classList.toggle("live", on);
-    liveIndicator.classList.toggle("auto", !on);
     liveText.textContent = on ? "EN VIVO" : "PROGRAMACIÓN";
   }
 
   // ===============================
-  // CONTROLES
+  // CONTROLES (CHROME SAFE)
   // ===============================
- playPauseBtn.addEventListener("click", async () => {
+  playPauseBtn.addEventListener("click", async () => {
 
-  // 🔥 CREAR AudioContext SOLO EN INTERACCIÓN HUMANA
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 512;
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 512;
 
-    source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-  }
+      source = audioCtx.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    }
 
-  if (audioCtx.state === "suspended") {
-    await audioCtx.resume();
-  }
+    if (audioCtx.state === "suspended") {
+      await audioCtx.resume();
+    }
 
-  if (audio.paused) {
-    await audio.play();
-  } else {
-    audio.pause();
-  }
-});
-
+    if (audio.paused) {
+      await audio.play();
+    } else {
+      audio.pause();
+    }
+  });
 
   stopBtn.addEventListener("click", () => {
     audio.pause();
@@ -204,9 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   muteBtn.addEventListener("click", () => {
     audio.muted = !audio.muted;
-    muteBtn.innerHTML = audio.muted
-      ? '<i class="fas fa-volume-mute"></i>'
-      : '<i class="fas fa-volume-up"></i>';
   });
 
   // ===============================
@@ -214,42 +181,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===============================
   audio.addEventListener("playing", () => {
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    player.classList.add("playing"); // 🔥 brillo / oscurecer
     startTimer();
     startMatrix();
-    startSpectrum();
+    drawSpectrum();
   });
 
   audio.addEventListener("pause", () => {
     playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    player.classList.remove("playing");
     stopTimer();
     stopMatrix();
-    stopSpectrum();
+    cancelAnimationFrame(spectrumRAF);
   });
 
-  // ===============================
-  // ZENO LIVE REAL
-  // ===============================
-  const ZENO_META =
-    "https://corsproxy.io/?https://api.zeno.fm/mounts/metadata/ezq3fcuf5ehvv";
-
- async function checkLiveFromZeno() {
-  try {
-    const res = await fetch(ZENO_META, { cache: "no-store" });
-    const data = await res.json();
-
-    const isLive =
-      data.stream_active === true ||
-      data.stream_active === "true";
-
-    setLive(isLive);
-
-  } catch (e) {
-    console.warn("Zeno no responde, asumiendo OFF");
-    setLive(false);
-  }
-}
-
-
-  setInterval(checkLiveFromZeno, 10000);
-  checkLiveFromZeno();
 });

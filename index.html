@@ -54,62 +54,36 @@
 <section class="player-section">
   <div class="player-container" id="player">
 
-    <!-- BACKGROUND -->
-    <img
-      src="img/background1.png"
-      alt="Sonar Rock Background"
-      class="player-bg"
-      width="380"
-      height="580"
-    >
+    <img src="img/background1.png" alt="Sonar Rock Background" class="player-bg">
 
-    <!-- MATRIX -->
-    <canvas id="matrixCanvas"></canvas>
+    <canvas id="matrixCanvas" aria-hidden="true"></canvas>
 
-    <!-- OVERLAY -->
     <div class="overlay"></div>
 
-    <!-- CONTENIDO -->
     <div class="player-content">
 
-      <!-- NOW PLAYING -->
       <div id="now-playing" class="now-playing">
         Sonar Rock · Radio Independiente
       </div>
 
-      <!-- LIVE BADGE -->
       <div id="live-indicator" class="live-badge">
         <span class="dot"></span>
         <span class="text">EN VIVO</span>
       </div>
 
-      <!-- CONTROLES -->
       <div class="controls">
-
         <button id="playPauseBtn" class="btn" aria-label="Play">
           <i class="fas fa-play"></i>
         </button>
-
         <button id="stop-btn" class="btn" aria-label="Stop">
           <i class="fas fa-stop"></i>
         </button>
-
         <button id="mute-btn" class="btn" aria-label="Mute">
           <i class="fas fa-volume-up"></i>
         </button>
-
-        <input
-          id="volume"
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value="1"
-        >
-
+        <input id="volume" type="range" min="0" max="1" step="0.01" value="1">
       </div>
 
-      <!-- PROGRESO -->
       <div class="progress-wrapper">
         <div class="progress-container">
           <div id="radio-progress"></div>
@@ -117,17 +91,15 @@
         <div id="time-display">00:00:00</div>
       </div>
 
-      <!-- AUDIO (ZENO - FUNCIONAL) -->
-      <audio id="radio-audio" preload="auto">
-        <source
-          src="https://stream.zeno.fm/ezq3fcuf5ehvv"
-          type="audio/mpeg"
-        >
-      </audio>
-
     </div>
+
+    <audio id="radio-audio" preload="auto">
+      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+    </audio>
+
   </div>
 </section>
+
 
 
 <!-- ========================= -->

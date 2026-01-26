@@ -48,34 +48,53 @@
 </section>
 
 <!-- ========================= -->
-<!-- REPRODUCTOR STREAMING -->
+<!-- REPRODUCTOR SONAR ROCK -->
 <!-- ========================= -->
-<section class="player-section">
-  <div class="player-container">
 
-    <!-- Fondo -->
-    <img src="img/background1.png" alt="Background" class="player-bg">
+<section class="player-section">
+  <div class="player-container" id="player">
+
+    <!-- BACKGROUND -->
+    <img
+      src="img/background1.png"
+      alt="Sonar Rock Background"
+      class="player-bg"
+      width="380"
+      height="580"
+    >
+
+    <!-- OVERLAY -->
     <div class="overlay"></div>
 
-    <!-- Canvas efectos -->
-    <canvas id="matrixCanvas"></canvas>
-    <canvas id="spectrumCanvas"></canvas>
-
-    <!-- BADGE EN VIVO -->
-    <div id="live-indicator" class="live-badge auto">
-      <span class="dot"></span>
-      <span class="text">PROGRAMACIÓN</span>
-    </div>
-
-    <!-- CONTENIDO INFERIOR -->
+    <!-- CONTENIDO -->
     <div class="player-content">
 
-      <!-- Now Playing -->
-      <div id="now-playing"></div>
+      <!-- NOW PLAYING -->
+      <div id="now-playing" class="now-playing">
+        Sonar Rock · Radio Independiente
+      </div>
 
-      <!-- Controles -->
+      <!-- SPECTRUM (SIMULADO) -->
+      <div class="spectrum">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <!-- LIVE BADGE -->
+      <div id="live-indicator" class="live-badge">
+        <span class="dot"></span>
+        <span class="text">EN VIVO</span>
+      </div>
+
+      <!-- CONTROLES -->
       <div class="controls">
-        <button id="playPauseBtn" class="btn" aria-label="Play/Pause">
+
+        <button id="playPauseBtn" class="btn" aria-label="Play">
           <i class="fas fa-play"></i>
         </button>
 
@@ -94,25 +113,27 @@
           max="1"
           step="0.01"
           value="1"
-          aria-label="Volume"
         >
+
       </div>
 
-      <!-- Progreso -->
+      <!-- PROGRESO -->
       <div class="progress-wrapper">
-        <div id="radio-progress-container" class="progress-container">
+        <div class="progress-container">
           <div id="radio-progress"></div>
         </div>
-        <div id="time-display" class="time-display">00:00:00</div>
+        <div id="time-display">00:00:00</div>
       </div>
 
+      <!-- AUDIO (ZENO - NO TOCAR) -->
+      <audio id="radio-audio" preload="auto">
+        <source
+          src="https://stream.zeno.fm/ezq3fcuf5ehvv"
+          type="audio/mpeg"
+        >
+      </audio>
+
     </div>
-
-    <!-- Audio -->
-  <audio id="radio-audio" preload="auto">
-  <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-</audio>
-
   </div>
 </section>
 

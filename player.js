@@ -154,7 +154,7 @@ for (let i = 2; i < 20; i++) bass += data[i];
 const avg = bass / 18 / 255;
 
   if (avg > 0.05) {
-    const intensity = Math.min(1, avg * 2.5);
+    const intensity = Math.min(1, Math.pow(avg * 3, 1.2));
     player.classList.add("glow");
    const color = liveIndicator.classList.contains("live")
   ? `255,60,60`

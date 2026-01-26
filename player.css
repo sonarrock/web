@@ -13,12 +13,12 @@
   position: relative;
   width: 100%;
   max-width: 320px;
-  height: 420px;              /* 🔥 ALTURA FIJA (CRÍTICO) */
+  height: 420px;
   background: #000;
   border-radius: 16px;
   overflow: hidden;
   transition: box-shadow 0.25s ease, filter 0.25s ease;
-  isolation: isolate;         /* 🔥 evita conflictos de z-index */
+  isolation: isolate;
 }
 
 .player-container.glow {
@@ -45,10 +45,9 @@
 }
 
 /* =========================
-   CANVAS
+   MATRIX (FULL)
 ========================= */
-#matrixCanvas,
-#spectrumCanvas {
+#matrixCanvas {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -56,10 +55,24 @@
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.3s ease;
+  z-index: 2;
 }
 
-#matrixCanvas { z-index: 2; }
-#spectrumCanvas { z-index: 4; }
+/* =========================
+   SPECTRUM (CENTRADO REAL)
+========================= */
+#spectrumCanvas {
+  position: absolute;
+  width: 90%;
+  height: 110px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 4;
+}
 
 .player-container.playing #matrixCanvas,
 .player-container.playing #spectrumCanvas {
@@ -192,5 +205,10 @@
 @media (max-width: 768px) {
   .player-container {
     width: 90%;
+    height: 380px;
+  }
+
+  #spectrumCanvas {
+    height: 90px;
   }
 }

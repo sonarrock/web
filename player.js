@@ -8,6 +8,8 @@ const muteBtn = document.getElementById("mute-btn");
 const liveBadge = document.getElementById("live-indicator");
 const player = document.querySelector(".player-container");
 const matrixCanvas = document.getElementById("matrixCanvas");
+const volumeSlider = document.getElementById("volume");
+
 
 if (!audio || !playBtn || !player || !matrixCanvas) {
   console.error("❌ Player incompleto");
@@ -23,7 +25,7 @@ let animationId = null;
 /* ===============================
    MATRIX CONFIG
 =============================== */
-const matrixChars = "SONARROCK101010";
+const matrixChars = "0123456789ABCDEFGHIJKMNOPQRSTUVXYZ";
 const fontSize = 14;
 let drops = [];
 
@@ -159,4 +161,11 @@ audio.addEventListener("error", () => {
   setTimeout(() => {
     audio.play().catch(() => {});
   }, 3000);
+
+   if (volumeSlider) {
+  audio.volume = volumeSlider.value;
+
+  volumeSlider.addEventListener("input", () => {
+    audio.volume = volumeSlider.value;
+  
 });

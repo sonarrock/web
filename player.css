@@ -2,9 +2,6 @@
    ELEMENTOS
 =============================== */
 const audio = document.getElementById("radio-audio");
-audio.crossOrigin = "anonymous";
-audio.preload = "none";
-
 const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
@@ -13,10 +10,21 @@ const matrixCanvas = document.getElementById("matrixCanvas");
 const spectrumCanvas = document.getElementById("spectrumCanvas");
 const liveIndicator = document.getElementById("live-indicator");
 const player = document.querySelector(".player-container");
+const bgImage = document.querySelector(".player-bg");
 
 if (!audio || !player) {
   console.error("❌ Player incompleto");
   throw new Error("Player incompleto");
+}
+
+/* ===============================
+   AJUSTE FORZADO DE IMAGEN
+=============================== */
+if (bgImage) {
+  bgImage.style.width = "380px";
+  bgImage.style.height = "580px";
+  bgImage.style.objectFit = "cover";
+  bgImage.style.maxWidth = "100%";
 }
 
 /* ===============================
@@ -36,7 +44,7 @@ const matrixCtx = matrixCanvas.getContext("2d");
 const spectrumCtx = spectrumCanvas.getContext("2d");
 
 /* ===============================
-   RESIZE
+   RESIZE CANVAS
 =============================== */
 function resizeCanvas() {
   const rect = player.getBoundingClientRect();
@@ -45,17 +53,16 @@ function resizeCanvas() {
   matrixCanvas.height = rect.height;
 
   spectrumCanvas.width = rect.width * 0.9;
-  spectrumCanvas.height = 110;
+  spectrumCanvas.height = 100;
 
   initMatrix();
 }
-
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("orientationchange", resizeCanvas);
 resizeCanvas();
 
 /* ===============================
-   AUDIO CONTEXT
+   AUDIO CONTEXT (SEGURO)
 =============================== */
 function initAudioContext() {
   if (audioCtx) return;
@@ -71,7 +78,7 @@ function initAudioContext() {
 }
 
 /* ===============================
-   PLAY / PAUSE (FIX CRÍTICO)
+   PLAY / PAUSE (FIX REAL)
 =============================== */
 playPauseBtn.addEventListener("click", () => {
   initAudioContext();
@@ -81,26 +88,24 @@ playPauseBtn.addEventListener("click", () => {
   }
 
   if (audio.paused) {
-    audio.load();
+    audio.muted = false;
 
-    audio.play()
-      .then(() => {
-        player.classList.add("playing");
-        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        liveIndicator.classList.add("live");
+    audio.play().then(() => {
+      player.classList.add("playing");
+      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+      liveIndicator.classList.add("live");
 
-        if (!startTime) startTime = Date.now();
-        animate();
-      })
-      .catch(err => {
-        console.warn("⚠️ Play bloqueado:", err);
-      });
+      if (!startTime) startTime = Date.now();
+      animate();
+    }).catch(err => {
+      console.warn("⚠️ Chrome bloqueó el play:", err);
+    });
 
   } else {
     audio.pause();
     playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-    player.style.setProperty("--glow-intensity", 0.25);
     cancelAnimationFrame(animationId);
+    player.style.setProperty("--glow-intensity", 0.25);
   }
 });
 
@@ -110,13 +115,13 @@ playPauseBtn.addEventListener("click", () => {
 stopBtn.addEventListener("click", () => {
   audio.pause();
   audio.currentTime = 0;
+  startTime = null;
 
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
   player.classList.remove("playing");
   player.style.setProperty("--glow-intensity", 0.25);
 
   cancelAnimationFrame(animationId);
-  startTime = null;
 });
 
 /* ===============================
@@ -130,7 +135,7 @@ muteBtn.addEventListener("click", () => {
 });
 
 /* ===============================
-   TIME
+   TIME DISPLAY
 =============================== */
 setInterval(() => {
   if (!startTime) return;
@@ -143,14 +148,14 @@ setInterval(() => {
 }, 1000);
 
 /* ===============================
-   GLOW
+   GLOW DINÁMICO
 =============================== */
 function updateGlow(data) {
   let sum = 0;
   for (let i = 0; i < data.length; i++) sum += data[i];
 
-  const target = Math.min(Math.max(sum / data.length / 150, 0.25), 1);
-  lastGlow = lastGlow * 0.7 + target * 0.3;
+  const target = Math.min(Math.max(sum / data.length / 160, 0.25), 1);
+  lastGlow = lastGlow * 0.75 + target * 0.25;
 
   player.style.setProperty("--glow-intensity", lastGlow.toFixed(2));
 }
@@ -159,19 +164,20 @@ function updateGlow(data) {
    SPECTRUM
 =============================== */
 function drawSpectrum() {
+  if (!analyser) return;
+
   const bufferLength = analyser.frequencyBinCount;
   const dataArray = new Uint8Array(bufferLength);
-
   analyser.getByteFrequencyData(dataArray);
-  updateGlow(dataArray);
 
+  updateGlow(dataArray);
   spectrumCtx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
 
   const barWidth = spectrumCanvas.width / bufferLength;
   let x = 0;
 
   for (let i = 0; i < bufferLength; i++) {
-    const h = dataArray[i] * 0.7;
+    const h = dataArray[i] * 0.6;
     spectrumCtx.fillStyle = "#ff6600";
     spectrumCtx.fillRect(x, spectrumCanvas.height - h, barWidth - 1, h);
     x += barWidth;
@@ -200,20 +206,4 @@ function drawMatrix() {
   matrixDrops.forEach((y, i) => {
     const c = matrixChars[Math.floor(Math.random() * matrixChars.length)];
     matrixCtx.fillText(c, i * fontSize, y * fontSize);
-    if (y * fontSize > matrixCanvas.height && Math.random() > 0.97) {
-      matrixDrops[i] = 0;
-    }
-    matrixDrops[i]++;
-  });
-}
-
-/* ===============================
-   LOOP
-=============================== */
-function animate() {
-  if (!analyser) return;
-
-  drawSpectrum();
-  drawMatrix();
-  animationId = requestAnimationFrame(animate);
-}
+    if (y * fontSize > matrixCanvas.height &&*

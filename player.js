@@ -25,6 +25,7 @@ let analyser;
 let source;
 let animationId;
 let startTime = null;
+let lastGlow = 0.35;
 
 /* ===============================
    CANVAS CONTEXTS
@@ -84,6 +85,7 @@ playPauseBtn.addEventListener("click", async () => {
   } else {
     audio.pause();
     playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    player.style.setProperty("--glow-intensity", 0.35);
     cancelAnimationFrame(animationId);
   }
 });
@@ -96,6 +98,7 @@ stopBtn.addEventListener("click", () => {
   audio.currentTime = 0;
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
   player.classList.remove("playing");
+  player.style.setProperty("--glow-intensity", 0.25);
   cancelAnimationFrame(animationId);
   startTime = null;
 });
@@ -125,6 +128,24 @@ setInterval(() => {
 }, 1000);
 
 /* ===============================
+   GLOW DINÁMICO
+=============================== */
+function updateGlow(dataArray) {
+  let sum = 0;
+  for (let i = 0; i < dataArray.length; i++) {
+    sum += dataArray[i];
+  }
+
+  const average = sum / dataArray.length;
+  const target = Math.min(Math.max(average / 180, 0.25), 1);
+
+  // suavizado analógico
+  lastGlow = lastGlow * 0.8 + target * 0.2;
+
+  player.style.setProperty("--glow-intensity", lastGlow.toFixed(2));
+}
+
+/* ===============================
    SPECTRUM VISUALIZER
 =============================== */
 function drawSpectrum() {
@@ -132,6 +153,7 @@ function drawSpectrum() {
   const dataArray = new Uint8Array(bufferLength);
 
   analyser.getByteFrequencyData(dataArray);
+  updateGlow(dataArray);
 
   spectrumCtx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
 

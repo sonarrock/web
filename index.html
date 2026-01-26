@@ -63,6 +63,9 @@
       height="580"
     >
 
+    <!-- MATRIX -->
+    <canvas id="matrixCanvas"></canvas>
+
     <!-- OVERLAY -->
     <div class="overlay"></div>
 
@@ -72,17 +75,6 @@
       <!-- NOW PLAYING -->
       <div id="now-playing" class="now-playing">
         Sonar Rock · Radio Independiente
-      </div>
-
-      <!-- SPECTRUM (SIMULADO) -->
-      <div class="spectrum">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
       </div>
 
       <!-- LIVE BADGE -->
@@ -125,7 +117,7 @@
         <div id="time-display">00:00:00</div>
       </div>
 
-      <!-- AUDIO (ZENO - NO TOCAR) -->
+      <!-- AUDIO (ZENO - FUNCIONAL) -->
       <audio id="radio-audio" preload="auto">
         <source
           src="https://stream.zeno.fm/ezq3fcuf5ehvv"
@@ -136,6 +128,7 @@
     </div>
   </div>
 </section>
+
 
 <!-- ========================= -->
 <!-- REDES SOCIALES -->

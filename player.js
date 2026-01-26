@@ -10,7 +10,6 @@ const matrixCanvas = document.getElementById("matrixCanvas");
 const spectrumCanvas = document.getElementById("spectrumCanvas");
 const liveIndicator = document.getElementById("live-indicator");
 const player = document.querySelector(".player-container");
-const bgImage = document.querySelector(".player-bg");
 
 if (!audio || !player) {
   console.error("❌ Player incompleto");
@@ -18,14 +17,11 @@ if (!audio || !player) {
 }
 
 /* ===============================
-   AJUSTE FORZADO DE IMAGEN
+   STREAM CONFIG (CRÍTICO CHROME)
 =============================== */
-if (bgImage) {
-  bgImage.style.width = "380px";
-  bgImage.style.height = "580px";
-  bgImage.style.objectFit = "cover";
-  bgImage.style.maxWidth = "100%";
-}
+const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
+audio.crossOrigin = "anonymous";
+audio.preload = "none";
 
 /* ===============================
    ESTADO
@@ -48,13 +44,10 @@ const spectrumCtx = spectrumCanvas.getContext("2d");
 =============================== */
 function resizeCanvas() {
   const rect = player.getBoundingClientRect();
-
   matrixCanvas.width = rect.width;
   matrixCanvas.height = rect.height;
-
   spectrumCanvas.width = rect.width * 0.9;
   spectrumCanvas.height = 100;
-
   initMatrix();
 }
 window.addEventListener("resize", resizeCanvas);
@@ -62,7 +55,7 @@ window.addEventListener("orientationchange", resizeCanvas);
 resizeCanvas();
 
 /* ===============================
-   AUDIO CONTEXT (SEGURO)
+   AUDIO CONTEXT (SAFE)
 =============================== */
 function initAudioContext() {
   if (audioCtx) return;
@@ -78,10 +71,14 @@ function initAudioContext() {
 }
 
 /* ===============================
-   PLAY / PAUSE (FIX REAL)
+   PLAY / PAUSE (CHROME FIX)
 =============================== */
 playPauseBtn.addEventListener("click", () => {
   initAudioContext();
+
+  if (!audio.src) {
+    audio.src = STREAM_URL;   // 🔥 ASIGNAR SRC AQUÍ
+  }
 
   if (audioCtx.state === "suspended") {
     audioCtx.resume();
@@ -98,14 +95,14 @@ playPauseBtn.addEventListener("click", () => {
       if (!startTime) startTime = Date.now();
       animate();
     }).catch(err => {
-      console.warn("⚠️ Chrome bloqueó el play:", err);
+      console.error("❌ Chrome bloqueó el audio:", err);
     });
 
   } else {
     audio.pause();
     playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-    cancelAnimationFrame(animationId);
     player.style.setProperty("--glow-intensity", 0.25);
+    cancelAnimationFrame(animationId);
   }
 });
 
@@ -114,13 +111,13 @@ playPauseBtn.addEventListener("click", () => {
 =============================== */
 stopBtn.addEventListener("click", () => {
   audio.pause();
-  audio.currentTime = 0;
-  startTime = null;
+  audio.removeAttribute("src"); // 🔥 reset real
+  audio.load();
 
+  startTime = null;
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
   player.classList.remove("playing");
   player.style.setProperty("--glow-intensity", 0.25);
-
   cancelAnimationFrame(animationId);
 });
 
@@ -139,7 +136,6 @@ muteBtn.addEventListener("click", () => {
 =============================== */
 setInterval(() => {
   if (!startTime) return;
-
   const t = Math.floor((Date.now() - startTime) / 1000);
   timeDisplay.textContent =
     `${String(Math.floor(t / 3600)).padStart(2, "0")}:` +
@@ -148,15 +144,13 @@ setInterval(() => {
 }, 1000);
 
 /* ===============================
-   GLOW DINÁMICO
+   GLOW
 =============================== */
 function updateGlow(data) {
   let sum = 0;
   for (let i = 0; i < data.length; i++) sum += data[i];
-
   const target = Math.min(Math.max(sum / data.length / 160, 0.25), 1);
   lastGlow = lastGlow * 0.75 + target * 0.25;
-
   player.style.setProperty("--glow-intensity", lastGlow.toFixed(2));
 }
 

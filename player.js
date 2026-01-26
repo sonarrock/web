@@ -1,16 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ==================================================
-  // AUDIO CONTEXT (CREADO SOLO CON INTERACCIÓN HUMANA)
-  // ==================================================
-  let audioCtx = null;
-  let analyser = null;
-  let source = null;
-  let spectrumRAF = null;
-
-  // ===============================
-  // ELEMENTOS
-  // ===============================
+  /* ===============================
+     ELEMENTOS
+  =============================== */
   const audio = document.getElementById("radio-audio");
   const playPauseBtn = document.getElementById("playPauseBtn");
   const stopBtn = document.getElementById("stop-btn");
@@ -22,12 +14,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const player = document.querySelector(".player-container");
   const liveText = liveIndicator.querySelector(".text");
 
-  audio.playsInline = true;
-  audio.preload = "auto";
+  if (!audio || !player) {
+    console.error("❌ Player incompleto");
+    return;
+  }
 
-  // ===============================
-  // TIMER
-  // ===============================
+  /* ===============================
+     AUDIO BASE (CRÍTICO)
+  =============================== */
+  audio.src = "https://stream.zeno.fm/ezq3fcuf5ehvv";
+  audio.crossOrigin = "anonymous";
+  audio.preload = "none";
+  audio.playsInline = true;
+
+  /* ===============================
+     AUDIO CONTEXT
+  =============================== */
+  let audioCtx = null;
+  let analyser = null;
+  let source = null;
+  let spectrumRAF = null;
+
+  /* ===============================
+     TIMER
+  =============================== */
   let timer = null;
   let startTime = 0;
 
@@ -36,26 +46,24 @@ document.addEventListener("DOMContentLoaded", () => {
     startTime = Date.now();
     timer = setInterval(() => {
       const t = Math.floor((Date.now() - startTime) / 1000);
-      const m = String(Math.floor(t / 60)).padStart(2, "0");
-      const s = String(t % 60).padStart(2, "0");
-      timeDisplay.textContent = `${m}:${s}`;
+      timeDisplay.textContent =
+        `${String(t / 60 | 0).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
     }, 1000);
   }
 
   function stopTimer() {
     clearInterval(timer);
-    timer = null;
     timeDisplay.textContent = "00:00";
   }
 
-  // ===============================
-  // MATRIX (LLUVIA REAL)
-  // ===============================
+  /* ===============================
+     MATRIX (LLUVIA REAL)
+  =============================== */
   const mctx = matrixCanvas.getContext("2d");
   const fontSize = 16;
+  const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let drops = [];
   let matrixRunning = false;
-  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZأ ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي";
 
   function resizeMatrix() {
     matrixCanvas.width = player.clientWidth;
@@ -69,12 +77,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function drawMatrix() {
     if (!matrixRunning) return;
 
-    // Fade suave (no borrar completo)
-    mctx.fillStyle = "rgba(0,0,0,0.08)";
+    mctx.fillStyle = "rgba(0,0,0,0.18)";
     mctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
 
     mctx.font = `${fontSize}px monospace`;
-    mctx.fillStyle = "rgba(0,255,180,0.9)";
+    mctx.fillStyle = "rgba(0,255,180,0.95)";
 
     drops.forEach((y, i) => {
       const char = chars[Math.random() * chars.length | 0];
@@ -96,9 +103,9 @@ document.addEventListener("DOMContentLoaded", () => {
     mctx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
   }
 
-  // ===============================
-  // SPECTRUM CIRCULAR REAL
-  // ===============================
+  /* ===============================
+     SPECTRUM (SEGURO)
+  =============================== */
   const sctx = spectrumCanvas.getContext("2d");
 
   function resizeSpectrum() {
@@ -129,46 +136,44 @@ document.addEventListener("DOMContentLoaded", () => {
       sctx.lineWidth = 2;
       sctx.beginPath();
       sctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
-      sctx.lineTo(
-        cx + Math.cos(a) * (r + v * r),
-        cy + Math.sin(a) * (r + v * r)
-      );
+      sctx.lineTo(cx + Math.cos(a) * (r + v * r), cy + Math.sin(a) * (r + v * r));
       sctx.stroke();
     }
 
     spectrumRAF = requestAnimationFrame(drawSpectrum);
   }
 
-  function stopSpectrum() {
-    cancelAnimationFrame(spectrumRAF);
-    sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
-  }
-
-  // ===============================
-  // LIVE STATUS (VISUAL)
-  // ===============================
+  /* ===============================
+     LIVE STATUS (VISUAL)
+  =============================== */
   function setLive(on) {
     liveIndicator.classList.toggle("live", on);
     liveText.textContent = on ? "EN VIVO" : "PROGRAMACIÓN";
   }
 
-  // ===============================
-  // CONTROLES (CHROME + iOS SAFE)
-  // ===============================
+  /* ===============================
+     CONTROLES (CHROME SAFE)
+  =============================== */
   playPauseBtn.addEventListener("click", async () => {
 
-    // Crear AudioContext SOLO aquí
     if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 512;
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 512;
 
-      source = audioCtx.createMediaElementSource(audio);
-      source.connect(analyser);
-      analyser.connect(audioCtx.destination);
+        source = audioCtx.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+
+      } catch (e) {
+        console.warn("⚠️ WebAudio bloqueado, audio directo");
+        audioCtx = null;
+        analyser = null;
+      }
     }
 
-    if (audioCtx.state === "suspended") {
+    if (audioCtx && audioCtx.state === "suspended") {
       await audioCtx.resume();
     }
 
@@ -186,20 +191,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   muteBtn.addEventListener("click", () => {
     audio.muted = !audio.muted;
-    muteBtn.innerHTML = audio.muted
-      ? '<i class="fas fa-volume-mute"></i>'
-      : '<i class="fas fa-volume-up"></i>';
   });
 
-  // ===============================
-  // EVENTOS DE AUDIO
-  // ===============================
+  /* ===============================
+     EVENTOS AUDIO
+  =============================== */
   audio.addEventListener("playing", () => {
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    player.classList.add("playing"); // brillo + oscurecer
+    player.classList.add("playing");
     startTimer();
     startMatrix();
     drawSpectrum();
+    setLive(true);
   });
 
   audio.addEventListener("pause", () => {
@@ -207,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
     player.classList.remove("playing");
     stopTimer();
     stopMatrix();
-    stopSpectrum();
+    cancelAnimationFrame(spectrumRAF);
   });
 
 });

@@ -1,8 +1,10 @@
 {
   "name": "Sonar Rock",
   "short_name": "Sonar Rock",
+  "description": "Sonar Rock · Radio Independiente",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#000000",
   "theme_color": "#ff6600",
   "icons": [

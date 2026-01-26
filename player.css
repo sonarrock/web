@@ -14,7 +14,7 @@
   position: relative;
   width: 100%;
   max-width: 320px;
-  min-height: 360px; /* 🔥 CRÍTICO */
+  min-height: 480px; /* 🔥 CRÍTICO */
   margin: auto;
   background: #000;
   border-radius: 16px;

@@ -29,23 +29,34 @@ let timerInterval = null;
 =============================== */
 playPauseBtn.addEventListener("click", () => {
   if (!isPlaying) {
+
+    // 🔄 MOSTRAR "CONECTANDO"
+    liveBadge?.classList.add("buffering");
+    liveBadge?.classList.remove("active");
+
     audio.play()
       .then(() => {
         isPlaying = true;
         startTime = Date.now();
         playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
         player.classList.add("playing");
-        player.style.setProperty("--glow-intensity", 0.75);
+
+        // 🔴 YA ESTÁ SONANDO
+        liveBadge?.classList.remove("buffering");
         liveBadge?.classList.add("active");
+
+        player.style.setProperty("--glow-intensity", 0.75);
         startTimer();
       })
       .catch(err => {
         console.error("❌ Error al reproducir:", err);
+        liveBadge?.classList.remove("buffering");
       });
   } else {
     pauseRadio();
   }
 });
+
 
 /* ===============================
    PAUSA (INTERNA)

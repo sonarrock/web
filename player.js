@@ -2,6 +2,8 @@
    ELEMENTOS
 =============================== */
 const audio = document.getElementById("radio-audio");
+audio.crossOrigin = "anonymous";
+
 const playPauseBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
@@ -20,10 +22,10 @@ if (!audio || !player) {
 /* ===============================
    ESTADO
 =============================== */
-let audioCtx;
-let analyser;
-let source;
-let animationId;
+let audioCtx = null;
+let analyser = null;
+let source = null;
+let animationId = null;
 let startTime = null;
 let lastGlow = 0.35;
 
@@ -34,7 +36,7 @@ const matrixCtx = matrixCanvas.getContext("2d");
 const spectrumCtx = spectrumCanvas.getContext("2d");
 
 /* ===============================
-   RESIZE CANVAS (CRÍTICO)
+   RESIZE CANVAS
 =============================== */
 function resizeCanvas() {
   const rect = player.getBoundingClientRect();
@@ -44,14 +46,16 @@ function resizeCanvas() {
 
   spectrumCanvas.width = rect.width * 0.9;
   spectrumCanvas.height = 110;
+
+  initMatrix();
 }
 
-resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("orientationchange", resizeCanvas);
+resizeCanvas();
 
 /* ===============================
-   AUDIO CONTEXT
+   AUDIO CONTEXT (CHROME SAFE)
 =============================== */
 function initAudioContext() {
   if (audioCtx) return;
@@ -59,6 +63,7 @@ function initAudioContext() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 256;
+  analyser.smoothingTimeConstant = 0.8;
 
   source = audioCtx.createMediaElementSource(audio);
   source.connect(analyser);
@@ -76,16 +81,18 @@ playPauseBtn.addEventListener("click", async () => {
   }
 
   if (audio.paused) {
-    audio.play();
+    await audio.play();
+
     player.classList.add("playing");
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     liveIndicator.classList.add("live");
+
     if (!startTime) startTime = Date.now();
     animate();
   } else {
     audio.pause();
     playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-    player.style.setProperty("--glow-intensity", 0.35);
+    player.style.setProperty("--glow-intensity", 0.3);
     cancelAnimationFrame(animationId);
   }
 });
@@ -96,9 +103,11 @@ playPauseBtn.addEventListener("click", async () => {
 stopBtn.addEventListener("click", () => {
   audio.pause();
   audio.currentTime = 0;
+
   playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
   player.classList.remove("playing");
   player.style.setProperty("--glow-intensity", 0.25);
+
   cancelAnimationFrame(animationId);
   startTime = null;
 });
@@ -114,7 +123,7 @@ muteBtn.addEventListener("click", () => {
 });
 
 /* ===============================
-   TIME DISPLAY (SIMULADO STREAM)
+   TIME DISPLAY
 =============================== */
 setInterval(() => {
   if (!startTime) return;
@@ -132,21 +141,17 @@ setInterval(() => {
 =============================== */
 function updateGlow(dataArray) {
   let sum = 0;
-  for (let i = 0; i < dataArray.length; i++) {
-    sum += dataArray[i];
-  }
+  for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
 
-  const average = sum / dataArray.length;
-  const target = Math.min(Math.max(average / 180, 0.25), 1);
+  const avg = sum / dataArray.length;
+  const target = Math.min(Math.max(avg / 160, 0.25), 1);
 
-  // suavizado analógico
-  lastGlow = lastGlow * 0.8 + target * 0.2;
-
+  lastGlow = lastGlow * 0.75 + target * 0.25;
   player.style.setProperty("--glow-intensity", lastGlow.toFixed(2));
 }
 
 /* ===============================
-   SPECTRUM VISUALIZER
+   SPECTRUM
 =============================== */
 function drawSpectrum() {
   const bufferLength = analyser.frequencyBinCount;
@@ -161,7 +166,7 @@ function drawSpectrum() {
   let x = 0;
 
   for (let i = 0; i < bufferLength; i++) {
-    const barHeight = dataArray[i] / 1.8;
+    const barHeight = dataArray[i] * 0.7;
 
     spectrumCtx.fillStyle = "#ff6600";
     spectrumCtx.fillRect(
@@ -176,18 +181,16 @@ function drawSpectrum() {
 }
 
 /* ===============================
-   MATRIX EFFECT (LIGERO)
+   MATRIX
 =============================== */
 const matrixChars = "SONARROCK101010";
 const fontSize = 14;
 let matrixDrops = [];
 
 function initMatrix() {
-  const columns = Math.floor(matrixCanvas.width / fontSize);
-  matrixDrops = Array(columns).fill(1);
+  const cols = Math.floor(matrixCanvas.width / fontSize);
+  matrixDrops = Array(cols).fill(1);
 }
-
-initMatrix();
 
 function drawMatrix() {
   matrixCtx.fillStyle = "rgba(0,0,0,0.08)";
@@ -197,12 +200,12 @@ function drawMatrix() {
   matrixCtx.font = `${fontSize}px monospace`;
 
   matrixDrops.forEach((y, i) => {
-    const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+    const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
     const x = i * fontSize;
 
-    matrixCtx.fillText(text, x, y * fontSize);
+    matrixCtx.fillText(char, x, y * fontSize);
 
-    if (y * fontSize > matrixCanvas.height && Math.random() > 0.975) {
+    if (y * fontSize > matrixCanvas.height && Math.random() > 0.97) {
       matrixDrops[i] = 0;
     }
     matrixDrops[i]++;
@@ -210,7 +213,7 @@ function drawMatrix() {
 }
 
 /* ===============================
-   ANIMATION LOOP
+   LOOP
 =============================== */
 function animate() {
   if (!analyser) return;

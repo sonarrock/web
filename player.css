@@ -1,15 +1,9 @@
-/* ===============================
-   VARIABLES
-=============================== */
 :root {
   --accent: #ff6600;
   --bg-dark: #0a0a0a;
   --glow-intensity: 0.35;
 }
 
-/* ===============================
-   CONTENEDOR GENERAL
-=============================== */
 .player-section {
   display: flex;
   justify-content: center;
@@ -17,9 +11,6 @@
   padding: 2rem 1rem;
 }
 
-/* ===============================
-   CONTENEDOR PLAYER
-=============================== */
 .player-container {
   position: relative;
   width: 380px;
@@ -36,9 +27,6 @@
   transition: box-shadow 0.4s ease;
 }
 
-/* ===============================
-   IMAGEN DE FONDO
-=============================== */
 .player-bg {
   position: absolute;
   inset: 0;
@@ -46,26 +34,20 @@
   height: 100%;
   object-fit: cover;
   z-index: 1;
-  filter: contrast(1.05) brightness(0.9);
+  filter: none; /* 🔥 quitamos contraste y oscurecido */
 }
 
-/* ===============================
-   OVERLAY
-=============================== */
 .overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(0,0,0,0.6),
-    rgba(0,0,0,0.85)
+    rgba(0,0,0,0.4),
+    rgba(0,0,0,0.6)
   );
   z-index: 2;
 }
 
-/* ===============================
-   CONTENIDO
-=============================== */
 .player-content {
   position: relative;
   z-index: 3;
@@ -78,18 +60,13 @@
   text-align: center;
 }
 
-/* ===============================
-   NOW PLAYING
-=============================== */
 .now-playing {
   font-size: 0.95rem;
   letter-spacing: 1px;
   opacity: 0.85;
 }
 
-/* ===============================
-   LIVE / BUFFER BADGE
-=============================== */
+/* LIVE / BUFFER BADGE */
 .live-badge {
   display: inline-flex;
   align-items: center;
@@ -111,49 +88,10 @@
   border-radius: 50%;
 }
 
-/* LIVE */
-.live-badge.active .dot {
-  animation: pulse 1.4s infinite;
-}
+.live-badge.active .dot { animation: pulse 1.4s infinite; }
+.live-badge.buffering .dot { animation: blink 1s infinite; }
 
-/* BUFFERING */
-.live-badge.buffering {
-  color: #ffc266;
-  border-color: #ffc266;
-}
-
-.live-badge.buffering .dot {
-  background: #ffc266;
-  animation: blink 1s infinite;
-}
-
-/* ===============================
-   SPECTRUM (SIMULADO)
-=============================== */
-.spectrum {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 4px;
-  height: 80px;
-  margin-top: 1rem;
-}
-
-.spectrum span {
-  width: 6px;
-  height: 20%;
-  background: var(--accent);
-  animation: equalizer 1.2s infinite ease-in-out;
-  animation-play-state: paused;
-}
-
-.player-container.playing .spectrum span {
-  animation-play-state: running;
-}
-
-/* ===============================
-   CONTROLES
-=============================== */
+/* CONTROLES */
 .controls {
   display: flex;
   align-items: center;
@@ -178,20 +116,10 @@
   background: rgba(255,102,0,0.15);
 }
 
-/* ===============================
-   VOLUMEN
-=============================== */
-#volume {
-  width: 80px;
-}
+#volume { width: 80px; }
 
-/* ===============================
-   PROGRESO
-=============================== */
-.progress-wrapper {
-  margin-top: 1rem;
-}
-
+/* PROGRESO */
+.progress-wrapper { margin-top: 1rem; }
 .progress-container {
   width: 100%;
   height: 4px;
@@ -199,22 +127,13 @@
   border-radius: 4px;
   overflow: hidden;
 }
+#radio-progress { width: 30%; height: 100%; background: var(--accent); }
+#time-display { font-size: 0.7rem; margin-top: 0.4rem; opacity: 0.7; }
 
-#radio-progress {
-  width: 30%;
-  height: 100%;
-  background: var(--accent);
-}
+/* ANIMACIONES */
+@keyframes pulse { 0%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:0.4;}100%{transform:scale(1);opacity:1;} }
+@keyframes blink {0%,100%{opacity:1;}50%{opacity:0.3;}}
 
-#time-display {
-  font-size: 0.7rem;
-  margin-top: 0.4rem;
-  opacity: 0.7;
-}
-
-/* ===============================
-   ANIMACIONES SOLO EN PLAY
-=============================== */
 .player-container.playing {
   animation: glowPulse 2.2s ease-in-out infinite;
 }
@@ -230,8 +149,8 @@
 }
 
 @keyframes bgZoom {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.06); }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
   100% { transform: scale(1); }
 }
 
@@ -239,38 +158,8 @@
   animation: btnPulse 1.6s ease-in-out infinite;
 }
 
-@keyframes btnPulse {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.08); }
-  100% { transform: scale(1); }
-}
+@keyframes btnPulse { 0%{transform:scale(1);}50%{transform:scale(1.08);}100%{transform:scale(1);} }
 
-/* ===============================
-   KEYFRAMES
-=============================== */
-@keyframes equalizer {
-  0% { height: 20%; }
-  50% { height: 100%; }
-  100% { height: 20%; }
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.4); opacity: 0.4; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-/* ===============================
-   RESPONSIVE
-=============================== */
-@media (max-width: 420px) {
-  .player-container {
-    width: 92vw;
-    height: 520px;
-  }
+@media (max-width: 420px){
+  .player-container{width:92vw;height:520px;}
 }

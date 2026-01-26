@@ -12,8 +12,8 @@
 .player-container {
   position: relative;
   width: 100%;
-  max-width: 360px;
-  height: 520px;
+  max-width: 380px;
+  height: 580px;
   background: #000;
   border-radius: 16px;
   overflow: hidden;

@@ -4,16 +4,21 @@
 const audio = document.getElementById("radio-audio");
 const playBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
+const muteBtn = document.getElementById("mute-btn");
 const liveBadge = document.getElementById("live-indicator");
 const player = document.querySelector(".player-container");
 const matrixCanvas = document.getElementById("matrixCanvas");
 
-if (!audio || !player) {
+if (!audio || !playBtn || !player || !matrixCanvas) {
   console.error("❌ Player incompleto");
-  throw new Error("Player incompleto");
 }
 
-const ctx = matrixCanvas.getContext("2d");
+/* ===============================
+   ESTADO
+=============================== */
+let isPlaying = false;
+let matrixCtx = matrixCanvas.getContext("2d");
+let animationId = null;
 
 /* ===============================
    MATRIX CONFIG
@@ -21,35 +26,37 @@ const ctx = matrixCanvas.getContext("2d");
 const matrixChars = "SONARROCK101010";
 const fontSize = 14;
 let drops = [];
-let animationId = null;
 
 /* ===============================
-   RESIZE
+   CANVAS RESIZE
 =============================== */
 function resizeCanvas() {
   const rect = player.getBoundingClientRect();
   matrixCanvas.width = rect.width;
   matrixCanvas.height = rect.height;
 
-  const cols = Math.floor(rect.width / fontSize);
-  drops = Array(cols).fill(1);
+  const columns = Math.floor(rect.width / fontSize);
+  drops = Array(columns).fill(1);
 }
+
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
+window.addEventListener("orientationchange", resizeCanvas);
 
 /* ===============================
    MATRIX DRAW
 =============================== */
 function drawMatrix() {
-  ctx.fillStyle = "rgba(0,0,0,0.06)";
-  ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+  matrixCtx.fillStyle = "rgba(0,0,0,0.08)";
+  matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
 
-  ctx.fillStyle = "#ff6600";
-  ctx.font = `${fontSize}px monospace`;
+  matrixCtx.fillStyle = "#ff6600";
+  matrixCtx.font = `${fontSize}px monospace`;
 
   drops.forEach((y, i) => {
-    const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-    ctx.fillText(text, i * fontSize, y * fontSize);
+    const x = i * fontSize;
+    const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+    matrixCtx.fillText(char, x, y * fontSize);
 
     if (y * fontSize > matrixCanvas.height && Math.random() > 0.975) {
       drops[i] = 0;
@@ -58,51 +65,62 @@ function drawMatrix() {
   });
 }
 
-function animate() {
-  if (audio.paused) return;
+function animateMatrix() {
   drawMatrix();
-  animationId = requestAnimationFrame(animate);
+  animationId = requestAnimationFrame(animateMatrix);
 }
 
 /* ===============================
-   PLAY / PAUSE (CLAVE)
+   MATRIX CONTROL
 =============================== */
-playBtn.addEventListener("click", () => {
-  if (audio.paused) {
-    liveBadge.classList.add("buffering");
+function startMatrix() {
+  matrixCanvas.classList.add("active");
+  cancelAnimationFrame(animationId);
+  animateMatrix();
+}
 
-    audio.load(); // 🔥 CLAVE PARA STREAMS
-    audio.play().catch(err => {
-      console.error("❌ Error play:", err);
-    });
-  } else {
-    audio.pause();
-  }
-});
+function stopMatrix() {
+  matrixCanvas.classList.remove("active");
+  cancelAnimationFrame(animationId);
+  animationId = null;
+}
 
 /* ===============================
-   AUDIO EVENTS (MANDAN EL ESTADO)
+   PLAY / PAUSE
 =============================== */
-audio.addEventListener("playing", () => {
-  playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-  player.classList.add("playing");
+playBtn.addEventListener("click", async () => {
 
-  liveBadge.classList.remove("buffering");
-  liveBadge.classList.add("active");
+  if (!isPlaying) {
+    liveBadge.classList.add("buffering");
+    liveBadge.classList.remove("active");
 
-  animate();
-});
+    try {
+      await audio.play();
 
-audio.addEventListener("pause", () => {
-  playBtn.innerHTML = '<i class="fas fa-play"></i>';
-  player.classList.remove("playing");
-  liveBadge.classList.remove("active");
+      isPlaying = true;
+      playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+      player.classList.add("playing");
 
-  cancelAnimationFrame(animationId);
-});
+      liveBadge.classList.remove("buffering");
+      liveBadge.classList.add("active");
 
-audio.addEventListener("waiting", () => {
-  liveBadge.classList.add("buffering");
+      startMatrix();
+
+    } catch (err) {
+      console.error("❌ Error al reproducir:", err);
+      liveBadge.classList.remove("buffering");
+    }
+
+  } else {
+    audio.pause();
+    isPlaying = false;
+
+    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    player.classList.remove("playing");
+    liveBadge.classList.remove("active");
+
+    stopMatrix();
+  }
 });
 
 /* ===============================
@@ -111,12 +129,34 @@ audio.addEventListener("waiting", () => {
 stopBtn.addEventListener("click", () => {
   audio.pause();
   audio.currentTime = 0;
+  isPlaying = false;
+
+  playBtn.innerHTML = '<i class="fas fa-play"></i>';
+  player.classList.remove("playing");
+  liveBadge.classList.remove("active");
+
+  stopMatrix();
 });
 
 /* ===============================
-   RECOVERY ZENO
+   MUTE
+=============================== */
+muteBtn?.addEventListener("click", () => {
+  audio.muted = !audio.muted;
+  muteBtn.innerHTML = audio.muted
+    ? '<i class="fas fa-volume-mute"></i>'
+    : '<i class="fas fa-volume-up"></i>';
+});
+
+/* ===============================
+   AUTO RECOVERY (ZENO)
 =============================== */
 audio.addEventListener("error", () => {
-  console.warn("⚠️ Stream cayó, reintentando…");
-  setTimeout(() => audio.play().catch(() => {}), 3000);
+  console.warn("⚠️ Stream interrumpido. Reintentando...");
+  liveBadge.classList.add("buffering");
+  liveBadge.classList.remove("active");
+
+  setTimeout(() => {
+    audio.play().catch(() => {});
+  }, 3000);
 });

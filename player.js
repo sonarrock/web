@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const fontSize = 16;
   let drops = [];
   let matrixRunning = false;
-  const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZأ ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي";
 
   function resizeMatrix() {
     matrixCanvas.width = player.clientWidth;

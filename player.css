@@ -1,209 +1,214 @@
-/* ===============================
-   ELEMENTOS
-=============================== */
-const audio = document.getElementById("radio-audio");
-const playPauseBtn = document.getElementById("playPauseBtn");
-const stopBtn = document.getElementById("stop-btn");
-const muteBtn = document.getElementById("mute-btn");
-const timeDisplay = document.getElementById("time-display");
-const matrixCanvas = document.getElementById("matrixCanvas");
-const spectrumCanvas = document.getElementById("spectrumCanvas");
-const liveIndicator = document.getElementById("live-indicator");
-const player = document.querySelector(".player-container");
-const bgImage = document.querySelector(".player-bg");
+/* =========================
+   PLAYER STREAMING – SONAR ROCK
+========================= */
 
-if (!audio || !player) {
-  console.error("❌ Player incompleto");
-  throw new Error("Player incompleto");
+.player-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 40px 0;
 }
 
-/* ===============================
-   AJUSTE FORZADO DE IMAGEN
-=============================== */
-if (bgImage) {
-  bgImage.style.width = "380px";
-  bgImage.style.height = "580px";
-  bgImage.style.objectFit = "cover";
-  bgImage.style.maxWidth = "100%";
+.player-container {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  height: 520px;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, filter 0.25s ease;
+  isolation: isolate;
 }
 
-/* ===============================
-   ESTADO
-=============================== */
-let audioCtx = null;
-let analyser = null;
-let source = null;
-let animationId = null;
-let startTime = null;
-let lastGlow = 0.3;
-
-/* ===============================
-   CANVAS
-=============================== */
-const matrixCtx = matrixCanvas.getContext("2d");
-const spectrumCtx = spectrumCanvas.getContext("2d");
-
-/* ===============================
-   RESIZE CANVAS
-=============================== */
-function resizeCanvas() {
-  const rect = player.getBoundingClientRect();
-
-  matrixCanvas.width = rect.width;
-  matrixCanvas.height = rect.height;
-
-  spectrumCanvas.width = rect.width * 0.9;
-  spectrumCanvas.height = 100;
-
-  initMatrix();
-}
-window.addEventListener("resize", resizeCanvas);
-window.addEventListener("orientationchange", resizeCanvas);
-resizeCanvas();
-
-/* ===============================
-   AUDIO CONTEXT (SEGURO)
-=============================== */
-function initAudioContext() {
-  if (audioCtx) return;
-
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
-  analyser.smoothingTimeConstant = 0.85;
-
-  source = audioCtx.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
+.player-container.glow {
+  filter: brightness(1.08);
 }
 
-/* ===============================
-   PLAY / PAUSE (FIX REAL)
-=============================== */
-playPauseBtn.addEventListener("click", () => {
-  initAudioContext();
+/* =========================
+   FONDO
+========================= */
+.player-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
 
-  if (audioCtx.state === "suspended") {
-    audioCtx.resume();
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1;
+}
+
+/* =========================
+   MATRIX (FULL)
+========================= */
+#matrixCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+}
+
+/* =========================
+   SPECTRUM (CENTRADO REAL)
+========================= */
+#spectrumCanvas {
+  position: absolute;
+  width: 90%;
+  height: 110px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 4;
+}
+
+.player-container.playing #matrixCanvas,
+.player-container.playing #spectrumCanvas {
+  opacity: 1;
+}
+
+/* =========================
+   CONTENIDO
+========================= */
+.player-content {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+}
+
+/* =========================
+   CONTROLES
+========================= */
+.controls {
+  display: flex;
+  gap: 12px;
+}
+
+.controls .btn {
+  background: #ff6600;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 14px rgba(255,102,0,0.7);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.controls .btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 0 22px rgba(255,102,0,1);
+}
+
+.controls .btn i {
+  color: #fff;
+  font-size: 14px;
+}
+
+/* =========================
+   PROGRESO
+========================= */
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-container {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+#radio-progress {
+  width: 0%;
+  height: 100%;
+  background: #ff6600;
+}
+
+.time-display {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* =========================
+   LIVE BADGE
+========================= */
+#live-indicator {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(0,0,0,0.6);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #aaa;
+}
+
+#live-indicator .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #666;
+}
+
+#live-indicator.live {
+  color: #ff3b3b;
+  box-shadow: 0 0 14px rgba(255,60,60,0.8);
+}
+
+#live-indicator.live .dot {
+  background: #ff3b3b;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  .player-container {
+    width: 90%;
+    height: 380px;
   }
 
-  if (audio.paused) {
-    audio.muted = false;
-
-    audio.play().then(() => {
-      player.classList.add("playing");
-      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-      liveIndicator.classList.add("live");
-
-      if (!startTime) startTime = Date.now();
-      animate();
-    }).catch(err => {
-      console.warn("⚠️ Chrome bloqueó el play:", err);
-    });
-
-  } else {
-    audio.pause();
-    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-    cancelAnimationFrame(animationId);
-    player.style.setProperty("--glow-intensity", 0.25);
-  }
-});
-
-/* ===============================
-   STOP
-=============================== */
-stopBtn.addEventListener("click", () => {
-  audio.pause();
-  audio.currentTime = 0;
-  startTime = null;
-
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  player.classList.remove("playing");
-  player.style.setProperty("--glow-intensity", 0.25);
-
-  cancelAnimationFrame(animationId);
-});
-
-/* ===============================
-   MUTE
-=============================== */
-muteBtn.addEventListener("click", () => {
-  audio.muted = !audio.muted;
-  muteBtn.innerHTML = audio.muted
-    ? '<i class="fas fa-volume-mute"></i>'
-    : '<i class="fas fa-volume-up"></i>';
-});
-
-/* ===============================
-   TIME DISPLAY
-=============================== */
-setInterval(() => {
-  if (!startTime) return;
-
-  const t = Math.floor((Date.now() - startTime) / 1000);
-  timeDisplay.textContent =
-    `${String(Math.floor(t / 3600)).padStart(2, "0")}:` +
-    `${String(Math.floor((t % 3600) / 60)).padStart(2, "0")}:` +
-    `${String(t % 60).padStart(2, "0")}`;
-}, 1000);
-
-/* ===============================
-   GLOW DINÁMICO
-=============================== */
-function updateGlow(data) {
-  let sum = 0;
-  for (let i = 0; i < data.length; i++) sum += data[i];
-
-  const target = Math.min(Math.max(sum / data.length / 160, 0.25), 1);
-  lastGlow = lastGlow * 0.75 + target * 0.25;
-
-  player.style.setProperty("--glow-intensity", lastGlow.toFixed(2));
-}
-
-/* ===============================
-   SPECTRUM
-=============================== */
-function drawSpectrum() {
-  if (!analyser) return;
-
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-  analyser.getByteFrequencyData(dataArray);
-
-  updateGlow(dataArray);
-  spectrumCtx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
-
-  const barWidth = spectrumCanvas.width / bufferLength;
-  let x = 0;
-
-  for (let i = 0; i < bufferLength; i++) {
-    const h = dataArray[i] * 0.6;
-    spectrumCtx.fillStyle = "#ff6600";
-    spectrumCtx.fillRect(x, spectrumCanvas.height - h, barWidth - 1, h);
-    x += barWidth;
+  #spectrumCanvas {
+    height: 90px;
   }
 }
-
-/* ===============================
-   MATRIX
-=============================== */
-const matrixChars = "SONARROCK101010";
-const fontSize = 14;
-let matrixDrops = [];
-
-function initMatrix() {
-  const cols = Math.floor(matrixCanvas.width / fontSize);
-  matrixDrops = Array(cols).fill(1);
-}
-
-function drawMatrix() {
-  matrixCtx.fillStyle = "rgba(0,0,0,0.08)";
-  matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-
-  matrixCtx.fillStyle = "#ff6600";
-  matrixCtx.font = `${fontSize}px monospace`;
-
-  matrixDrops.forEach((y, i) => {
-    const c = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-    matrixCtx.fillText(c, i * fontSize, y * fontSize);
-    if (y * fontSize > matrixCanvas.height &&*

@@ -8,7 +8,6 @@ const muteBtn = document.getElementById("mute-btn");
 const liveBadge = document.getElementById("live-indicator");
 const player = document.querySelector(".player-container");
 const matrixCanvas = document.getElementById("matrixCanvas");
-const volumeSlider = document.getElementById("volume");
 
 
 if (!audio || !playBtn || !player || !matrixCanvas) {

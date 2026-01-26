@@ -9,28 +9,28 @@
   margin: 40px 0;
 }
 
-/* CONTENEDOR BASE */
+/* =========================
+   CONTENEDOR
+========================= */
 .player-container {
   position: relative;
   width: 100%;
   max-width: 320px;
-  min-height: 480px; /* 🔥 CRÍTICO */
   margin: auto;
   background: #000;
   border-radius: 16px;
   overflow: hidden;
-  transition: box-shadow 0.15s ease, filter 0.15s ease;
+  transition: box-shadow 0.25s ease, filter 0.25s ease;
 }
 
-/* GLOW DINÁMICO */
+/* GLOW CONTROLADO */
 .player-container.glow {
-  filter: brightness(1.05);
+  filter: brightness(1.08);
 }
 
 /* =========================
    FONDO
 ========================= */
-
 .player-bg {
   position: absolute;
   inset: 0;
@@ -48,9 +48,8 @@
 }
 
 /* =========================
-   CANVAS
+   CANVAS (MATRIX + SPECTRUM)
 ========================= */
-
 #matrixCanvas,
 #spectrumCanvas {
   position: absolute;
@@ -58,28 +57,37 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
 }
 
+/* MATRIX */
 #matrixCanvas {
   z-index: 2;
 }
 
+/* SPECTRUM */
 #spectrumCanvas {
   z-index: 4;
 }
 
-/* =========================
-   CONTENIDO
-========================= */
+/* SOLO CUANDO SUENA */
+.player-container.playing #matrixCanvas,
+.player-container.playing #spectrumCanvas {
+  opacity: 1;
+}
 
+/* =========================
+   CONTENIDO UI
+========================= */
 .player-content {
   position: absolute;
-  inset: 0;
-  padding: 16px;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
   z-index: 6;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   gap: 12px;
   color: #fff;
   text-shadow: 0 2px 8px rgba(0,0,0,0.85);
@@ -88,11 +96,9 @@
 /* =========================
    CONTROLES
 ========================= */
-
 .controls {
   display: flex;
   gap: 12px;
-  z-index: 7;
 }
 
 .controls .btn {
@@ -105,13 +111,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 14px rgba(255,102,0,0.8);
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 14px rgba(255,102,0,0.7);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .controls .btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 20px rgba(255,102,0,1);
+  transform: scale(1.12);
+  box-shadow: 0 0 22px rgba(255,102,0,1);
 }
 
 .controls .btn i {
@@ -122,7 +128,6 @@
 /* =========================
    PROGRESO + TIEMPO
 ========================= */
-
 .progress-wrapper {
   display: flex;
   align-items: center;
@@ -141,6 +146,7 @@
   width: 0%;
   height: 100%;
   background: #ff6600;
+  transition: width 0.3s linear;
 }
 
 .time-display {
@@ -151,12 +157,11 @@
 /* =========================
    LIVE BADGE
 ========================= */
-
 #live-indicator {
   position: absolute;
   top: 16px;
   right: 16px;
-  z-index: 8;
+  z-index: 7;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -170,6 +175,7 @@
   color: #aaa;
 }
 
+/* DOT */
 #live-indicator .dot {
   width: 8px;
   height: 8px;
@@ -180,7 +186,7 @@
 /* 🔴 EN VIVO */
 #live-indicator.live {
   color: #ff3b3b;
-  box-shadow: 0 0 12px rgba(255,60,60,0.8);
+  box-shadow: 0 0 14px rgba(255,60,60,0.8);
 }
 
 #live-indicator.live .dot {
@@ -190,25 +196,4 @@
 
 /* ⚪ PROGRAMACIÓN */
 #live-indicator.auto {
-  color: #aaa;
-}
-
-/* =========================
-   ANIMACIÓN
-========================= */
-
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.6); opacity: 0.4; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 768px) {
-  .player-container {
-    width: 90%;
-  }
-}
+  color: #

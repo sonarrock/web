@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
   =============================== */
   const mctx = matrixCanvas.getContext("2d");
   const fontSize = 16;
-  const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let drops = [];
   let matrixRunning = false;
 
@@ -146,12 +146,12 @@ document.addEventListener("DOMContentLoaded", () => {
     sctx.stroke();
   }
 
-  // ===============================
-  // GLOW SEGÚN VOLUMEN REAL
-  // ===============================
-  let sum = 0;
-  for (let i = 0; i < 80; i++) sum += data[i];
-  const avg = sum / 80 / 255;
+ // ===============================
+// VOLUMEN REAL DE BAJOS (KICK)
+// ===============================
+let bass = 0;
+for (let i = 2; i < 20; i++) bass += data[i];
+const avg = bass / 18 / 255;
 
   if (avg > 0.05) {
     const intensity = Math.min(1, avg * 2.5);

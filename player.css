@@ -216,5 +216,51 @@
   .player-container {
     width: 92vw;
     height: 520px;
+}
+     
+     /* =========================
+   ANIMACIONES SOLO EN PLAY
+========================= */
+
+/* Glow dinámico */
+.player-container {
+  --glow-intensity: 0.35;
+  box-shadow:
+    0 0 calc(25px * var(--glow-intensity)) rgba(255,102,0,0.6),
+    0 0 calc(45px * var(--glow-intensity)) rgba(255,102,0,0.4);
+  transition: box-shadow 0.4s ease;
+}
+
+.player-container.playing {
+  animation: glowPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%   { --glow-intensity: 0.45; }
+  50%  { --glow-intensity: 0.85; }
+  100% { --glow-intensity: 0.45; }
+}
+
+/* Fondo vivo */
+.player-container.playing .player-bg {
+  animation: bgZoom 18s ease-in-out infinite;
+}
+
+@keyframes bgZoom {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* Controles con latido */
+.player-container.playing .controls .btn {
+  animation: btnPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes btnPulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+
   }
 }

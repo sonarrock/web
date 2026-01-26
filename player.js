@@ -155,17 +155,26 @@ muteBtn?.addEventListener("click", () => {
 =============================== */
 audio.addEventListener("error", () => {
   console.warn("⚠️ Stream interrumpido. Reintentando...");
-  liveBadge.classList.add("buffering");
-  liveBadge.classList.remove("active");
+
+  if (liveBadge) {
+    liveBadge.classList.add("buffering");
+    liveBadge.classList.remove("active");
+  }
 
   setTimeout(() => {
     audio.play().catch(() => {});
   }, 3000);
+});
 
-   if (volumeSlider) {
+/* ===============================
+   CONTROL DE VOLUMEN
+=============================== */
+const volumeSlider = document.getElementById("volume");
+
+if (volumeSlider) {
   audio.volume = volumeSlider.value;
 
   volumeSlider.addEventListener("input", () => {
     audio.volume = volumeSlider.value;
-  
-});
+  });
+}

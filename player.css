@@ -9,21 +9,18 @@
   margin: 40px 0;
 }
 
-/* =========================
-   CONTENEDOR
-========================= */
 .player-container {
   position: relative;
   width: 100%;
   max-width: 320px;
-  margin: auto;
+  height: 420px;              /* 🔥 ALTURA FIJA (CRÍTICO) */
   background: #000;
   border-radius: 16px;
   overflow: hidden;
   transition: box-shadow 0.25s ease, filter 0.25s ease;
+  isolation: isolate;         /* 🔥 evita conflictos de z-index */
 }
 
-/* GLOW CONTROLADO */
 .player-container.glow {
   filter: brightness(1.08);
 }
@@ -48,7 +45,7 @@
 }
 
 /* =========================
-   CANVAS (MATRIX + SPECTRUM)
+   CANVAS
 ========================= */
 #matrixCanvas,
 #spectrumCanvas {
@@ -58,27 +55,19 @@
   height: 100%;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.3s ease;
 }
 
-/* MATRIX */
-#matrixCanvas {
-  z-index: 2;
-}
+#matrixCanvas { z-index: 2; }
+#spectrumCanvas { z-index: 4; }
 
-/* SPECTRUM */
-#spectrumCanvas {
-  z-index: 4;
-}
-
-/* SOLO CUANDO SUENA */
 .player-container.playing #matrixCanvas,
 .player-container.playing #spectrumCanvas {
   opacity: 1;
 }
 
 /* =========================
-   CONTENIDO UI
+   CONTENIDO
 ========================= */
 .player-content {
   position: absolute;
@@ -126,7 +115,7 @@
 }
 
 /* =========================
-   PROGRESO + TIEMPO
+   PROGRESO
 ========================= */
 .progress-wrapper {
   display: flex;
@@ -146,7 +135,6 @@
   width: 0%;
   height: 100%;
   background: #ff6600;
-  transition: width 0.3s linear;
 }
 
 .time-display {
@@ -175,7 +163,6 @@
   color: #aaa;
 }
 
-/* DOT */
 #live-indicator .dot {
   width: 8px;
   height: 8px;
@@ -183,7 +170,6 @@
   background: #666;
 }
 
-/* 🔴 EN VIVO */
 #live-indicator.live {
   color: #ff3b3b;
   box-shadow: 0 0 14px rgba(255,60,60,0.8);
@@ -194,6 +180,17 @@
   animation: pulse 1.2s infinite;
 }
 
-/* ⚪ PROGRAMACIÓN */
-#live-indicator.auto {
-  color: #
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  .player-container {
+    width: 90%;
+  }
+}

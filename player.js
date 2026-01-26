@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ===============================
-  // AUDIO CONTEXT (UNA SOLA VEZ)
-  // ===============================
+  // ==================================================
+  // AUDIO CONTEXT (CREADO SOLO CON INTERACCIÓN HUMANA)
+  // ==================================================
   let audioCtx = null;
   let analyser = null;
   let source = null;
@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const spectrumCanvas = document.getElementById("spectrumCanvas");
   const liveIndicator = document.getElementById("live-indicator");
   const player = document.querySelector(".player-container");
-
   const liveText = liveIndicator.querySelector(".text");
 
   audio.playsInline = true;
@@ -37,18 +36,20 @@ document.addEventListener("DOMContentLoaded", () => {
     startTime = Date.now();
     timer = setInterval(() => {
       const t = Math.floor((Date.now() - startTime) / 1000);
-      timeDisplay.textContent =
-        `${String(t / 60 | 0).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
+      const m = String(Math.floor(t / 60)).padStart(2, "0");
+      const s = String(t % 60).padStart(2, "0");
+      timeDisplay.textContent = `${m}:${s}`;
     }, 1000);
   }
 
   function stopTimer() {
     clearInterval(timer);
+    timer = null;
     timeDisplay.textContent = "00:00";
   }
 
   // ===============================
-  // MATRIX REAL (LLUVIA)
+  // MATRIX (LLUVIA REAL)
   // ===============================
   const mctx = matrixCanvas.getContext("2d");
   const fontSize = 16;
@@ -68,8 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function drawMatrix() {
     if (!matrixRunning) return;
 
-    // 🔥 fade, NO clear total
-    mctx.fillStyle = "rgba(0,0,0,0.15)";
+    // Fade suave (no borrar completo)
+    mctx.fillStyle = "rgba(0,0,0,0.08)";
     mctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
 
     mctx.font = `${fontSize}px monospace`;
@@ -96,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===============================
-  // SPECTRUM REAL
+  // SPECTRUM CIRCULAR REAL
   // ===============================
   const sctx = spectrumCanvas.getContext("2d");
 
@@ -109,6 +110,8 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("resize", resizeSpectrum);
 
   function drawSpectrum() {
+    if (!analyser) return;
+
     const data = new Uint8Array(analyser.frequencyBinCount);
     analyser.getByteFrequencyData(data);
 
@@ -126,15 +129,23 @@ document.addEventListener("DOMContentLoaded", () => {
       sctx.lineWidth = 2;
       sctx.beginPath();
       sctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
-      sctx.lineTo(cx + Math.cos(a) * (r + v * r), cy + Math.sin(a) * (r + v * r));
+      sctx.lineTo(
+        cx + Math.cos(a) * (r + v * r),
+        cy + Math.sin(a) * (r + v * r)
+      );
       sctx.stroke();
     }
 
     spectrumRAF = requestAnimationFrame(drawSpectrum);
   }
 
+  function stopSpectrum() {
+    cancelAnimationFrame(spectrumRAF);
+    sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
+  }
+
   // ===============================
-  // LIVE STATUS
+  // LIVE STATUS (VISUAL)
   // ===============================
   function setLive(on) {
     liveIndicator.classList.toggle("live", on);
@@ -142,10 +153,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===============================
-  // CONTROLES (CHROME SAFE)
+  // CONTROLES (CHROME + iOS SAFE)
   // ===============================
   playPauseBtn.addEventListener("click", async () => {
 
+    // Crear AudioContext SOLO aquí
     if (!audioCtx) {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       analyser = audioCtx.createAnalyser();
@@ -174,14 +186,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   muteBtn.addEventListener("click", () => {
     audio.muted = !audio.muted;
+    muteBtn.innerHTML = audio.muted
+      ? '<i class="fas fa-volume-mute"></i>'
+      : '<i class="fas fa-volume-up"></i>';
   });
 
   // ===============================
-  // EVENTOS AUDIO
+  // EVENTOS DE AUDIO
   // ===============================
   audio.addEventListener("playing", () => {
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    player.classList.add("playing"); // 🔥 brillo / oscurecer
+    player.classList.add("playing"); // brillo + oscurecer
     startTimer();
     startMatrix();
     drawSpectrum();
@@ -192,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
     player.classList.remove("playing");
     stopTimer();
     stopMatrix();
-    cancelAnimationFrame(spectrumRAF);
+    stopSpectrum();
   });
 
 });

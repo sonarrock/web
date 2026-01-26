@@ -117,31 +117,61 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("resize", resizeSpectrum);
 
   function drawSpectrum() {
-    if (!analyser) return;
+  if (!analyser) return;
 
-    const data = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(data);
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  analyser.getByteFrequencyData(data);
 
-    sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
+  sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
 
-    const cx = spectrumCanvas.width / 2;
-    const cy = spectrumCanvas.height / 2;
-    const r = Math.min(cx, cy) * 0.35;
+  const cx = spectrumCanvas.width / 2;
+  const cy = spectrumCanvas.height / 2;
+  const r = Math.min(cx, cy) * 0.35;
 
-    for (let i = 0; i < 120; i++) {
-      const v = data[i] / 255;
-      const a = (i / 120) * Math.PI * 2;
+  // ===============================
+  // DIBUJO DEL ESPECTRO
+  // ===============================
+  for (let i = 0; i < 120; i++) {
+    const v = data[i] / 255;
+    const a = (i / 120) * Math.PI * 2;
 
-      sctx.strokeStyle = `rgba(0,180,255,${0.4 + v})`;
-      sctx.lineWidth = 2;
-      sctx.beginPath();
-      sctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
-      sctx.lineTo(cx + Math.cos(a) * (r + v * r), cy + Math.sin(a) * (r + v * r));
-      sctx.stroke();
-    }
-
-    spectrumRAF = requestAnimationFrame(drawSpectrum);
+    sctx.strokeStyle = `rgba(0,180,255,${0.4 + v})`;
+    sctx.lineWidth = 2;
+    sctx.beginPath();
+    sctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+    sctx.lineTo(
+      cx + Math.cos(a) * (r + v * r),
+      cy + Math.sin(a) * (r + v * r)
+    );
+    sctx.stroke();
   }
+
+  // ===============================
+  // GLOW SEGÚN VOLUMEN REAL
+  // ===============================
+  let sum = 0;
+  for (let i = 0; i < 80; i++) sum += data[i];
+  const avg = sum / 80 / 255;
+
+  if (avg > 0.05) {
+    const intensity = Math.min(1, avg * 2.5);
+    player.classList.add("glow");
+   const color = liveIndicator.classList.contains("live")
+  ? `255,60,60`
+  : `0,180,255`;
+
+player.style.boxShadow = `
+  0 0 ${20 + intensity * 50}px rgba(${color},${0.3 + intensity}),
+  inset 0 0 ${10 + intensity * 30}px rgba(${color},${0.15 + intensity * 0.5})
+`;
+
+  } else {
+    player.classList.remove("glow");
+    player.style.boxShadow = "none";
+  }
+
+  spectrumRAF = requestAnimationFrame(drawSpectrum);
+}
 
   /* ===============================
      LIVE STATUS (VISUAL)

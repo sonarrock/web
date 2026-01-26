@@ -18,7 +18,10 @@
   border-radius: 16px;
   overflow: hidden;
   transition: box-shadow 0.15s ease, filter 0.15s ease;
+   .player-container.glow {
+  filter: brightness(1.05);
 }
+
 
 /* =========================
    IMAGEN DE FONDO

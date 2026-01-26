@@ -1,137 +1,97 @@
-/* ===============================
-   ELEMENTOS
-=============================== */
 const audio = document.getElementById("radio-audio");
-const playPauseBtn = document.getElementById("playPauseBtn");
+const playBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
-const muteBtn = document.getElementById("mute-btn");
-const volumeSlider = document.getElementById("volume");
-const timeDisplay = document.getElementById("time-display");
+const liveBadge = document.getElementById("live-indicator");
 const player = document.querySelector(".player-container");
-const liveBadge = document.querySelector(".live-badge");
+const matrixCanvas = document.getElementById("matrixCanvas");
 
-/* ===============================
-   VALIDACIÓN
-=============================== */
-if (!audio || !playPauseBtn || !player) {
-  console.error("❌ Reproductor incompleto");
+const matrixCtx = matrixCanvas.getContext("2d");
+
+let audioCtx, analyser, source, animationId, startTime=null, isPlaying=false;
+let matrixChars="SONARROCK101010";
+let fontSize=14;
+let matrixDrops=[];
+
+function resizeCanvas(){
+  const rect = player.getBoundingClientRect();
+  matrixCanvas.width = rect.width;
+  matrixCanvas.height = rect.height;
+  const columns = Math.floor(rect.width / fontSize);
+  matrixDrops = Array(columns).fill(1);
 }
 
-/* ===============================
-   ESTADO
-=============================== */
-let isPlaying = false;
-let startTime = null;
-let timerInterval = null;
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+window.addEventListener("orientationchange", resizeCanvas);
 
-/* ===============================
-   PLAY / PAUSE
-=============================== */
-playPauseBtn.addEventListener("click", () => {
-  if (!isPlaying) {
-
-    // 🔄 MOSTRAR "CONECTANDO"
-    liveBadge?.classList.add("buffering");
-    liveBadge?.classList.remove("active");
-
-    audio.play()
-      .then(() => {
-        isPlaying = true;
-        startTime = Date.now();
-        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        player.classList.add("playing");
-
-        // 🔴 YA ESTÁ SONANDO
-        liveBadge?.classList.remove("buffering");
-        liveBadge?.classList.add("active");
-
-        player.style.setProperty("--glow-intensity", 0.75);
-        startTimer();
-      })
-      .catch(err => {
-        console.error("❌ Error al reproducir:", err);
-        liveBadge?.classList.remove("buffering");
-      });
-  } else {
-    pauseRadio();
-  }
-});
-
-
-/* ===============================
-   PAUSA (INTERNA)
-=============================== */
-function pauseRadio() {
-  audio.pause();
-  isPlaying = false;
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  player.style.setProperty("--glow-intensity", 0.35);
-  stopTimer();
+function initAudioCtx(){
+  if(audioCtx) return;
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
 }
 
-/* ===============================
-   STOP
-=============================== */
-stopBtn?.addEventListener("click", () => {
-  audio.pause();
-  audio.currentTime = 0;
-  isPlaying = false;
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  player.classList.remove("playing");
-  player.style.setProperty("--glow-intensity", 0.3);
-  stopTimer();
-});
+function drawMatrix(){
+  matrixCtx.fillStyle = "rgba(0,0,0,0.08)";
+  matrixCtx.fillRect(0,0,matrixCanvas.width,matrixCanvas.height);
 
-/* ===============================
-   MUTE
-=============================== */
-muteBtn?.addEventListener("click", () => {
-  audio.muted = !audio.muted;
-  muteBtn.innerHTML = audio.muted
-    ? '<i class="fas fa-volume-mute"></i>'
-    : '<i class="fas fa-volume-up"></i>';
-});
+  matrixCtx.fillStyle="#ff6600";
+  matrixCtx.font=`${fontSize}px monospace`;
 
-/* ===============================
-   VOLUMEN
-=============================== */
-if (volumeSlider) {
-  audio.volume = volumeSlider.value;
-
-  volumeSlider.addEventListener("input", () => {
-    audio.volume = volumeSlider.value;
+  matrixDrops.forEach((y,i)=>{
+    const x = i*fontSize;
+    const text = matrixChars[Math.floor(Math.random()*matrixChars.length)];
+    matrixCtx.fillText(text,x,y*fontSize);
+    if(y*fontSize>matrixCanvas.height && Math.random()>0.975) matrixDrops[i]=0;
+    matrixDrops[i]++;
   });
 }
 
-/* ===============================
-   TIMER SIMULADO (STREAM)
-=============================== */
-function startTimer() {
-  stopTimer();
-
-  timerInterval = setInterval(() => {
-    if (!startTime) return;
-
-    const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    const hrs = String(Math.floor(elapsed / 3600)).padStart(2, "0");
-    const mins = String(Math.floor((elapsed % 3600) / 60)).padStart(2, "0");
-    const secs = String(elapsed % 60).padStart(2, "0");
-
-    if (timeDisplay) {
-      timeDisplay.textContent = `${hrs}:${mins}:${secs}`;
-    }
-  }, 1000);
+function animate(){
+  drawMatrix();
+  animationId=requestAnimationFrame(animate);
 }
 
-function stopTimer() {
-  clearInterval(timerInterval);
-  timerInterval = null;
-  startTime = null;
+playBtn.addEventListener("click", async ()=>{
+  initAudioCtx();
+  if(audioCtx.state==="suspended") await audioCtx.resume();
 
-  if (timeDisplay) {
-    timeDisplay.textContent = "00:00:00";
+  if(!isPlaying){
+    liveBadge?.classList.add("buffering");
+    liveBadge?.classList.remove("active");
+
+    audio.play().then(()=>{
+      isPlaying=true;
+      startTime=Date.now();
+      playBtn.innerHTML='<i class="fas fa-pause"></i>';
+      player.classList.add("playing");
+
+      liveBadge?.classList.remove("buffering");
+      liveBadge?.classList.add("active");
+
+      animate();
+    }).catch(err=>console.error(err));
+  } else {
+    audio.pause();
+    playBtn.innerHTML='<i class="fas fa-play"></i>';
+    player.classList.remove("playing");
+    cancelAnimationFrame(animationId);
+    isPlaying=false;
   }
-}
+});
+
+stopBtn.addEventListener("click", ()=>{
+  audio.pause();
+  audio.currentTime=0;
+  playBtn.innerHTML='<i class="fas fa-play"></i>';
+  player.classList.remove("playing");
+  liveBadge?.classList.remove("active");
+  cancelAnimationFrame(animationId);
+  isPlaying=false;
+});
+
 
 /* ===============================
    AUTO-RECOVERY (SI ZENO SE CAE)

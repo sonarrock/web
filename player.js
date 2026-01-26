@@ -8,18 +8,12 @@ const liveBadge = document.getElementById("live-indicator");
 const player = document.querySelector(".player-container");
 const matrixCanvas = document.getElementById("matrixCanvas");
 
-if (!audio || !player || !matrixCanvas) {
-  console.error("❌ Elementos del reproductor faltantes");
+if (!audio || !player) {
+  console.error("❌ Player incompleto");
   throw new Error("Player incompleto");
 }
 
 const ctx = matrixCanvas.getContext("2d");
-
-/* ===============================
-   ESTADO
-=============================== */
-let isPlaying = false;
-let animationId = null;
 
 /* ===============================
    MATRIX CONFIG
@@ -27,22 +21,21 @@ let animationId = null;
 const matrixChars = "SONARROCK101010";
 const fontSize = 14;
 let drops = [];
+let animationId = null;
 
 /* ===============================
-   RESIZE CANVAS
+   RESIZE
 =============================== */
 function resizeCanvas() {
   const rect = player.getBoundingClientRect();
   matrixCanvas.width = rect.width;
   matrixCanvas.height = rect.height;
 
-  const columns = Math.floor(rect.width / fontSize);
-  drops = Array(columns).fill(1);
+  const cols = Math.floor(rect.width / fontSize);
+  drops = Array(cols).fill(1);
 }
-
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
-window.addEventListener("orientationchange", resizeCanvas);
 
 /* ===============================
    MATRIX DRAW
@@ -56,9 +49,7 @@ function drawMatrix() {
 
   drops.forEach((y, i) => {
     const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-    const x = i * fontSize;
-
-    ctx.fillText(text, x, y * fontSize);
+    ctx.fillText(text, i * fontSize, y * fontSize);
 
     if (y * fontSize > matrixCanvas.height && Math.random() > 0.975) {
       drops[i] = 0;
@@ -67,57 +58,51 @@ function drawMatrix() {
   });
 }
 
-/* ===============================
-   LOOP
-=============================== */
 function animate() {
-  if (!isPlaying) return;
+  if (audio.paused) return;
   drawMatrix();
   animationId = requestAnimationFrame(animate);
 }
 
 /* ===============================
-   PLAY / PAUSE
+   PLAY / PAUSE (CLAVE)
 =============================== */
 playBtn.addEventListener("click", () => {
-  if (!isPlaying) {
-    liveBadge?.classList.add("buffering");
+  if (audio.paused) {
+    liveBadge.classList.add("buffering");
 
-    audio.play()
-      .then(() => {
-        isPlaying = true;
-        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-
-        player.classList.add("playing");
-        liveBadge?.classList.remove("buffering");
-        liveBadge?.classList.add("active");
-
-        animate();
-      })
-      .catch(err => {
-        console.error("❌ No se pudo reproducir:", err);
-        liveBadge?.classList.remove("buffering");
-      });
-
+    audio.load(); // 🔥 CLAVE PARA STREAMS
+    audio.play().catch(err => {
+      console.error("❌ Error play:", err);
+    });
   } else {
     audio.pause();
   }
 });
 
 /* ===============================
-   AUDIO EVENTS (LA CLAVE)
+   AUDIO EVENTS (MANDAN EL ESTADO)
 =============================== */
+audio.addEventListener("playing", () => {
+  playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+  player.classList.add("playing");
+
+  liveBadge.classList.remove("buffering");
+  liveBadge.classList.add("active");
+
+  animate();
+});
+
 audio.addEventListener("pause", () => {
-  isPlaying = false;
   playBtn.innerHTML = '<i class="fas fa-play"></i>';
   player.classList.remove("playing");
-  liveBadge?.classList.remove("active");
+  liveBadge.classList.remove("active");
 
   cancelAnimationFrame(animationId);
 });
 
-audio.addEventListener("playing", () => {
-  liveBadge?.classList.remove("buffering");
+audio.addEventListener("waiting", () => {
+  liveBadge.classList.add("buffering");
 });
 
 /* ===============================
@@ -126,19 +111,12 @@ audio.addEventListener("playing", () => {
 stopBtn.addEventListener("click", () => {
   audio.pause();
   audio.currentTime = 0;
-
-  isPlaying = false;
-  playBtn.innerHTML = '<i class="fas fa-play"></i>';
-  player.classList.remove("playing");
-  liveBadge?.classList.remove("active");
-
-  cancelAnimationFrame(animationId);
 });
 
 /* ===============================
-   AUTO-RECOVERY ZENO
+   RECOVERY ZENO
 =============================== */
 audio.addEventListener("error", () => {
-  console.warn("⚠️ Stream interrumpido, reintentando…");
+  console.warn("⚠️ Stream cayó, reintentando…");
   setTimeout(() => audio.play().catch(() => {}), 3000);
 });

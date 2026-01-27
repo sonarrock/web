@@ -3,21 +3,31 @@
 // ----------------------------
 const fileName = "Fleetwood Mac - Rumours.mp3"; // cambiar cada semana
 const discoAudio = document.getElementById("disco-audio");
+const discoProgress = document.getElementById("disco-progress");
+const discoProgressContainer = document.getElementById("disco-progress-container");
 const cover = document.getElementById("cover");
-const trackTitle = document.getElementById("track-title");
+const discoTitle = document.getElementById("disco-title");
 
-// Si quieres mostrar título dentro del audio o por JS
-trackTitle && (trackTitle.textContent = "Fleetwood Mac – Rumours");
+// Asignar portada y archivo
+cover.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" + Date.now();
+discoAudio.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/" + fileName;
 
-// Portada
-cover.src =
-  "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" + Date.now();
+// Mostrar título sin extensión
+discoTitle.textContent = fileName.replace(/\.mp3$/i, "");
 
-// Audio
-discoAudio.src =
-  "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/" + fileName;
+// PROGRESO
+discoAudio.addEventListener("timeupdate", () => {
+  if (discoAudio.duration) {
+    discoProgress.style.width = (discoAudio.currentTime / discoAudio.duration) * 100 + "%";
+  }
+});
 
-// Zoom animado (opcional)
+discoProgressContainer.addEventListener("click", e => {
+  const rect = discoProgressContainer.getBoundingClientRect();
+  discoAudio.currentTime = ((e.clientX - rect.left) / rect.width) * discoAudio.duration;
+});
+
+// ANIMACIÓN PORTADA
 let zoomDirection = 1;
 let zoomInterval;
 
@@ -35,14 +45,8 @@ discoAudio.addEventListener("play", () => {
 discoAudio.addEventListener("pause", resetCover);
 discoAudio.addEventListener("ended", resetCover);
 
-
 function resetCover() {
   clearInterval(zoomInterval);
   cover.style.transform = "scale(1)";
-  cover.style.boxShadow = "none";
+  cover.style.boxShadow = "0 0 18px rgba(255,102,0,0.6)";
 }
-
-
-// Título del disco sin extensión
-trackTitle.textContent = fileName.replace(/\.mp3$/i, "");
-document.getElementById("disco-title").textContent = trackTitle.textContent;

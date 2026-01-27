@@ -405,60 +405,27 @@ canvas#matrixCanvas {
 }
 
 /* =======================
-   DISCO DE LA SEMANA - PORTADA CENTRADA Y MISMO TAMAÑO QUE SPOTIFY
+   Disco de la Semana - Miniatura como iVoox
 ======================= */
 .disco-section {
     display: flex;
-    flex-direction: column;
-    align-items: center; /* CENTRADO HORIZONTAL */
-    justify-content: center;
-    text-align: center;
-    gap: 15px;
-    margin-bottom: 50px;
-    width: 100%;
-    max-width: 650px; /* Igual que los reproductores de Spotify/iVoox */
+    align-items: center; /* Alinea portada y reproductor en la misma línea */
+    gap: 10px; /* Espacio entre portada y audio */
+    margin-bottom: 30px;
 }
 
 .disco-section img#cover {
-    width: 100%; /* Igual que el contenedor del reproductor */
-    max-width: 650px; /* Limita tamaño máximo igual que Spotify */
-    height: auto;
-    border-radius: 12px;
-    border: 2px solid #ff6600;
-    box-shadow: 0 8px 24px rgba(255,102,0,0.6);
-    display: block;
-    margin: 0 auto; /* CENTRADO */
+    width: 40px;
+    height: 40px;
+    border-radius: 4px; /* Opcional: igual que iVoox */
+    border: 1px solid #ff6600;
+    box-shadow: 0 0 5px rgba(255,102,0,0.6);
 }
 
 #disco-player {
-    width: 100%;
-    height: 170px; /* Igual que Spotify */
-    border-radius: 12px;
-    border: 2px solid #ff6600;
-    box-shadow: 0 8px 24px rgba(255,102,0,0.6);
-    margin: 0 auto; /* CENTRADO */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background: #111;
-}
-
-/* Subtítulo centrado */
-.disco-section .section-subtitle {
-    color: #FF6600;
-    font-size: 1rem;
-    font-weight: 500;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-/* Responsivo */
-@media (max-width: 768px) {
-    .disco-section img#cover { max-width: 100%; height: auto; }
-    #disco-player { height: 150px; }
-}
-
-@media (max-width: 480px) {
-    .disco-section img#cover { max-width: 100%; height: auto; }
-    #disco-player { height: 130px; }
+    flex: 1; /* Ocupa el resto del espacio al lado de la portada */
+    height: 40px; /* Misma altura que la portada */
+    border-radius: 4px;
+    border: 1px solid #ff6600;
+    box-shadow: 0 0 5px rgba(255,102,0,0.6);
 }

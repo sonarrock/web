@@ -65,7 +65,7 @@ body {
 }
 
 /* ========================= */
-/* REPRODUCTOR STREAMING     */
+/* REPRODUCTORES STREAMING     */
 /* ========================= */
 .player-section {
   margin-top: 50px;
@@ -212,158 +212,22 @@ canvas#matrixCanvas {
     text-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
 }
 
-.embed-container {
-    max-width: 800px;
-    margin: 0 auto;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    border: 2px solid #ff6600;
-}
-
-.spotify-embed {
-    display: flex;
-    justify-content: center;
-}
-
-/* Staff Section */
-.staff-section {
-    padding: 60px 0;
-    background: rgba(0, 0, 0, 0.2);
-}
-
-.staff-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 40px;
-    margin-top: 40px;
-}
-
-.staff-member {
-    text-align: center;
-    background: rgba(26, 26, 26, 0.8);
-    padding: 30px;
-    border-radius: 15px;
-    border: 2px solid #ff6600;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.staff-member:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(255, 102, 0, 0.2);
-}
-
-.staff-image {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 20px;
-    border: 3px solid #ff6600;
-    box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
-}
-
-.staff-member h3 {
-    font-size: 1.5rem;
-    color: #ff6600;
-    text-shadow: 0 0 5px rgba(255, 102, 0, 0.3);
-}
-
-/* About Sections */
-.about-section {
-    padding: 60px 0;
-}
-
-.about-content {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.about-text {
-    font-size: 1.2rem;
-    line-height: 1.8;
-    color: #cccccc;
-    margin-top: 20px;
-}
-
-/* RESPONSIVE DESIGN */
-@media (max-width: 768px) {
-    .title-section h1 { font-size: 2rem; }
-    .subtitle { font-size: 1rem; }
-    .logo-section { flex-direction: column; gap: 15px; }
-    .main-image { height: 300px; }
-    .social-buttons { gap: 15px; }
-    .social-btn { width: 50px; height: 50px; font-size: 20px; }
-    .staff-grid { grid-template-columns: 1fr; gap: 30px; }
-}
-
-@media (max-width: 480px) {
-    .container { padding: 0 15px; }
-    .title-section h1 { font-size: 1.5rem; }
-    .section-title { font-size: 2rem; }
-    .player-controls { flex-direction: column; gap: 15px; }
-    .custom-player {
-        padding: 10px;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-    }
-    .player-controls { flex-direction: column; align-items: center; }
-    .volume-control { width: 100%; display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
-    .volume-slider { width: 80%; }
-    .visualizer { margin-top: 10px; gap: 3px; }
-    .bar { margin: 0 1px; height: 5px; }
-    #streamStatus { font-size: 13px; margin-top: 8px; text-align: center; }
-    .main-image-container img.main-image { max-width: 100%; height: auto; }
-    .player-overlay { position: relative; width: 100%; padding: 10px 0; }
-}
-
-.listeners-badge {
-    background-color: #ff6600;
-    color: #fff;
-    font-weight: bold;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.9em;
-    margin-left: 10px;
-    display: inline-block;
-}
-
-/* ========================= */
-/* Disco de la Semana estilo iVoox */
-/* ========================= */
-.disco-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 10px;
+/* =========================
+   Reproductores uniformes
+========================= */
+.embed-player, #disco-player, #podcast-player {
     width: 100%;
     max-width: 650px;
-    margin: 0 auto 50px auto;
-}
-
-.disco-section .section-subtitle {
-    color: #FF6600;
-    font-size: 1.2rem;
-    font-weight: 600;
-    text-align: center;
-}
-
-#disco-player {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 170px;
+    margin: 20px auto 50px auto;
     background: #111;
-    border-radius: 12px;
     border: 2px solid #ff6600;
+    border-radius: 12px;
     box-shadow: 0 8px 24px rgba(255,102,0,0.6);
     overflow: hidden;
-    gap: 15px;
+    display: flex;
+    align-items: center;
     padding: 10px;
+    gap: 15px;
     box-sizing: border-box;
 }
 
@@ -384,15 +248,63 @@ canvas#matrixCanvas {
     outline: none;
 }
 
-/* RESPONSIVO Disco de la Semana */
+.embed-player iframe,
+#podcast-player iframe {
+    width: 100%;
+    height: 170px;
+    border: 0;
+}
+
+/* RESPONSIVO para todos los reproductores */
 @media (max-width: 768px) {
-    #disco-player { height: 150px; }
+    #disco-player, .embed-player, #podcast-player {
+        max-width: 100%;
+        flex-direction: column;
+        align-items: center;
+        height: auto;
+        gap: 10px;
+        padding: 10px;
+    }
+
     #disco-player img#cover { width: 120px; height: 120px; }
+    #disco-player audio { height: 45px; }
+
+    .embed-player iframe,
+    #podcast-player iframe { height: 150px; }
 }
 
 @media (max-width: 480px) {
-    #disco-player { flex-direction: column; height: auto; gap: 8px; }
     #disco-player img#cover { width: 100px; height: 100px; }
-    #disco-player audio { width: 100%; height: 40px; }
+    #disco-player audio { height: 40px; }
+    .embed-player iframe,
+    #podcast-player iframe { height: 130px; }
 }
 
+/* =========================
+   Staff, About y resto del CSS (igual que antes)
+========================= */
+.staff-section { padding: 60px 0; background: rgba(0,0,0,0.2); }
+.staff-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap:40px; margin-top:40px; }
+.staff-member {
+  text-align:center;
+  background: rgba(26,26,26,0.8);
+  padding:30px;
+  border-radius:15px;
+  border:2px solid #ff6600;
+  transition:all 0.3s ease;
+  box-shadow:0 5px 15px rgba(0,0,0,0.3);
+}
+.staff-member:hover {
+  transform: translateY(-10px);
+  box-shadow:0 15px 30px rgba(255,102,0,0.2);
+}
+.staff-image { width:150px; height:150px; border-radius:50%; object-fit:cover; margin-bottom:20px; border:3px solid #ff6600; box-shadow:0 0 20px rgba(255,102,0,0.3);}
+.staff-member h3 { font-size:1.5rem; color:#ff6600; text-shadow:0 0 5px rgba(255,102,0,0.3); }
+.about-section { padding:60px 0; }
+.about-content { max-width:800px; margin:0 auto; text-align:center; }
+.about-text { font-size:1.2rem; line-height:1.8; color:#cccccc; margin-top:20px; }
+
+/* RESPONSIVE GENERAL */
+@media(max-width:768px){.title-section h1{font-size:2rem}.subtitle{font-size:1rem}.logo-section{flex-direction:column;gap:15px}.main-image{height:300px}.social-buttons{gap:15px}.social-btn{width:50px;height:50px;font-size:20px}.staff-grid{grid-template-columns:1fr;gap:30px}}
+@media(max-width:480px){.container{padding:0 15px}.title-section h1{font-size:1.5rem}.section-title{font-size:2rem}.player-controls{flex-direction:column;gap:15px}.custom-player{padding:10px;flex-direction:column;align-items:center;gap:10px}.player-controls{flex-direction:column;align-items:center}.volume-control{width:100%;display:flex;justify-content:center;gap:10px;margin-top:8px}.volume-slider{width:80%}.visualizer{margin-top:10px;gap:3px}.bar{margin:0 1px;height:5px}#streamStatus{font-size:13px;margin-top:8px;text-align:center}.main-image-container img.main-image{max-width:100%;height:auto}.player-overlay{position:relative;width:100%;padding:10px 0}}
+.listeners-badge{background-color:#ff6600;color:#fff;font-weight:bold;padding:3px 8px;border-radius:12px;font-size:0.9em;margin-left:10px;display:inline-block;}

@@ -1,161 +1,256 @@
-/* =======================
-   RESET Y BODY
-======================= */
+/* ========================= */
+/* RESET BÁSICO              */
+/* ========================= */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-    font-family: 'Arial', sans-serif;
-    background: #0a0a0a;
-    color: #fff;
-    line-height: 1.6;
-    min-height: 100vh;
+  font-family: "Spotify Circular", Arial, sans-serif;
+  background: #121212;
+  color: #fff;
+  line-height: 1.5;
 }
 
+/* ========================= */
+/* CONTENEDORES GENERALES     */
+/* ========================= */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-/* =======================
-   HEADER
-======================= */
+/* ========================= */
+/* HEADER                    */
+/* ========================= */
 .header {
-    background: #0a0a0a;
-    padding: 40px 0;
-    border-bottom: 4px solid #ff6600;
-    text-align: center;
+  padding: 15px 0;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.logo-section {
-    margin-bottom: 20px;
+.header .logo-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.logo {
-    width: 220px;
-    border-radius: 12px;
-    border: 4px solid #ff6600;
-    box-shadow: 0 0 30px rgba(255,102,0,0.5);
+.header .logo {
+  height: 60px;
+  object-fit: contain;
 }
 
-.title-section h1 {
-    font-size: 4rem;
-    font-weight: bold;
-    color: #ff6600;
-    text-shadow: 0 0 15px rgba(255,102,0,0.6);
-    text-align: center;
-    margin-bottom: 10px;
+.header h1 {
+  color: #FF6600;
+  font-size: 1.2rem;
 }
 
-.subtitle {
-    font-size: 1.4rem;
-    color: #ff6600;
-    letter-spacing: 2px;
-    margin-bottom: 40px;
-    text-align: center;
+/* ========================= */
+/* IMAGEN PRINCIPAL          */
+/* ========================= */
+.main-section {
+  margin-top: 20px;
+  text-align: center;
 }
 
-/* =======================
-   SECCIONES Y TITULOS
-======================= */
+.main-section .main-image {
+  border-radius: 12px;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ========================= */
+/* REPRODUCTOR STREAMING     */
+/* ========================= */
+.player-section {
+  margin-top: 50px;
+  position: relative;
+}
+
+.player-container {
+  position: relative;
+  background: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+
+.player-bg {
+  width: 100%;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  opacity: 0.4;
+}
+
+canvas#matrixCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.player-container .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 3;
+}
+
+.player-content {
+  position: relative;
+  z-index: 4;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Controles */
+.controls {
+  display: flex;
+  gap: 15px;
+}
+
+.btn {
+  background: #222;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #fff;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  background: #333;
+  color: #FF6600;
+}
+
+/* Progreso */
+.progress-container {
+  width: 100%;
+  height: 6px;
+  background: #333;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+#radio-progress, #disco-progress {
+  width: 0%;
+  height: 100%;
+  background: #FF6600;
+  border-radius: 4px;
+}
+
+.time-display {
+  font-size: 0.9rem;
+  color: #aaa;
+  text-align: right;
+  margin-top: 2px;
+}
+
+/* ========================= */
+/* SECCIONES                */
+/* ========================= */
 .section-title {
-    color: #FF6600;
-    font-size: 1.6rem;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 5px;
+  color: #FF6600;
+  font-size: 1.4rem;
+  margin-bottom: 25px;
+  font-weight: 700;
 }
 
-.section-subtitle {
-    color: #FF6600;
-    font-size: 1rem;
-    font-weight: 500;
-    text-align: center;
-    margin-bottom: 30px;
+/* DISCO DE LA SEMANA */
+.disco-section {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 50px;
 }
 
-/* =======================
-   SECCIONES CENTRADAS Y SIMÉTRICAS
-======================= */
-.disco-section,
-.social-section,
+.disco-section img#cover {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(255,102,0,0.6);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.disco-section div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* EMBEDS SPOTIFY E IVOOX */
 .embed-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    margin-bottom: 60px; /* mismo margen entre secciones */
-    width: 100%;
-    max-width: 650px;
+  margin-top: 60px;
 }
 
-/* =======================
-   REPRODUCTORES UNIFORMES
-======================= */
-.embed-section iframe,
-.disco-section audio,
-#disco-player,
+.embed-section iframe, 
 #podcast-player {
-    width: 100%;
-    height: 170px; /* altura uniforme */
-    border-radius: 12px;
-    border: 3px solid #ff6600; /* borde naranja */
-    box-shadow: 0 10px 30px rgba(255,102,0,0.7); /* sombra definida */
-    margin-bottom: 20px; /* espacio entre reproductor y títulos/subtítulos */
-    display: block;
-    background: #0a0a0a;
+  width: 100%;
+  max-width: 650px;
+  height: 170px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  margin: auto;
+  display: block;
 }
 
-/* =======================
-   BOTONES SOCIALES
-======================= */
-.social-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px; /* espaciado uniforme */
-    margin-top: 15px;
+/* Podcast iVoox episodio */
+.podcast-episode {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-/* =======================
-   RESPONSIVE
-======================= */
-@media (max-width: 1024px) {
-    .embed-section iframe,
-    .disco-section audio,
-    #disco-player,
-    #podcast-player {
-        height: 160px;
-    }
+.podcast-episode img {
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
+  object-fit: cover;
 }
 
-@media (max-width: 768px) {
-    .title-section h1 { font-size: 2.5rem; }
-    .subtitle { font-size: 1.1rem; margin-bottom: 30px; }
-    .section-title { font-size: 1.4rem; }
-    .section-subtitle { font-size: 0.95rem; margin-bottom: 25px; }
-    .embed-section iframe,
-    .disco-section audio,
-    #disco-player,
-    #podcast-player { height: 150px; }
+.podcast-episode h3 {
+  font-size: 14px;
+  color: #fff;
+  margin-bottom: 4px;
 }
 
-@media (max-width: 480px) {
-    .title-section h1 { font-size: 1.8rem; }
-    .subtitle { font-size: 0.95rem; margin-bottom: 20px; }
-    .section-title { font-size: 1.2rem; }
-    .section-subtitle { font-size: 0.85rem; margin-bottom: 15px; }
-    .embed-section iframe,
-    .disco-section audio,
-    #disco-player,
-    #podcast-player { height: 130px; }
+.podcast-episode p {
+  font-size: 10px;
+  color: #b3b3b3;
+  margin-bottom: 6px;
 }
+
+.podcast-episode audio {
+  width: 100%;
+  border-radius: 8px;
+  background: #222;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
+}
+
+/* ========================= */
+/* STAFF SECTION             */
+/* ========================= */
+.staff-section {
+  margin-top: 60px;
+}
+
+.staff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150p

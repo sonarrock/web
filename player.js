@@ -105,6 +105,9 @@ function drawMatrix() {
 }
 
 function startMatrix() {
+  resizeCanvas(); // 👈 clave
+  showMatrix();
+
   cancelAnimationFrame(animationId);
   animationId = requestAnimationFrame(function animate() {
     drawMatrix();
@@ -115,7 +118,19 @@ function startMatrix() {
 function stopMatrix() {
   cancelAnimationFrame(animationId);
   animationId = null;
+  hideMatrix();
 }
+
+
+function hideMatrix() {
+  matrixCtx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+  matrixCanvas.style.opacity = "0";
+}
+
+function showMatrix() {
+  matrixCanvas.style.opacity = "1";
+}
+
 
 /* ===============================
    PLAY / PAUSE
@@ -244,6 +259,10 @@ document.addEventListener("visibilitychange", () => {
     audio.play().catch(() => {});
   }
 });
+
+hideMatrix();
+setOffline();
+
 
 /* ===============================
    SERVICE WORKER

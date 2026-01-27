@@ -152,6 +152,38 @@ playBtn.addEventListener("click", async () => {
   }
 });
 
+const progressBar = document.getElementById("progressBar");
+const timeDisplay = document.getElementById("timeDisplay");
+
+let playStartTime = null;
+let timerInterval = null;
+
+// Cuando se da PLAY
+function startTimer() {
+  playStartTime = Date.now();
+
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - playStartTime) / 1000);
+
+    const min = String(Math.floor(elapsed / 60)).padStart(2, "0");
+    const sec = String(elapsed % 60).padStart(2, "0");
+
+    timeDisplay.textContent = `${min}:${sec}`;
+
+    // Barra simulando progreso por minuto
+    const progress = (elapsed % 60) / 60 * 100;
+    progressBar.style.width = `${progress}%`;
+  }, 1000);
+}
+
+// Cuando se pausa o detiene
+function stopTimer() {
+  clearInterval(timerInterval);
+  progressBar.style.width = "0%";
+  timeDisplay.textContent = "00:00";
+}
+
+
 /* ===============================
    STOP
 =============================== */

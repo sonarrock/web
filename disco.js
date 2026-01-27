@@ -54,5 +54,5 @@ discoAudio.addEventListener("ended", resetCover);
 function resetCover() {
   clearInterval(zoomInterval);
   cover.style.transform = "scale(1)";
-  cover.style.boxShadow = "none";
+  cover.style.boxShadow = "0 0 18px rgba(255,102,0,0.6)"; // mantiene marco naranja
 }

@@ -251,5 +251,23 @@
 <script src="disco.js"></script>
 <script src="ivoox.js"></script>
 
+
+  <!-- REGISTRO SERVICE WORKER -->
+  <script>
+ 
+    if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(reg => {
+          console.log('✅ Service Worker registrado:', reg.scope);
+        })
+        .catch(err => {
+          console.error('❌ Error al registrar Service Worker:', err);
+        });
+    });
+  }
+</script>
+
+  
 </body>
 </html>

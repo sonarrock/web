@@ -24,30 +24,24 @@ body {
 }
 
 /* ========================= */
-/* HEADER                    */
+/* HEADER TÍTULO NARANJA ANIMADO */
 /* ========================= */
-.header {
-  padding: 15px 0;
-  background: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.header .logo-section {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.header .logo {
-  height: 60px;
-  object-fit: contain;
-}
-
 .header h1 {
-  color: #FF6600;
-  font-size: 1.2rem;
+    font-size: 3.6rem; /* 3 veces más grande que antes */
+    color: #FF6600;
+    text-shadow: 0 0 10px rgba(255, 102, 0, 0.6);
+    animation: titleGlow 2.5s infinite alternate;
+    text-align: center;
+}
+
+/* Animación de resplandor del título */
+@keyframes titleGlow {
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(255, 102, 0, 0.6), 0 0 20px rgba(255, 102, 0, 0.4);
+    }
+    50% {
+        text-shadow: 0 0 25px rgba(255, 102, 0, 0.9), 0 0 40px rgba(255, 102, 0, 0.6);
+    }
 }
 
 /* ========================= */
@@ -404,3 +398,19 @@ canvas#matrixCanvas {
     #disco-player img#cover { width: 100px; height: 100px; }
     #disco-player audio, #podcast-player audio { width: 100%; height: 40px; }
 }
+
+/* ========================= */
+/* HEADER TÍTULO RESPONSIVO  */
+/* ========================= */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2.5rem; /* tamaño moderado para tablets y móviles grandes */
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.8rem; /* tamaño compacto para móviles pequeños */
+    }
+}
+

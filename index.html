@@ -325,6 +325,16 @@ if (navigator.connection) {
 }
 </script>
 
+  <script>
+window.addEventListener('offline', () => {
+  alert('⚠️ Conexión perdida. Intentaremos reconectar.');
+});
+
+window.addEventListener('online', () => {
+  console.log('✅ Conexión restaurada');
+});
+</script>
+
   
 </body>
 </html>

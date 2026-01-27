@@ -24,25 +24,51 @@ body {
 }
 
 /* ========================= */
-/* HEADER TÍTULO NARANJA ANIMADO */
+/* HEADER LOGO Y DIVISIÓN    */
 /* ========================= */
-.header h1 {
-    font-size: 3.6rem; /* 3 veces más grande que antes */
-    color: #FF6600;
-    text-shadow: 0 0 10px rgba(255, 102, 0, 0.6);
-    animation: titleGlow 2.5s infinite alternate;
-    text-align: center;
+.header {
+    padding: 15px 0;
+    background: #000;
+    display: flex;
+    flex-direction: column; /* permite línea debajo del logo */
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }
 
-/* Animación de resplandor del título */
-@keyframes titleGlow {
-    0%, 100% {
-        text-shadow: 0 0 10px rgba(255, 102, 0, 0.6), 0 0 20px rgba(255, 102, 0, 0.4);
-    }
-    50% {
-        text-shadow: 0 0 25px rgba(255, 102, 0, 0.9), 0 0 40px rgba(255, 102, 0, 0.6);
-    }
+.header .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
+
+.header .logo {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 3px solid #FF6600; /* marco naranja */
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(255,102,0,0.6);
+    animation: glow 2s infinite alternate; /* animación de resplandor */
+}
+
+/* Línea naranja debajo del header */
+.header::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 4px;
+    background: #FF6600;
+    margin-top: 10px;
+    box-shadow: 0 0 8px rgba(255,102,0,0.7);
+}
+
+/* Animación de resplandor */
+@keyframes glow {
+    from { box-shadow: 0 0 10px rgba(255,102,0,0.5); }
+    to   { box-shadow: 0 0 20px rgba(255,102,0,1); }
+}
+
 
 /* ========================= */
 /* IMAGEN PRINCIPAL          */

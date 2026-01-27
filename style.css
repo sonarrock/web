@@ -19,6 +19,9 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* =======================
@@ -47,13 +50,16 @@ body {
     font-weight: bold;
     color: #ff6600;
     text-shadow: 0 0 15px rgba(255,102,0,0.6);
+    text-align: center;
+    margin-bottom: 10px;
 }
 
 .subtitle {
     font-size: 1.4rem;
     color: #ff6600;
     letter-spacing: 2px;
-    margin-top: 5px;
+    margin-bottom: 40px;
+    text-align: center;
 }
 
 /* =======================
@@ -61,62 +67,95 @@ body {
 ======================= */
 .section-title {
     color: #FF6600;
-    font-size: 1.4rem;
-    margin-bottom: 25px;
+    font-size: 1.6rem;
     font-weight: 700;
-    text-align: center; /* CENTRADO */
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.section-subtitle {
+    color: #FF6600;
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 30px;
 }
 
 /* =======================
-   REPRODUCTORES
+   SECCIONES CENTRADAS Y SIMÉTRICAS
+======================= */
+.disco-section,
+.social-section,
+.embed-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 60px; /* mismo margen entre secciones */
+    width: 100%;
+    max-width: 650px;
+}
+
+/* =======================
+   REPRODUCTORES UNIFORMES
 ======================= */
 .embed-section iframe,
-.embed-section audio,
+.disco-section audio,
 #disco-player,
 #podcast-player {
     width: 100%;
-    max-width: 650px;
-    height: 170px;
+    height: 170px; /* altura uniforme */
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-    margin: auto;
+    border: 3px solid #ff6600; /* borde naranja */
+    box-shadow: 0 10px 30px rgba(255,102,0,0.7); /* sombra definida */
+    margin-bottom: 20px; /* espacio entre reproductor y títulos/subtítulos */
     display: block;
+    background: #0a0a0a;
+}
+
+/* =======================
+   BOTONES SOCIALES
+======================= */
+.social-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px; /* espaciado uniforme */
+    margin-top: 15px;
 }
 
 /* =======================
    RESPONSIVE
 ======================= */
-@media (max-width: 768px) {
-    .title-section h1 {
-        font-size: 2rem;
-    }
-    
-    .subtitle {
-        font-size: 1rem;
-    }
-
+@media (max-width: 1024px) {
     .embed-section iframe,
-    .embed-section audio,
+    .disco-section audio,
     #disco-player,
     #podcast-player {
-        max-width: 100%;
-        height: 150px;
+        height: 160px;
     }
 }
 
-@media (max-width: 480px) {
-    .title-section h1 {
-        font-size: 1.5rem;
-    }
-    
-    .section-title {
-        font-size: 1.2rem;
-    }
-    
+@media (max-width: 768px) {
+    .title-section h1 { font-size: 2.5rem; }
+    .subtitle { font-size: 1.1rem; margin-bottom: 30px; }
+    .section-title { font-size: 1.4rem; }
+    .section-subtitle { font-size: 0.95rem; margin-bottom: 25px; }
     .embed-section iframe,
-    .embed-section audio,
+    .disco-section audio,
     #disco-player,
-    #podcast-player {
-        height: 130px;
-    }
+    #podcast-player { height: 150px; }
+}
+
+@media (max-width: 480px) {
+    .title-section h1 { font-size: 1.8rem; }
+    .subtitle { font-size: 0.95rem; margin-bottom: 20px; }
+    .section-title { font-size: 1.2rem; }
+    .section-subtitle { font-size: 0.85rem; margin-bottom: 15px; }
+    .embed-section iframe,
+    .disco-section audio,
+    #disco-player,
+    #podcast-player { height: 130px; }
 }

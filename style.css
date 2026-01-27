@@ -361,102 +361,105 @@ canvas#matrixCanvas {
 }
 
 /* ========================= */
-/* Disco de la Semana estilo iVoox */
+/* Disco de la Semana estilo iVoox/Spotify */
 /* ========================= */
 .disco-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 10px;
-  width: 100%;
-  max-width: 650px;
-  margin: 0 auto 50px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto 50px auto;
 }
 
 .disco-section .section-subtitle {
-  color: #FF6600;
-  font-size: 1.6rem; /* más grande */
-  font-weight: 600;
-  text-align: center;
+    color: #FF6600;
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 15px;
 }
 
 #disco-player {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 170px;
-  background: #111;
-  border-radius: 12px;
-  border: 2px solid #ff6600;
-  box-shadow: 0 8px 24px rgba(255,102,0,0.6);
-  overflow: hidden;
-  gap: 15px;
-  padding: 10px;
-  box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 170px;
+    background: #111;
+    border-radius: 12px;
+    border: 2px solid #ff6600;
+    box-shadow: 0 8px 24px rgba(255,102,0,0.6);
+    overflow: hidden;
+    gap: 15px;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 #disco-player img#cover {
-  width: 150px;
-  height: 150px;
-  border-radius: 12px;
-  border: 2px solid #ff6600;
-  box-shadow: 0 0 18px rgba(255,102,0,0.6);
-  flex-shrink: 0;
-  object-fit: cover;
-  animation: glow 2s infinite alternate;
+    width: 150px;
+    height: 150px;
+    border-radius: 12px;
+    border: 2px solid #ff6600;
+    box-shadow: 0 0 18px rgba(255,102,0,0.6);
+    flex-shrink: 0;
+    object-fit: cover;
+    animation: glow 2s infinite alternate;
 }
 
-#disco-player span#track-title {
-  color: #FF6600;
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 8px;
+.disco-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+}
+
+.track-title {
+    color: #FF6600;
+    font-size: 1.3rem;
+    font-weight: 600;
 }
 
 #disco-player audio {
-    display: block;      /* Asegura que se vea */
-    flex: none;          /* No se encoge */
-    width: 100%;         /* Ocupa todo el contenedor */
-    height: 50px;        /* Tamaño visible */
+    width: 100%;
+    height: 50px;
     outline: none;
-    background: #111;    /* Fondo consistente */
-    color: #FF6600;      /* Color de controles si aplica */
 }
 
-
 #disco-progress-container {
-  width: 100%;
-  height: 6px;
-  background: #333;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 5px;
+    width: 100%;
+    height: 6px;
+    background: #333;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 5px;
 }
 
 #disco-progress {
-  width: 0%;
-  height: 100%;
-  background: #FF6600;
-  border-radius: 4px;
+    width: 0%;
+    height: 100%;
+    background: #FF6600;
+    border-radius: 4px;
 }
 
-/* Animación de resplandor portada */
+/* Animación de resplandor */
 @keyframes glow {
-  from { box-shadow: 0 0 10px rgba(255,102,0,0.5); }
-  to   { box-shadow: 0 0 20px rgba(255,102,0,1); }
+    from { box-shadow: 0 0 10px rgba(255,102,0,0.5); }
+    to   { box-shadow: 0 0 20px rgba(255,102,0,1); }
 }
 
-/* RESPONSIVO Disco de la Semana */
+/* RESPONSIVO */
 @media (max-width: 768px) {
-  #disco-player { height: 150px; }
-  #disco-player img#cover { width: 120px; height: 120px; }
+    #disco-player { height: 150px; }
+    #disco-player img#cover { width: 120px; height: 120px; }
 }
 
 @media (max-width: 480px) {
-  #disco-player { flex-direction: column; height: auto; gap: 8px; }
-  #disco-player img#cover { width: 100px; height: 100px; }
-  #disco-player audio { width: 100%; height: 40px; }
+    #disco-player { flex-direction: column; height: auto; gap: 8px; }
+    #disco-player img#cover { width: 100px; height: 100px; }
+    #disco-player audio { width: 100%; height: 40px; }
 }
 
 /* ========================= */

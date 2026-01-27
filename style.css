@@ -288,111 +288,38 @@ canvas#matrixCanvas {
     margin-top: 20px;
 }
 
-/* Responsive Design */
+/* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
-    .title-section h1 {
-        font-size: 2rem;
-    }
-    
-    .subtitle {
-        font-size: 1rem;
-    }
-    
-    .logo-section {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .main-image {
-        height: 300px;
-    }
-    
-    .social-buttons {
-        gap: 15px;
-    }
-    
-    .social-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-    }
-    
-    .staff-grid {
-        grid-template-columns: 1fr;
-        gap: 30px;
-    }
+    .title-section h1 { font-size: 2rem; }
+    .subtitle { font-size: 1rem; }
+    .logo-section { flex-direction: column; gap: 15px; }
+    .main-image { height: 300px; }
+    .social-buttons { gap: 15px; }
+    .social-btn { width: 50px; height: 50px; font-size: 20px; }
+    .staff-grid { grid-template-columns: 1fr; gap: 30px; }
 }
 
 @media (max-width: 480px) {
-    .container {
-        padding: 0 15px;
-    }
-    
-    .title-section h1 {
-        font-size: 1.5rem;
-    }
-    
-    .section-title {
-        font-size: 2rem;
-    }
-    
-    .player-controls {
+    .container { padding: 0 15px; }
+    .title-section h1 { font-size: 1.5rem; }
+    .section-title { font-size: 2rem; }
+    .player-controls { flex-direction: column; gap: 15px; }
+    .custom-player {
+        padding: 10px;
         flex-direction: column;
-        gap: 15px;
+        align-items: center;
+        gap: 10px;
     }
+    .player-controls { flex-direction: column; align-items: center; }
+    .volume-control { width: 100%; display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
+    .volume-slider { width: 80%; }
+    .visualizer { margin-top: 10px; gap: 3px; }
+    .bar { margin: 0 1px; height: 5px; }
+    #streamStatus { font-size: 13px; margin-top: 8px; text-align: center; }
+    .main-image-container img.main-image { max-width: 100%; height: auto; }
+    .player-overlay { position: relative; width: 100%; padding: 10px 0; }
 }
-@media (max-width: 480px) {
-  .custom-player {
-    padding: 10px;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
 
-  .player-controls {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .volume-control {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 8px;
-  }
-
-  .volume-slider {
-    width: 80%;
-  }
-
-  .visualizer {
-    margin-top: 10px;
-    gap: 3px;
-  }
-
-  .bar {
-    margin: 0 1px;
-    height: 5px;
-  }
-
-  #streamStatus {
-    font-size: 13px;
-    margin-top: 8px;
-    text-align: center;
-  }
-
-  .main-image-container img.main-image {
-    max-width: 100%;
-    height: auto;
-  }
-
-  .player-overlay {
-    position: relative;
-    width: 100%;
-    padding: 10px 0;
-  }
-}
 .listeners-badge {
     background-color: #ff6600;
     color: #fff;
@@ -404,9 +331,9 @@ canvas#matrixCanvas {
     display: inline-block;
 }
 
-/* =======================
-   Disco de la Semana estilo iVoox
-======================= */
+/* ========================= */
+/* Disco de la Semana estilo iVoox */
+/* ========================= */
 .disco-section {
     display: flex;
     flex-direction: column;
@@ -414,7 +341,7 @@ canvas#matrixCanvas {
     text-align: center;
     gap: 10px;
     width: 100%;
-    max-width: 650px; /* Igual que los embeds de Spotify/Ivoox */
+    max-width: 650px;
     margin: 0 auto 50px auto;
 }
 
@@ -429,7 +356,7 @@ canvas#matrixCanvas {
     display: flex;
     align-items: center;
     width: 100%;
-    height: 170px; /* Altura igual a iVoox */
+    height: 170px;
     background: #111;
     border-radius: 12px;
     border: 2px solid #ff6600;
@@ -441,7 +368,7 @@ canvas#matrixCanvas {
 }
 
 #disco-player img#cover {
-    width: 150px; /* Portada visible grande */
+    width: 150px;
     height: 150px;
     border-radius: 12px;
     border: 2px solid #ff6600;
@@ -453,11 +380,11 @@ canvas#matrixCanvas {
 #disco-player audio {
     flex: 1;
     width: 100%;
-    height: 50px; /* Controles de audio compactos */
+    height: 50px;
     outline: none;
 }
 
-/* RESPONSIVO */
+/* RESPONSIVO Disco de la Semana */
 @media (max-width: 768px) {
     #disco-player { height: 150px; }
     #disco-player img#cover { width: 120px; height: 120px; }
@@ -468,3 +395,4 @@ canvas#matrixCanvas {
     #disco-player img#cover { width: 100px; height: 100px; }
     #disco-player audio { width: 100%; height: 40px; }
 }
+

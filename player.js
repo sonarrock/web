@@ -5,12 +5,12 @@ const audio = document.getElementById("radio-audio");
 const playBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
+const volumeSlider = document.getElementById("volume");
 const liveBadge = document.getElementById("live-indicator");
 const player = document.querySelector(".player-container");
 const matrixCanvas = document.getElementById("matrixCanvas");
-const volumeSlider = document.getElementById("volume");
 
-if (!audio || !playBtn || !player || !matrixCanvas) {
+if (!audio || !playBtn || !player || !matrixCanvas || !liveBadge) {
   console.error("❌ Player incompleto");
 }
 
@@ -19,33 +19,72 @@ if (!audio || !playBtn || !player || !matrixCanvas) {
 =============================== */
 let isPlaying = false;
 let fadeInterval = null;
-let animationId = null;
 
 /* ===============================
-   MATRIX CONFIG
+   LIVE / BUFFERING INDICATOR
+=============================== */
+function setLive() {
+  liveBadge.classList.remove("buffering");
+  liveBadge.classList.add("active");
+  liveBadge.querySelector(".text").textContent = "EN VIVO";
+}
+
+function setBuffering() {
+  liveBadge.classList.remove("active");
+  liveBadge.classList.add("buffering");
+  liveBadge.querySelector(".text").textContent = "CONECTANDO…";
+}
+
+function setOffline() {
+  liveBadge.classList.remove("active", "buffering");
+  liveBadge.querySelector(".text").textContent = "OFFLINE";
+}
+
+/* ===============================
+   FADE IN / FADE OUT (FM STYLE)
+=============================== */
+function fadeTo(targetVolume, duration = 2000) {
+  clearInterval(fadeInterval);
+
+  const startVolume = audio.volume;
+  const steps = 30;
+  const stepTime = duration / steps;
+  const volumeStep = (targetVolume - startVolume) / steps;
+
+  let currentStep = 0;
+
+  fadeInterval = setInterval(() => {
+    currentStep++;
+    audio.volume = Math.min(1, Math.max(0, audio.volume + volumeStep));
+
+    if (currentStep >= steps) {
+      audio.volume = targetVolume;
+      clearInterval(fadeInterval);
+    }
+  }, stepTime);
+}
+
+/* ===============================
+   MATRIX EFFECT
 =============================== */
 const matrixCtx = matrixCanvas.getContext("2d");
-const matrixChars = "0123456789SONARROCK";
+const matrixChars = "0123456789ABCDEFGHIJKMNOPQRSTUVXYZ";
 const fontSize = 14;
 let drops = [];
+let animationId = null;
 
-/* ===============================
-   CANVAS RESIZE
-=============================== */
 function resizeCanvas() {
   const rect = player.getBoundingClientRect();
   matrixCanvas.width = rect.width;
   matrixCanvas.height = rect.height;
-  drops = Array(Math.floor(rect.width / fontSize)).fill(1);
+  const columns = Math.floor(rect.width / fontSize);
+  drops = Array(columns).fill(1);
 }
 
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("orientationchange", resizeCanvas);
 
-/* ===============================
-   MATRIX DRAW
-=============================== */
 function drawMatrix() {
   matrixCtx.fillStyle = "rgba(0,0,0,0.08)";
   matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
@@ -66,40 +105,16 @@ function drawMatrix() {
 }
 
 function startMatrix() {
-  matrixCanvas.classList.add("active");
   cancelAnimationFrame(animationId);
-  (function animate() {
+  animationId = requestAnimationFrame(function animate() {
     drawMatrix();
     animationId = requestAnimationFrame(animate);
-  })();
+  });
 }
 
 function stopMatrix() {
-  matrixCanvas.classList.remove("active");
   cancelAnimationFrame(animationId);
   animationId = null;
-}
-
-/* ===============================
-   FADE IN / FADE OUT
-=============================== */
-function fadeTo(target, duration = 2000) {
-  clearInterval(fadeInterval);
-
-  const steps = 30;
-  const stepTime = duration / steps;
-  const start = audio.volume;
-  const diff = (target - start) / steps;
-  let count = 0;
-
-  fadeInterval = setInterval(() => {
-    count++;
-    audio.volume = Math.min(1, Math.max(0, audio.volume + diff));
-    if (count >= steps) {
-      audio.volume = target;
-      clearInterval(fadeInterval);
-    }
-  }, stepTime);
 }
 
 /* ===============================
@@ -107,35 +122,34 @@ function fadeTo(target, duration = 2000) {
 =============================== */
 playBtn.addEventListener("click", async () => {
   if (!isPlaying) {
-    liveBadge.classList.add("buffering");
-    liveBadge.classList.remove("active");
+    setBuffering();
 
     try {
-      audio.volume = 0;
+      audio.volume = volumeSlider ? volumeSlider.value : 0.8;
       await audio.play();
-      fadeTo(volumeSlider ? volumeSlider.value : 1, 2500);
 
       isPlaying = true;
       playBtn.innerHTML = '<i class="fas fa-pause"></i>';
       player.classList.add("playing");
-      liveBadge.classList.remove("buffering");
-      liveBadge.classList.add("active");
 
+      fadeTo(audio.volume, 2000);
       startMatrix();
-    } catch (e) {
-      liveBadge.classList.remove("buffering");
-      console.error("❌ Play error", e);
+
+    } catch (err) {
+      console.error("❌ Error al reproducir:", err);
+      setOffline();
     }
+
   } else {
-    fadeTo(0, 1200);
-    setTimeout(() => audio.pause(), 1300);
+    fadeTo(0, 800);
+    setTimeout(() => audio.pause(), 800);
 
     isPlaying = false;
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
     player.classList.remove("playing");
-    liveBadge.classList.remove("active");
 
     stopMatrix();
+    setOffline();
   }
 });
 
@@ -143,18 +157,18 @@ playBtn.addEventListener("click", async () => {
    STOP
 =============================== */
 stopBtn.addEventListener("click", () => {
-  fadeTo(0, 1000);
+  fadeTo(0, 800);
   setTimeout(() => {
     audio.pause();
     audio.currentTime = 0;
-  }, 1100);
+  }, 800);
 
   isPlaying = false;
   playBtn.innerHTML = '<i class="fas fa-play"></i>';
   player.classList.remove("playing");
-  liveBadge.classList.remove("active");
 
   stopMatrix();
+  setOffline();
 });
 
 /* ===============================
@@ -178,39 +192,58 @@ if (volumeSlider) {
 }
 
 /* ===============================
+   STREAM REAL EVENTS
+=============================== */
+audio.addEventListener("playing", setLive);
+audio.addEventListener("waiting", setBuffering);
+audio.addEventListener("stalled", setBuffering);
+audio.addEventListener("error", setBuffering);
+audio.addEventListener("pause", () => {
+  if (!isPlaying) setOffline();
+});
+
+/* ===============================
    AUTO RECOVERY STREAM
 =============================== */
 let retryCount = 0;
 let retryTimer = null;
+const maxRetries = 10;
 
 function reconnectStream() {
-  if (retryCount > 8) return;
-  retryCount++;
+  if (!isPlaying || retryCount >= maxRetries) return;
 
-  fadeTo(0, 800);
+  retryCount++;
+  setBuffering();
 
   clearTimeout(retryTimer);
-  retryTimer = setTimeout(() => {
+
+  try {
     audio.pause();
+    audio.src = audio.src;
     audio.load();
-    audio.play().then(() => {
-      fadeTo(volumeSlider ? volumeSlider.value : 1, 2000);
-    }).catch(() => {});
-  }, 2000);
+    audio.play().catch(() => {});
+  } catch (e) {}
+
+  retryTimer = setTimeout(reconnectStream, Math.min(3000 * retryCount, 15000));
 }
 
 audio.addEventListener("playing", () => {
   retryCount = 0;
+  clearTimeout(retryTimer);
 });
 
-audio.addEventListener("error", reconnectStream);
-audio.addEventListener("stalled", reconnectStream);
-
 setInterval(() => {
-  if (!audio.paused && audio.readyState < 3) reconnectStream();
+  if (isPlaying && !audio.paused && audio.readyState < 3) {
+    reconnectStream();
+  }
 }, 10000);
 
 window.addEventListener("online", reconnectStream);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && isPlaying) {
+    audio.play().catch(() => {});
+  }
+});
 
 /* ===============================
    SERVICE WORKER
@@ -219,6 +252,7 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("/service-worker.js")
-      .catch(() => {});
+      .then(() => console.log("✅ Service Worker registrado"))
+      .catch(err => console.warn("❌ SW error:", err));
   });
 }

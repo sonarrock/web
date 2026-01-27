@@ -146,14 +146,18 @@
   </div>
 </section>
 
-<!-- Disco de la Semana -->
-  <section class="embed-section">
-    <h2 class="section-title">El Disco de la Semana</h2>
-    <audio id="disco-player" controls>
-      <source src="audio/disco-semana.mp3" type="audio/mpeg">
-      Tu navegador no soporta el reproductor de audio.
-    </audio>
-  </section>
+<div class="disco-section">
+  <h2 class="section-title">El Disco de la Semana</h2>
+  <h3 class="section-subtitle" id="track-title">Fleetwood Mac – Rumours</h3>
+  <img id="cover" alt="Portada del Disco de la Semana" />
+
+  <div id="disco-player" class="custom-player">
+    <audio id="disco-audio" controls preload="metadata"></audio>
+    <div id="disco-progress-container" class="progress-container">
+      <div id="disco-progress"></div>
+    </div>
+  </div>
+</div>
 
 <!-- ========================= -->
 <!-- EMBEDS -->

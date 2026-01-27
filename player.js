@@ -21,12 +21,12 @@ let isPlaying = false;
 let fadeInterval = null;
 
 /* ===============================
-   LIVE / BUFFERING INDICATOR
+   STATUS (MANUAL / UX HONESTO)
 =============================== */
 function setLive() {
   liveBadge.classList.remove("buffering");
   liveBadge.classList.add("active");
-  liveBadge.querySelector(".text").textContent = "EN VIVO";
+  liveBadge.querySelector(".text").textContent = "SONANDO";
 }
 
 function setBuffering() {
@@ -37,17 +37,17 @@ function setBuffering() {
 
 function setOffline() {
   liveBadge.classList.remove("active", "buffering");
-  liveBadge.querySelector(".text").textContent = "OFFLINE";
+  liveBadge.querySelector(".text").textContent = "PROGRAMACIÓN";
 }
 
 /* ===============================
-   FADE IN / FADE OUT (FM STYLE)
+   FADE IN / FADE OUT
 =============================== */
-function fadeTo(targetVolume, duration = 2000) {
+function fadeTo(targetVolume, duration = 1500) {
   clearInterval(fadeInterval);
 
   const startVolume = audio.volume;
-  const steps = 30;
+  const steps = 25;
   const stepTime = duration / steps;
   const volumeStep = (targetVolume - startVolume) / steps;
 
@@ -67,8 +67,8 @@ function fadeTo(targetVolume, duration = 2000) {
 /* ===============================
    MATRIX EFFECT
 =============================== */
-const matrixCtx = matrixCanvas.getContext("2d");
-const matrixChars = "0123456789ABCDEFGHIJKMNOPQRSTUVXYZ";
+const ctx = matrixCanvas.getContext("2d");
+const chars = "0123456789ABCDEFGHIJKMNOPQRSTUVXYZ";
 const fontSize = 14;
 let drops = [];
 let animationId = null;
@@ -81,21 +81,17 @@ function resizeCanvas() {
   drops = Array(columns).fill(1);
 }
 
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-window.addEventListener("orientationchange", resizeCanvas);
-
 function drawMatrix() {
-  matrixCtx.fillStyle = "rgba(0,0,0,0.08)";
-  matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+  ctx.fillStyle = "rgba(0,0,0,0.08)";
+  ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
 
-  matrixCtx.fillStyle = "#ff6600";
-  matrixCtx.font = `${fontSize}px monospace`;
+  ctx.fillStyle = "#ff6600";
+  ctx.font = `${fontSize}px monospace`;
 
   drops.forEach((y, i) => {
     const x = i * fontSize;
-    const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-    matrixCtx.fillText(char, x, y * fontSize);
+    const char = chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(char, x, y * fontSize);
 
     if (y * fontSize > matrixCanvas.height && Math.random() > 0.975) {
       drops[i] = 0;
@@ -105,9 +101,7 @@ function drawMatrix() {
 }
 
 function startMatrix() {
-  resizeCanvas(); // 👈 clave
-  showMatrix();
-
+  resizeCanvas();
   cancelAnimationFrame(animationId);
   animationId = requestAnimationFrame(function animate() {
     drawMatrix();
@@ -118,19 +112,8 @@ function startMatrix() {
 function stopMatrix() {
   cancelAnimationFrame(animationId);
   animationId = null;
-  hideMatrix();
+  ctx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
 }
-
-
-function hideMatrix() {
-  matrixCtx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-  matrixCanvas.style.opacity = "0";
-}
-
-function showMatrix() {
-  matrixCanvas.style.opacity = "1";
-}
-
 
 /* ===============================
    PLAY / PAUSE
@@ -147,7 +130,8 @@ playBtn.addEventListener("click", async () => {
       playBtn.innerHTML = '<i class="fas fa-pause"></i>';
       player.classList.add("playing");
 
-      fadeTo(audio.volume, 2000);
+      setLive();          // 🔥 SONANDO
+      fadeTo(audio.volume);
       startMatrix();
 
     } catch (err) {
@@ -156,27 +140,28 @@ playBtn.addEventListener("click", async () => {
     }
 
   } else {
-    fadeTo(0, 800);
-    setTimeout(() => audio.pause(), 800);
+    fadeTo(0, 600);
+    setTimeout(() => audio.pause(), 600);
 
     isPlaying = false;
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
     player.classList.remove("playing");
 
     stopMatrix();
-    setOffline();
+    setOffline();        // 🔕 PROGRAMACIÓN
   }
 });
 
 /* ===============================
    STOP
 =============================== */
-stopBtn.addEventListener("click", () => {
-  fadeTo(0, 800);
+stopBtn?.addEventListener("click", () => {
+  fadeTo(0, 600);
+
   setTimeout(() => {
     audio.pause();
     audio.currentTime = 0;
-  }, 800);
+  }, 600);
 
   isPlaying = false;
   playBtn.innerHTML = '<i class="fas fa-play"></i>';
@@ -207,71 +192,29 @@ if (volumeSlider) {
 }
 
 /* ===============================
-   STREAM REAL EVENTS
+   EVENTOS REALES (SIN ZENO FAKE)
 =============================== */
-audio.addEventListener("playing", setLive);
 audio.addEventListener("waiting", setBuffering);
 audio.addEventListener("stalled", setBuffering);
-audio.addEventListener("error", setBuffering);
-audio.addEventListener("pause", () => {
-  if (!isPlaying) setOffline();
-});
+audio.addEventListener("error", setOffline);
 
 /* ===============================
-   AUTO RECOVERY STREAM
+   RECOVERY BÁSICO
 =============================== */
-let retryCount = 0;
-let retryTimer = null;
-const maxRetries = 10;
-
-function reconnectStream() {
-  if (!isPlaying || retryCount >= maxRetries) return;
-
-  retryCount++;
-  setBuffering();
-
-  clearTimeout(retryTimer);
-
-  try {
-    audio.pause();
-    audio.src = audio.src;
-    audio.load();
-    audio.play().catch(() => {});
-  } catch (e) {}
-
-  retryTimer = setTimeout(reconnectStream, Math.min(3000 * retryCount, 15000));
-}
-
-audio.addEventListener("playing", () => {
-  retryCount = 0;
-  clearTimeout(retryTimer);
+window.addEventListener("online", () => {
+  if (isPlaying) audio.play().catch(() => {});
 });
 
-setInterval(() => {
-  if (isPlaying && !audio.paused && audio.readyState < 3) {
-    reconnectStream();
-  }
-}, 10000);
-
-window.addEventListener("online", reconnectStream);
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && isPlaying) {
     audio.play().catch(() => {});
   }
 });
 
-hideMatrix();
+/* ===============================
+   INIT
+=============================== */
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 setOffline();
 
-
-/* ===============================
-   SERVICE WORKER
-=============================== */
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/service-worker.js")
-      .then(() => console.log("✅ Service Worker registrado"))
-      .catch(err => console.warn("❌ SW error:", err));
-  });
-}

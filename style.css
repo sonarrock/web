@@ -360,106 +360,99 @@ canvas#matrixCanvas {
     display: inline-block;
 }
 
-/* =========================
-   Disco de la Semana
-========================= */
+/* ========================= */
+/* Disco de la Semana estilo iVoox */
+/* ========================= */
 .disco-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 15px;
-    width: 100%;
-    max-width: 650px;
-    margin: 0 auto 50px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto 50px auto;
 }
 
-.disco-section .section-title {
-    color: #FF6600;
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 15px;
+.disco-section .section-subtitle {
+  color: #FF6600;
+  font-size: 1.6rem; /* más grande */
+  font-weight: 600;
+  text-align: center;
 }
 
 #disco-player {
-    display: flex;
-    align-items: flex-start; /* alinea portada con track-info */
-    width: 100%;
-    background: #111;
-    border-radius: 12px;
-    border: 2px solid #ff6600;
-    box-shadow: 0 8px 24px rgba(255,102,0,0.6);
-    overflow: hidden;
-    gap: 15px;
-    padding: 10px;
-    box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 170px;
+  background: #111;
+  border-radius: 12px;
+  border: 2px solid #ff6600;
+  box-shadow: 0 8px 24px rgba(255,102,0,0.6);
+  overflow: hidden;
+  gap: 15px;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 #disco-player img#cover {
-    width: 150px;
-    height: 150px;
-    border-radius: 12px;
-    border: 2px solid #ff6600;
-    box-shadow: 0 0 18px rgba(255,102,0,0.6);
-    flex-shrink: 0;
-    object-fit: cover;
-    animation: glow 2s infinite alternate;
+  width: 150px;
+  height: 150px;
+  border-radius: 12px;
+  border: 2px solid #ff6600;
+  box-shadow: 0 0 18px rgba(255,102,0,0.6);
+  flex-shrink: 0;
+  object-fit: cover;
+  animation: glow 2s infinite alternate;
 }
 
-.track-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch; /* ocupa todo el ancho disponible */
+#disco-player span#track-title {
+  color: #FF6600;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
 }
 
-.track-info h3#track-title {
-    color: #fff;
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin: 0;
-    text-align: center; /* título centrado encima del audio */
+#disco-player audio {
+  flex: 1;
+  width: 100%;
+  height: 50px;
+  outline: none;
 }
 
-.track-info audio {
-    width: 100%;
-    height: 50px;
-    outline: none;
-}
-
-/* Barra de progreso debajo del audio */
 #disco-progress-container {
-    width: 100%;
-    height: 6px;
-    background: #333;
-    border-radius: 4px;
-    cursor: pointer;
+  width: 100%;
+  height: 6px;
+  background: #333;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 5px;
 }
 
 #disco-progress {
-    width: 0%;
-    height: 100%;
-    background: #FF6600;
-    border-radius: 4px;
+  width: 0%;
+  height: 100%;
+  background: #FF6600;
+  border-radius: 4px;
 }
 
-/* Animación portada */
+/* Animación de resplandor portada */
 @keyframes glow {
-    from { box-shadow: 0 0 10px rgba(255,102,0,0.5); }
-    to   { box-shadow: 0 0 20px rgba(255,102,0,1); }
+  from { box-shadow: 0 0 10px rgba(255,102,0,0.5); }
+  to   { box-shadow: 0 0 20px rgba(255,102,0,1); }
 }
 
-/* Responsivo */
+/* RESPONSIVO Disco de la Semana */
 @media (max-width: 768px) {
-    #disco-player { flex-direction: row; }
-    #disco-player img#cover { width: 120px; height: 120px; }
+  #disco-player { height: 150px; }
+  #disco-player img#cover { width: 120px; height: 120px; }
 }
 
 @media (max-width: 480px) {
-    #disco-player { flex-direction: column; align-items: center; gap: 8px; }
-    #disco-player img#cover { width: 100px; height: 100px; }
-    .track-info audio { width: 100%; height: 40px; }
+  #disco-player { flex-direction: column; height: auto; gap: 8px; }
+  #disco-player img#cover { width: 100px; height: 100px; }
+  #disco-player audio { width: 100%; height: 40px; }
 }
 
 /* ========================= */

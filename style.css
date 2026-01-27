@@ -405,27 +405,57 @@ canvas#matrixCanvas {
 }
 
 /* =======================
-   Disco de la Semana - Miniatura como iVoox
+   Disco de la Semana - Miniatura a la izquierda del reproductor
 ======================= */
 .disco-section {
     display: flex;
-    align-items: center; /* Alinea portada y reproductor en la misma línea */
-    gap: 10px; /* Espacio entre portada y audio */
-    margin-bottom: 30px;
+    align-items: center; /* Alinea portada y reproductor verticalmente */
+    justify-content: center; /* Centra el conjunto horizontal */
+    gap: 15px;
+    margin-bottom: 50px;
+    max-width: 650px; /* Igual que Spotify/iVoox */
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .disco-section img#cover {
-    width: 40px;
+    width: 40px; /* Tamaño tipo iVoox */
     height: 40px;
-    border-radius: 4px; /* Opcional: igual que iVoox */
-    border: 1px solid #ff6600;
-    box-shadow: 0 0 5px rgba(255,102,0,0.6);
-}
-
-#disco-player {
-    flex: 1; /* Ocupa el resto del espacio al lado de la portada */
-    height: 40px; /* Misma altura que la portada */
     border-radius: 4px;
     border: 1px solid #ff6600;
     box-shadow: 0 0 5px rgba(255,102,0,0.6);
+    flex-shrink: 0;
+}
+
+#disco-player {
+    flex: 1; /* Ocupa el resto del espacio */
+    height: 40px; /* Igual altura que la portada */
+    border-radius: 4px;
+    border: 1px solid #ff6600;
+    box-shadow: 0 0 5px rgba(255,102,0,0.6);
+    display: flex;
+    align-items: center;
+    background: #111;
+}
+
+/* Subtítulo centrado encima */
+.disco-section .section-subtitle {
+    color: #FF6600;
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+    .disco-section img#cover { width: 30px; height: 30px; }
+    #disco-player { height: 30px; }
+}
+
+@media (max-width: 480px) {
+    .disco-section { flex-direction: column; gap: 8px; }
+    .disco-section img#cover { width: 30px; height: 30px; }
+    #disco-player { width: 100%; height: 30px; }
 }

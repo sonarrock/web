@@ -15,7 +15,7 @@ trackTitle.textContent = fileName.replace(".mp3","");
 cover.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" + Date.now();
 
 // Cargar audio
-discoAudio.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/" + fileName;
+discoAudio.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/Fleetwood Mac - Rumours.mp3";
 
 // PROGRESO
 discoAudio.addEventListener("timeupdate", () => {

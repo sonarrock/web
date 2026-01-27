@@ -364,3 +364,23 @@ canvas#matrixCanvas {
         text-align: center;
     }
 }
+
+/* =========================
+   MODO CONEXIÓN LENTA
+========================= */
+
+body.slow-connection .main-image,
+body.slow-connection .background-video,
+body.slow-connection .visualizer {
+  display: none;
+}
+
+body.slow-connection::before {
+  content: "⚠️ Conexión lenta detectada. Optimizando audio.";
+  display: block;
+  background: #111;
+  color: #ff6600;
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+}

@@ -11,7 +11,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem 1rem;
+  padding: 1.5rem 0.8rem;
 }
 
 .player-container {
@@ -23,10 +23,10 @@
   overflow: hidden;
 
   box-shadow:
-    0 0 calc(30px * var(--glow-intensity)) rgba(255,102,0,0.7),
-    inset 0 0 40px rgba(0,0,0,0.7);
+    0 0 calc(24px * var(--glow-intensity)) rgba(255,102,0,0.6),
+    inset 0 0 30px rgba(0,0,0,0.65);
 
-  transition: box-shadow 0.4s ease;
+  transition: box-shadow 0.3s ease;
 }
 
 /* =========================
@@ -39,11 +39,10 @@
   height: 100%;
   object-fit: cover;
   z-index: 1;
-  filter: none;
 }
 
 /* =========================
-   MATRIX CANVAS (CORREGIDO)
+   MATRIX CANVAS (OPTIMIZADO)
 ========================= */
 #matrixCanvas {
   position: absolute;
@@ -53,11 +52,12 @@
   z-index: 2;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.6s ease;
+  transition: opacity 0.4s ease;
+  will-change: opacity;
 }
 
 .player-container.playing #matrixCanvas {
-  opacity: 0.45;
+  opacity: 0.32; /* ↓ menos carga visual */
 }
 
 /* =========================
@@ -68,8 +68,8 @@
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(0,0,0,0.12),
-    rgba(0,0,0,0.25)
+    rgba(0,0,0,0.10),
+    rgba(0,0,0,0.22)
   );
   z-index: 3;
   pointer-events: none;
@@ -85,13 +85,13 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1.4rem;
+  padding: 1.2rem;
   color: #fff;
   text-align: center;
 }
 
 .now-playing {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   letter-spacing: 1px;
   opacity: 0.85;
 }
@@ -103,73 +103,72 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  margin: 0.8rem auto;
-  padding: 0.3rem 0.8rem;
+  gap: 0.45rem;
+  margin: 0.7rem auto;
+  padding: 0.25rem 0.75rem;
   border-radius: 20px;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   letter-spacing: 1px;
   border: 1px solid var(--accent);
   color: var(--accent);
 }
 
 .live-badge .dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   background: var(--accent);
   border-radius: 50%;
 }
 
 .live-badge.active .dot {
-  animation: pulse 1.4s infinite;
+  animation: pulse 1.6s infinite;
 }
 
 .live-badge.buffering .dot {
-  animation: blink 1s infinite;
+  animation: blink 1.1s infinite;
 }
 
 /* =========================
-   CONTROLES
+   CONTROLES (MOBILE FIRST)
 ========================= */
 .controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.8rem;
+  gap: 0.7rem;
 }
 
 .btn {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   border: none;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.65);
   color: var(--accent);
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.2s ease;
+  transition: transform 0.12s ease, background 0.2s ease;
 }
 
-.btn:hover {
-  transform: scale(1.1);
-  background: rgba(255,102,0,0.15);
+.btn:active {
+  transform: scale(0.92);
 }
 
 #volume {
-  width: 80px;
+  width: 70px;
 }
 
 /* =========================
    PROGRESO
 ========================= */
 .progress-wrapper {
-  margin-top: 1rem;
+  margin-top: 0.9rem;
 }
 
 .progress-container {
   width: 100%;
-  height: 4px;
-  background: rgba(255,255,255,0.2);
+  height: 3px;
+  background: rgba(255,255,255,0.18);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -181,17 +180,17 @@
 }
 
 #time-display {
-  font-size: 0.7rem;
-  margin-top: 0.4rem;
-  opacity: 0.7;
+  font-size: 0.65rem;
+  margin-top: 0.35rem;
+  opacity: 0.65;
 }
 
 /* =========================
-   ANIMACIONES
+   ANIMACIONES (SUAVIZADAS)
 ========================= */
 @keyframes pulse {
   0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.4); opacity: 0.4; }
+  50% { transform: scale(1.3); opacity: 0.4; }
   100% { transform: scale(1); opacity: 1; }
 }
 
@@ -201,44 +200,62 @@
 }
 
 /* =========================
-   ESTADO PLAYING
+   ESTADO PLAYING (OPTIMIZADO)
 ========================= */
 .player-container.playing {
-  animation: glowPulse 2.2s ease-in-out infinite;
+  animation: glowPulse 3s ease-in-out infinite;
 }
 
 @keyframes glowPulse {
-  0%   { --glow-intensity: 0.45; }
-  50%  { --glow-intensity: 0.85; }
-  100% { --glow-intensity: 0.45; }
+  0%   { --glow-intensity: 0.4; }
+  50%  { --glow-intensity: 0.7; }
+  100% { --glow-intensity: 0.4; }
 }
 
 .player-container.playing .player-bg {
-  animation: bgZoom 18s ease-in-out infinite;
+  animation: bgZoom 22s ease-in-out infinite;
 }
 
 @keyframes bgZoom {
   0% { transform: scale(1); }
-  50% { transform: scale(1.06); }
+  50% { transform: scale(1.04); }
   100% { transform: scale(1); }
 }
 
 .player-container.playing .controls .btn {
-  animation: btnPulse 1.6s ease-in-out infinite;
+  animation: btnPulse 2.2s ease-in-out infinite;
 }
 
 @keyframes btnPulse {
   0% { transform: scale(1); }
-  50% { transform: scale(1.08); }
+  50% { transform: scale(1.05); }
   100% { transform: scale(1); }
 }
 
 /* =========================
-   RESPONSIVE
+   RESPONSIVE MOBILE
 ========================= */
 @media (max-width: 420px) {
   .player-container {
-    width: 92vw;
-    height: 520px;
+    width: 94vw;
+    height: 500px;
+  }
+
+  /* Reduce carga visual extrema */
+  .player-container.playing #matrixCanvas {
+    opacity: 0.25;
+  }
+}
+
+/* =========================
+   REDUCCIÓN DE MOVIMIENTO
+========================= */
+@media (prefers-reduced-motion: reduce) {
+  #matrixCanvas,
+  .player-container.playing,
+  .player-container.playing .player-bg,
+  .player-container.playing .controls .btn {
+    animation: none !important;
+    transition: none !important;
   }
 }

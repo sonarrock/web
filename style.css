@@ -405,57 +405,62 @@ canvas#matrixCanvas {
 }
 
 /* =======================
-   Disco de la Semana - Miniatura a la izquierda del reproductor
+   Disco de la Semana - Centrado, simétrico
 ======================= */
 .disco-section {
     display: flex;
-    align-items: center; /* Alinea portada y reproductor verticalmente */
-    justify-content: center; /* Centra el conjunto horizontal */
+    flex-direction: column; /* Portada arriba, reproductor debajo */
+    align-items: center; /* CENTRADO HORIZONTAL */
+    text-align: center;
     gap: 15px;
     margin-bottom: 50px;
-    max-width: 650px; /* Igual que Spotify/iVoox */
+    width: 100%;
+    max-width: 400px; /* Tamaño visible razonable para portada */
     margin-left: auto;
     margin-right: auto;
 }
 
+.disco-section .section-subtitle {
+    color: #FF6600;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
 .disco-section img#cover {
-    width: 40px; /* Tamaño tipo iVoox */
-    height: 40px;
-    border-radius: 4px;
-    border: 1px solid #ff6600;
-    box-shadow: 0 0 5px rgba(255,102,0,0.6);
-    flex-shrink: 0;
+    width: 100%;        /* Misma anchura que el contenedor */
+    max-width: 400px;   /* Controla tamaño de portada */
+    height: auto;
+    border-radius: 12px;
+    border: 2px solid #ff6600;
+    box-shadow: 0 8px 24px rgba(255,102,0,0.6);
+    display: block;
+    margin: 0 auto;     /* CENTRADO */
 }
 
 #disco-player {
-    flex: 1; /* Ocupa el resto del espacio */
-    height: 40px; /* Igual altura que la portada */
-    border-radius: 4px;
-    border: 1px solid #ff6600;
-    box-shadow: 0 0 5px rgba(255,102,0,0.6);
+    width: 100%;
+    max-width: 400px;   /* Igual que la portada */
+    height: 50px;       /* Altura estándar de audio */
+    border-radius: 12px;
+    border: 2px solid #ff6600;
+    box-shadow: 0 8px 24px rgba(255,102,0,0.6);
     display: flex;
     align-items: center;
+    justify-content: center;
     background: #111;
-}
-
-/* Subtítulo centrado encima */
-.disco-section .section-subtitle {
-    color: #FF6600;
-    font-size: 1rem;
-    font-weight: 500;
-    text-align: center;
-    width: 100%;
-    margin-bottom: 10px;
+    margin: 0 auto;     /* CENTRADO */
 }
 
 /* RESPONSIVO */
 @media (max-width: 768px) {
-    .disco-section img#cover { width: 30px; height: 30px; }
-    #disco-player { height: 30px; }
+    .disco-section { max-width: 300px; }
+    #disco-player { max-width: 300px; height: 45px; }
 }
 
 @media (max-width: 480px) {
-    .disco-section { flex-direction: column; gap: 8px; }
-    .disco-section img#cover { width: 30px; height: 30px; }
-    #disco-player { width: 100%; height: 30px; }
+    .disco-section { max-width: 250px; }
+    #disco-player { max-width: 250px; height: 40px; }
+    .disco-section .section-subtitle { font-size: 1rem; }
 }

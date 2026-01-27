@@ -163,6 +163,40 @@ if (volumeSlider) {
 }
 
 /* ===============================
+   FADE IN / FADE OUT (RADIO FM)
+=============================== */
+
+let fadeInterval = null;
+
+function fadeTo(targetVolume, duration = 2000) {
+  if (!audio) return;
+
+  clearInterval(fadeInterval);
+
+  const startVolume = audio.volume;
+  const steps = 30;
+  const stepTime = duration / steps;
+  const volumeStep = (targetVolume - startVolume) / steps;
+
+  let currentStep = 0;
+
+  fadeInterval = setInterval(() => {
+    currentStep++;
+
+    audio.volume = Math.min(
+      1,
+      Math.max(0, audio.volume + volumeStep)
+    );
+
+    if (currentStep >= steps) {
+      audio.volume = targetVolume;
+      clearInterval(fadeInterval);
+    }
+  }, stepTime);
+}
+
+
+/* ===============================
    SERVICE WORKER REGISTRATION
 =============================== */
 if ("serviceWorker" in navigator) {

@@ -1,15 +1,13 @@
 // ----------------------------
 // DISCO DE LA SEMANA
 // ----------------------------
-const fileName = "Fleetwood Mac - Rumours.mp3"; // Cambiar cada semana
+const fileName = "Fleetwood Mac - Rumours.mp3"; // cambiar cada semana
 const discoAudio = document.getElementById("disco-audio");
-const discoProgress = document.getElementById("disco-progress");
-const discoProgressContainer = document.getElementById("disco-progress-container");
 const cover = document.getElementById("cover");
 const trackTitle = document.getElementById("track-title");
 
-// Título del disco
-trackTitle.textContent = "Fleetwood Mac – Rumours";
+// Si quieres mostrar título dentro del audio o por JS
+trackTitle && (trackTitle.textContent = "Fleetwood Mac – Rumours");
 
 // Portada
 cover.src =
@@ -19,21 +17,7 @@ cover.src =
 discoAudio.src =
   "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/" + fileName;
 
-// Barra de progreso
-discoAudio.addEventListener("timeupdate", () => {
-  if (discoAudio.duration) {
-    discoProgress.style.width =
-      (discoAudio.currentTime / discoAudio.duration) * 100 + "%";
-  }
-});
-
-discoProgressContainer.addEventListener("click", e => {
-  const rect = discoProgressContainer.getBoundingClientRect();
-  discoAudio.currentTime =
-    ((e.clientX - rect.left) / rect.width) * discoAudio.duration;
-});
-
-// Animación de portada
+// Zoom animado (opcional)
 let zoomDirection = 1;
 let zoomInterval;
 
@@ -54,5 +38,5 @@ discoAudio.addEventListener("ended", resetCover);
 function resetCover() {
   clearInterval(zoomInterval);
   cover.style.transform = "scale(1)";
-  cover.style.boxShadow = "0 0 24px rgba(255,102,0,0.6)";
+  cover.style.boxShadow = "none";
 }

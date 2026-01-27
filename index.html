@@ -146,40 +146,47 @@
   </div>
 </section>
 
-<!-- =========================
-     Disco de la Semana
-========================= -->
-<section class="disco-section">
-  <div class="section-subtitle">El Disco de la Semana</div>
-  <div id="disco-player">
-    <img id="cover" alt="Portada del disco">
-    <audio id="disco-audio" controls></audio>
+<!-- ========================= -->
+<!-- REPRODUCTORES UNIFORMES -->
+<!-- ========================= -->
+<section class="embed-section">
+  <div class="container" style="max-width:650px; margin:auto;">
+
+    <!-- Disco de la Semana -->
+    <h3 class="section-title">El Disco de la Semana</h3>
+    <div id="disco-player">
+      <img id="cover" alt="Portada del Disco">
+      <audio id="disco-audio" controls></audio>
+    </div>
+
+    <!-- Spotify -->
+    <h3 class="section-title" style="margin-top:40px;">Escucha en Spotify</h3>
+    <div class="embed-player" style="border:2px solid #ff6600; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(255,102,0,0.6);">
+      <iframe 
+        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU"
+        width="100%" 
+        height="170" 
+        frameborder="0" 
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+        allowfullscreen
+      ></iframe>
+    </div>
+
+    <!-- iVoox -->
+    <h3 class="section-title" style="margin-top:40px;">Escucha en iVoox</h3>
+    <div id="podcast-player" style="border:2px solid #ff6600; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(255,102,0,0.6); height:170px;">
+      <iframe 
+        src="https://www.ivoox.com/player_embed/sonar-rock_sq_f12661206_1" 
+        width="100%" 
+        height="170" 
+        frameborder="0" 
+        allow="autoplay" 
+        allowfullscreen
+      ></iframe>
+    </div>
+
   </div>
 </section>
-
-<!-- =========================
-     Spotify Embed
-========================= -->
-<div class="spotify-embed embed-section">
-  <iframe 
-    src="TU_URL_DE_SPOTIFY"
-    frameborder="0" 
-    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-    allowfullscreen
-  ></iframe>
-</div>
-
-<!-- =========================
-     iVoox Embed
-========================= -->
-<div id="podcast-player" class="embed-section">
-  <iframe 
-    src="TU_URL_DE_IVOX"
-    frameborder="0"
-    allow="autoplay"
-    allowfullscreen
-  ></iframe>
-</div>
 
 
 <!-- ========================= -->

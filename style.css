@@ -403,3 +403,68 @@ canvas#matrixCanvas {
     margin-left: 10px;
     display: inline-block;
 }
+
+/* =======================
+   DISCO DE LA SEMANA
+======================= */
+.disco-section {
+    display: flex;
+    flex-direction: column; /* Columna para portada y reproductor */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 15px;
+    margin-bottom: 50px;
+    width: 100%;
+    max-width: 650px; /* Igual que los embeds de Spotify */
+}
+
+.disco-section img#cover {
+    width: 100%;
+    max-width: 300px; /* Tamaño de portada */
+    height: auto;
+    border-radius: 12px;
+    border: 2px solid #ff6600;
+    box-shadow: 0 8px 24px rgba(255,102,0,0.6);
+    display: block;
+}
+
+#disco-player {
+    width: 100%;
+    max-width: 650px; /* Igual que Spotify */
+    height: 170px; /* Igual que Spotify */
+    border-radius: 12px;
+    border: 2px solid #ff6600;
+    box-shadow: 0 8px 24px rgba(255,102,0,0.6);
+    margin: 0 auto;
+    display: block;
+    background: #111;
+}
+
+/* Subtítulo centrado */
+.disco-section .section-subtitle {
+    color: #FF6600;
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .disco-section img#cover {
+        max-width: 200px;
+    }
+    #disco-player {
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .disco-section img#cover {
+        max-width: 150px;
+    }
+    #disco-player {
+        height: 130px;
+    }
+}

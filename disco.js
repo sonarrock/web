@@ -35,8 +35,14 @@ discoAudio.addEventListener("play", () => {
 discoAudio.addEventListener("pause", resetCover);
 discoAudio.addEventListener("ended", resetCover);
 
+
 function resetCover() {
   clearInterval(zoomInterval);
   cover.style.transform = "scale(1)";
   cover.style.boxShadow = "none";
 }
+
+
+// Título del disco sin extensión
+trackTitle.textContent = fileName.replace(/\.mp3$/i, "");
+document.getElementById("disco-title").textContent = trackTitle.textContent;

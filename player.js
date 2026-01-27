@@ -150,22 +150,6 @@ muteBtn?.addEventListener("click", () => {
 });
 
 /* ===============================
-   AUTO RECOVERY (ZENO)
-=============================== */
-audio.addEventListener("error", () => {
-  console.warn("⚠️ Stream interrumpido. Reintentando...");
-
-  if (liveBadge) {
-    liveBadge.classList.add("buffering");
-    liveBadge.classList.remove("active");
-  }
-
-  setTimeout(() => {
-    audio.play().catch(() => {});
-  }, 3000);
-});
-
-/* ===============================
    CONTROL DE VOLUMEN
 =============================== */
 const volumeSlider = document.getElementById("volume");
@@ -189,4 +173,68 @@ if ("serviceWorker" in navigator) {
       .catch(err => console.warn("❌ SW error:", err));
   });
 }
+
+/* ===============================
+   AUTO RECOVERY STREAM (PRO)
+=============================== */
+
+let retryCount = 0;
+let maxRetries = 10;
+let retryTimer = null;
+
+// Intento limpio de reconexión
+function reconnectStream() {
+  if (retryCount >= maxRetries) return;
+
+  retryCount++;
+  console.warn(`🔄 Reintentando stream (${retryCount})`);
+
+  clearTimeout(retryTimer);
+
+  try {
+    audio.pause();
+    audio.src = audio.src;
+    audio.load();
+
+    const playPromise = audio.play();
+    if (playPromise) {
+      playPromise.catch(() => {});
+    }
+
+  } catch (e) {}
+
+  retryTimer = setTimeout(reconnectStream, Math.min(3000 * retryCount, 15000));
+}
+
+// Reset cuando vuelve a sonar
+audio.addEventListener('playing', () => {
+  retryCount = 0;
+  clearTimeout(retryTimer);
+  console.log('✅ Stream recuperado');
+});
+
+// Errores directos
+audio.addEventListener('error', () => {
+  reconnectStream();
+});
+
+// Buffer eterno (freeze)
+audio.addEventListener('stalled', () => {
+  reconnectStream();
+});
+
+// Silencio falso (stream vivo pero mudo)
+setInterval(() => {
+  if (!audio.paused && audio.readyState < 3) {
+    reconnectStream();
+  }
+}, 10000);
+
+// Cambio de red / regreso a app
+window.addEventListener('online', reconnectStream);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && audio.paused) {
+    audio.play().catch(() => {});
+  }
+});
 

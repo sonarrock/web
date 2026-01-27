@@ -125,6 +125,9 @@
   </div>
 </section>
 
+<button id="installBtn" style="display:none;">
+  📲 Instalar Sonar Rock
+</button>
 
 
 <!-- ========================= -->
@@ -266,6 +269,31 @@
         });
     });
   }
+</script>
+
+  <script>
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = 'block';
+
+  installBtn.addEventListener('click', () => {
+    installBtn.style.display = 'none';
+    deferredPrompt.prompt();
+
+    deferredPrompt.userChoice.then(choice => {
+      if (choice.outcome === 'accepted') {
+        console.log('✅ PWA instalada');
+      } else {
+        console.log('❌ Instalación cancelada');
+      }
+      deferredPrompt = null;
+    });
+  });
+});
 </script>
 
   

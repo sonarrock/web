@@ -449,3 +449,29 @@ canvas#matrixCanvas {
     }
 }
 
+/* Título del disco al lado de la portada */
+#disco-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #FF6600;
+    text-align: left;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Contenedor de portada + título + audio */
+#disco-player-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    gap: 15px;
+}
+
+#disco-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}

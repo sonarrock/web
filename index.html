@@ -296,6 +296,35 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 </script>
 
+  <script>
+/* =========================
+   MODO CONEXIÓN LENTA
+========================= */
+
+function checkConnection() {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+
+  if (!connection) return;
+
+  const slow =
+    connection.saveData ||
+    ['slow-2g', '2g', '3g'].includes(connection.effectiveType);
+
+  if (slow) {
+    document.body.classList.add('slow-connection');
+    console.warn('⚠️ Conexión lenta detectada');
+  } else {
+    document.body.classList.remove('slow-connection');
+    console.log('✅ Conexión normal');
+  }
+}
+
+window.addEventListener('load', checkConnection);
+if (navigator.connection) {
+  navigator.connection.addEventListener('change', checkConnection);
+}
+</script>
+
   
 </body>
 </html>

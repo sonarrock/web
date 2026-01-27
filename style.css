@@ -360,25 +360,25 @@ canvas#matrixCanvas {
     display: inline-block;
 }
 
-/* ========================= */
-/* Disco de la Semana estilo iVoox/funcional */
-/* ========================= */
+/* =========================
+   Disco de la Semana
+========================= */
 .disco-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 10px;
+    gap: 15px;
     width: 100%;
-    max-width: 650px;
+    max-width: 650px; /* Igual que embeds */
     margin: 0 auto 50px auto;
 }
 
-.disco-section .section-subtitle {
+.disco-section .section-title {
     color: #FF6600;
-    font-size: 1.2rem;
-    font-weight: 600;
-    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 15px;
 }
 
 #disco-player {
@@ -396,7 +396,7 @@ canvas#matrixCanvas {
     box-sizing: border-box;
 }
 
-#cover {
+#disco-player img#cover {
     width: 150px;
     height: 150px;
     border-radius: 12px;
@@ -404,32 +404,24 @@ canvas#matrixCanvas {
     box-shadow: 0 0 18px rgba(255,102,0,0.6);
     flex-shrink: 0;
     object-fit: cover;
+    animation: glow 2s infinite alternate;
 }
 
-#disco-track-info {
+.track-info {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    flex: 1;
-    gap: 5px;
+    gap: 10px;
 }
 
-#disco-title {
-    color: #FF6600;
+#disco-player h3#track-title {
+    color: #fff;
+    font-size: 1.2rem;
     font-weight: 600;
-    font-size: 1rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin: 0;
 }
 
-#disco-audio {
-    width: 100%;
-    height: 50px;
-    outline: none;
-}
-
-/* Progreso */
+/* Barra de progreso */
 #disco-progress-container {
     width: 100%;
     height: 6px;
@@ -445,16 +437,29 @@ canvas#matrixCanvas {
     border-radius: 4px;
 }
 
+/* Audio */
+#disco-player audio {
+    width: 100%;
+    height: 50px;
+    outline: none;
+}
+
+/* Animación de resplandor portada */
+@keyframes glow {
+    from { box-shadow: 0 0 10px rgba(255,102,0,0.5); }
+    to   { box-shadow: 0 0 20px rgba(255,102,0,1); }
+}
+
 /* RESPONSIVO */
 @media (max-width: 768px) {
     #disco-player { height: 150px; }
-    #cover { width: 120px; height: 120px; }
+    #disco-player img#cover { width: 120px; height: 120px; }
 }
 
 @media (max-width: 480px) {
     #disco-player { flex-direction: column; height: auto; gap: 8px; }
-    #cover { width: 100px; height: 100px; }
-    #disco-audio { width: 100%; height: 40px; }
+    #disco-player img#cover { width: 100px; height: 100px; }
+    #disco-player audio { width: 100%; height: 40px; }
 }
 
 /* ========================= */

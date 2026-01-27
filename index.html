@@ -80,29 +80,34 @@
 <section class="player-section">
   <div class="player-container" id="player">
 
+    <!-- IMAGEN PRINCIPAL -->
+    <img
+      src="img/background1.png"
+      alt="Sonar Rock Background"
+      class="player-bg"
+      aria-hidden="true"
+    >
+
     <!-- MATRIX -->
     <canvas id="matrixCanvas" aria-hidden="true"></canvas>
 
-    <!-- OVERLAY SUAVE (NO OSCURECE) -->
+    <!-- OVERLAY LEVE -->
     <div class="overlay" aria-hidden="true"></div>
 
     <!-- CONTENIDO -->
     <div class="player-content">
 
-      <!-- TEXTO / PROGRAMACIÓN -->
+      <!-- PROGRAMACIÓN / EN VIVO -->
       <div id="now-playing" class="now-playing">
         PROGRAMACIÓN
       </div>
 
-      <!-- BADGE EN VIVO -->
       <div id="live-indicator" class="live-badge">
         <span class="dot"></span>
         <span class="text">PROGRAMACIÓN</span>
       </div>
 
-      <!-- ========================= -->
       <!-- CAJA DE CONTROLES -->
-      <!-- ========================= -->
       <div class="controls-box">
 
         <!-- BOTONES -->
@@ -147,14 +152,12 @@
 
     <!-- AUDIO -->
     <audio id="radio-audio" preload="auto">
-      <source
-        src="https://stream.zeno.fm/ezq3fcuf5ehvv"
-        type="audio/mpeg"
-      >
+      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
     </audio>
 
   </div>
 </section>
+
 
 <button id="installBtn" style="display:none;">
   📲 Instalar Sonar Rock

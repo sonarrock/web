@@ -161,96 +161,245 @@ canvas#matrixCanvas {
   margin-top: 2px;
 }
 
-/* ========================= */
-/* SECCIONES                */
-/* ========================= */
-.section-title {
-  color: #FF6600;
-  font-size: 1.4rem;
-  margin-bottom: 25px;
-  font-weight: 700;
+/* Social Media */
+.social-section {
+    padding: 50px 0;
+    background: rgba(0, 0, 0, 0.3);
 }
 
-/* DISCO DE LA SEMANA */
-.disco-section {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  margin-bottom: 50px;
+.social-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-.disco-section img#cover {
-  width: 120px;
-  height: 120px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(255,102,0,0.6);
-  transition: transform 0.2s, box-shadow 0.2s;
+.social-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-.disco-section div {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+.social-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
-/* EMBEDS SPOTIFY E IVOOX */
+.whatsapp { background: linear-gradient(45deg, #25d366, #128c7e); }
+.facebook { background: linear-gradient(45deg, #1877f2, #42a5f5); }
+.instagram { background: linear-gradient(45deg, #e4405f, #f77737); }
+.spotify { background: linear-gradient(45deg, #1db954, #1ed760); }
+.ivoox { background: linear-gradient(45deg, #ff6600, #ff8833); }
+
+/* Embed Sections */
 .embed-section {
-  margin-top: 60px;
+    padding: 40px 0;
 }
 
-.embed-section iframe, 
-#podcast-player {
-  width: 100%;
-  max-width: 650px;
-  height: 170px;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-  margin: auto;
-  display: block;
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #ff6600;
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
 }
 
-/* Podcast iVoox episodio */
-.podcast-episode {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  margin-bottom: 20px;
+.embed-container {
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 2px solid #ff6600;
 }
 
-.podcast-episode img {
-  width: 140px;
-  height: 140px;
-  border-radius: 12px;
-  object-fit: cover;
+.spotify-embed {
+    display: flex;
+    justify-content: center;
 }
 
-.podcast-episode h3 {
-  font-size: 14px;
-  color: #fff;
-  margin-bottom: 4px;
-}
-
-.podcast-episode p {
-  font-size: 10px;
-  color: #b3b3b3;
-  margin-bottom: 6px;
-}
-
-.podcast-episode audio {
-  width: 100%;
-  border-radius: 8px;
-  background: #222;
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
-}
-
-/* ========================= */
-/* STAFF SECTION             */
-/* ========================= */
+/* Staff Section */
 .staff-section {
-  margin-top: 60px;
+    padding: 60px 0;
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .staff-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150p
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.staff-member {
+    text-align: center;
+    background: rgba(26, 26, 26, 0.8);
+    padding: 30px;
+    border-radius: 15px;
+    border: 2px solid #ff6600;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.staff-member:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(255, 102, 0, 0.2);
+}
+
+.staff-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 3px solid #ff6600;
+    box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
+}
+
+.staff-member h3 {
+    font-size: 1.5rem;
+    color: #ff6600;
+    text-shadow: 0 0 5px rgba(255, 102, 0, 0.3);
+}
+
+/* About Sections */
+.about-section {
+    padding: 60px 0;
+}
+
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.about-text {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #cccccc;
+    margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .title-section h1 {
+        font-size: 2rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .logo-section {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .main-image {
+        height: 300px;
+    }
+    
+    .social-buttons {
+        gap: 15px;
+    }
+    
+    .social-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .staff-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .title-section h1 {
+        font-size: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .player-controls {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+@media (max-width: 480px) {
+  .custom-player {
+    padding: 10px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .player-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .volume-control {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .volume-slider {
+    width: 80%;
+  }
+
+  .visualizer {
+    margin-top: 10px;
+    gap: 3px;
+  }
+
+  .bar {
+    margin: 0 1px;
+    height: 5px;
+  }
+
+  #streamStatus {
+    font-size: 13px;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .main-image-container img.main-image {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .player-overlay {
+    position: relative;
+    width: 100%;
+    padding: 10px 0;
+  }
+}
+.listeners-badge {
+    background-color: #ff6600;
+    color: #fff;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.9em;
+    margin-left: 10px;
+    display: inline-block;
+}

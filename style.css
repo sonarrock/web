@@ -313,8 +313,17 @@ body {
     justify-content: center;
 }
 /* ========================= */
-            STAFF 
 /* ========================= */
+/* STAFF – SECCIÓN CON FONDO Y HALO PULSANTE */
+/* ========================= */
+
+.staff-section {
+    background-image: url('attached_assets/fondostaff.jpg'); /* ruta de tu imagen de fondo */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 80px 0; /* espacio arriba y abajo */
+}
 
 /* Contenedor de staff */
 .staff-grid {

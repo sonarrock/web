@@ -92,8 +92,7 @@
     <img src="img/background1.png" alt="" class="player-bg"> <!-- Alt vacío si es solo decorativo -->
 
     <canvas id="matrixCanvas" aria-hidden="true" aria-label="Efecto visual de matrix"></canvas>
-    <!-- Tu aria-hidden es correcto, pero si el canvas tiene un efecto visual importante para algunos, se puede describir -->
-
+    
     <div class="overlay"></div>
 
     <div class="player-content">
@@ -101,6 +100,8 @@
       <div id="now-playing" class="now-playing" aria-live="polite">
         <!-- aria-live="polite" le dice a los lectores de pantalla que anuncien cambios aquí de forma educada -->
       </div>
+<!-- Enlaza este script DESPUÉS del player.js en tu HTML -->
+<script src="matrix.js"></script>
 
       <div id="live-indicator" class="live-badge">
         <span class="dot"></span>

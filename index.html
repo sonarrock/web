@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="player.css">
 
   <!-- Font Awesome -->
-  <!-- Usar "crossorigin" para mayor seguridad y mejor rendimiento -->
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyP+gMgJ7wY7o9FuKWJbYQ5JkSJKQZAPCckZkPNI/Soxw=="
@@ -18,20 +17,17 @@
         referrerpolicy="no-referrer">
 
   <!-- PWA -->
-  <!-- Quité la barra diagonal inicial '/' en 'href' para que funcione mejor en diferentes servidores si no está en la raíz del sitio -->
 <link rel="manifest" href="icons/site.webmanifest">
 <meta name="theme-color" content="#ff6600">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <!-- Icons -->
-<!-- Quité la barra diagonal inicial '/' en 'href' para consistencia -->
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" href="icons/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
 
   <!-- iOS Splash Screen -->
-  <!-- El media query es muy específico, si funciona para tu caso, déjalo, si no, podrías necesitar más queries para otros dispositivos -->
 <link
   rel="apple-touch-startup-image"
   href="icons/splash-iphone.png"
@@ -40,11 +36,9 @@
 >
 
   <!-- Policies -->
-  <!-- 'encrypted-media' es necesario para permitir la reproducción de audio/video. La política está bien escrita. -->
   <meta http-equiv="Permissions-Policy" content="encrypted-media=()">
   <meta name="google" content="notranslate">
 </head>
-
 
 <body>
 
@@ -60,7 +54,6 @@
           class="logo"
         >
         <div class="title-section">
-          <!-- Corregí el h1 para que sea un h2. Típicamente, solo debe haber un h1 principal por página. El título de la radio es el h1. Esto es semántico. -->
           <h2>LA RADIO INDEPENDIENTE</h2>
         </div>
       </div>
@@ -86,10 +79,9 @@
 <!-- ========================= -->
 
 <section class="player-section">
-  <!-- Añadí role="region" y aria-labelledby para accesibilidad. Un lector de pantalla sabe qué es esta sección. -->
   <div class="player-container" id="player" role="region" aria-labelledby="live-indicator">
 
-    <img src="img/background1.png" alt="" class="player-bg"> <!-- Alt vacío si es solo decorativo -->
+    <img src="img/background1.png" alt="" class="player-bg">
 
     <canvas id="matrixCanvas" aria-hidden="true" aria-label="Efecto visual de matrix"></canvas>
     
@@ -98,10 +90,7 @@
     <div class="player-content">
 
       <div id="now-playing" class="now-playing" aria-live="polite">
-        <!-- aria-live="polite" le dice a los lectores de pantalla que anuncien cambios aquí de forma educada -->
       </div>
-<!-- Enlaza este script DESPUÉS del player.js en tu HTML -->
-<script src="matrix.js"></script>
 
       <div id="live-indicator" class="live-badge">
         <span class="dot"></span>
@@ -109,9 +98,8 @@
       </div>
 
       <div class="controls">
-        <!-- aria-label es crucial aquí ya que los botones solo contienen íconos -->
         <button id="playPauseBtn" class="btn" aria-label="Reproducir/Pausar">
-          <i class="fas fa-play" aria-hidden="true"></i> <!-- Iconos son decorativos -->
+          <i class="fas fa-play" aria-hidden="true"></i>
         </button>
         <button id="stop-btn" class="btn" aria-label="Detener">
           <i class="fas fa-stop" aria-hidden="true"></i>
@@ -119,11 +107,11 @@
         <button id="mute-btn" class="btn" aria-label="Silenciar">
           <i class="fas fa-volume-up" aria-hidden="true"></i>
         </button>
-        <!-- Añadí aria-label para el slider de volumen -->
         <label for="volume" class="sr-only">Control de Volumen</label>
         <input id="volume" type="range" min="0" max="1" step="0.01" value="1" aria-label="Control de Volumen">
       </div>
 
+      <!-- La sección progress-wrapper está oculta por CSS ahora -->
       <div class="progress-wrapper">
         <div class="progress-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progreso de la transmisión de radio">
           <div id="radio-progress"></div>
@@ -135,7 +123,6 @@
 
     <audio id="radio-audio" preload="auto">
       <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-      <!-- Texto alternativo para navegadores que no soportan la etiqueta audio -->
       Tu navegador no soporta el elemento de audio HTML5. Puedes escuchar la radio directamente desde la [página de Zeno.fm](https://zeno.fm).
     </audio>
 
@@ -155,7 +142,6 @@
   <div class="container">
     <h2 class="section-title">Redes Sociales</h2>
     <div class="social-buttons">
-      <!-- Añadí aria-label a los enlaces para que los lectores de pantalla sepan a dónde van, ya que solo tienen íconos dentro -->
       <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp" aria-label="WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
       <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" class="social-btn facebook" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
       <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
@@ -177,11 +163,9 @@
 <section class="disco-section">
   <h2 class="section-subtitle">Disco de la Semana</h2>
   <div id="disco-player">
-    <!-- Añadí un alt descriptivo -->
     <img id="cover" src="" alt="Portada del disco de la semana">
     <div class="disco-info">
       <div id="track-title" class="track-title"></div>
-      <!-- Añadí un label para accesibilidad al control de audio -->
       <label for="disco-audio" class="sr-only">Reproducir Disco de la Semana</label>
       <audio id="disco-audio" controls>
         Tu navegador no soporta el elemento de audio.
@@ -196,9 +180,8 @@
     <!-- Spotify -->
     <h3 class="section-title" style="margin-top:40px;">Escucha en Spotify</h3>
     <div class="embed-player" style="border:2px solid #ff6600; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(255,102,0,0.6);">
-      <!-- Añadí title y role="region" para describir el iframe a lectores de pantalla -->
       <iframe 
-        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU"
+        src="https://open.spotify.com"
         width="100%" 
         height="170" 
         frameborder="0" 
@@ -213,9 +196,8 @@
     <!-- iVoox -->
     <h3 class="section-title" style="margin-top:40px;">Escucha en iVoox</h3>
     <div id="podcast-player" style="border:2px solid #ff6600; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(255,102,0,0.6); height:170px;">
-      <!-- Añadí title y role="region" para describir el iframe a lectores de pantalla -->
       <iframe 
-        src="https://www.ivoox.com/player_embed/sonar-rock_sq_f12661206_1" 
+        src="https://www.ivoox.com" 
         width="100%" 
         height="170" 
         frameborder="0" 
@@ -239,7 +221,6 @@
     <h2 class="section-title" style="margin-bottom:40px;">Staff</h2>
     <div class="staff-grid">
       <div class="staff-member">
-        <!-- Corregí el nombre en el alt -->
         <img src="attached_assets/Wendy_1749601460841.jpeg" alt="Miembro del Staff Wendy" class="staff-image">
         <h3>Wendy</h3>
       </div>
@@ -271,11 +252,19 @@
         Nuestra misión es simple pero poderosa: abrir un foro auténtico para las bandas emergentes, apoyar la escena local y mantener viva la esencia del rock en todas sus vertientes.
 
         Creemos en la fuerza de la música como motor de cambio, como punto de encuentro y como refugio de quienes buscan algo distinto a lo convencional.
-        En Sonar Rock somos más que
+        En Sonar Rock somos más que una radio, somos una comunidad.
       </p>
-     </div>
+    </div>
   </div>
 </section>
+<!-- Fin del contenido principal -->
+
+<!-- SCRIPTS JS -->
+<!-- Colocados al final del body para asegurar que todos los elementos HTML estén cargados -->
+<script src="matrix.js"></script>
+<script src="player.js"></script>
+<script src="disco.js"></script>
+
 
 </body>
 </html>

@@ -241,47 +241,70 @@ body {
 
 
 /* =========================
-   REPRODUCTOR DISCO DE LA SEMANA
+   DISCO DE LA SEMANA – LAYOUT HORIZONTAL
    ========================= */
-.custom-player {
-    background: rgba(26, 26, 26, 0.7);
-    border-radius: 15px;
+
+.custom-player.disco-player {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 20px;
+    max-width: 900px;
     padding: 20px;
-    border: 2px solid #ff6600; /* Marco naranja */
-    box-shadow: 0 0 30px rgba(255, 102, 0, 0.3); /* Efecto de halo */
-    backdrop-filter: blur(5px);
-    display: flex;
-    justify-content: center; /* Centrado */
-    align-items: center;
-    gap: 10px;
-    flex-direction: column;
-    width: 100%;
-    max-width: 650px; /* Limita el ancho */
-    margin: 0 auto; /* Centrado en la página */
-    transition: box-shadow 0.3s ease; /* Para la animación del halo */
 }
 
-/* Estilo al pasar el ratón sobre el reproductor */
-.custom-player:hover {
-    box-shadow: 0 0 50px rgba(255, 102, 0, 0.8); /* Aumenta el halo al pasar el ratón */
+/* Portada izquierda */
+.custom-player.disco-player img#cover {
+    width: 140px;
+    height: 140px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 3px solid #ff6600;
+    box-shadow:
+        0 0 25px rgba(255,102,0,0.8),
+        0 0 50px rgba(255,102,0,0.4);
+}
+
+/* Contenedor derecho */
+.custom-player.disco-player .player-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* Título */
+.custom-player.disco-player #track-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 10px;
+    text-shadow: 0 0 8px rgba(255,102,0,0.6);
+}
+
+/* Audio abajo */
+.custom-player.disco-player audio {
+    width: 100%;
+    border-radius: 8px;
+    background: #111;
+    box-shadow: 0 0 20px rgba(255,102,0,0.4);
 }
 
 /* =========================
-   CENTRADO DEL REPRODUCTOR
+   RESPONSIVE
    ========================= */
-.custom-player .player-header h2 {
-    font-size: 1.8rem;
-    color: #ff6600;
-    text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
-    margin-bottom: 15px;
-}
+@media (max-width: 768px) {
+    .custom-player.disco-player {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
 
-.custom-player .player-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 20px;
+    .custom-player.disco-player img#cover {
+        width: 160px;
+        height: 160px;
+    }
 }
 
 /* =========================

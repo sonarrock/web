@@ -1,7 +1,3 @@
-/* ===============================
-   SONAR ROCK – PLAYER ESTABLE
-=============================== */
-
 document.addEventListener("DOMContentLoaded", () => {
 
   const audio = document.getElementById("radio-audio");
@@ -14,51 +10,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let isPlaying = false;
 
-  if (!audio || !playBtn || !stopBtn || !muteBtn || !volumeSlider) {
-    console.warn("Sonar Rock Player: elementos faltantes");
-    return;
-  }
+  /* =============================== */
+  /* REPRODUCCIÓN Y CONTROL DE AUDIO */
+  /* =============================== */
 
-  /* ===============================
-     AUDIO CONFIG
-  =============================== */
-  audio.preload = "none";
-  audio.volume = volumeSlider.value;
-
-  /* ===============================
-     PLAY / PAUSE
-  =============================== */
+  // Reproducir audio
   playBtn.addEventListener("click", () => {
     if (!isPlaying) {
       audio.play().then(() => {
         isPlaying = true;
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
         liveIndicator.textContent = "EN VIVO";
+        liveIndicator.classList.add("active");
         playerContainer.classList.add("playing");
+
+        startMatrix();  // Inicia animación de Matrix al reproducir
       }).catch(err => {
         console.error("Error al reproducir:", err);
       });
     } else {
-      pauseStream();
+      audio.pause();
+      isPlaying = false;
+      playBtn.innerHTML = '<i class="fas fa-play"></i>';
+      liveIndicator.textContent = "OFFLINE";
+      liveIndicator.classList.remove("active");
+      playerContainer.classList.remove("playing");
+
+      stopMatrix();  // Detiene animación de Matrix al pausar
     }
   });
 
-  function pauseStream() {
+  // Detener audio
+  stopBtn.addEventListener("click", () => {
     audio.pause();
+    audio.currentTime = 0;
     isPlaying = false;
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    liveIndicator.textContent = "PROGRAMACIÓN";
+    liveIndicator.textContent = "OFFLINE";
+    liveIndicator.classList.remove("active");
     playerContainer.classList.remove("playing");
-  }
 
-  /* ===============================
-     STOP
-  =============================== */
-  stopBtn.addEventListener("click", pauseStream);
+    stopMatrix();  // Detiene animación al detener
+  });
 
-  /* ===============================
-     MUTE
-  =============================== */
+  // Mute botón
   muteBtn.addEventListener("click", () => {
     audio.muted = !audio.muted;
     muteBtn.innerHTML = audio.muted
@@ -66,19 +61,29 @@ document.addEventListener("DOMContentLoaded", () => {
       : '<i class="fas fa-volume-up"></i>';
   });
 
-  /* ===============================
-     VOLUMEN
-  =============================== */
+  // Control de volumen
   volumeSlider.addEventListener("input", () => {
     audio.volume = volumeSlider.value;
   });
 
-  /* ===============================
-     EVENTOS STREAM
-  =============================== */
+  /* =============================== */
+  /* EVENTOS DEL STREAM */
+  /* =============================== */
+
+  // Cuando el audio termina
+  audio.addEventListener("ended", () => {
+    isPlaying = false;
+    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    liveIndicator.textContent = "OFFLINE";
+    liveIndicator.classList.remove("active");
+    playerContainer.classList.remove("playing");
+    stopMatrix();  // Detiene animación al finalizar
+  });
+
+  // Error en el stream
   audio.addEventListener("error", () => {
     console.warn("Stream no disponible");
-    pauseStream();
+    stopMatrix();
   });
 
 });

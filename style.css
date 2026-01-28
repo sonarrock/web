@@ -313,31 +313,25 @@ body {
     justify-content: center;
 }
 /* Staff Section */
-.staff-section {
-    padding: 60px 0;
-    background: rgba(0, 0, 0, 0.2);
-}
-
-.staff-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 40px;
-    margin-top: 40px;
-}
-
 .staff-member {
+    position: relative;
     text-align: center;
-    background: rgba(26, 26, 26, 0.8);
-    padding: 30px;
+    background: rgba(0,0,0,0.3); /* transparencia como reproductores */
     border-radius: 15px;
-    border: 2px solid #ff6600;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border: 3px solid #ff6600; /* borde naranja */
+    box-shadow: 
+        0 0 30px rgba(255,102,0,0.8), 
+        0 0 60px rgba(255,102,0,0.4) inset;
+    padding: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    backdrop-filter: blur(5px); /* efecto blur */
 }
 
 .staff-member:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(255, 102, 0, 0.2);
+    transform: translateY(-8px);
+    box-shadow: 
+        0 0 35px rgba(255,102,0,1), 
+        0 0 70px rgba(255,102,0,0.5) inset;
 }
 
 .staff-image {
@@ -347,15 +341,20 @@ body {
     object-fit: cover;
     margin-bottom: 20px;
     border: 3px solid #ff6600;
-    box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
+    box-shadow: 0 0 25px rgba(255,102,0,0.5);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.staff-member:hover .staff-image {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255,102,0,0.8);
 }
 
 .staff-member h3 {
     font-size: 1.5rem;
     color: #ff6600;
-    text-shadow: 0 0 5px rgba(255, 102, 0, 0.3);
+    text-shadow: 0 0 5px rgba(255,102,0,0.4);
 }
-
 /* About Sections */
 .about-section {
     padding: 60px 0;

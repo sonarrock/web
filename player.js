@@ -1,30 +1,170 @@
+/* ===============================
+   ELEMENTOS
+=============================== */
 const audio = document.getElementById("radio-audio");
-const playerContainer = document.getElementById("player"); 
-const playPauseBtn = document.getElementById("playPauseBtn");
+const playBtn = document.getElementById("playPauseBtn");
 const stopBtn = document.getElementById("stop-btn");
 const muteBtn = document.getElementById("mute-btn");
 const volumeSlider = document.getElementById("volume");
-const liveIndicatorEl = document.getElementById("live-indicator"); 
-const nowPlayingEl = document.getElementById("now-playing");
+const liveBadge = document.getElementById("live-indicator");
+const player = document.querySelector(".player-container");
+const matrixCanvas = document.getElementById("matrixCanvas");
 
-// liveIndicatorEl.style.display = "none"; // Ocultar por defecto si no está sonando
-nowPlayingEl.textContent = "Sonar Rock - La Radio Independiente";
+if (!audio || !playBtn || !player || !matrixCanvas || !liveBadge) {
+  console.error("❌ Player incompleto");
+}
+
+/* ===============================
+   ESTADO
+=============================== */
+let isPlaying = false;
+let fadeInterval = null;
+
+/* ===============================
+   LIVE / BUFFERING INDICATOR
+=============================== */
+function setLive() {
+  liveBadge.classList.remove("buffering");
+  liveBadge.classList.add("active");
+  liveBadge.querySelector(".text").textContent = "EN VIVO";
+}
+
+function setBuffering() {
+  liveBadge.classList.remove("active");
+  liveBadge.classList.add("buffering");
+  liveBadge.querySelector(".text").textContent = "CONECTANDO…";
+}
+
+function setOffline() {
+  liveBadge.classList.remove("active", "buffering");
+  liveBadge.querySelector(".text").textContent = "OFFLINE";
+}
+
+/* ===============================
+   FADE IN / FADE OUT (FM STYLE)
+=============================== */
+function fadeTo(targetVolume, duration = 2000) {
+  clearInterval(fadeInterval);
+
+  const startVolume = audio.volume;
+  const steps = 30;
+  const stepTime = duration / steps;
+  const volumeStep = (targetVolume - startVolume) / steps;
+
+  let currentStep = 0;
+
+  fadeInterval = setInterval(() => {
+    currentStep++;
+    audio.volume = Math.min(1, Math.max(0, audio.volume + volumeStep));
+
+    if (currentStep >= steps) {
+      audio.volume = targetVolume;
+      clearInterval(fadeInterval);
+    }
+  }, stepTime);
+}
+
+/* ===============================
+   MATRIX EFFECT
+=============================== */
+const matrixCtx = matrixCanvas.getContext("2d");
+const matrixChars = "0123456789ABCDEFGHIJKMNOPQRSTUVXYZ";
+const fontSize = 14;
+let drops = [];
+let animationId = null;
+
+function resizeCanvas() {
+  const rect = player.getBoundingClientRect();
+  matrixCanvas.width = rect.width;
+  matrixCanvas.height = rect.height;
+  const columns = Math.floor(rect.width / fontSize);
+  drops = Array(columns).fill(1);
+}
+
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+window.addEventListener("orientationchange", resizeCanvas);
+
+function drawMatrix() {
+  matrixCtx.fillStyle = "rgba(0,0,0,0.08)";
+  matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+
+  matrixCtx.fillStyle = "#ff6600";
+  matrixCtx.font = `${fontSize}px monospace`;
+
+  drops.forEach((y, i) => {
+    const x = i * fontSize;
+    const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+    matrixCtx.fillText(char, x, y * fontSize);
+
+    if (y * fontSize > matrixCanvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
+    }
+    drops[i]++;
+  });
+}
+
+function startMatrix() {
+  resizeCanvas(); // 👈 clave
+  showMatrix();
+
+  cancelAnimationFrame(animationId);
+  animationId = requestAnimationFrame(function animate() {
+    drawMatrix();
+    animationId = requestAnimationFrame(animate);
+  });
+}
+
+function stopMatrix() {
+  cancelAnimationFrame(animationId);
+  animationId = null;
+  hideMatrix();
+}
+
+
+function hideMatrix() {
+  matrixCtx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+  matrixCanvas.style.opacity = "0";
+}
+
+function showMatrix() {
+  matrixCanvas.style.opacity = "1";
+}
+
 
 /* ===============================
    PLAY / PAUSE
 =============================== */
-playPauseBtn.addEventListener("click", () => {
-  if (audio.paused) {
-    audio.play();
-    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>'; 
-    liveIndicatorEl.style.display = "flex"; 
-    playerContainer.classList.add("is-playing");
-    nowPlayingEl.textContent = "¡Estás escuchando la transmisión en vivo!";
+playBtn.addEventListener("click", async () => {
+  if (!isPlaying) {
+    setBuffering();
+
+    try {
+      audio.volume = volumeSlider ? volumeSlider.value : 0.8;
+      await audio.play();
+
+      isPlaying = true;
+      playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+      player.classList.add("playing");
+
+      fadeTo(audio.volume, 2000);
+      startMatrix();
+
+    } catch (err) {
+      console.error("❌ Error al reproducir:", err);
+      setOffline();
+    }
+
   } else {
-    audio.pause();
-    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-    playerContainer.classList.remove("is-playing");
-    nowPlayingEl.textContent = "Transmisión Pausada";
+    fadeTo(0, 800);
+    setTimeout(() => audio.pause(), 800);
+
+    isPlaying = false;
+    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    player.classList.remove("playing");
+
+    stopMatrix();
+    setOffline();
   }
 });
 
@@ -32,28 +172,106 @@ playPauseBtn.addEventListener("click", () => {
    STOP
 =============================== */
 stopBtn.addEventListener("click", () => {
-  audio.pause();
-  audio.currentTime = 0;
-  playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-  liveIndicatorEl.style.display = "none";
-  playerContainer.classList.remove("is-playing");
-  nowPlayingEl.textContent = "OFFLINE";
+  fadeTo(0, 800);
+  setTimeout(() => {
+    audio.pause();
+    audio.currentTime = 0;
+  }, 800);
+
+  isPlaying = false;
+  playBtn.innerHTML = '<i class="fas fa-play"></i>';
+  player.classList.remove("playing");
+
+  stopMatrix();
+  setOffline();
 });
 
 /* ===============================
-   MUTE / UNMUTE / VOLUME
+   MUTE
 =============================== */
-muteBtn.addEventListener("click", () => {
+muteBtn?.addEventListener("click", () => {
   audio.muted = !audio.muted;
-  muteBtn.innerHTML = audio.muted 
-    ? '<i class="fas fa-volume-mute"></i>' 
+  muteBtn.innerHTML = audio.muted
+    ? '<i class="fas fa-volume-mute"></i>'
     : '<i class="fas fa-volume-up"></i>';
 });
 
-volumeSlider.addEventListener("input", e => {
-  audio.volume = e.target.value;
-  if (audio.volume > 0) {
-      audio.muted = false;
-      muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+/* ===============================
+   VOLUMEN
+=============================== */
+if (volumeSlider) {
+  audio.volume = volumeSlider.value;
+  volumeSlider.addEventListener("input", () => {
+    audio.volume = volumeSlider.value;
+  });
+}
+
+/* ===============================
+   STREAM REAL EVENTS
+=============================== */
+audio.addEventListener("playing", setLive);
+audio.addEventListener("waiting", setBuffering);
+audio.addEventListener("stalled", setBuffering);
+audio.addEventListener("error", setBuffering);
+audio.addEventListener("pause", () => {
+  if (!isPlaying) setOffline();
+});
+
+/* ===============================
+   AUTO RECOVERY STREAM
+=============================== */
+let retryCount = 0;
+let retryTimer = null;
+const maxRetries = 10;
+
+function reconnectStream() {
+  if (!isPlaying || retryCount >= maxRetries) return;
+
+  retryCount++;
+  setBuffering();
+
+  clearTimeout(retryTimer);
+
+  try {
+    audio.pause();
+    audio.src = audio.src;
+    audio.load();
+    audio.play().catch(() => {});
+  } catch (e) {}
+
+  retryTimer = setTimeout(reconnectStream, Math.min(3000 * retryCount, 15000));
+}
+
+audio.addEventListener("playing", () => {
+  retryCount = 0;
+  clearTimeout(retryTimer);
+});
+
+setInterval(() => {
+  if (isPlaying && !audio.paused && audio.readyState < 3) {
+    reconnectStream();
+  }
+}, 10000);
+
+window.addEventListener("online", reconnectStream);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && isPlaying) {
+    audio.play().catch(() => {});
   }
 });
+
+hideMatrix();
+setOffline();
+
+
+/* ===============================
+   SERVICE WORKER
+=============================== */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .then(() => console.log("✅ Service Worker registrado"))
+      .catch(err => console.warn("❌ SW error:", err));
+  });
+}

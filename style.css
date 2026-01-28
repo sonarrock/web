@@ -417,7 +417,7 @@ canvas#matrixCanvas {
     text-align: center;
     gap: 10px;
     width: 100%;
-    max-width: 650px;
+    max-width: 600px;
     margin: 0 auto 50px auto;
 }
 
@@ -434,8 +434,8 @@ canvas#matrixCanvas {
 }
 
 #cover {
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
     object-fit: cover;
     border-radius: 8px;
     margin-bottom: 15px;

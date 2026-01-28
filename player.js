@@ -41,7 +41,7 @@ function setOffline() {
 }
 
 /* ===============================
-   FADE IN / FADE OUT (FM STYLE)
+   FADE IN / FADE OUT
 =============================== */
 function fadeTo(targetVolume, duration = 2000) {
   clearInterval(fadeInterval);
@@ -105,7 +105,7 @@ function drawMatrix() {
 }
 
 function startMatrix() {
-  resizeCanvas(); // 👈 clave
+  resizeCanvas();
   showMatrix();
 
   cancelAnimationFrame(animationId);
@@ -121,7 +121,6 @@ function stopMatrix() {
   hideMatrix();
 }
 
-
 function hideMatrix() {
   matrixCtx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
   matrixCanvas.style.opacity = "0";
@@ -131,7 +130,6 @@ function showMatrix() {
   matrixCanvas.style.opacity = "1";
 }
 
-
 /* ===============================
    PLAY / PAUSE
 =============================== */
@@ -140,14 +138,16 @@ playBtn.addEventListener("click", async () => {
     setBuffering();
 
     try {
-      audio.volume = volumeSlider ? volumeSlider.value : 0.8;
+      audio.volume = 0;
       await audio.play();
+
+      const targetVolume = volumeSlider ? volumeSlider.value / 100 : 0.8;
 
       isPlaying = true;
       playBtn.innerHTML = '<i class="fas fa-pause"></i>';
       player.classList.add("playing");
 
-      fadeTo(audio.volume, 2000);
+      fadeTo(targetVolume, 2000);
       startMatrix();
 
     } catch (err) {
@@ -169,13 +169,13 @@ playBtn.addEventListener("click", async () => {
 });
 
 /* ===============================
-   STOP
+   STOP (STREAM SAFE)
 =============================== */
 stopBtn.addEventListener("click", () => {
   fadeTo(0, 800);
+
   setTimeout(() => {
     audio.pause();
-    audio.currentTime = 0;
   }, 800);
 
   isPlaying = false;
@@ -197,12 +197,13 @@ muteBtn?.addEventListener("click", () => {
 });
 
 /* ===============================
-   VOLUMEN
+   VOLUMEN (NORMALIZADO)
 =============================== */
 if (volumeSlider) {
-  audio.volume = volumeSlider.value;
+  audio.volume = volumeSlider.value / 100;
+
   volumeSlider.addEventListener("input", () => {
-    audio.volume = volumeSlider.value;
+    audio.volume = volumeSlider.value / 100;
   });
 }
 
@@ -212,7 +213,8 @@ if (volumeSlider) {
 audio.addEventListener("playing", setLive);
 audio.addEventListener("waiting", setBuffering);
 audio.addEventListener("stalled", setBuffering);
-audio.addEventListener("error", setBuffering);
+audio.addEventListener("error", setOffline);
+
 audio.addEventListener("pause", () => {
   if (!isPlaying) setOffline();
 });
@@ -229,17 +231,19 @@ function reconnectStream() {
 
   retryCount++;
   setBuffering();
-
   clearTimeout(retryTimer);
 
   try {
     audio.pause();
-    audio.src = audio.src;
+    audio.src = audio.src.split("?")[0] + "?t=" + Date.now();
     audio.load();
     audio.play().catch(() => {});
   } catch (e) {}
 
-  retryTimer = setTimeout(reconnectStream, Math.min(3000 * retryCount, 15000));
+  retryTimer = setTimeout(
+    reconnectStream,
+    Math.min(3000 * retryCount, 15000)
+  );
 }
 
 audio.addEventListener("playing", () => {
@@ -254,15 +258,18 @@ setInterval(() => {
 }, 10000);
 
 window.addEventListener("online", reconnectStream);
+
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && isPlaying) {
     audio.play().catch(() => {});
   }
 });
 
+/* ===============================
+   INIT
+=============================== */
 hideMatrix();
 setOffline();
-
 
 /* ===============================
    SERVICE WORKER

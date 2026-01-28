@@ -1,323 +1,445 @@
-/* ========================= */
-/* RESET BÁSICO              */
-/* ========================= */
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: "Spotify Circular", Arial, sans-serif;
-  background: #121212;
-  color: #fff;
-  line-height: 1.5;
+    font-family: 'Arial', sans-serif;
+    background: #0a0a0a;
+    color: #ffffff;
+    line-height: 1.6;
+    min-height: 100vh;
 }
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-}
-
-/* ========================= */
-/* CONTENEDORES GENERALES     */
-/* ========================= */
 .container {
-  max-width: 1220px;
-  margin: 0 auto;
-  padding: 0 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-.section-title {
-  text-align: center;
-  font-size: 2.5rem;
-  color: #ff6600;
-  margin-bottom: 30px;
-  text-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
-}
-
-.section-subtitle {
-  color: #FF6600;
-  font-size: 2rem;
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-/* ========================= */
-/* HEADER                    */
-/* ========================= */
+/* Header */
 .header {
-  padding: 15px 0;
-  background: #000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    background: #0a0a0a;
+    padding: 20px 0;
+    border-bottom: 2px solid #ff6600;
 }
 
-.header .logo {
-  width: 180px;
-  height: 180px;
-  border: 3px solid #FF6600;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(255,102,0,0.6);
-  animation: glow 2s infinite alternate;
+.logo-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
 }
 
-.header h2 {
-  color: #FF6600;
-  font-size: 4rem;
-  text-shadow: 0 0 10px rgba(255,102,0,0.6);
-  margin-top: 15px;
+.logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ff6600;
+    box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
 }
 
-/* ========================= */
-/* REPRODUCTOR STREAMING     */
-/* ========================= */
-.player-section {
-  margin-top: 50px;
+.title-section h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #ff6600;
+    text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+    margin-bottom: 5px;
 }
 
-.player-container {
-  position: relative;
-  background: #111;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+.subtitle {
+    font-size: 1.2rem;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+/* Main Section */
+.main-section {
+    padding: 40px 0;
+    position: relative;
 }
 
-/* Imagen del reproductor */
-.player-bg {
-  width: 100%;
-  display: block;
-  position: relative;
-  z-index: 1;
-  filter: brightness(1);
-  transition: filter 0.4s ease;
+.main-image-container {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* Oscurecer SOLO al reproducir */
-.player-container.playing .player-bg {
-  filter: brightness(0.65);
+.main-image {
+    width: 100%;
+    height: 800px;
+    object-fit: contain;
+    display: block;
+    background: #000;
 }
 
-/* Matrix */
-#matrixCanvas {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
+.player-overlay {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
+    padding: 40px 20px 20px;
 }
 
-.player-container.playing #matrixCanvas {
-  opacity: 1;
+.custom-player {
+    background: rgba(26, 26, 26, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid #ff6600;
+    box-shadow: 0 0 30px rgba(255, 102, 0, 0.3);
+    backdrop-filter: blur(5px);
 }
 
-/* Overlay ligero */
-.player-container .overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.25);
-  z-index: 3;
+.player-header h2 {
+    text-align: center;
+    color: #ff6600;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
 }
 
-/* Contenido */
-.player-content {
-  position: relative;
-  z-index: 4;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
-/* ========================= */
-/* STATUS EN VIVO / OFFLINE  */
-/* ========================= */
-#live-indicator {
-  font-size: 0.75rem;
-  font-weight: bold;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: #ff6600;
-  background: none;
-  padding: 0;
+.play-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #ff6600, #ff8833);
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4);
 }
 
-#live-indicator.active {
-  color: #ff6600;
+.play-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 102, 0, 0.6);
 }
 
-/* ========================= */
-/* CONTROLES                 */
-/* ========================= */
-.controls {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-/* Botones */
-.controls .btn {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #ff6600;
-  border: none;
-  color: #ffffff;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease;
+.volume-control i {
+    color: #ff6600;
+    font-size: 18px;
 }
 
-.controls .btn:hover {
-  transform: scale(1.05);
+.volume-slider {
+    width: 100px;
+    height: 5px;
+    background: #333;
+    border-radius: 5px;
+    outline: none;
+    -webkit-appearance: none;
 }
 
-/* ========================= */
-/* SOCIAL MEDIA              */
-/* ========================= */
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #ff6600;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.visualizer {
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    gap: 3px;
+    height: 40px;
+}
+
+.stream-status {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: white;
+    text-align: center;
+}
+.stream-status.error {
+    color: #ff4d4d;
+}
+.stream-status.playing {
+    color: #00ff88;
+}
+
+.bar {
+    width: 4px;
+    background: linear-gradient(to top, #ff6600, #ffaa66);
+    border-radius: 2px;
+    animation: pulse 1s ease-in-out infinite alternate;
+}
+
+.bar:nth-child(1) { animation-delay: 0s; }
+.bar:nth-child(2) { animation-delay: 0.1s; }
+.bar:nth-child(3) { animation-delay: 0.2s; }
+.bar:nth-child(4) { animation-delay: 0.3s; }
+.bar:nth-child(5) { animation-delay: 0.4s; }
+.bar:nth-child(6) { animation-delay: 0.5s; }
+.bar:nth-child(7) { animation-delay: 0.6s; }
+.bar:nth-child(8) { animation-delay: 0.7s; }
+
+@keyframes pulse {
+    0% { height: 5px; }
+    100% { height: 35px; }
+}
+
+/* Social Media */
 .social-section {
-  padding: 50px 0;
-  background: rgba(0, 0, 0, 0.3);
+    padding: 30px 0;
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .social-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
 .social-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: white;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* ========================= */
-/* STAFF                     */
-/* ========================= */
+.social-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.whatsapp { background: linear-gradient(45deg, #25d366, #128c7e); }
+.facebook { background: linear-gradient(45deg, #1877f2, #42a5f5); }
+.instagram { background: linear-gradient(45deg, #e4405f, #f77737); }
+.spotify { background: linear-gradient(45deg, #1db954, #1ed760); }
+.ivoox { background: linear-gradient(45deg, #ff6600, #ff8833); }
+
+/* Embed Sections */
+.embed-section {
+    padding: 40px 0;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #ff6600;
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
+}
+
+.embed-container {
+    max-width: 800px;
+    margin: 0 auto;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 2px solid #ff6600;
+}
+
+.spotify-embed {
+    display: flex;
+    justify-content: center;
+}
+
+/* Staff Section */
 .staff-section {
-  padding: 60px 0;
-  background: rgba(0, 0, 0, 0.2);
+    padding: 60px 0;
+    background: rgba(0, 0, 0, 0.2);
 }
 
-/* ========================= */
-/* ANIMACIONES               */
-/* ========================= */
-@keyframes glow {
-  from { box-shadow: 0 0 10px rgba(255,102,0,0.5); }
-  to   { box-shadow: 0 0 20px rgba(255,102,0,1); }
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-top: 40px;
 }
 
-/* ========================= */
-/* RESPONSIVE                */
-/* ========================= */
+.staff-member {
+    text-align: center;
+    background: rgba(26, 26, 26, 0.8);
+    padding: 30px;
+    border-radius: 15px;
+    border: 2px solid #ff6600;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.staff-member:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(255, 102, 0, 0.2);
+}
+
+.staff-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 3px solid #ff6600;
+    box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
+}
+
+.staff-member h3 {
+    font-size: 1.5rem;
+    color: #ff6600;
+    text-shadow: 0 0 5px rgba(255, 102, 0, 0.3);
+}
+
+/* About Sections */
+.about-section {
+    padding: 60px 0;
+}
+
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.about-text {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #cccccc;
+    margin-top: 20px;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-
-  /* =========================
-   PATCH SONAR ROCK PLAYER
-   SOLO STREAMING
-========================= */
-
-/* Imagen SIN oscurecer por defecto */
-.player-bg {
-  opacity: 1 !important;
-  filter: brightness(1) !important;
-  transition: filter 0.4s ease;
+    .title-section h1 {
+        font-size: 2rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .logo-section {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .main-image {
+        height: 300px;
+    }
+    
+    .social-buttons {
+        gap: 15px;
+    }
+    
+    .social-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .staff-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
 }
 
-/* Overlay apagado por defecto */
-.player-container .overlay {
-  background: rgba(0,0,0,0) !important;
-  transition: background 0.4s ease;
+@media (max-width: 480px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .title-section h1 {
+        font-size: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .player-controls {
+        flex-direction: column;
+        gap: 15px;
+    }
 }
+@media (max-width: 480px) {
+  .custom-player {
+    padding: 10px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
 
-/* Estado reproduciendo */
-.player-container.playing .player-bg {
-  filter: brightness(0.65) !important; /* 35% oscuro */
-}
-
-.player-container.playing .overlay {
-  background: rgba(0,0,0,0.25) !important;
-}
-
-/* Matrix oculto hasta play */
-#matrixCanvas {
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-
-.player-container.playing #matrixCanvas {
-  opacity: 1;
-}
-
-/* =========================
-   STATUS EN VIVO / OFFLINE
-========================= */
-#live-indicator {
-  background: none !important;
-  padding: 0 !important;
-  font-size: 0.75rem;
-  font-weight: bold;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: #ff6600;
-}
-
-/* =========================
-   CONTROLES
-========================= */
-.controls {
-  justify-content: center;
-}
-
-/* Botones redondos */
-.controls .btn {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #ff6600;
-  color: #ffffff;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  /* Box shadow negro 20% */
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-
-  transition: transform 0.2s ease;
-}
-
-.controls .btn:hover {
-  transform: scale(1.05);
-}
-
-  .controls {
+  .player-controls {
     flex-direction: column;
     align-items: center;
   }
+
+  .volume-control {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .volume-slider {
+    width: 80%;
+  }
+
+  .visualizer {
+    margin-top: 10px;
+    gap: 3px;
+  }
+
+  .bar {
+    margin: 0 1px;
+    height: 5px;
+  }
+
+  #streamStatus {
+    font-size: 13px;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .main-image-container img.main-image {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .player-overlay {
+    position: relative;
+    width: 100%;
+    padding: 10px 0;
+  }
+}
+.listeners-badge {
+    background-color: #ff6600;
+    color: #fff;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.9em;
+    margin-left: 10px;
+    display: inline-block;
 }

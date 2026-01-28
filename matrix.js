@@ -51,3 +51,23 @@ function drawMatrixFrame() {
 function clearMatrix() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
+
+/**
+ * Activa la animación de la Matrix (cuando se está reproduciendo)
+ */
+function startMatrix() {
+  const animate = () => {
+    drawMatrixFrame();
+    requestAnimationFrame(animate);
+  };
+
+  animate();
+}
+
+/**
+ * Detiene la animación de la Matrix (cuando se pausa o detiene el audio)
+ */
+function stopMatrix() {
+  cancelAnimationFrame(animate);
+  clearMatrix();
+}

@@ -4,13 +4,18 @@
   margin: auto;
 }
 
-/* PLAYER CONTAINER */
+/* PLAYER CONTAINER - Nuevo tamaño fijo para 320x560px */
 .player-container {
   position: relative;
-  width: 100%;
-  aspect-ratio: 16/9;
+  /* Dimensiones fijas solicitadas */
+  width: 320px;
+  height: 560px; 
+  /* Asegúrate de centrarlo si es necesario */
+  margin: auto; 
   overflow: hidden;
   border-radius: 16px;
+  /* Sombra para darle vida al contenedor general */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 /* IMAGEN PRINCIPAL */
@@ -19,13 +24,15 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  /* La imagen es clara por defecto */
+  opacity: 1; 
 }
 
-/* OVERLAY LEVE */
+/* OVERLAY LEVE - Ahora solo al 20% aprox. */
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.12);
+  background: rgba(0,0,0,0.2); /* Oscurece ligeramente para que se vea el Matrix */
   z-index: 1;
 }
 
@@ -48,7 +55,7 @@
   padding: 14px;
 }
 
-/* PROGRAMACIÓN / EN VIVO */
+/* PROGRAMACIÓN / EN VIVO - Se eliminó la sección de "Programación" superior en el HTML anterior */
 .now-playing {
   text-align: center;
   font-size: 14px;
@@ -79,15 +86,16 @@
   50% { opacity: 0.3; }
 }
 
-/* CAJA DE CONTROLES */
+/* CAJA DE CONTROLES (Ahora con la sombra que pediste) */
 .controls-box {
   background: rgba(0,0,0,0.85);
   border-radius: 14px;
   padding: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+  /* La sombra en la parte inferior de la caja de controles */
+  box-shadow: 0 15px 30px rgba(255,102,0,0.5); 
 }
 
-/* BOTONES */
+/* BOTONES - Naranja y Blanco, con animación */
 .controls {
   display: flex;
   justify-content: center;
@@ -95,16 +103,26 @@
 }
 
 .controls .btn {
-  background: none;
+  background: #ff6600; /* Fondo Naranja */
   border: none;
-  color: #ffffff;
+  color: #ffffff;      /* Texto Blanco */
   font-size: 20px;
   cursor: pointer;
+  padding: 10px 14px; /* Añadido padding para que se vean mejor */
+  border-radius: 8px; /* Bordes suaves */
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 4px 10px rgba(255, 102, 0, 0.4);
 }
 
 .controls .btn:hover {
-  color: #ff6600;
+  background: #e65c00; /* Naranja más oscuro al pasar el cursor */
+  transform: scale(1.1); /* Animación de vida */
 }
+
+.controls .btn:active {
+    transform: scale(0.95); /* Efecto de click */
+}
+
 
 /* VOLUMEN */
 #volume {
@@ -112,34 +130,15 @@
   margin: 10px 0;
 }
 
-/* PROGRESO */
+/* PROGRESO - Eliminamos el contador de tiempo */
 .progress-wrapper {
   margin-top: 6px;
+  display: none; /* Ocultamos el wrapper de progreso y tiempo */
 }
 
-.progress-container {
-  width: 100%;
-  height: 4px;
-  background: rgba(255,255,255,0.25);
-  border-radius: 2px;
-  overflow: hidden;
-}
+/* El resto del CSS sigue igual, pero las reglas anteriores lo sobreescriben */
+/* ... */
 
-.progress-bar {
-  width: 0%;
-  height: 100%;
-  background: #ff6600;
-  transition: width 0.4s linear;
-}
-
-/* TIEMPO */
-.time {
-  margin-top: 6px;
-  text-align: center;
-  font-size: 12px;
-  color: #ffffff;
-  opacity: 0.85;
-}
 
 /* ========================= */
 /* AJUSTE BRILLO IMAGEN PLAYER */

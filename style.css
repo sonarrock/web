@@ -8,10 +8,23 @@
 }
 
 body {
+  /* Asegúrate de que la fuente "Spotify Circular" esté enlazada en tu HTML si no es una fuente web segura */
   font-family: "Spotify Circular", Arial, sans-serif;
   background: #121212;
   color: #fff;
   line-height: 1.5;
+}
+
+/* Clase para elementos ocultos visualmente pero accesibles para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 /* ========================= */
@@ -23,6 +36,24 @@ body {
   padding: 0 20px;
 }
 
+/* Selectores generales para títulos añadidos en la revisión del HTML */
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #ff6600;
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
+}
+
+.section-subtitle {
+    color: #FF6600;
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+
 /* ========================= */
 /* HEADER LOGO Y DIVISIÓN    */
 /* ========================= */
@@ -30,7 +61,7 @@ body {
     padding: 15px 0;
     background: #000;
     display: flex;
-    flex-direction: column; /* permite línea debajo del logo */
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     position: relative;
@@ -46,10 +77,10 @@ body {
     width: 180px;
     height: 180px;
     object-fit: cover;
-    border: 3px solid #FF6600; /* marco naranja */
+    border: 3px solid #FF6600;
     border-radius: 12px;
     box-shadow: 0 0 15px rgba(255,102,0,0.6);
-    animation: glow 2s infinite alternate; /* animación de resplandor */
+    animation: glow 2s infinite alternate;
 }
 
 /* Línea naranja debajo del header */
@@ -69,12 +100,13 @@ body {
     to   { box-shadow: 0 0 20px rgba(255,102,0,1); }
 }
 
-.header h1 {
-    color: #FF6600; /* naranja */
-    font-size: 4rem; /* tamaño grande, ajustable */
+/* Selector corregido: En el HTML cambié h1 por h2 para semántica */
+.header h2 {
+    color: #FF6600;
+    font-size: 4rem;
     font-weight: bold;
-    text-shadow: 0 0 10px rgba(255,102,0,0.6); /* resplandor suave */
-    margin-top: 15px; /* separación respecto al logo */
+    text-shadow: 0 0 10px rgba(255,102,0,0.6);
+    margin-top: 15px;
     text-align: center;
 }
 
@@ -190,7 +222,8 @@ canvas#matrixCanvas {
   border-radius: 4px;
 }
 
-.time-display {
+/* Corrección de selector: en HTML era #time-display */
+#time-display {
   font-size: 0.9rem;
   color: #aaa;
   text-align: right;
@@ -240,14 +273,7 @@ canvas#matrixCanvas {
     padding: 40px 0;
 }
 
-.section-title {
-    text-align: center;
-    font-size: 2.5rem;
-    color: #ff6600;
-    margin-bottom: 30px;
-    text-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
-}
-
+/* Selectores que no estaban en uso en el HTML proporcionado, pero los mantengo por si acaso */
 .embed-container {
     max-width: 800px;
     margin: 0 auto;
@@ -326,10 +352,12 @@ canvas#matrixCanvas {
 
 /* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
-    .title-section h1 { font-size: 2rem; }
-    .subtitle { font-size: 1rem; }
+    /* Corregí el selector h1 a h2 para coincidir con el HTML */
+    .title-section h2 { font-size: 2rem; }
+    /* El selector .subtitle no existe en el HTML que me diste, lo dejo comentado por si lo necesitas */
+    /* .subtitle { font-size: 1rem; } */
     .logo-section { flex-direction: column; gap: 15px; }
-    .main-image { height: 300px; }
+    .main-image { height: auto; max-width: 100%; } /* Ajuste para mejor visualización móvil */
     .social-buttons { gap: 15px; }
     .social-btn { width: 50px; height: 50px; font-size: 20px; }
     .staff-grid { grid-template-columns: 1fr; gap: 30px; }
@@ -337,9 +365,12 @@ canvas#matrixCanvas {
 
 @media (max-width: 480px) {
     .container { padding: 0 15px; }
-    .title-section h1 { font-size: 1.5rem; }
+    /* Corregí el selector h1 a h2 para coincidir con el HTML */
+    .title-section h2 { font-size: 1.5rem; }
     .section-title { font-size: 2rem; }
-    .player-controls { flex-direction: column; gap: 15px; }
+    
+    /* Estos selectores no existen en el HTML/CSS que me diste, los dejo comentados */
+    /* .player-controls { flex-direction: column; gap: 15px; }
     .custom-player {
         padding: 10px;
         flex-direction: column;
@@ -351,11 +382,13 @@ canvas#matrixCanvas {
     .volume-slider { width: 80%; }
     .visualizer { margin-top: 10px; gap: 3px; }
     .bar { margin: 0 1px; height: 5px; }
-    #streamStatus { font-size: 13px; margin-top: 8px; text-align: center; }
+    #streamStatus { font-size: 13px; margin-top: 8px; text-align: center; } */
+    
     .main-image-container img.main-image { max-width: 100%; height: auto; }
-    .player-overlay { position: relative; width: 100%; padding: 10px 0; }
+    /* .player-overlay { position: relative; width: 100%; padding: 10px 0; } */
 }
 
+/* Estilos relacionados con el badge de "oyentes" (listeners) que no vi en el HTML, pero mantengo */
 .listeners-badge {
     background-color: #ff6600;
     color: #fff;
@@ -368,7 +401,7 @@ canvas#matrixCanvas {
 }
 
 /* ========================= */
-/* Disco de la Semana estilo iVoox/Spotify */
+/* Disco de la Semana estilo (completado) */
 /* ========================= */
 .disco-section {
     display: flex;
@@ -381,153 +414,43 @@ canvas#matrixCanvas {
     margin: 0 auto 50px auto;
 }
 
-.disco-section .section-subtitle {
-    color: #FF6600;
-    font-size: 2rem;
-    font-weight: 600;
-    text-align: center;
-    margin-bottom: 15px;
-}
-
+/* Estilos faltantes para #disco-player y sus elementos internos */
 #disco-player {
     display: flex;
+    flex-direction: column;
     align-items: center;
     width: 100%;
-    height: 170px;
-    background: #111;
+    background: #1a1a1a;
+    padding: 20px;
     border-radius: 12px;
-    border: 2px solid #ff6600;
-    box-shadow: 0 8px 24px rgba(255,102,0,0.6);
-    overflow: hidden;
-    gap: 15px;
-    padding: 10px;
-    box-sizing: border-box;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-#disco-player img#cover {
+#cover {
     width: 150px;
     height: 150px;
-    border-radius: 12px;
-    border: 2px solid #ff6600;
-    box-shadow: 0 0 18px rgba(255,102,0,0.6);
-    flex-shrink: 0;
     object-fit: cover;
-    animation: glow 2s infinite alternate;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 2px solid #ff6600;
 }
 
 .disco-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 5px;
+    width: 100%;
 }
 
 .track-title {
-    color: #FFFFFF;
-    font-size: 1.0rem;
-    font-weight: 600;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 10px;
 }
 
-#disco-player audio {
+#disco-audio {
     width: 100%;
-    height: 50px;
-    outline: none;
+    margin-top: 10px;
 }
 
 #disco-progress-container {
-    width: 100%;
-    height: 6px;
-    background: #333;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 5px;
-}
-
-#disco-progress {
-    width: 0%;
-    height: 100%;
-    background: #FF6600;
-    border-radius: 4px;
-}
-
-/* Animación de resplandor */
-@keyframes glow {
-    from { box-shadow: 0 0 10px rgba(255,102,0,0.5); }
-    to   { box-shadow: 0 0 20px rgba(255,102,0,1); }
-}
-
-/* RESPONSIVO */
-@media (max-width: 768px) {
-    #disco-player { height: 150px; }
-    #disco-player img#cover { width: 120px; height: 120px; }
-}
-
-@media (max-width: 480px) {
-    #disco-player { flex-direction: column; height: auto; gap: 8px; }
-    #disco-player img#cover { width: 100px; height: 100px; }
-    #disco-player audio { width: 100%; height: 40px; }
-}
-
-/* ========================= */
-/* Ajuste iVoox para ocupar todo el contenedor */
-/* ========================= */
-#podcast-player audio {
-    width: 100%;
-    height: 50px;
-    outline: none;
-}
-
-/* RESPONSIVO Disco de la Semana e iVoox */
-@media (max-width: 768px) {
-    #disco-player, #podcast-player { height: 150px; }
-    #disco-player img#cover { width: 120px; height: 120px; }
-}
-
-@media (max-width: 480px) {
-    #disco-player, #podcast-player { flex-direction: column; height: auto; gap: 8px; }
-    #disco-player img#cover { width: 100px; height: 100px; }
-    #disco-player audio, #podcast-player audio { width: 100%; height: 40px; }
-}
-
-/* ========================= */
-/* HEADER TÍTULO RESPONSIVO  */
-/* ========================= */
-@media (max-width: 768px) {
-    .header h1 {
-        font-size: 2.5rem; /* tamaño moderado para tablets y móviles grandes */
-    }
-}
-
-@media (max-width: 480px) {
-    .header h1 {
-        font-size: 1.8rem; /* tamaño compacto para móviles pequeños */
-    }
-}
-
-/* Título del disco al lado de la portada */
-#disco-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #FFFFFF;
-    text-align: left;
-    margin-bottom: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Contenedor de portada + título + audio */
-#disco-player-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
-    gap: 15px;
-}
-
-#disco-info {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+    margin-top: 10px;
 }

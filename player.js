@@ -1,5 +1,5 @@
 /* ===============================
-   SONAR ROCK – PLAYER STREAMING
+   SONAR ROCK – PLAYER ESTABLE
 =============================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -10,36 +10,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const muteBtn = document.getElementById("mute-btn");
   const volumeSlider = document.getElementById("volume");
   const liveIndicator = document.getElementById("live-indicator");
+  const playerContainer = document.querySelector(".player-container");
+
+  let isPlaying = false;
 
   if (!audio || !playBtn || !stopBtn || !muteBtn || !volumeSlider) {
     console.warn("Sonar Rock Player: elementos faltantes");
     return;
   }
 
-  let isPlaying = false;
-
   /* ===============================
-     CONFIG AUDIO
+     AUDIO CONFIG
   =============================== */
-  audio.volume = volumeSlider.value;
   audio.preload = "none";
+  audio.volume = volumeSlider.value;
 
   /* ===============================
      PLAY / PAUSE
   =============================== */
-  playBtn.addEventListener("click", async () => {
+  playBtn.addEventListener("click", () => {
     if (!isPlaying) {
-      try {
-        await audio.play();
+      audio.play().then(() => {
         isPlaying = true;
-
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        liveIndicator.classList.add("active");
-        liveIndicator.querySelector(".text").textContent = "EN VIVO";
-
-      } catch (err) {
-        console.error("No se pudo reproducir el stream:", err);
-      }
+        liveIndicator.textContent = "EN VIVO";
+        playerContainer.classList.add("playing");
+      }).catch(err => {
+        console.error("Error al reproducir:", err);
+      });
     } else {
       pauseStream();
     }
@@ -48,19 +46,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function pauseStream() {
     audio.pause();
     isPlaying = false;
-
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    liveIndicator.classList.remove("active");
-    liveIndicator.querySelector(".text").textContent = "PROGRAMACIÓN";
+    liveIndicator.textContent = "PROGRAMACIÓN";
+    playerContainer.classList.remove("playing");
   }
 
   /* ===============================
      STOP
   =============================== */
-  stopBtn.addEventListener("click", () => {
-    pauseStream();
-    audio.load(); // resetea stream correctamente
-  });
+  stopBtn.addEventListener("click", pauseStream);
 
   /* ===============================
      MUTE
@@ -80,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ===============================
-     ERRORES STREAM
+     EVENTOS STREAM
   =============================== */
   audio.addEventListener("error", () => {
     console.warn("Stream no disponible");

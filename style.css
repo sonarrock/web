@@ -427,8 +427,8 @@ canvas#matrixCanvas {
 }
 
 #cover {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 140px;
     object-fit: cover;
     border-radius: 8px;
     margin-bottom: 15px;
@@ -440,7 +440,7 @@ canvas#matrixCanvas {
 }
 
 .track-title {
-    font-size: 1.1rem;
+    font-size: 1.0rem;
     font-weight: bold;
     color: #fff;
     margin-bottom: 10px;
@@ -454,3 +454,9 @@ canvas#matrixCanvas {
 #disco-progress-container {
     margin-top: 10px;
 }
+
+/* Ocultamos específicamente el contenedor de la barra de progreso personalizada en la sección del disco */
+#disco-progress-container {
+    display: none;
+}
+

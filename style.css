@@ -318,7 +318,7 @@ body {
 /* ========================= */
 
 .staff-section {
-    background-image: url('attached_assets/fondostaff.jpg'); /* ruta de tu imagen de fondo */
+    background-image: url('attached_assets/fondostaff.png'); /* ruta de tu imagen de fondo */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

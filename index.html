@@ -110,7 +110,36 @@
 <!-- ========================= -->
 <!-- SECCIÓN DE REPRODUCTORES MODULAR -->
 <!-- ========================= -->
+<section class="disco-ivoox-spotify">
+  <div class="players-container">
+
+    <!-- DISCO DE LA SEMANA -->
+    <div class="custom-player" id="disco-player">
+      <img id="cover" src="" alt="Portada Disco">
+      <div class="player-info">
+        <div id="track-title">Título del Disco</div>
+        <audio id="disco-audio" controls preload="auto"></audio>
+      </div>
+    </div>
+
+    <!-- SPOTIFY -->
+    <div class="custom-player" id="spotify-player">
+      <iframe src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU"
+        frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        allowfullscreen></iframe>
+    </div>
+
+    <!-- iVoox -->
+    <div class="custom-player" id="ivoox-player">
+      <div id="podcast-player"></div>
+    </div>
+
+  </div>
+</section>
+
 <style>
+/* ----------------------------- */
+/* SECCIÓN FONDO */
 .disco-ivoox-spotify {
     background-image: url('attached_assets/fondoplayer.png');
     background-size: cover;
@@ -118,114 +147,178 @@
     background-repeat: no-repeat;
     padding: 60px 0;
 }
+
+/* CONTENEDOR GENERAL DE REPRODUCTORES */
+.players-container {
+    max-width: 900px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    align-items: center;
+}
+
+/* ESTILO COMÚN DE REPRODUCTORES */
+.custom-player {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    padding: 20px;
+    border-radius: 15px;
+    border: 3px solid #ff6600;
+    box-shadow: 
+        0 0 30px rgba(255,102,0,0.8), 
+        0 0 60px rgba(255,102,0,0.4) inset;
+    backdrop-filter: blur(5px);
+    background: rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 650px;
+}
+
+/* DISCO DE LA SEMANA */
+#disco-player img#cover {
+    width: 140px;
+    height: 140px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid #ff6600;
+    box-shadow: 0 0 20px rgba(255,102,0,0.5);
+}
+
+.player-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#track-title {
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+#disco-audio {
+    width: 100%;
+    border-radius: 8px;
+    background: #222;
+    box-shadow: 0 0 15px rgba(255,102,0,0.4);
+}
+
+/* SPOTIFY */
+#spotify-player iframe {
+    width: 100%;
+    height: 170px;
+    border-radius: 12px;
+}
+
+/* iVoox */
+#ivoox-player #podcast-player {
+    width: 100%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .players-container {
+        gap: 30px;
+    }
+    .custom-player {
+        flex-direction: column;
+        align-items: center;
+    }
+    #spotify-player iframe {
+        height: 150px;
+    }
+}
 </style>
 
-  <div class="players-container" style="max-width:900px; margin:auto; display:flex; flex-direction:column; gap:50px; align-items:center;">
+<script>
+// ----------------------------
+// DISCO DE LA SEMANA
+// ----------------------------
+const fileName = "Fleetwood Mac - Rumours.mp3"; // cambiar cada semana
+const discoAudio = document.getElementById("disco-audio");
+const cover = document.getElementById("cover");
+const trackTitle = document.getElementById("track-title");
 
-    <!-- DISCO DE LA SEMANA -->
-    <div class="custom-player" id="disco-player" style="display:flex; gap:20px; align-items:center; padding:20px; border:3px solid #ff6600; border-radius:15px; box-shadow:0 0 25px rgba(255,102,0,0.6); backdrop-filter:blur(5px);">
-      <img id="cover" src="" alt="Portada Disco" style="width:140px; height:140px; border-radius:12px; object-fit:cover; border:2px solid #ff6600; box-shadow:0 0 20px rgba(255,102,0,0.5);">
-      <div style="flex:1; display:flex; flex-direction:column; gap:12px;">
-        <div id="track-title" style="color:#fff; font-weight:bold; font-size:1.2rem;">Título del Disco</div>
-        <audio id="disco-audio" controls style="width:100%; border-radius:8px; background:#222; box-shadow:0 0 15px rgba(255,102,0,0.4);" preload="auto"></audio>
+// Mostrar título sin la extensión .mp3
+trackTitle.textContent = fileName.replace(".mp3", "");
+
+// Asignar archivo al audio
+discoAudio.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/" + fileName;
+
+// Asignar portada
+cover.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" + Date.now();
+
+// ANIMACIÓN PORTADA
+let zoomDirection = 1;
+let zoomInterval;
+
+discoAudio.addEventListener("play", () => {
+  zoomInterval = setInterval(() => {
+    let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g, "")) || 1;
+    scale += 0.0015 * zoomDirection;
+    if (scale >= 1.03) zoomDirection = -1;
+    if (scale <= 0.97) zoomDirection = 1;
+    cover.style.transform = `scale(${scale})`;
+    cover.style.boxShadow = `0 0 20px rgba(255,102,0,0.6)`;
+  }, 20);
+});
+
+discoAudio.addEventListener("pause", resetCover);
+discoAudio.addEventListener("ended", resetCover);
+
+function resetCover() {
+  clearInterval(zoomInterval);
+  cover.style.transform = "scale(1)";
+  cover.style.boxShadow = "0 0 20px rgba(255,102,0,0.6)";
+}
+
+// ----------------------------
+// CARGA ÚLTIMO EPISODIO iVoox
+// ----------------------------
+async function loadLatestIvooxEpisode(){
+  const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
+  const playerContainer = document.getElementById("podcast-player");
+
+  try{
+    const response = await fetch(feedUrl);
+    const xmlText = await response.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText,"text/xml");
+
+    const item = xml.querySelector("item");
+    if(!item) throw new Error("No se encontró ningún episodio");
+
+    const title = item.querySelector("title").textContent;
+    const audioUrl = item.querySelector("enclosure").getAttribute("url");
+    const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
+    const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
+
+    const playerHTML = `
+      <div class="podcast-episode" style="display:flex; gap:15px; align-items:center;">
+        <img src="${imageUrl}" alt="Carátula episodio" style="width:140px;height:140px;border-radius:12px;object-fit:cover;border:2px solid #ff6600;box-shadow:0 0 20px rgba(255,102,0,0.5);">
+        <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+          <h3 style="margin:0;color:#fff;font-size:14px;">${title}</h3>
+          <p style="margin:0;color:#b3b3b3;font-size:10px;">Publicado el ${pubDate}</p>
+          <audio controls preload="none" style="width:100%; border-radius:8px; background:#222; box-shadow:0 0 15px rgba(255,102,0,0.4);">
+            <source src="${audioUrl}" type="audio/mpeg">
+            Tu navegador no soporta audio HTML5.
+          </audio>
+        </div>
       </div>
-    </div>
+    `;
+    playerContainer.innerHTML = playerHTML;
+  }catch(error){
+    playerContainer.innerHTML = `<p style="color:#f00;">No se pudo cargar el reproductor. Intenta más tarde.</p>`;
+    console.error("Error cargando feed iVoox:", error);
+  }
+}
 
-    <!-- SPOTIFY -->
-    <div class="custom-player" style="width:100%; max-width:650px; border:3px solid #ff6600; border-radius:15px; box-shadow:0 0 25px rgba(255,102,0,0.6);">
-      <iframe src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU" width="100%" height="170" style="border:none; border-radius:12px;" loading="lazy"></iframe>
-    </div>
-
-    <!-- IVOOX -->
-    <div class="custom-player" id="ivoox-player" style="width:100%; max-width:650px; border:3px solid #ff6600; border-radius:15px; box-shadow:0 0 25px rgba(255,102,0,0.6); padding:15px; color:#fff;"></div>
-
-  </div>
-
-  <style>
-    /* Animación portada disco */
-    #cover {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-  </style>
-
-  <script>
-    // ----------------------------
-    // DISCO DE LA SEMANA
-    // ----------------------------
-    (function(){
-      const fileName = "Fleetwood Mac - Rumours.mp3"; // cambiar cada semana
-      const discoAudio = document.getElementById("disco-audio");
-      const cover = document.getElementById("cover");
-      const trackTitle = document.getElementById("track-title");
-
-      trackTitle.textContent = fileName.replace(".mp3", "");
-      discoAudio.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/" + fileName;
-      cover.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" + Date.now();
-
-      // Animación portada
-      let zoomDirection = 1;
-      let zoomInterval;
-      discoAudio.addEventListener("play", () => {
-        zoomInterval = setInterval(() => {
-          let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g, "")) || 1;
-          scale += 0.0015 * zoomDirection;
-          if(scale >= 1.03) zoomDirection = -1;
-          if(scale <= 0.97) zoomDirection = 1;
-          cover.style.transform = `scale(${scale})`;
-          cover.style.boxShadow = `0 0 25px rgba(255,102,0,0.6)`;
-        }, 20);
-      });
-      discoAudio.addEventListener("pause", resetCover);
-      discoAudio.addEventListener("ended", resetCover);
-      function resetCover(){
-        clearInterval(zoomInterval);
-        cover.style.transform = "scale(1)";
-        cover.style.boxShadow = "0 0 20px rgba(255,102,0,0.5)";
-      }
-    })();
-
-    // ----------------------------
-    // IVOOX
-    // ----------------------------
-    (async function(){
-      const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
-      const playerContainer = document.getElementById("ivoox-player");
-
-      try {
-        const response = await fetch(feedUrl);
-        const xmlText = await response.text();
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(xmlText,"text/xml");
-
-        const item = xml.querySelector("item");
-        if(!item) throw new Error("No se encontró ningún episodio");
-
-        const title = item.querySelector("title").textContent;
-        const audioUrl = item.querySelector("enclosure").getAttribute("url");
-        const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
-        const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
-
-        playerContainer.innerHTML = `
-          <div style="display:flex; gap:15px; align-items:center;">
-            <img src="${imageUrl}" alt="Carátula episodio" style="width:140px;height:140px;border-radius:12px;object-fit:cover; border:2px solid #ff6600; box-shadow:0 0 20px rgba(255,102,0,0.5);">
-            <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
-              <h3 style="margin:0;color:#fff;font-size:14px;">${title}</h3>
-              <p style="margin:0;color:#b3b3b3;font-size:10px;">Publicado el ${pubDate}</p>
-              <audio controls preload="none" style="width:100%; border-radius:8px; background:#222; box-shadow:0 0 15px rgba(255,102,0,0.4);">
-                <source src="${audioUrl}" type="audio/mpeg">
-                Tu navegador no soporta audio HTML5.
-              </audio>
-            </div>
-          </div>
-        `;
-      } catch(err){
-        playerContainer.innerHTML = `<p style="color:#f00;">No se pudo cargar el reproductor. Intenta más tarde.</p>`;
-        console.error("Error cargando feed iVoox:", err);
-      }
-    })();
-  </script>
-</section>
-
+loadLatestIvooxEpisode();
+</script>
+  </section>
+  
 <!-- ========================= -->
 <!-- STAFF -->
 <!-- ========================= -->

@@ -79,17 +79,17 @@
 <!-- ========================= -->
 
 <section class="player-section">
-  <div class="player-container" id="player" role="region" aria-labelledby="live-indicator">
+  <div class="player-container" id="player">
 
-    <img src="img/background1.png" alt="" class="player-bg">
+    <img src="img/background1.png" alt="Sonar Rock Background" class="player-bg">
 
-    <canvas id="matrixCanvas" aria-hidden="true" aria-label="Efecto visual de matrix"></canvas>
-    
+    <canvas id="matrixCanvas" aria-hidden="true"></canvas>
+
     <div class="overlay"></div>
 
     <div class="player-content">
 
-      <div id="now-playing" class="now-playing" aria-live="polite">
+      <div id="now-playing" class="now-playing">
       </div>
 
       <div id="live-indicator" class="live-badge">
@@ -98,22 +98,20 @@
       </div>
 
       <div class="controls">
-        <button id="playPauseBtn" class="btn" aria-label="Reproducir/Pausar">
-          <i class="fas fa-play" aria-hidden="true"></i>
+        <button id="playPauseBtn" class="btn" aria-label="Play">
+          <i class="fas fa-play"></i>
         </button>
-        <button id="stop-btn" class="btn" aria-label="Detener">
-          <i class="fas fa-stop" aria-hidden="true"></i>
+        <button id="stop-btn" class="btn" aria-label="Stop">
+          <i class="fas fa-stop"></i>
         </button>
-        <button id="mute-btn" class="btn" aria-label="Silenciar">
-          <i class="fas fa-volume-up" aria-hidden="true"></i>
+        <button id="mute-btn" class="btn" aria-label="Mute">
+          <i class="fas fa-volume-up"></i>
         </button>
-        <label for="volume" class="sr-only">Control de Volumen</label>
-        <input id="volume" type="range" min="0" max="1" step="0.01" value="1" aria-label="Control de Volumen">
+        <input id="volume" type="range" min="0" max="1" step="0.01" value="1">
       </div>
 
-      <!-- La sección progress-wrapper está oculta por CSS ahora -->
       <div class="progress-wrapper">
-        <div class="progress-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progreso de la transmisión de radio">
+        <div class="progress-container">
           <div id="radio-progress"></div>
         </div>
         <div id="time-display">00:00:00</div>
@@ -123,12 +121,10 @@
 
     <audio id="radio-audio" preload="auto">
       <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-      Tu navegador no soporta el elemento de audio HTML5. Puedes escuchar la radio directamente desde la [página de Zeno.fm](https://zeno.fm).
     </audio>
 
   </div>
 </section>
-
 <!-- PWA Install Button (está bien, solo necesita JavaScript para funcionar) -->
 <button id="installBtn" style="display:none;">
   📲 Instalar Sonar Rock

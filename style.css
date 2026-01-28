@@ -239,6 +239,53 @@ body {
 .spotify { background: linear-gradient(45deg, #1db954, #1ed760); }
 .ivoox { background: linear-gradient(45deg, #ff6600, #ff8833); }
 
+
+/* =========================
+   REPRODUCTOR DISCO DE LA SEMANA
+   ========================= */
+.custom-player {
+    background: rgba(26, 26, 26, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid #ff6600; /* Marco naranja */
+    box-shadow: 0 0 30px rgba(255, 102, 0, 0.3); /* Efecto de halo */
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center; /* Centrado */
+    align-items: center;
+    gap: 10px;
+    flex-direction: column;
+    width: 100%;
+    max-width: 650px; /* Limita el ancho */
+    margin: 0 auto; /* Centrado en la página */
+    transition: box-shadow 0.3s ease; /* Para la animación del halo */
+}
+
+/* Estilo al pasar el ratón sobre el reproductor */
+.custom-player:hover {
+    box-shadow: 0 0 50px rgba(255, 102, 0, 0.8); /* Aumenta el halo al pasar el ratón */
+}
+
+/* =========================
+   CENTRADO DEL REPRODUCTOR
+   ========================= */
+.custom-player .player-header h2 {
+    font-size: 1.8rem;
+    color: #ff6600;
+    text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+    margin-bottom: 15px;
+}
+
+.custom-player .player-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+
+
 /* Embed Sections */
 .embed-section {
     padding: 40px 0;

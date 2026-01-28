@@ -1,8 +1,9 @@
 /* ===============================
    SONAR ROCK – PLAYER FINAL
-   =============================== */
+=============================== */
 
 document.addEventListener("DOMContentLoaded", () => {
+
   /* ===============================
      ELEMENTOS
   =============================== */
@@ -13,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const volumeSlider = document.getElementById("volume");
   const liveIndicator = document.getElementById("live-indicator");
   const canvas = document.getElementById("matrixCanvas");
+  const playerContainer = document.querySelector(".player-container");
 
   let isPlaying = false;
   let matrixAnimationId = null;
@@ -20,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ===============================
      SEGURIDAD
   =============================== */
-  if (!audio || !playBtn || !stopBtn || !muteBtn || !volumeSlider) {
+  if (!audio || !playBtn || !stopBtn || !muteBtn || !volumeSlider || !playerContainer) {
     console.warn("Sonar Rock Player: elementos faltantes en el DOM");
     return;
   }
@@ -33,14 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ===============================
      MATRIX CONTROL
-     (usa funciones de matrix.js)
   =============================== */
   function resizeCanvas() {
-    const container = document.querySelector(".player-container");
-    if (!container) return;
-
-    canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
+    canvas.width = playerContainer.clientWidth;
+    canvas.height = playerContainer.clientHeight;
 
     if (typeof initMatrix === "function") {
       initMatrix();
@@ -75,45 +73,52 @@ document.addEventListener("DOMContentLoaded", () => {
   resizeCanvas();
 
   /* ===============================
-     BOTÓN PLAY / PAUSE
+     PLAY / PAUSE
   =============================== */
   playBtn.addEventListener("click", () => {
     if (!isPlaying) {
-      audio.play()
-        .then(() => {
-          isPlaying = true;
-          playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-          liveIndicator?.classList.add("active");
-          startMatrix();
-        })
-        .catch(err => {
-          console.error("Error al reproducir:", err);
-        });
+      audio.play().then(() => {
+        isPlaying = true;
+
+        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        liveIndicator.textContent = "EN VIVO";
+        liveIndicator.classList.add("active");
+
+        playerContainer.classList.add("playing");
+        startMatrix();
+
+      }).catch(err => {
+        console.error("Error al reproducir:", err);
+      });
+
     } else {
-      audio.pause();
-      isPlaying = false;
-      playBtn.innerHTML = '<i class="fas fa-play"></i>';
-      liveIndicator?.classList.remove("active");
-      stopMatrix();
+      pauseStream();
     }
   });
 
+  function pauseStream() {
+    audio.pause();
+    isPlaying = false;
+
+    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    liveIndicator.textContent = "OFFLINE";
+    liveIndicator.classList.remove("active");
+
+    playerContainer.classList.remove("playing");
+    stopMatrix();
+  }
+
   /* ===============================
-     BOTÓN STOP
+     STOP
   =============================== */
   stopBtn.addEventListener("click", () => {
     audio.pause();
     audio.currentTime = 0;
-
-    isPlaying = false;
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    liveIndicator?.classList.remove("active");
-
-    stopMatrix();
+    pauseStream();
   });
 
   /* ===============================
-     BOTÓN MUTE
+     MUTE
   =============================== */
   muteBtn.addEventListener("click", () => {
     audio.muted = !audio.muted;
@@ -123,25 +128,19 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ===============================
-     CONTROL DE VOLUMEN
-     (0–1 como en tu HTML)
+     VOLUMEN
   =============================== */
   volumeSlider.addEventListener("input", () => {
     audio.volume = volumeSlider.value;
   });
 
   /* ===============================
-     EVENTOS DE AUDIO
+     EVENTOS STREAM
   =============================== */
-  audio.addEventListener("ended", () => {
-    isPlaying = false;
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    liveIndicator?.classList.remove("active");
-    stopMatrix();
-  });
-
+  audio.addEventListener("ended", pauseStream);
   audio.addEventListener("error", () => {
     console.warn("Stream no disponible");
-    stopMatrix();
+    pauseStream();
   });
+
 });

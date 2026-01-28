@@ -284,7 +284,27 @@ body {
     margin-bottom: 20px;
 }
 
+/* =========================
+   iVoox – mostrar solo el último episodio
+   ========================= */
 
+/* Contenedor del iframe iVoox */
+.ivoox-player {
+    width: 100%;
+    max-width: 650px;      /* mismo ancho que Spotify y Disco */
+    margin: 0 auto;        /* centrado */
+    overflow: hidden;      /* CLAVE: oculta los demás episodios */
+    border-radius: 15px;
+}
+
+/* Ajuste directo al iframe */
+.ivoox-player iframe {
+    width: 100%;
+    height: 150px;         /* muestra SOLO el último episodio */
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+}
 
 /* Embed Sections */
 .embed-section {

@@ -1,204 +1,193 @@
-/* PLAYER SECTION */
+/* =========================
+   PLAYER STREAMING – SONAR ROCK
+   ========================= */
+
 .player-section {
-  max-width: 480px;
-  margin: auto;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 40px 0;
 }
 
-/* PLAYER CONTAINER - Nuevo tamaño fijo para 320x560px */
 .player-container {
   position: relative;
-  /* Dimensiones fijas solicitadas */
-  width: 320px;
-  height: 560px; 
-  /* Asegúrate de centrarlo si es necesario */
-  margin: auto; 
+  width: 65%;
+  max-width: 420px;
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
   overflow: hidden;
-  border-radius: 16px;
-  /* Sombra para darle vida al contenedor general */
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  background: #000;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.7);
 }
 
-/* IMAGEN PRINCIPAL */
+/* =========================
+   IMAGEN DE FONDO
+   ========================= */
 .player-bg {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
-  /* La imagen es clara por defecto */
-  opacity: 1; 
-}
-
-/* OVERLAY LEVE - Ahora solo al 20% aprox. */
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.2); /* Oscurece ligeramente para que se vea el Matrix */
   z-index: 1;
+  filter: none; /* 👈 evita imagen oscura */
 }
 
-/* MATRIX CANVAS */
+/* =========================
+   MATRIX
+   ========================= */
 #matrixCanvas {
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
+  opacity: 0.65; /* visible sin oscurecer */
 }
 
-/* PLAYER CONTENT */
-.player-content {
+/* =========================
+   ANALIZADOR CIRCULAR
+   ========================= */
+#spectrumCanvas {
   position: absolute;
   inset: 0;
+  pointer-events: none;
   z-index: 3;
+}
+
+/* =========================
+   CONTENIDO
+   ========================= */
+.player-content {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 6;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 14px;
+  gap: 12px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.85);
 }
 
-/* PROGRAMACIÓN / EN VIVO - Se eliminó la sección de "Programación" superior en el HTML anterior */
-.now-playing {
-  text-align: center;
-  font-size: 14px;
-  color: #ff6600;
-  letter-spacing: 1px;
-  margin-bottom: 6px;
-}
-
-.live-badge {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #ff6600;
-  margin-bottom: 10px;
-}
-
-.live-badge .dot {
-  width: 8px;
-  height: 8px;
-  background: #ff6600;
-  border-radius: 50%;
-  animation: blink 1.5s infinite;
-}
-
-@keyframes blink {
-  50% { opacity: 0.3; }
-}
-
-/* CAJA DE CONTROLES (Ahora con la sombra que pediste) */
-.controls-box {
-  background: rgba(0,0,0,0.85);
-  border-radius: 14px;
-  padding: 12px;
-  /* La sombra en la parte inferior de la caja de controles */
-  box-shadow: 0 15px 30px rgba(255,102,0,0.5); 
-}
-
-/* BOTONES - Naranja y Blanco, con animación */
+/* =========================
+   CONTROLES
+   ========================= */
 .controls {
   display: flex;
-  justify-content: center;
-  gap: 18px;
+  gap: 12px;
 }
 
 .controls .btn {
-  background: #ff6600; /* Fondo Naranja */
+  background: #ff6600;
   border: none;
-  color: #ffffff;      /* Texto Blanco */
-  font-size: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   cursor: pointer;
-  padding: 10px 14px; /* Añadido padding para que se vean mejor */
-  border-radius: 8px; /* Bordes suaves */
-  transition: transform 0.2s ease, background-color 0.2s ease;
-  box-shadow: 0 4px 10px rgba(255, 102, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 14px rgba(255,102,0,0.8);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .controls .btn:hover {
-  background: #e65c00; /* Naranja más oscuro al pasar el cursor */
-  transform: scale(1.1); /* Animación de vida */
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255,102,0,1);
 }
 
-.controls .btn:active {
-    transform: scale(0.95); /* Efecto de click */
+.controls .btn i {
+  color: #fff;
+  font-size: 14px;
 }
 
-
-/* VOLUMEN */
-#volume {
-  width: 100%;
-  margin: 10px 0;
-}
-
-/* PROGRESO - Eliminamos el contador de tiempo */
+/* =========================
+   PROGRESO + TIEMPO
+   ========================= */
 .progress-wrapper {
-  margin-top: 6px;
-  display: none; /* Ocultamos el wrapper de progreso y tiempo */
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* El resto del CSS sigue igual, pero las reglas anteriores lo sobreescriben */
-/* ... */
-
-
-/* ========================= */
-/* AJUSTE BRILLO IMAGEN PLAYER */
-/* ========================= */
-
-.player-bg {
-  opacity: 0.7;
+.progress-container {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-/* Estilos para manejar el overlay y la sombra con JavaScript */
-.player-container .overlay {
-  /* ... (código existente) ... */
-  transition: opacity 0.5s ease; /* Añadimos transición */
+#radio-progress {
+  width: 0%;
+  height: 100%;
+  background: #ff6600;
 }
 
-/* Oculta el overlay cuando la clase 'is-playing' está presente */
-.player-container.is-playing .overlay {
-  opacity: 0;
-  pointer-events: none; /* Permite interactuar con los elementos debajo del overlay */
+.time-display {
+  font-size: 12px;
+  font-weight: 600;
 }
 
-/* Añade una sombra bonita a la sección de controles cuando está sonando */
-.player-container.is-playing .player-content {
-    box-shadow: 0 15px 40px rgba(255, 102, 0, 0.5);
-    background: rgba(0, 0, 0, 0.4); /* Un ligero fondo para la sombra */
-    border-radius: 12px;
+/* =========================
+   LIVE BADGE
+   ========================= */
+#live-indicator {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(0,0,0,0.6);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #aaa;
 }
 
-/* Estilo para el indicador de EN VIVO */
-.live-badge {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background-color: #ff6600;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    text-transform: uppercase;
+#live-indicator .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #666;
 }
 
-.live-badge .dot {
-    width: 8px;
-    height: 8px;
-    background-color: white;
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
+/* 🔴 EN VIVO */
+#live-indicator.live {
+  color: #ff3b3b;
+  box-shadow: 0 0 12px rgba(255,60,60,0.8);
 }
 
+#live-indicator.live .dot {
+  background: #ff3b3b;
+  animation: pulse 1.2s infinite;
+}
+
+/* ⚪ PROGRAMACIÓN */
+#live-indicator.auto {
+  color: #aaa;
+}
+
+/* =========================
+   ANIMACIÓN LIVE
+   ========================= */
 @keyframes pulse {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1); }
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-/* Estilo para el texto "Now Playing" */
-#now-playing {
-    font-size: 1rem;
-    color: #FF6600;
-    margin-bottom: 10px;
-    text-align: center;
+/* =========================
+   RESPONSIVE
+   ========================= */
+@media (max-width: 768px) {
+  .player-container {
+    width: 90%;
+  }
 }

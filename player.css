@@ -148,3 +148,58 @@
 .player-bg {
   opacity: 0.7;
 }
+
+/* Estilos para manejar el overlay y la sombra con JavaScript */
+.player-container .overlay {
+  /* ... (código existente) ... */
+  transition: opacity 0.5s ease; /* Añadimos transición */
+}
+
+/* Oculta el overlay cuando la clase 'is-playing' está presente */
+.player-container.is-playing .overlay {
+  opacity: 0;
+  pointer-events: none; /* Permite interactuar con los elementos debajo del overlay */
+}
+
+/* Añade una sombra bonita a la sección de controles cuando está sonando */
+.player-container.is-playing .player-content {
+    box-shadow: 0 15px 40px rgba(255, 102, 0, 0.5);
+    background: rgba(0, 0, 0, 0.4); /* Un ligero fondo para la sombra */
+    border-radius: 12px;
+}
+
+/* Estilo para el indicador de EN VIVO */
+.live-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #ff6600;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.live-badge .dot {
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Estilo para el texto "Now Playing" */
+#now-playing {
+    font-size: 1rem;
+    color: #FF6600;
+    margin-bottom: 10px;
+    text-align: center;
+}

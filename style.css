@@ -235,6 +235,87 @@ body {
 /* RESPONSIVE                */
 /* ========================= */
 @media (max-width: 768px) {
+
+  /* =========================
+   PATCH SONAR ROCK PLAYER
+   SOLO STREAMING
+========================= */
+
+/* Imagen SIN oscurecer por defecto */
+.player-bg {
+  opacity: 1 !important;
+  filter: brightness(1) !important;
+  transition: filter 0.4s ease;
+}
+
+/* Overlay apagado por defecto */
+.player-container .overlay {
+  background: rgba(0,0,0,0) !important;
+  transition: background 0.4s ease;
+}
+
+/* Estado reproduciendo */
+.player-container.playing .player-bg {
+  filter: brightness(0.65) !important; /* 35% oscuro */
+}
+
+.player-container.playing .overlay {
+  background: rgba(0,0,0,0.25) !important;
+}
+
+/* Matrix oculto hasta play */
+#matrixCanvas {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.player-container.playing #matrixCanvas {
+  opacity: 1;
+}
+
+/* =========================
+   STATUS EN VIVO / OFFLINE
+========================= */
+#live-indicator {
+  background: none !important;
+  padding: 0 !important;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #ff6600;
+}
+
+/* =========================
+   CONTROLES
+========================= */
+.controls {
+  justify-content: center;
+}
+
+/* Botones redondos */
+.controls .btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #ff6600;
+  color: #ffffff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Box shadow negro 20% */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+
+  transition: transform 0.2s ease;
+}
+
+.controls .btn:hover {
+  transform: scale(1.05);
+}
+
   .controls {
     flex-direction: column;
     align-items: center;

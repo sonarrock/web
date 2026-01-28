@@ -312,11 +312,23 @@ body {
     display: flex;
     justify-content: center;
 }
-/* Staff Section */
+/* ========================= */
+/* STAFF – AJUSTE DE CONTENEDOR, HALO Y RESPONSIVE */
+/* ========================= */
+
+.staff-grid {
+    display: flex;
+    justify-content: center; /* centra las imágenes horizontalmente */
+    flex-wrap: wrap;         /* permite que bajen si no caben */
+    gap: 40px;               /* separación entre miembros */
+    max-width: 800px;        /* ancho máximo para alinear las cuatro imágenes */
+    margin: 0 auto;
+}
+
 .staff-member {
     position: relative;
     text-align: center;
-    background: rgba(0,0,0,0.3); /* transparencia como reproductores */
+    background: rgba(0,0,0,0.3); /* transparencia tipo reproductores */
     border-radius: 15px;
     border: 3px solid #ff6600; /* borde naranja */
     box-shadow: 
@@ -325,6 +337,8 @@ body {
     padding: 20px;
     transition: transform 0.3s, box-shadow 0.3s;
     backdrop-filter: blur(5px); /* efecto blur */
+    flex: 1 1 180px; /* ancho mínimo flexible */
+    max-width: 200px; /* para que quepan 4 en línea */
 }
 
 .staff-member:hover {
@@ -335,26 +349,64 @@ body {
 }
 
 .staff-image {
-    width: 150px;
-    height: 150px;
+    width: 140px;   
+    height: 140px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     border: 3px solid #ff6600;
-    box-shadow: 0 0 25px rgba(255,102,0,0.5);
+    box-shadow: 
+        0 0 20px rgba(255,102,0,0.6),
+        0 0 40px rgba(255,102,0,0.3) inset;
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .staff-member:hover .staff-image {
     transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(255,102,0,0.8);
+    box-shadow: 
+        0 0 30px rgba(255,102,0,0.8),
+        0 0 50px rgba(255,102,0,0.4) inset;
 }
 
 .staff-member h3 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: #ff6600;
     text-shadow: 0 0 5px rgba(255,102,0,0.4);
 }
+
+/* ========================= */
+/* RESPONSIVE – PANTALLAS PEQUEÑAS */
+/* ========================= */
+@media (max-width: 768px) {
+    .staff-grid {
+        gap: 30px;
+        max-width: 600px; /* ajusta ancho para tablets */
+    }
+    .staff-member {
+        flex: 1 1 45%; /* dos columnas en tablets */
+        max-width: 45%;
+    }
+}
+
+@media (max-width: 480px) {
+    .staff-grid {
+        gap: 20px;
+        max-width: 100%;
+    }
+    .staff-member {
+        flex: 1 1 90%; /* una columna en móviles */
+        max-width: 90%;
+    }
+    .staff-image {
+        width: 120px;
+        height: 120px;
+    }
+    .staff-member h3 {
+        font-size: 1.1rem;
+    }
+}
+
+
 /* About Sections */
 .about-section {
     padding: 60px 0;

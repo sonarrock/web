@@ -1,125 +1,207 @@
-/* ===============================
-   SONAR ROCK – PLAYER FINAL
-=============================== */
-
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ===============================
-     ELEMENTOS
-  =============================== */
+  let audioCtx, analyser, source;
+
+  // ===============================
+  // ELEMENTOS
+  // ===============================
   const audio = document.getElementById("radio-audio");
-  const playBtn = document.getElementById("playPauseBtn");
+  const playPauseBtn = document.getElementById("playPauseBtn");
   const stopBtn = document.getElementById("stop-btn");
   const muteBtn = document.getElementById("mute-btn");
-  const volumeSlider = document.getElementById("volume");
+  const timeDisplay = document.getElementById("time-display");
+  const matrixCanvas = document.getElementById("matrixCanvas");
+  const spectrumCanvas = document.getElementById("spectrumCanvas");
   const liveIndicator = document.getElementById("live-indicator");
-  const canvas = document.getElementById("matrixCanvas");
-  const playerContainer = document.querySelector(".player-container");
 
-  let isPlaying = false;
-  let matrixAnimationId = null;
-
-  /* ===============================
-     SEGURIDAD
-  =============================== */
-  if (!audio || !playBtn || !stopBtn || !muteBtn || !volumeSlider || !playerContainer) {
-    console.warn("Sonar Rock Player: elementos faltantes en el DOM");
+  if (!audio || !playPauseBtn || !matrixCanvas || !spectrumCanvas || !liveIndicator) {
+    console.error("❌ Elementos críticos no encontrados");
     return;
   }
 
-  /* ===============================
-     AUDIO CONFIG
-  =============================== */
-  audio.preload = "none";
-  audio.volume = volumeSlider.value;
+  const liveText = liveIndicator.querySelector(".text");
 
-  /* ===============================
-     MATRIX CONTROL
-  =============================== */
-  function resizeCanvas() {
-    canvas.width = playerContainer.clientWidth;
-    canvas.height = playerContainer.clientHeight;
+  audio.playsInline = true;
+  audio.preload = "auto";
 
-    if (typeof initMatrix === "function") {
-      initMatrix();
-    }
+  // ===============================
+  // TIMER
+  // ===============================
+  let timer = null;
+  let startTime = 0;
+
+  function startTimer() {
+    stopTimer();
+    startTime = Date.now();
+    timer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
+      const s = String(elapsed % 60).padStart(2, "0");
+      timeDisplay.textContent = `${m}:${s}`;
+    }, 1000);
+  }
+
+  function stopTimer() {
+    clearInterval(timer);
+    timer = null;
+    timeDisplay.textContent = "00:00";
+  }
+
+  // ===============================
+  // MATRIX
+  // ===============================
+  const mctx = matrixCanvas.getContext("2d");
+  const fontSize = 16;
+  let drops = [];
+  let matrixRunning = false;
+
+  function resizeMatrix() {
+    const c = document.querySelector(".player-container");
+    matrixCanvas.width = c.clientWidth;
+    matrixCanvas.height = c.clientHeight;
+    drops = Array(Math.floor(matrixCanvas.width / fontSize)).fill(1);
+  }
+
+  resizeMatrix();
+  window.addEventListener("resize", resizeMatrix);
+
+  const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  function drawMatrix() {
+    if (!matrixRunning) return;
+
+    mctx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+    mctx.font = `${fontSize}px monospace`;
+    mctx.fillStyle = "rgba(0,255,180,0.6)";
+
+    drops.forEach((y, i) => {
+      const char = chars[Math.floor(Math.random() * chars.length)];
+      mctx.fillText(char, i * fontSize, y * fontSize);
+      drops[i] = y * fontSize > matrixCanvas.height ? 0 : y + 1;
+    });
+
+    requestAnimationFrame(drawMatrix);
   }
 
   function startMatrix() {
-    if (matrixAnimationId) return;
-
-    const animate = () => {
-      if (typeof drawMatrixFrame === "function") {
-        drawMatrixFrame();
-      }
-      matrixAnimationId = requestAnimationFrame(animate);
-    };
-
-    animate();
+    if (matrixRunning) return;
+    matrixRunning = true;
+    drawMatrix();
   }
 
   function stopMatrix() {
-    if (matrixAnimationId) {
-      cancelAnimationFrame(matrixAnimationId);
-      matrixAnimationId = null;
-    }
-
-    if (typeof clearMatrix === "function") {
-      clearMatrix();
-    }
+    matrixRunning = false;
+    mctx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
   }
 
-  window.addEventListener("resize", resizeCanvas);
-  resizeCanvas();
+  // ===============================
+  // ANALIZADOR CIRCULAR REAL
+  // ===============================
+  let audioCtx, analyser, source, spectrumRAF;
+  const sctx = spectrumCanvas.getContext("2d");
 
-  /* ===============================
-     PLAY / PAUSE
-  =============================== */
-  playBtn.addEventListener("click", () => {
-    if (!isPlaying) {
-      audio.play().then(() => {
-        isPlaying = true;
+  function resizeSpectrum() {
+    const c = document.querySelector(".player-container");
+    spectrumCanvas.width = c.clientWidth;
+    spectrumCanvas.height = c.clientHeight;
+  }
 
-        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        liveIndicator.textContent = "EN VIVO";
-        liveIndicator.classList.add("active");
+  resizeSpectrum();
+  window.addEventListener("resize", resizeSpectrum);
 
-        playerContainer.classList.add("playing");
-        startMatrix();
+  function initSpectrum() {
+    if (audioCtx) return;
 
-      }).catch(err => {
-        console.error("Error al reproducir:", err);
-      });
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
 
-    } else {
-      pauseStream();
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+
+  function drawSpectrum() {
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(data);
+
+    sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
+
+    const cx = spectrumCanvas.width / 2;
+    const cy = spectrumCanvas.height / 2;
+    const r = Math.min(cx, cy) * 0.35;
+
+    for (let i = 0; i < 120; i++) {
+      const v = data[i] / 255;
+      const a = (i / 120) * Math.PI * 2;
+
+      sctx.strokeStyle = `rgba(0,255,200,${0.3 + v})`;
+      sctx.lineWidth = 2;
+      sctx.beginPath();
+      sctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+      sctx.lineTo(cx + Math.cos(a) * (r + v * r), cy + Math.sin(a) * (r + v * r));
+      sctx.stroke();
     }
-  });
 
-  function pauseStream() {
+    spectrumRAF = requestAnimationFrame(drawSpectrum);
+  }
+
+  function startSpectrum() {
+  if (!analyser) return;
+  cancelAnimationFrame(spectrumRAF);
+  drawSpectrum();
+}
+
+
+  function stopSpectrum() {
+    cancelAnimationFrame(spectrumRAF);
+    sctx.clearRect(0, 0, spectrumCanvas.width, spectrumCanvas.height);
+  }
+
+  // ===============================
+  // LIVE STATUS
+  // ===============================
+  function setLive(on) {
+    if (!liveText) return;
+
+    liveIndicator.classList.toggle("live", on);
+    liveIndicator.classList.toggle("auto", !on);
+    liveText.textContent = on ? "EN VIVO" : "PROGRAMACIÓN";
+  }
+
+  // ===============================
+  // CONTROLES
+  // ===============================
+ playPauseBtn.addEventListener("click", async () => {
+
+  // 🔥 CREAR AudioContext SOLO EN INTERACCIÓN HUMANA
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
+
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+
+  if (audioCtx.state === "suspended") {
+    await audioCtx.resume();
+  }
+
+  if (audio.paused) {
+    await audio.play();
+  } else {
     audio.pause();
-    isPlaying = false;
-
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    liveIndicator.textContent = "OFFLINE";
-    liveIndicator.classList.remove("active");
-
-    playerContainer.classList.remove("playing");
-    stopMatrix();
   }
+});
 
-  /* ===============================
-     STOP
-  =============================== */
+
   stopBtn.addEventListener("click", () => {
     audio.pause();
     audio.currentTime = 0;
-    pauseStream();
   });
 
-  /* ===============================
-     MUTE
-  =============================== */
   muteBtn.addEventListener("click", () => {
     audio.muted = !audio.muted;
     muteBtn.innerHTML = audio.muted
@@ -127,20 +209,47 @@ document.addEventListener("DOMContentLoaded", () => {
       : '<i class="fas fa-volume-up"></i>';
   });
 
-  /* ===============================
-     VOLUMEN
-  =============================== */
-  volumeSlider.addEventListener("input", () => {
-    audio.volume = volumeSlider.value;
+  // ===============================
+  // EVENTOS AUDIO
+  // ===============================
+  audio.addEventListener("playing", () => {
+    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    startTimer();
+    startMatrix();
+    startSpectrum();
   });
 
-  /* ===============================
-     EVENTOS STREAM
-  =============================== */
-  audio.addEventListener("ended", pauseStream);
-  audio.addEventListener("error", () => {
-    console.warn("Stream no disponible");
-    pauseStream();
+  audio.addEventListener("pause", () => {
+    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    stopTimer();
+    stopMatrix();
+    stopSpectrum();
   });
 
+  // ===============================
+  // ZENO LIVE REAL
+  // ===============================
+  const ZENO_META =
+    "https://corsproxy.io/?https://api.zeno.fm/mounts/metadata/ezq3fcuf5ehvv";
+
+ async function checkLiveFromZeno() {
+  try {
+    const res = await fetch(ZENO_META, { cache: "no-store" });
+    const data = await res.json();
+
+    const isLive =
+      data.stream_active === true ||
+      data.stream_active === "true";
+
+    setLive(isLive);
+
+  } catch (e) {
+    console.warn("Zeno no responde, asumiendo OFF");
+    setLive(false);
+  }
+}
+
+
+  setInterval(checkLiveFromZeno, 10000);
+  checkLiveFromZeno();
 });

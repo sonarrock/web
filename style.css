@@ -134,19 +134,12 @@ body {
 }
 
 .player-container {
-  width: 360px;
-  height: 580px;
-  max-width: 100%;
-  margin: 0 auto;
+  position: relative;
+  background: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
 }
-
-@media (max-width: 400px) {
-  .player-container {
-    width: 100%;
-    height: 580px;
-  }
-}
-
 
 .player-bg {
   width: 100%;
@@ -222,8 +215,7 @@ canvas#matrixCanvas {
   border-radius: 4px;
 }
 
-/* Corrección de selector: en HTML era #time-display */
-#time-display {
+.time-display {
   font-size: 0.9rem;
   color: #aaa;
   text-align: right;
@@ -257,30 +249,30 @@ canvas#matrixCanvas {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Social Media - ... (código existente) */
-
-/* ... (código existente hasta aquí) ... */
-
 .social-btn:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
-/* Colores específicos para cada botón con !important añadido */
-.whatsapp { background: linear-gradient(45deg, #25d366, #128c7e) !important; }
-.facebook { background: linear-gradient(45deg, #1877f2, #42a5f5) !important; }
-.instagram { background: linear-gradient(45deg, #e4405f, #f77737) !important; }
-.spotify { background: linear-gradient(45deg, #1db954, #1ed760) !important; }
-.ivoox { background: linear-gradient(45deg, #ff6600, #ff8833) !important; }
-
-/* Embed Sections - ... (código existente) */
+.whatsapp { background: linear-gradient(45deg, #25d366, #128c7e); }
+.facebook { background: linear-gradient(45deg, #1877f2, #42a5f5); }
+.instagram { background: linear-gradient(45deg, #e4405f, #f77737); }
+.spotify { background: linear-gradient(45deg, #1db954, #1ed760); }
+.ivoox { background: linear-gradient(45deg, #ff6600, #ff8833); }
 
 /* Embed Sections */
 .embed-section {
     padding: 40px 0;
 }
 
-/* Selectores que no estaban en uso en el HTML proporcionado, pero los mantengo por si acaso */
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #ff6600;
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
+}
+
 .embed-container {
     max-width: 800px;
     margin: 0 auto;
@@ -359,12 +351,10 @@ canvas#matrixCanvas {
 
 /* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
-    /* Corregí el selector h1 a h2 para coincidir con el HTML */
-    .title-section h2 { font-size: 2rem; }
-    /* El selector .subtitle no existe en el HTML que me diste, lo dejo comentado por si lo necesitas */
-    /* .subtitle { font-size: 1rem; } */
+    .title-section h1 { font-size: 2rem; }
+    .subtitle { font-size: 1rem; }
     .logo-section { flex-direction: column; gap: 15px; }
-    .main-image { height: auto; max-width: 100%; } /* Ajuste para mejor visualización móvil */
+    .main-image { height: 300px; }
     .social-buttons { gap: 15px; }
     .social-btn { width: 50px; height: 50px; font-size: 20px; }
     .staff-grid { grid-template-columns: 1fr; gap: 30px; }
@@ -372,12 +362,9 @@ canvas#matrixCanvas {
 
 @media (max-width: 480px) {
     .container { padding: 0 15px; }
-    /* Corregí el selector h1 a h2 para coincidir con el HTML */
-    .title-section h2 { font-size: 1.5rem; }
+    .title-section h1 { font-size: 1.5rem; }
     .section-title { font-size: 2rem; }
-    
-    /* Estos selectores no existen en el HTML/CSS que me diste, los dejo comentados */
-    /* .player-controls { flex-direction: column; gap: 15px; }
+    .player-controls { flex-direction: column; gap: 15px; }
     .custom-player {
         padding: 10px;
         flex-direction: column;
@@ -389,13 +376,11 @@ canvas#matrixCanvas {
     .volume-slider { width: 80%; }
     .visualizer { margin-top: 10px; gap: 3px; }
     .bar { margin: 0 1px; height: 5px; }
-    #streamStatus { font-size: 13px; margin-top: 8px; text-align: center; } */
-    
+    #streamStatus { font-size: 13px; margin-top: 8px; text-align: center; }
     .main-image-container img.main-image { max-width: 100%; height: auto; }
-    /* .player-overlay { position: relative; width: 100%; padding: 10px 0; } */
+    .player-overlay { position: relative; width: 100%; padding: 10px 0; }
 }
 
-/* Estilos relacionados con el badge de "oyentes" (listeners) que no vi en el HTML, pero mantengo */
 .listeners-badge {
     background-color: #ff6600;
     color: #fff;
@@ -407,63 +392,167 @@ canvas#matrixCanvas {
     display: inline-block;
 }
 
-/* ========================= */
-/* Disco de la Semana estilo (completado) */
-/* ========================= */
+/* =========================
+   Disco de la Semana
+========================= */
 .disco-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 10px;
+    gap: 15px;
     width: 100%;
-    max-width: 600px;
+    max-width: 650px; /* Igual que embeds */
     margin: 0 auto 50px auto;
 }
 
-/* Estilos faltantes para #disco-player y sus elementos internos */
+.disco-section .section-title {
+    color: #FF6600;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
 #disco-player {
     display: flex;
-    flex-direction: column;
     align-items: center;
     width: 100%;
-    background: #1a1a1a;
-    padding: 20px;
+    height: 170px;
+    background: #111;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-#cover {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 15px;
     border: 2px solid #ff6600;
+    box-shadow: 0 8px 24px rgba(255,102,0,0.6);
+    overflow: hidden;
+    gap: 15px;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
-.disco-info {
-    width: 100%;
+#disco-player img#cover {
+    width: 150px;
+    height: 150px;
+    border-radius: 12px;
+    border: 2px solid #ff6600;
+    box-shadow: 0 0 18px rgba(255,102,0,0.6);
+    flex-shrink: 0;
+    object-fit: cover;
+    animation: glow 2s infinite alternate;
 }
 
-.track-title {
-    font-size: 1.0rem;
-    font-weight: bold;
+.track-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#disco-player h3#track-title {
     color: #fff;
-    margin-bottom: 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
 }
 
-#disco-audio {
+/* Barra de progreso */
+#disco-progress-container {
     width: 100%;
-    margin-top: 10px;
+    height: 6px;
+    background: #333;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
-#disco-progress-container {
-    margin-top: 10px;
+#disco-progress {
+    width: 0%;
+    height: 100%;
+    background: #FF6600;
+    border-radius: 4px;
 }
 
-/* Ocultamos específicamente el contenedor de la barra de progreso personalizada en la sección del disco */
-#disco-progress-container {
-    display: none;
+/* Audio */
+#disco-player audio {
+    width: 100%;
+    height: 50px;
+    outline: none;
 }
 
+/* Animación de resplandor portada */
+@keyframes glow {
+    from { box-shadow: 0 0 10px rgba(255,102,0,0.5); }
+    to   { box-shadow: 0 0 20px rgba(255,102,0,1); }
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+    #disco-player { height: 150px; }
+    #disco-player img#cover { width: 120px; height: 120px; }
+}
+
+@media (max-width: 480px) {
+    #disco-player { flex-direction: column; height: auto; gap: 8px; }
+    #disco-player img#cover { width: 100px; height: 100px; }
+    #disco-player audio { width: 100%; height: 40px; }
+}
+
+/* ========================= */
+/* Ajuste iVoox para ocupar todo el contenedor */
+/* ========================= */
+#podcast-player audio {
+    width: 100%;
+    height: 50px;
+    outline: none;
+}
+
+/* RESPONSIVO Disco de la Semana e iVoox */
+@media (max-width: 768px) {
+    #disco-player, #podcast-player { height: 150px; }
+    #disco-player img#cover { width: 120px; height: 120px; }
+}
+
+@media (max-width: 480px) {
+    #disco-player, #podcast-player { flex-direction: column; height: auto; gap: 8px; }
+    #disco-player img#cover { width: 100px; height: 100px; }
+    #disco-player audio, #podcast-player audio { width: 100%; height: 40px; }
+}
+
+/* ========================= */
+/* HEADER TÍTULO RESPONSIVO  */
+/* ========================= */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2.5rem; /* tamaño moderado para tablets y móviles grandes */
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.8rem; /* tamaño compacto para móviles pequeños */
+    }
+}
+
+/* Título del disco al lado de la portada */
+#disco-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    text-align: left;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Contenedor de portada + título + audio */
+#disco-player-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    gap: 15px;
+}
+
+#disco-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}

@@ -1,286 +1,280 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sonar Rock Player</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sonar Rock - La Radio Independiente</title>
 
-<style>
-:root {
-  --accent: #ff6600;
-  --bg: #000;
-  --text: #fff;
-}
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="player.css">
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+  <!-- Font Awesome -->
+  <!-- Usar "crossorigin" para mayor seguridad y mejor rendimiento -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyP+gMgJ7wY7o9FuKWJbYQ5JkSJKQZAPCckZkPNI/Soxw=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer">
 
-body {
-  background: #0a0a0a;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  font-family: Arial, Helvetica, sans-serif;
-}
+  <!-- PWA -->
+  <!-- Quité la barra diagonal inicial '/' en 'href' para que funcione mejor en diferentes servidores si no está en la raíz del sitio -->
+<link rel="manifest" href="icons/site.webmanifest">
+<meta name="theme-color" content="#ff6600">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-/* =========================
-   PLAYER CONTENEDOR
-========================= */
-.player-container {
-  width: 380px;
-  height: 580px;
-  background: #000;
-  border-radius: 22px;
-  overflow: hidden;
-  border: 2px solid var(--accent);
-  position: relative;
-}
+<!-- Icons -->
+<!-- Quité la barra diagonal inicial '/' en 'href' para consistencia -->
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
 
-/* =========================
-   PROGRAMACIÓN
-========================= */
-.programacion {
-  text-align: center;
-  padding: 14px;
-  background: linear-gradient(180deg,#111,#000);
-  font-weight: bold;
-  letter-spacing: 1px;
-  color: var(--accent);
-}
+  <!-- iOS Splash Screen -->
+  <!-- El media query es muy específico, si funciona para tu caso, déjalo, si no, podrías necesitar más queries para otros dispositivos -->
+<link
+  rel="apple-touch-startup-image"
+  href="icons/splash-iphone.png"
+  media="(device-width: 375px) and (device-height: 812px)
+  and (-webkit-device-pixel-ratio: 3)"
+>
 
-/* =========================
-   IMAGEN
-========================= */
-.player-image {
-  width: 100%;
-  height: 320px;
-  background: url("https://sonarrock.com/logo-sonar-rock.jpg") center/contain no-repeat;
-  background-color: #000;
-}
-
-/* =========================
-   CONTROLES
-========================= */
-.player-controls {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  padding: 16px;
-  background: rgba(0,0,0,.9);
-  box-shadow: 0 -12px 30px rgba(255,102,0,.45);
-}
-
-.status {
-  text-align: center;
-  margin-bottom: 10px;
-  font-size: 14px;
-  color: var(--accent);
-}
-
-/* =========================
-   BOTONES
-========================= */
-.controls {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  margin-bottom: 14px;
-}
-
-.controls button {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: transparent;
-  border: 2px solid var(--accent);
-  color: #fff;
-  font-size: 18px;
-  cursor: pointer;
-  transition: .2s;
-}
-
-.controls button:hover {
-  background: var(--accent);
-  color: #000;
-}
-
-/* =========================
-   PROGRESO
-========================= */
-.progress-container {
-  width: 100%;
-  height: 6px;
-  background: #222;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-
-#progress {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), #fff);
-  transition: width .3s linear;
-}
-
-/* =========================
-   TIEMPO
-========================= */
-.time {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  opacity: .9;
-}
-
-/* =========================
-   VOLUMEN
-========================= */
-.volume {
-  margin-top: 10px;
-}
-
-.volume input {
-  width: 100%;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-@media(max-width: 420px){
-  .player-container {
-    width: 95%;
-    height: 560px;
-  }
-}
-</style>
+  <!-- Policies -->
+  <!-- 'encrypted-media' es necesario para permitir la reproducción de audio/video. La política está bien escrita. -->
+  <meta http-equiv="Permissions-Policy" content="encrypted-media=()">
+  <meta name="google" content="notranslate">
 </head>
+
 
 <body>
 
-<div class="player-container">
+  <!-- ========================= -->
+  <!-- HEADER -->
+  <!-- ========================= -->
+  <header class="header">
+    <div class="container">
+      <div class="logo-section">
+        <img
+          src="attached_assets/logo_1749601460841.jpeg"
+          alt="Sonar Rock Logo"
+          class="logo"
+        >
+        <div class="title-section">
+          <!-- Corregí el h1 para que sea un h2. Típicamente, solo debe haber un h1 principal por página. El título de la radio es el h1. Esto es semántico. -->
+          <h2>LA RADIO INDEPENDIENTE</h2>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <div class="programacion">
-    PROGRAMACIÓN SONAR ROCK
+  <!-- ========================= -->
+  <!-- IMAGEN PRINCIPAL -->
+  <!-- ========================= -->
+  <section class="main-section">
+    <div class="container">
+      <div class="main-image-container">
+        <img
+          src="attached_assets/sonarrock.png"
+          alt="Imagen principal de Sonar Rock"
+          class="main-image"
+        >
+      </div>
+    </div>
+  </section>
+<!-- ========================= -->
+<!-- REPRODUCTOR SONAR ROCK -->
+<!-- ========================= -->
+
+<section class="player-section">
+  <!-- Añadí role="region" y aria-labelledby para accesibilidad. Un lector de pantalla sabe qué es esta sección. -->
+  <div class="player-container" id="player" role="region" aria-labelledby="live-indicator">
+
+    <img src="img/background1.png" alt="" class="player-bg"> <!-- Alt vacío si es solo decorativo -->
+
+    <canvas id="matrixCanvas" aria-hidden="true" aria-label="Efecto visual de matrix"></canvas>
+    <!-- Tu aria-hidden es correcto, pero si el canvas tiene un efecto visual importante para algunos, se puede describir -->
+
+    <div class="overlay"></div>
+
+    <div class="player-content">
+
+      <div id="now-playing" class="now-playing" aria-live="polite">
+        <!-- aria-live="polite" le dice a los lectores de pantalla que anuncien cambios aquí de forma educada -->
+      </div>
+
+      <div id="live-indicator" class="live-badge">
+        <span class="dot"></span>
+        <span class="text">EN VIVO</span>
+      </div>
+
+      <div class="controls">
+        <!-- aria-label es crucial aquí ya que los botones solo contienen íconos -->
+        <button id="playPauseBtn" class="btn" aria-label="Reproducir/Pausar">
+          <i class="fas fa-play" aria-hidden="true"></i> <!-- Iconos son decorativos -->
+        </button>
+        <button id="stop-btn" class="btn" aria-label="Detener">
+          <i class="fas fa-stop" aria-hidden="true"></i>
+        </button>
+        <button id="mute-btn" class="btn" aria-label="Silenciar">
+          <i class="fas fa-volume-up" aria-hidden="true"></i>
+        </button>
+        <!-- Añadí aria-label para el slider de volumen -->
+        <label for="volume" class="sr-only">Control de Volumen</label>
+        <input id="volume" type="range" min="0" max="1" step="0.01" value="1" aria-label="Control de Volumen">
+      </div>
+
+      <div class="progress-wrapper">
+        <div class="progress-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progreso de la transmisión de radio">
+          <div id="radio-progress"></div>
+        </div>
+        <div id="time-display">00:00:00</div>
+      </div>
+
+    </div>
+
+    <audio id="radio-audio" preload="auto">
+      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+      <!-- Texto alternativo para navegadores que no soportan la etiqueta audio -->
+      Tu navegador no soporta el elemento de audio HTML5. Puedes escuchar la radio directamente desde la [página de Zeno.fm](https://zeno.fm).
+    </audio>
+
   </div>
+</section>
 
-  <div class="player-image"></div>
+<!-- PWA Install Button (está bien, solo necesita JavaScript para funcionar) -->
+<button id="installBtn" style="display:none;">
+  📲 Instalar Sonar Rock
+</button>
 
-  <div class="player-controls">
 
-    <div class="status" id="status-text">OFFLINE</div>
+<!-- ========================= -->
+<!-- REDES SOCIALES -->
+<!-- ========================= -->
+<section class="social-section">
+  <div class="container">
+    <h2 class="section-title">Redes Sociales</h2>
+    <div class="social-buttons">
+      <!-- Añadí aria-label a los enlaces para que los lectores de pantalla sepan a dónde van, ya que solo tienen íconos dentro -->
+      <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp" aria-label="WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
+      <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" class="social-btn facebook" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+      <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+      <a href="https://open.spotify.com/show/6mPcjQLeDdCwxzJe3PLlyU" target="_blank" class="social-btn spotify" aria-label="Spotify"><i class="fab fa-spotify" aria-hidden="true"></i></a>
+      <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox" aria-label="iVoox"><i class="fas fa-podcast" aria-hidden="true"></i></a>
+    </div>
+  </div>
+</section>
 
-    <div class="controls">
-      <button id="playPauseBtn">▶</button>
-      <button id="stop-btn">■</button>
-      <button id="mute-btn">🔊</button>
+<!-- ========================= -->
+<!-- REPRODUCTORES UNIFORMES -->
+<!-- ========================= -->
+<section class="embed-section">
+  <div class="container" style="max-width:650px; margin:auto;">
+
+<!-- ========================= -->
+<!-- DISCO DE LA SEMANA -->
+<!-- ========================= -->
+<section class="disco-section">
+  <h2 class="section-subtitle">Disco de la Semana</h2>
+  <div id="disco-player">
+    <!-- Añadí un alt descriptivo -->
+    <img id="cover" src="" alt="Portada del disco de la semana">
+    <div class="disco-info">
+      <div id="track-title" class="track-title"></div>
+      <!-- Añadí un label para accesibilidad al control de audio -->
+      <label for="disco-audio" class="sr-only">Reproducir Disco de la Semana</label>
+      <audio id="disco-audio" controls>
+        Tu navegador no soporta el elemento de audio.
+      </audio>
+      <div id="disco-progress-container" class="progress-container">
+        <div id="disco-progress"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- Spotify -->
+    <h3 class="section-title" style="margin-top:40px;">Escucha en Spotify</h3>
+    <div class="embed-player" style="border:2px solid #ff6600; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(255,102,0,0.6);">
+      <!-- Añadí title y role="region" para describir el iframe a lectores de pantalla -->
+      <iframe 
+        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU"
+        width="100%" 
+        height="170" 
+        frameborder="0" 
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+        allowfullscreen
+        title="Reproductor de Spotify para el podcast Sonar Rock"
+        role="region"
+        aria-label="Reproductor de Spotify"
+      ></iframe>
     </div>
 
-    <div class="progress-container">
-      <div id="progress"></div>
-    </div>
-
-    <div class="time">
-      <span id="current-time">00:00</span>
-      <span id="total-time">LIVE</span>
-    </div>
-
-    <div class="volume">
-      <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+    <!-- iVoox -->
+    <h3 class="section-title" style="margin-top:40px;">Escucha en iVoox</h3>
+    <div id="podcast-player" style="border:2px solid #ff6600; border-radius:12px; overflow:hidden; box-shadow:0 8px 24px rgba(255,102,0,0.6); height:170px;">
+      <!-- Añadí title y role="region" para describir el iframe a lectores de pantalla -->
+      <iframe 
+        src="https://www.ivoox.com/player_embed/sonar-rock_sq_f12661206_1" 
+        width="100%" 
+        height="170" 
+        frameborder="0" 
+        allow="autoplay" 
+        allowfullscreen
+        title="Reproductor de iVoox para el podcast Sonar Rock"
+        role="region"
+        aria-label="Reproductor de iVoox"
+      ></iframe>
     </div>
 
   </div>
-</div>
+</section>
 
-<audio id="radio-audio" preload="none">
- <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-  </audio>
 
-<script>
-const audio = document.getElementById("radio-audio");
-const playBtn = document.getElementById("playPauseBtn");
-const stopBtn = document.getElementById("stop-btn");
-const muteBtn = document.getElementById("mute-btn");
-const volumeSlider = document.getElementById("volume");
-const progress = document.getElementById("progress");
-const currentTimeEl = document.getElementById("current-time");
-const totalTimeEl = document.getElementById("total-time");
-const statusText = document.getElementById("status-text");
+<!-- ========================= -->
+<!-- STAFF -->
+<!-- ========================= -->
+<section class="staff-section">
+  <div class="container">
+    <h2 class="section-title" style="margin-bottom:40px;">Staff</h2>
+    <div class="staff-grid">
+      <div class="staff-member">
+        <!-- Corregí el nombre en el alt -->
+        <img src="attached_assets/Wendy_1749601460841.jpeg" alt="Miembro del Staff Wendy" class="staff-image">
+        <h3>Wendy</h3>
+      </div>
+      <div class="staff-member">
+        <img src="attached_assets/Alvaro_1749601460841.jpeg" alt="Miembro del Staff Alvaro" class="staff-image">
+        <h3>El Contralor</h3>
+      </div>
+      <div class="staff-member">
+        <img src="attached_assets/Hans_1749601460841.jpeg" alt="Miembro del Staff Hans" class="staff-image">
+        <h3>Hans</h3>
+      </div>
+      <div class="staff-member">
+        <img src="attached_assets/El Chris_1749601460841.jpeg" alt="Miembro del Staff El Chris" class="staff-image">
+        <h3>El Chris</h3>
+      </div>
+    </div>
+  </div>
+</section>
 
-let fakeSeconds = 0;
-let fakeTimer = null;
+<!-- ========================= -->
+<!-- ¿QUIÉNES SOMOS? -->
+<!-- ========================= -->
+<section class="about-section">
+  <div class="container">
+    <div class="about-content">
+      <h2 class="section-title">¿Quiénes Somos?</h2>
+      <p class="about-text">
+        Sonar Rock es una trinchera sonora, un espacio libre y apasionado que nace en Guadalajara, Jalisco, México.
+        Nuestra misión es simple pero poderosa: abrir un foro auténtico para las bandas emergentes, apoyar la escena local y mantener viva la esencia del rock en todas sus vertientes.
 
-/* =========================
-   PLAY / PAUSE
-========================= */
-playBtn.addEventListener("click", () => {
-  if (audio.paused) {
-    audio.play();
-    playBtn.textContent = "❚❚";
-    statusText.textContent = "SONANDO EN VIVO";
-    startFakeTimer();
-  } else {
-    audio.pause();
-    playBtn.textContent = "▶";
-    stopFakeTimer();
-  }
-});
-
-/* =========================
-   STOP
-========================= */
-stopBtn.addEventListener("click", () => {
-  audio.pause();
-  fakeSeconds = 0;
-  updateFakeUI();
-  playBtn.textContent = "▶";
-  statusText.textContent = "OFFLINE";
-  stopFakeTimer();
-});
-
-/* =========================
-   MUTE
-========================= */
-muteBtn.addEventListener("click", () => {
-  audio.muted = !audio.muted;
-  muteBtn.textContent = audio.muted ? "🔇" : "🔊";
-});
-
-/* =========================
-   VOLUMEN
-========================= */
-volumeSlider.addEventListener("input", e => {
-  audio.volume = e.target.value;
-});
-
-/* =========================
-   FAKE LIVE TIME
-========================= */
-function startFakeTimer() {
-  if (fakeTimer) return;
-  fakeTimer = setInterval(() => {
-    fakeSeconds++;
-    updateFakeUI();
-  }, 1000);
-}
-
-function stopFakeTimer() {
-  clearInterval(fakeTimer);
-  fakeTimer = null;
-}
-
-function updateFakeUI() {
-  const m = String(Math.floor(fakeSeconds / 60)).padStart(2,"0");
-  const s = String(fakeSeconds % 60).padStart(2,"0");
-  currentTimeEl.textContent = `${m}:${s}`;
-  totalTimeEl.textContent = "LIVE";
-  progress.style.width = `${(fakeSeconds % 60) * 1.6}%`;
-}
-</script>
+        Creemos en la fuerza de la música como motor de cambio, como punto de encuentro y como refugio de quienes buscan algo distinto a lo convencional.
+        En Sonar Rock somos más que
+      </p>
+     </div>
+  </div>
+</section>
 
 </body>
 </html>

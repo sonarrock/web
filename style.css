@@ -92,7 +92,7 @@ h1, h2, h3 {
     border-radius: 12px;
     background: rgba(26,26,26,0.7);
     box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
-    margin: 20px auto;
+    margin: 30px auto;             /* más espacio entre reproductores */
 }
 
 .custom-player:hover {
@@ -105,7 +105,7 @@ h1, h2, h3 {
     height: 150px;
     border-radius: 12px;
     object-fit: cover;
-    border: 3px solid #ff6600;
+    border: none;                  /* quitado marco para que no se vea doble */
     box-shadow: 0 0 15px rgba(255,102,0,0.5);
     flex-shrink: 0;
 }
@@ -117,6 +117,14 @@ h1, h2, h3 {
     flex-direction: column;
     justify-content: center;
     gap: 8px;
+    text-align: center;            /* títulos centrados */
+}
+
+/* Títulos de los reproductores */
+.player-info h3 {
+    color: #ff6600;
+    margin: 0 0 5px 0;
+    font-size: 1.2rem;
 }
 
 /* Audio HTML5 */
@@ -137,6 +145,38 @@ h1, h2, h3 {
     border: none;
     box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .custom-player {
+        flex-direction: column;
+        height: auto;
+        gap: 15px;
+    }
+
+    .player-info audio,
+    .player-info iframe {
+        height: 120px;               /* reduce altura en móvil */
+    }
+}
+
+@media (max-width: 480px) {
+    .custom-player {
+        width: 95%;
+        padding: 10px;
+    }
+
+    .custom-player img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .player-info audio,
+    .player-info iframe {
+        height: 100px;
+    }
+}
+
 
 /* ===============================
    REDES SOCIALES

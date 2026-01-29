@@ -20,62 +20,69 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.7);
 }
 
-/* =========================
-   IMAGEN DE FONDO
-   ========================= */
+/* IMAGEN DE FONDO */
 .player-bg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: 1;  /* Fondo detrás */
-  filter: none; /* Evita imagen oscura */
+  z-index: 1;  
+  filter: brightness(1); /* Ajustable: 0.5 si quieres más oscuro */
 }
 
-/* =========================
-   MATRIX
-   ========================= */
+/* MATRIX ANIMATION */
 #matrixCanvas {
   position: absolute;
   inset: 0;
-  z-index: 2; /* Asegura que esté encima del fondo, pero debajo de los controles */
+  z-index: 2;
   pointer-events: none;
-  opacity: 0.65; /* Visible sin oscurecer */
+  opacity: 0.65;
 }
 
-/* =========================
-   ANALIZADOR CIRCULAR
-   ========================= */
+/* ANALIZADOR CIRCULAR */
 #spectrumCanvas {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 3; /* Asegura que el analizador esté encima de la animación */
+  z-index: 3;
 }
 
-/* =========================
-   CONTENIDO
-   ========================= */
+/* CONTENIDO PRINCIPAL */
 .player-content {
   position: absolute;
   bottom: 16px;
   left: 16px;
   right: 16px;
-  z-index: 6; /* Está encima de los controles y animaciones */
+  z-index: 6;
   display: flex;
   flex-direction: column;
   gap: 12px;
   color: #fff;
   text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+  align-items: center;
 }
 
-/* =========================
-   CONTROLES
-   ========================= */
+/* IMAGEN DE PORTADA RADIO */
+.radio-cover {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(255,102,0,0.5);
+  margin-bottom: 10px;
+}
+
+/* NOMBRE O ESTADO */
+#now-playing {
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* CONTROLES */
 .controls {
   display: flex;
   gap: 12px;
+  justify-content: center;
 }
 
 .controls .btn {
@@ -102,13 +109,12 @@
   font-size: 14px;
 }
 
-/* =========================
-   PROGRESO + TIEMPO
-   ========================= */
+/* BARRA DE PROGRESO + TIEMPO */
 .progress-wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
 }
 
 .progress-container {
@@ -128,11 +134,10 @@
 .time-display {
   font-size: 12px;
   font-weight: 600;
+  color: #fff;
 }
 
-/* =========================
-   LIVE BADGE
-   ========================= */
+/* LIVE BADGE */
 #live-indicator {
   position: absolute;
   top: 16px;
@@ -158,7 +163,7 @@
   background: #666;
 }
 
-/* 🔴 EN VIVO */
+/* EN VIVO */
 #live-indicator.live {
   color: #ff3b3b;
   box-shadow: 0 0 12px rgba(255,60,60,0.8);
@@ -169,26 +174,21 @@
   animation: pulse 1.2s infinite;
 }
 
-/* ⚪ PROGRAMACIÓN */
+/* PROGRAMACIÓN */
 #live-indicator.auto {
   color: #aaa;
 }
 
-/* =========================
-   ANIMACIÓN LIVE
-   ========================= */
+/* ANIMACIÓN PULSANTE */
 @keyframes pulse {
   0% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.6); opacity: 0.4; }
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* =========================
-   RESPONSIVE
-   ========================= */
+/* RESPONSIVE */
 @media (max-width: 768px) {
   .player-container {
     width: 90%;
   }
 }
-

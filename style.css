@@ -72,7 +72,7 @@ h1, h2, h3 {
 =============================== */
 .players-section {
     padding: 40px 0;
-    background: url('web/attached_assets/fondoplayer.jpg') no-repeat center center;
+    background: url('../attached_assets/fondoplayer.jpg') no-repeat center center;
     background-size: cover;
 }
 

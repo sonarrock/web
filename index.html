@@ -109,11 +109,10 @@
 
     <!-- DISCO DE LA SEMANA -->
     <div class="custom-player disco-player" id="disco-player">
-      <img id="cover" src="attached_assets/disco_portada.png" alt="Portada Disco" class="disco-cover">
+      <img id="cover" class="disco-cover" src="" alt="Portada Disco">
       <div class="player-info">
         <div id="track-title">Título del Disco</div>
         <audio id="disco-audio" controls preload="auto">
-          <source src="attached_assets/disco_audio.mp3" type="audio/mpeg">
           Tu navegador no soporta audio HTML5.
         </audio>
       </div>
@@ -130,8 +129,11 @@
     </div>
 
     <!-- IVOOX -->
-    <div class="custom-player ivoox-player" id="podcast-player">
-      <!-- Aquí el JS generará el último episodio -->
+    <div class="custom-player ivoox-player">
+      <h2 class="section-title" style="margin-bottom:15px;">Último episodio en iVoox</h2>
+      <div id="podcast-player">
+        <!-- JS cargará el episodio -->
+      </div>
     </div>
 
   </div>

@@ -249,46 +249,34 @@
 </style>
 
 <script>
+
 // ----------------------------
-// DISCO DE LA SEMANA
+// DISCO DE LA SEMANA (SEGURO)
 // ----------------------------
-const fileName = "Aretha Franklin - Lady Soul.mp3"; // cambiar cada semana
-const discoAudio = document.getElementById("disco-audio");
-const cover = document.getElementById("cover");
-const trackTitle = document.getElementById("track-title");
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
-// Mostrar título sin la extensión .mp3
-trackTitle.textContent = fileName.replace(".mp3", "");
+  const fileName = "Aretha Franklin - Lady Soul.mp3";
 
-// Asignar archivo al audio
-discoAudio.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/" + fileName;
+  const audio = document.getElementById("disco-audio");
+  const cover = document.getElementById("cover");
+  const title = document.getElementById("track-title");
 
-// Asignar portada
-cover.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" + Date.now();
+  if (!audio || !cover || !title) return;
 
-// ANIMACIÓN PORTADA
-let zoomDirection = 1;
-let zoomInterval;
+  title.textContent = fileName.replace(".mp3", "");
 
-discoAudio.addEventListener("play", () => {
-  zoomInterval = setInterval(() => {
-    let scale = parseFloat(cover.style.transform.replace(/[^\d.]/g, "")) || 1;
-    scale += 0.0015 * zoomDirection;
-    if (scale >= 1.03) zoomDirection = -1;
-    if (scale <= 0.97) zoomDirection = 1;
-    cover.style.transform = `scale(${scale})`;
-    cover.style.boxShadow = `0 0 20px rgba(255,102,0,0.6)`;
-  }, 20);
+  audio.src =
+    "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/" +
+    encodeURIComponent(fileName);
+
+  cover.src =
+    "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" +
+    Date.now();
+
 });
+</script>
 
-discoAudio.addEventListener("pause", resetCover);
-discoAudio.addEventListener("ended", resetCover);
-
-function resetCover() {
-  clearInterval(zoomInterval);
-  cover.style.transform = "scale(1)";
-  cover.style.boxShadow = "0 0 20px rgba(255,102,0,0.6)";
-}
 
 // ----------------------------
 // CARGA ÚLTIMO EPISODIO iVoox

@@ -79,102 +79,100 @@ h1, h2, h3 {
 /* ===============================
    REPRODUCTORES
 =============================== */
+.players-section {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;      /* espacio uniforme entre reproductores */
+  align-items: center;
+  margin: 40px 0;
+}
+
 .custom-player {
-    display: flex;
-    flex-direction: row;           /* portada izquierda, info derecha */
-    align-items: center;
-    gap: 20px;
-    width: 100%;
-    max-width: 600px;
-    height: 152px;                 /* igual que Spotify */
-    padding: 10px 15px;
-    border: 3px solid #ff6600;
-    border-radius: 12px;
-    background: rgba(26,26,26,0.7);
-    box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
-    margin: 30px auto;             /* más espacio entre reproductores */
+  display: flex;
+  flex-direction: row;      /* portada izquierda, info derecha */
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 600px;         /* ancho como Spotify */
+  height: 152px;            /* altura igual que Spotify */
+  padding: 10px 15px;
+  border: 3px solid #ff6600;
+  border-radius: 12px;
+  background: rgba(26,26,26,0.7);
+  box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
+  margin: 0 auto;
 }
 
 .custom-player:hover {
-    box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
+  box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
 }
 
-/* Portada del Disco de la Semana */
-.custom-player img {
-    width: 150px;
-    height: 150px;
-    border-radius: 12px;
-    object-fit: cover;
-    border: none;                  /* quitado marco para que no se vea doble */
-    box-shadow: 0 0 15px rgba(255,102,0,0.5);
-    flex-shrink: 0;
+/* PORTADA DISCO */
+.custom-player#disco-player img {
+  width: 150px;
+  height: 150px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 0 15px rgba(255,102,0,0.5);
+  flex-shrink: 0;
 }
 
-/* Info del reproductor (audio / iframe) */
+/* INFO DEL REPRODUCTOR */
 .player-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 8px;
-    text-align: center;            /* títulos centrados */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
 }
 
-/* Títulos de los reproductores */
 .player-info h3 {
-    color: #ff6600;
-    margin: 0 0 5px 0;
-    font-size: 1.2rem;
+  color: #ff6600;
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  text-align: center;
 }
 
-/* Audio HTML5 */
+/* AUDIO HTML5 */
 .player-info audio {
-    width: 100%;
-    height: 40px;
-    border-radius: 6px;
-    background: #111;
-    border: none;
-    box-shadow: 0 0 10px rgba(255,102,0,0.35);
+  width: 100%;
+  height: 40px;
+  border-radius: 6px;
+  background: #111;
+  border: none;
+  box-shadow: 0 0 10px rgba(255,102,0,0.35);
 }
 
-/* Spotify e IVOOX iframes */
+/* SPOTIFY e IVOOX iframes */
 .player-info iframe {
-    width: 100%;
-    height: 152px;                  /* igual que Spotify */
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
+  width: 100%;
+  height: 152px;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
 }
 
-/* Responsive */
+/* RESPONSIVE */
 @media (max-width: 768px) {
-    .custom-player {
-        flex-direction: column;
-        height: auto;
-        gap: 15px;
-    }
+  .custom-player {
+    flex-direction: column;
+    height: auto;
+  }
 
-    .player-info audio,
-    .player-info iframe {
-        height: 120px;               /* reduce altura en móvil */
-    }
-}
+  .player-info {
+    align-items: center;
+  }
 
-@media (max-width: 480px) {
-    .custom-player {
-        width: 95%;
-        padding: 10px;
-    }
+  .player-info iframe,
+  .player-info audio {
+    height: 50px;
+  }
 
-    .custom-player img {
-        width: 120px;
-        height: 120px;
-    }
-
-    .player-info audio,
-    .player-info iframe {
-        height: 100px;
-    }
+  .custom-player#disco-player img {
+    width: 120px;
+    height: 120px;
+  }
 }
 
 

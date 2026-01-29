@@ -79,36 +79,39 @@ h1, h2, h3 {
 /* ===============================
    REPRODUCTORES
 =============================== */
-.players-section {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;      /* espacio uniforme entre reproductores */
-  align-items: center;
-  margin: 40px 0;
+
+/* Título arriba de cada reproductor */
+.player-title {
+  color: #ff6600;
+  text-align: center;
+  font-size: 1.6rem;
+  margin: 40px 0 10px; /* espacio arriba y abajo */
 }
 
+/* Base de todos los reproductores */
 .custom-player {
   display: flex;
-  flex-direction: row;      /* portada izquierda, info derecha */
+  flex-direction: row;
   align-items: center;
   gap: 20px;
   width: 100%;
-  max-width: 600px;         /* ancho como Spotify */
-  height: 152px;            /* altura igual que Spotify */
+  max-width: 600px;
+  height: auto;           /* altura automática según contenido */
+  min-height: 152px;      /* mínimo igual al iframe de Spotify */
   padding: 10px 15px;
   border: 3px solid #ff6600;
   border-radius: 12px;
   background: rgba(26,26,26,0.7);
   box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
-  margin: 0 auto;
+  margin: 40px auto;      /* mayor espacio entre reproductores */
 }
 
 .custom-player:hover {
   box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
 }
 
-/* PORTADA DISCO */
-.custom-player#disco-player img {
+/* Portada Disco de la Semana (sin doble marco) */
+.custom-player img {
   width: 150px;
   height: 150px;
   border-radius: 12px;
@@ -117,24 +120,16 @@ h1, h2, h3 {
   flex-shrink: 0;
 }
 
-/* INFO DEL REPRODUCTOR */
+/* Info del reproductor */
 .player-info {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  text-align: center;
 }
 
-.player-info h3 {
-  color: #ff6600;
-  font-size: 1.2rem;
-  margin-bottom: 5px;
-  text-align: center;
-}
-
-/* AUDIO HTML5 */
+/* Audio HTML5 */
 .player-info audio {
   width: 100%;
   height: 40px;
@@ -144,34 +139,37 @@ h1, h2, h3 {
   box-shadow: 0 0 10px rgba(255,102,0,0.35);
 }
 
-/* SPOTIFY e IVOOX iframes */
+/* Spotify e IVOOX iframes */
 .player-info iframe {
   width: 100%;
-  height: 152px;
+  height: 180px;         /* altura mayor para cubrir todo el marco */
   border-radius: 12px;
   border: none;
   box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
 }
 
-/* RESPONSIVE */
+/* Responsive */
 @media (max-width: 768px) {
   .custom-player {
     flex-direction: column;
     height: auto;
+    gap: 15px;
   }
-
-  .player-info {
-    align-items: center;
+  .player-info iframe {
+    height: 150px;
   }
+}
 
-  .player-info iframe,
-  .player-info audio {
-    height: 50px;
+@media (max-width: 480px) {
+  .custom-player {
+    width: 95%;
   }
-
-  .custom-player#disco-player img {
+  .custom-player img {
     width: 120px;
     height: 120px;
+  }
+  .player-info iframe {
+    height: 140px;
   }
 }
 

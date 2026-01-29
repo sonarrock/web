@@ -95,12 +95,12 @@
 </section>
 
 <!-- ========================= -->
-<!-- ========================= -->
 <!-- SECCIÓN REPRODUCTORES -->
 <!-- ========================= -->
 <section class="players-section">
-  <!-- DISCO DE LA SEMANA -->
-  <h3 class="player-title">Disco de la Semana</h3>
+  
+  <!-- Disco de la Semana -->
+  <h3 class="player-title">Disco de la Semana: Aretha Franklin - Lady Soul</h3>
   <div class="custom-player disco-player" id="disco-player">
     <img id="cover" src="" alt="Portada Disco">
     <div class="player-info">
@@ -108,7 +108,7 @@
     </div>
   </div>
 
-  <!-- SPOTIFY -->
+  <!-- Spotify -->
   <h3 class="player-title">Spotify</h3>
   <div class="custom-player spotify-player">
     <div class="player-info">
@@ -124,12 +124,12 @@
     </div>
   </div>
 
-  <!-- IVOOX -->
+  <!-- iVoox -->
   <h3 class="player-title">iVoox</h3>
   <div class="custom-player ivoox-player">
     <div class="player-info">
       <iframe 
-        src="https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=141c24" 
+        src="https://www.ivoox.com/player_es_podcast_2661206_1.html?c1=141c24" 
         width="100%" 
         height="152" 
         frameborder="0" 
@@ -139,6 +139,7 @@
       </iframe>
     </div>
   </div>
+
 </section>
 
 <!-- ========================= -->
@@ -150,13 +151,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const audio = document.getElementById("disco-audio");
   const cover = document.getElementById("cover");
   const container = document.getElementById("disco-player");
-  const titleElement = container.previousElementSibling; // h3 justo arriba del reproductor
 
-  if (!audio || !cover || !container || !titleElement) return;
+  if (!audio || !cover || !container) return;
 
   // Mostrar el nombre del archivo como título
   const title = fileName.replace(".mp3", "");
-  titleElement.textContent = "Disco de la Semana: " + title;
+  document.querySelector('.player-title').textContent = "Disco de la Semana: " + title;
 
   // Asignar archivo de audio
   audio.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
@@ -164,7 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Asignar portada
   cover.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=${Date.now()}`;
-  cover.classList.add("disco-cover");
 });
 </script>
 

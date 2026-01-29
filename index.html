@@ -54,23 +54,27 @@
 <!-- ========================= -->
 <!-- REPRODUCTOR STREAMING -->
 <!-- ========================= -->
-<section class="players-section">
-  <h3>Disco De La Semana</h3>
-  <div class="custom-player disco-player" id="disco-player">
-    <img id="cover" src="" alt="Portada Disco">
-    <div class="player-info">
-      <audio id="disco-audio" controls preload="auto"></audio>
+<section class="player-section">
+  <div class="player-container">
+    <img src="background1.png" alt="Fondo Radio" class="player-bg">
+    <div class="overlay"></div>
+
+    <div class="player-content">
+      <div id="live-indicator" class="live-badge">
+        <span class="dot"></span>
+        <span class="text" id="status-text">OFFLINE</span>
+      </div>
+      <div id="timer" class="timer">00:00</div>
+
+      <div class="controls">
+        <button id="playPauseBtn"><i class="fas fa-play"></i></button>
+        <button id="stop-btn"><i class="fas fa-stop"></i></button>
+        <button id="mute-btn"><i class="fas fa-volume-up"></i></button>
+        <input id="volume" type="range" min="0" max="1" step="0.01" value="1">
+      </div>
+
+      <audio id="radio-audio" playsinline></audio>
     </div>
-  </div>
-
-  <h3>Spotify</h3>
-  <div class="custom-player spotify-player">
-    <iframe src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-  </div>
-
-  <h3>iVoox</h3>
-  <div class="custom-player ivoox-player" id="ivoox-container">
-    <iframe src="https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=141c24" width="100%" height="152" frameborder="0" allowfullscreen="" scrolling="no" loading="lazy"></iframe>
   </div>
 </section>
 

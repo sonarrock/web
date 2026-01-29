@@ -1,3 +1,10 @@
+.player-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+}
+
 .player-container {
   position: relative;
   width: 360px;
@@ -9,27 +16,38 @@
   box-shadow: 0 0 30px rgba(255,102,0,0.6);
   transition: all 0.3s ease;
   animation: haloPulse 3s infinite alternate;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
 }
 
-/* Halo animado */
+.player-container:hover {
+  animation: haloHover 1.5s infinite alternate;
+}
+
 @keyframes haloPulse {
   0% { box-shadow: 0 0 30px rgba(255,102,0,0.5); }
   50% { box-shadow: 0 0 50px rgba(255,102,0,0.9); }
   100% { box-shadow: 0 0 30px rgba(255,102,0,0.5); }
 }
 
+@keyframes haloHover {
+  0% { box-shadow: 0 0 40px rgba(255,102,0,0.7); }
+  50% { box-shadow: 0 0 60px rgba(255,102,0,1); }
+  100% { box-shadow: 0 0 40px rgba(255,102,0,0.7); }
+}
+
 /* Intensifica halo al reproducir */
 .player-container.playing {
-  animation: haloPulsePlaying 1.5s infinite alternate;
+  animation: haloPlaying 1s infinite alternate;
 }
 
-@keyframes haloPulsePlaying {
-  0% { box-shadow: 0 0 40px rgba(255,102,0,0.8); }
-  50% { box-shadow: 0 0 70px rgba(255,102,0,1); }
-  100% { box-shadow: 0 0 40px rgba(255,102,0,0.8); }
+@keyframes haloPlaying {
+  0% { box-shadow: 0 0 50px rgba(255,102,0,0.9); }
+  50% { box-shadow: 0 0 90px rgba(255,102,0,1); }
+  100% { box-shadow: 0 0 50px rgba(255,102,0,0.9); }
 }
 
-/* Fondo del reproductor */
 .player-bg {
   position: absolute;
   top:0; left:0;
@@ -48,7 +66,6 @@
   z-index:2;
 }
 
-/* Contenido */
 .player-content {
   position: relative;
   z-index:3;
@@ -119,4 +136,13 @@
 .controls button:hover {
   transform: scale(1.15);
   box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+}
+
+/* Centrado total del body */
+body {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  background:#0a0a0a;
 }

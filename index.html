@@ -56,21 +56,22 @@
 <!-- ========================= -->
 <section class="player-section">
   <div class="player-container">
-    <!-- Fondo del reproductor -->
-    <img src="attached_assets/fondoplayer.jpg" alt="Fondo Radio" class="player-bg">
+    <!-- Fondo único -->
+    <img src="background1.png" alt="Fondo Radio" class="player-bg">
     <div class="overlay"></div>
 
     <!-- Contenido del reproductor -->
     <div class="player-content">
-      <img src="attached_assets/portada_radio.jpg" alt="Portada Radio" class="radio-cover">
-
-      <div id="now-playing">Sonar Rock</div>
-
+      <!-- Status -->
       <div id="live-indicator" class="live-badge">
         <span class="dot"></span>
         <span class="text" id="status-text">OFFLINE</span>
       </div>
 
+      <!-- Contador -->
+      <div id="timer" class="timer">00:00</div>
+
+      <!-- Controles -->
       <div class="controls">
         <button id="playPauseBtn"><i class="fas fa-play"></i></button>
         <button id="stop-btn"><i class="fas fa-stop"></i></button>
@@ -78,6 +79,7 @@
         <input id="volume" type="range" min="0" max="1" step="0.01" value="1">
       </div>
 
+      <!-- Audio -->
       <audio id="radio-audio" playsinline></audio>
     </div>
   </div>

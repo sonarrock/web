@@ -1,3 +1,6 @@
+/* =========================
+   RESET
+========================= */
 * {
     margin: 0;
     padding: 0;
@@ -18,7 +21,9 @@ body {
     padding: 0 20px;
 }
 
-/* Header */
+/* =========================
+   HEADER
+========================= */
 .header {
     background: #0a0a0a;
     padding: 20px 0;
@@ -55,94 +60,101 @@ body {
     text-transform: uppercase;
     letter-spacing: 2px;
 }
-/* Main Section */
-.main-section {
-    padding: 40px 0;
-    position: relative;
-}
 
+/* =========================
+   MAIN IMAGE FULL WIDTH
+========================= */
 .main-image-container {
-    position: relative;
-    max-width: 1200px;
-    margin: 0 auto;
-    border-radius: 15px;
+    width: 100vw;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    margin: 0;
+    padding: 0;
 }
 
 .main-image {
     width: 100%;
-    height: 800px;
-    object-fit: contain;
+    height: 100vh;
+    object-fit: cover;
     display: block;
-    background: #000;
 }
 
-.player-overlay {
-    position: relative;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
-    padding: 40px 20px 20px;
+/* =========================
+   STREAMING PLAYER SECTION
+========================= */
+.streaming-section {
+    background: url('attached_assets/fondoplayer.jpg') center/cover no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
 }
 
-.custom-player {
+.streaming-player {
+    width: 360px;
+    height: 580px;
     background: rgba(26, 26, 26, 0.7);
-    border-radius: 15px;
-    padding: 20px;
+    border-radius: 18px;
     border: 2px solid #ff6600;
-    box-shadow: 0 0 30px rgba(255, 102, 0, 0.3);
-    backdrop-filter: blur(5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: 20px;
 }
 
-.player-header h2 {
-    text-align: center;
-    color: #ff6600;
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-    text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+/* Imagen única en el reproductor */
+.streaming-player img {
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid #ff6600;
+    box-shadow: 0 0 20px rgba(255, 102, 0, 0.6);
 }
 
+/* Controles */
 .player-controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.player-controls button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 20px;
-    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.play-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: linear-gradient(45deg, #ff6600, #ff8833);
-    border: none;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 102, 0, 0.4);
-}
-
-.play-btn:hover {
+.player-controls button:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(255, 102, 0, 0.6);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.7);
 }
 
+/* Volume slider */
 .volume-control {
     display: flex;
     align-items: center;
     gap: 10px;
-}
-
-.volume-control i {
-    color: #ff6600;
-    font-size: 18px;
+    width: 100%;
+    justify-content: center;
 }
 
 .volume-slider {
-    width: 100px;
+    width: 80%;
     height: 5px;
     background: #333;
     border-radius: 5px;
@@ -159,14 +171,8 @@ body {
     cursor: pointer;
 }
 
-.visualizer {
-    display: flex;
-    justify-content: center;
-    align-items: end;
-    gap: 3px;
-    height: 40px;
-}
 
+/* Stream status */
 .stream-status {
     margin-top: 10px;
     font-size: 0.9rem;
@@ -180,26 +186,7 @@ body {
     color: #00ff88;
 }
 
-.bar {
-    width: 4px;
-    background: linear-gradient(to top, #ff6600, #ffaa66);
-    border-radius: 2px;
-    animation: pulse 1s ease-in-out infinite alternate;
-}
 
-.bar:nth-child(1) { animation-delay: 0s; }
-.bar:nth-child(2) { animation-delay: 0.1s; }
-.bar:nth-child(3) { animation-delay: 0.2s; }
-.bar:nth-child(4) { animation-delay: 0.3s; }
-.bar:nth-child(5) { animation-delay: 0.4s; }
-.bar:nth-child(6) { animation-delay: 0.5s; }
-.bar:nth-child(7) { animation-delay: 0.6s; }
-.bar:nth-child(8) { animation-delay: 0.7s; }
-
-@keyframes pulse {
-    0% { height: 5px; }
-    100% { height: 35px; }
-}
 
 /* Social Media */
 .social-section {
@@ -239,138 +226,81 @@ body {
 .spotify { background: linear-gradient(45deg, #1db954, #1ed760); }
 .ivoox { background: linear-gradient(45deg, #ff6600, #ff8833); }
 
-
-/* =========================
-   DISCO DE LA SEMANA – LAYOUT SIMÉTRICO
-   ========================= */
+/* ===============================
+   DISCO DE LA SEMANA – FIX FINAL
+=============================== */
 
 .custom-player.disco-player {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 16px;
-
-    max-width: 800px;        /* 👈 IGUAL a los otros */
-    min-height: 190px;       /* 👈 MISMA ALTURA */
-    padding: 16px;
-
-    box-sizing: border-box;
+  width: 100%;
+  max-width: 360px;          /* mismo ancho visual */
+  height: 430px;             /* controla el crecimiento */
+  background: #000;
+  border-radius: 18px;
+  border: 2px solid #ff6600;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-/* Portada izquierda */
-.custom-player.disco-player img#cover {
-    width: 120px;
-    height: 120px;
-    border-radius: 12px;
-    object-fit: cover;
-    flex-shrink: 0;
-
-    border: 3px solid #ff6600;
-    box-shadow:
-        0 0 20px rgba(255,102,0,0.7),
-        0 0 40px rgba(255,102,0,0.4);
+/* HEADER */
+.disco-header {
+  position: relative;
+  height: 300px;
+  overflow: hidden;
 }
 
-/* Contenedor derecho */
-.custom-player.disco-player .player-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex: 1;                /* 👈 ocupa todo el espacio */
-    min-height: 120px;
+.disco-header img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* Título arriba */
-.custom-player.disco-player #track-title {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #ffffff;
-    margin-bottom: 8px;
-    text-shadow: 0 0 6px rgba(255,102,0,0.5);
+/* TITULO */
+.disco-meta {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.85),
+    rgba(0,0,0,0)
+  );
 }
 
-/* Audio SIEMPRE visible abajo */
-.custom-player.disco-player audio {
-    width: 100%;
-    height: 36px;           /* 👈 fuerza visibilidad */
-    display: block;
-
-    border-radius: 6px;
-    background: #111;
-    box-shadow: 0 0 15px rgba(255,102,0,0.35);
+#track-title {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
 }
 
-/* =========================
-   RESPONSIVE
-   ========================= */
-@media (max-width: 768px) {
-    .custom-player.disco-player {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        min-height: auto;
-    }
-
-    .custom-player.disco-player img#cover {
-        width: 150px;
-        height: 150px;
-    }
-
-    .custom-player.disco-player .player-info {
-        width: 100%;
-    }
+/* AUDIO */
+.disco-audio {
+  padding: 10px;
+  background: #0a0a0a;
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.6);
 }
 
-/* =========================
-   iVoox – mostrar solo el último episodio
-   ========================= */
-
-/* Contenedor del iframe iVoox */
-.ivoox-player {
-    width: 100%;
-    max-width: 650px;      /* mismo ancho que Spotify y Disco */
-    margin: 0 auto;        /* centrado */
-    overflow: hidden;      /* CLAVE: oculta los demás episodios */
-    border-radius: 15px;
+.disco-audio audio {
+  width: 100%;
 }
 
-/* Ajuste directo al iframe */
-.ivoox-player iframe {
-    width: 100%;
-    height: 150px;         /* muestra SOLO el último episodio */
-    border: none;
-    border-radius: 12px;
-    background: transparent;
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .custom-player.disco-player {
+    max-width: 100%;
+    height: 420px;
+  }
 }
 
-/* Embed Sections */
-.embed-section {
-    padding: 40px 0;
-}
 
-.section-title {
-    text-align: center;
-    font-size: 2.5rem;
-    color: #ff6600;
-    margin-bottom: 30px;
-    text-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
-}
+/* ========================= iVoox – mostrar solo el último episodio ========================= */ /* Contenedor del iframe iVoox */ .ivoox-player { width: 100%; max-width: 650px; /* mismo ancho que Spotify y Disco */ margin: 0 auto; /* centrado */ overflow: hidden; /* CLAVE: oculta los demás episodios */ border-radius: 15px; } /* Ajuste directo al iframe */ .ivoox-player iframe { width: 100%; height: 150px; /* muestra SOLO el último episodio */ border: none; border-radius: 12px; background: transparent; } /* Embed Sections */ .embed-section { padding: 40px 0; } .section-title { text-align: center; font-size: 2.5rem; color: #ff6600; margin-bottom: 30px; text-shadow: 0 0 10px rgba(255, 102, 0, 0.3); } .embed-container { max-width: 800px; margin: 0 auto; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); border: 2px solid #ff6600; } .spotify-embed { display: flex; justify-content: center; }
 
-.embed-container {
-    max-width: 800px;
-    margin: 0 auto;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    border: 2px solid #ff6600;
-}
 
-.spotify-embed {
-    display: flex;
-    justify-content: center;
-}
-/* ========================= */
+
+
 /* ========================= */
 /* STAFF – SECCIÓN CON FONDO Y HALO PULSANTE */
 /* ========================= */
@@ -549,127 +479,4 @@ body {
     gap: 10px;
   }
 
-  .player-controls {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .volume-control {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 8px;
-  }
-
-  .volume-slider {
-    width: 80%;
-  }
-
-  .visualizer {
-    margin-top: 10px;
-    gap: 3px;
-  }
-
-  .bar {
-    margin: 0 1px;
-    height: 5px;
-  }
-
-  #streamStatus {
-    font-size: 13px;
-    margin-top: 8px;
-    text-align: center;
-  }
-
-  .main-image-container img.main-image {
-    max-width: 100%;
-    height: auto;
-  }
-
-  .player-overlay {
-    position: relative;
-    width: 100%;
-    padding: 10px 0;
-  }
-}
-.listeners-badge {
-    background-color: #ff6600;
-    color: #fff;
-    font-weight: bold;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.9em;
-    margin-left: 10px;
-    display: inline-block;
-}
-
-/* ===============================
-   DISCO DE LA SEMANA – FIX FINAL
-=============================== */
-
-.custom-player.disco-player {
-  width: 100%;
-  max-width: 360px;          /* mismo ancho visual */
-  height: 430px;             /* controla el crecimiento */
-  background: #000;
-  border-radius: 18px;
-  border: 2px solid #ff6600;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* HEADER */
-.disco-header {
-  position: relative;
-  height: 300px;
-  overflow: hidden;
-}
-
-.disco-header img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* TITULO */
-.disco-meta {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(
-    to top,
-    rgba(0,0,0,0.85),
-    rgba(0,0,0,0)
-  );
-}
-
-#track-title {
-  text-align: center;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #fff;
-}
-
-/* AUDIO */
-.disco-audio {
-  padding: 10px;
-  background: #0a0a0a;
-  box-shadow: inset 0 4px 10px rgba(0,0,0,0.6);
-}
-
-.disco-audio audio {
-  width: 100%;
-}
-
-/* RESPONSIVE */
-@media (max-width: 480px) {
-  .custom-player.disco-player {
-    max-width: 100%;
-    height: 420px;
-  }
-}
-
+  

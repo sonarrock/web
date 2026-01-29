@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const title = document.getElementById("track-title");
   const container = document.getElementById("disco-player");
 
-  if (!audio || !cover || !container) return;
+  if (!audio || !cover || !container || !title) return;
 
   // Mostrar nombre del disco dentro del contenedor, sobre el audio
   title.textContent = fileName.replace(".mp3", "");

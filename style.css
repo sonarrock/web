@@ -80,89 +80,104 @@ h1, h2, h3 {
    REPRODUCTORES
 =============================== */
 .players-section {
-  background: url('web/attached_assets/fondoplayer.jpg') center/cover no-repeat;
-  padding: 40px 20px;
+    padding: 40px 0;
+    background: url('web/attached_assets/fondoplayer.jpg') no-repeat center center;
+    background-size: cover;
 }
 
+/* Títulos de cada reproductor */
 .player-title {
-  text-align: center;
-  color: #ff6600;
-  margin: 20px 0 10px;
+    color: #ff6600;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
 }
 
+/* Base de todos los reproductores */
 .custom-player {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 20px;
-  width: 100%;
-  max-width: 600px;
-  height: 152px;
-  padding: 10px 15px;
-  border: 3px solid #ff6600;
-  border-radius: 12px;
-  background: rgba(26,26,26,0.7);
-  box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
-  margin: 40px auto; /* doble espacio entre reproductores */
+    display: flex;
+    flex-direction: row;       /* portada a la izquierda, info a la derecha */
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 600px;          /* ancho fijo */
+    height: 152px;             /* igual que Spotify embed */
+    padding: 10px 15px;
+    border: 3px solid #ff6600;
+    border-radius: 12px;
+    background: rgba(26,26,26,0.7);
+    box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
+    margin: 40px auto;         /* espacio entre reproductores */
 }
 
+/* Hover con halo */
 .custom-player:hover {
-  box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
+    box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
 }
 
 /* Portada del Disco de la Semana */
-.custom-player img {
-  width: 150px;
-  height: 150px;
-  border-radius: 12px;
-  object-fit: cover;
-  box-shadow: 0 0 15px rgba(255,102,0,0.5);
-  flex-shrink: 0;
+.disco-player img {
+    width: 150px;
+    height: 150px;
+    border-radius: 12px;
+    object-fit: cover;
+    /* eliminamos el borde naranja doble */
+    box-shadow: 0 0 15px rgba(255,102,0,0.5);
+    flex-shrink: 0;
 }
 
-/* Info del reproductor */
+/* Info del reproductor (audio / iframe) */
 .player-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 8px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
 }
 
 /* Audio HTML5 */
 .player-info audio {
-  width: 100%;
-  height: 40px;
-  border-radius: 6px;
-  background: #111;
-  border: none;
-  box-shadow: 0 0 10px rgba(255,102,0,0.35);
+    width: 100%;
+    height: 40px;
+    border-radius: 6px;
+    background: #111;
+    border: none;
+    box-shadow: 0 0 10px rgba(255,102,0,0.35);
 }
 
-/* Spotify e IVOOX iframes */
+/* Iframes (Spotify e IVOOX) */
 .player-info iframe {
-  width: 100%;
-  height: 152px;
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
+    width: 100%;
+    height: 152px;                  /* igual que Spotify */
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
 }
 
-/* RESPONSIVE */
+/* Responsivo */
 @media (max-width: 768px) {
-  .custom-player {
-    flex-direction: column;
-    height: auto;
-  }
+    .custom-player {
+        flex-direction: column;
+        height: auto;
+        gap: 15px;
+    }
 
-  .player-info {
-    align-items: center;
-  }
+    .player-info audio,
+    .player-info iframe {
+        height: 50px;
+    }
+}
 
-  .player-info audio,
-  .player-info iframe {
-    height: 100px;
-  }
+@media (max-width: 480px) {
+    .custom-player {
+        width: 95%;
+        height: auto;
+    }
+
+    .disco-player img {
+        width: 120px;
+        height: 120px;
+    }
 }
 
 

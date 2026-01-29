@@ -5,404 +5,138 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sonar Rock - La Radio Independiente</title>
 
-<!-- CSS -->
-<link href="style.css" rel="stylesheet">
-<link href="player.css" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/player.css">
 
-<!-- Iconos -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
-<!-- PWA & Favicons -->
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ff6600">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
-<link rel="shortcut icon" href="/icons/favicon.ico">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="google" content="notranslate">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="container">
-    <div class="logo-section">
-      <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
-      <div class="title-section">
-        <h1>LA RADIO INDEPENDIENTE</h1>
-      </div>
-    </div>
-  </div>
-</header>
 
-<!-- IMAGEN PRINCIPAL -->
-<section class="main-section">
-  <div class="container">
-    <div class="main-image-container">
-      <img src="attached_assets/sonarrock.png" alt="Sonar Rock" class="main-image">
-    </div>
-  </div>
-</section>
-
-<!-- ========================= -->
-<!-- REPRODUCTOR STREAMING -->
-<!-- ========================= -->
+  
+<!-- ================= STREAMING EN VIVO ================= -->
 <section class="player-section">
   <div class="player-container">
 
-    <img src="img/background1.png" alt="Background" class="player-bg">
+    <img src="img/background1.png" class="player-bg">
     <div class="overlay"></div>
-    <canvas id="matrixCanvas"></canvas>
 
     <div class="player-content">
 
-      <div id="now-playing"></div>
+      <div id="now-playing">Sonar Rock</div>
 
-      <canvas id="spectrumCanvas"></canvas>
-
-      <!-- BADGE EN VIVO -->
-      <div id="live-indicator" class="live-badge auto">
+      <div id="live-indicator" class="live-badge">
         <span class="dot"></span>
         <span class="text">PROGRAMACIÓN</span>
       </div>
 
       <div class="controls">
-        <button id="playPauseBtn" class="btn">
-          <i class="fas fa-play"></i>
-        </button>
-        <button id="stop-btn" class="btn">
-          <i class="fas fa-stop"></i>
-        </button>
-        <button id="mute-btn" class="btn">
-          <i class="fas fa-volume-up"></i>
-        </button>
-        <input id="volume" type="range" min="0" max="1" step="0.01" value="1">
+        <button id="playPauseBtn"><i class="fas fa-play"></i></button>
+        <button id="stop-btn"><i class="fas fa-stop"></i></button>
+        <button id="mute-btn"><i class="fas fa-volume-up"></i></button>
+        <input id="volume" type="range" min="0" max="1" step="0.01">
       </div>
 
-      <!-- AUDIO STREAM -->
-      <audio id="radio-audio" playsinline crossorigin="anonymous">
-      </audio>
+      <audio id="radio-audio" playsinline crossorigin="anonymous"></audio>
 
     </div>
   </div>
 </section>
 
 <!-- ========================= -->
-<!-- REDES SOCIALES -->
-<!-- ========================= -->
-<section class="social-section">
-  <div class="container">
-    <h2 class="section-title">Redes Sociales</h2>
-    <div class="social-buttons">
-      <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
-      <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
-      <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
-      <a href="https://open.spotify.com/show/6mPcjQLeDdCwxzJe3PLlyU" target="_blank" class="social-btn spotify"><i class="fab fa-spotify"></i></a>
-      <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox"><i class="fas fa-podcast"></i></a>
-    </div>
-  </div>
-</section>
+  <!-- REDES SOCIALES -->
+  <!-- ========================= -->
+  <section class="social-section">
+    <div class="container">
+      <h2 class="section-title">Redes Sociales</h2> 
+      <div class="social-buttons"> 
+        <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp">  <i class="fab fa-whatsapp"></i></a> 
+        <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a> 
+        <a href="https://www.instagram.com/sonar_rockgdl?igsh=bjlma2JpMXQwbDBv" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a> 
+        <a href="https://open.spotify.com/show/6mPcjQLeDdCwxzJe3PLlyU" target="_blank" class="social-btn spotify"><i class="fab fa-spotify"></i></a> 
+        <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox"><i class="fas fa-podcast"></i></a> </div> </div> </section>
 
-<!-- ========================= -->
-<!-- SECCIÓN DE REPRODUCTORES MODULAR -->
-<!-- ========================= -->
+  
+<!-- ================= DISCO DE LA SEMANA ================= -->
 <section class="disco-ivoox-spotify">
-  <div class="players-container">
 
-   <!-- DISCO DE LA SEMANA -->
-<div class="custom-player disco-player" id="disco-player">
-
-  <!-- HEADER -->
-  <div class="disco-header">
-    <img id="cover" src="" alt="Portada Disco">
-
-    <div class="disco-meta">
-      <div id="track-title">Título del Disco</div>
+  <div class="custom-player disco-player">
+    <img id="cover" alt="Portada">
+    <div>
+      <div id="track-title"></div>
+      <audio id="disco-audio" controls></audio>
     </div>
   </div>
 
-  <!-- AUDIO ABAJO FULL WIDTH -->
-  <div class="disco-audio">
-    <audio id="disco-audio" controls preload="auto"></audio>
+  <!-- ================= IVOOX ================= -->
+  <div class="custom-player ivoox-player">
+    <div id="podcast-player"></div>
   </div>
 
-</div>
+<!-- ========================= --> 
+<!-- STAFF --> 
+<!-- ========================= --> 
+  <section class="staff-section"> 
+    <div class="container"> 
+      <h2 class="section-title" style="margin-bottom:40px;">Staff</h2>
+      <div class="staff-grid"> <div class="staff-member"> 
+      <img src="attached_assets/Wendy_1749601460841.jpeg" alt="Wendy" class="staff-image"> <h3>Wendy</h3> 
+      </div> <div class="staff-member"> 
+        <img src="attached_assets/Alvaro_1749601460841.jpeg" alt="Alvaro" class="staff-image"> <h3>El Contralor</h3> 
+      </div> <div class="staff-member"> <img src="attached_assets/Hans_1749601460841.jpeg" alt="Hans" class="staff-image"> 
+        <h3>Hans</h3> </div> <div class="staff-member"> <img src="attached_assets/El Chris_1749601460841.jpeg" alt="El Chris" class="staff-image">
+          <h3>El Chris</h3> </div> </div> </div> </section> 
 
-
-    <!-- SPOTIFY -->
-    <div class="custom-player" id="spotify-player">
-      <iframe src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU"
-        frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        allowfullscreen></iframe>
-    </div>
-
-    <!-- iVoox -->
-    <div class="custom-player ivoox-player">
-  <iframe
-    src="https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=141c24"
-    width="100%"
-    height="150"
-    frameborder="0"
-    scrolling="no"
-    loading="lazy"
-  ></iframe>
-</div>
-
-<style>
-
-  /* ----------------------------- */
-/* SECCIÓN FONDO */
-.disco-ivoox-spotify {
-    background-image: url('attached_assets/fondoplayer.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 60px 0;
-}
-
-/* CONTENEDOR GENERAL DE REPRODUCTORES */
-.players-container {
-    max-width: 900px;
-    margin: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 50px;
-    align-items: center;
-}
-
-/* ESTILO COMÚN DE REPRODUCTORES */
-.custom-player {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    padding: 20px;
-    border-radius: 15px;
-    border: 3px solid #ff6600;
-    box-shadow: 
-        0 0 30px rgba(255,102,0,0.8), 
-        0 0 60px rgba(255,102,0,0.4) inset;
-    backdrop-filter: blur(5px);
-    background: rgba(0,0,0,0.3);
-    width: 100%;
-    max-width: 650px;
-}
-
-/* DISCO DE LA SEMANA */
-#disco-player img#cover {
-    width: 140px;
-    height: 140px;
-    border-radius: 12px;
-    object-fit: cover;
-    border: 2px solid #ff6600;
-    box-shadow: 0 0 20px rgba(255,102,0,0.5);
-}
-
-.player-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-#track-title {
-    color: #fff;
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-#disco-audio {
-    width: 100%;
-    border-radius: 8px;
-    background: #222;
-    box-shadow: 0 0 15px rgba(255,102,0,0.4);
-}
-
-/* SPOTIFY */
-#spotify-player iframe {
-    width: 100%;
-    height: 170px;
-    border-radius: 12px;
-}
-
-/* iVoox */
-#ivoox-player #podcast-player {
-    width: 100%;
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    .players-container {
-        gap: 30px;
-    }
-    .custom-player {
-        flex-direction: column;
-        align-items: center;
-    }
-    #spotify-player iframe {
-        height: 150px;
-    }
-}
-</style>
-
-<script>
-
-// ----------------------------
-// DISCO DE LA SEMANA (SEGURO)
-// ----------------------------
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-
-  const fileName = "Aretha Franklin - Lady Soul.mp3";
-
-  const audio = document.getElementById("disco-audio");
-  const cover = document.getElementById("cover");
-  const title = document.getElementById("track-title");
-
-  if (!audio || !cover || !title) return;
-
-  title.textContent = fileName.replace(".mp3", "");
-
-  audio.src =
-    "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/" +
-    encodeURIComponent(fileName);
-
-  cover.src =
-    "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" +
-    Date.now();
-
-});
-</script>
-
-
-// ----------------------------
-// CARGA ÚLTIMO EPISODIO iVoox
-// ----------------------------
-async function loadLatestIvooxEpisode(){
-  const feedUrl = "https://corsproxy.io/?https://www.ivoox.com/feed_fg_f12661206_filtro_1.xml";
-  const playerContainer = document.getElementById("podcast-player");
-
-  try{
-    const response = await fetch(feedUrl);
-    const xmlText = await response.text();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(xmlText,"text/xml");
-
-    const item = xml.querySelector("item");
-    if(!item) throw new Error("No se encontró ningún episodio");
-
-    const title = item.querySelector("title").textContent;
-    const audioUrl = item.querySelector("enclosure").getAttribute("url");
-    const pubDate = new Date(item.querySelector("pubDate").textContent).toLocaleDateString();
-    const imageUrl = item.querySelector("itunes\\:image, image")?.getAttribute("href") || "https://static-1.ivoox.com/img/podcast_default.jpg";
-
-    const playerHTML = `
-      <div class="podcast-episode" style="display:flex; gap:15px; align-items:center;">
-        <img src="${imageUrl}" alt="Carátula episodio" style="width:140px;height:140px;border-radius:12px;object-fit:cover;border:2px solid #ff6600;box-shadow:0 0 20px rgba(255,102,0,0.5);">
-        <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
-          <h3 style="margin:0;color:#fff;font-size:14px;">${title}</h3>
-          <p style="margin:0;color:#b3b3b3;font-size:10px;">Publicado el ${pubDate}</p>
-          <audio controls preload="none" style="width:100%; border-radius:8px; background:#222; box-shadow:0 0 15px rgba(255,102,0,0.4);">
-            <source src="${audioUrl}" type="audio/mpeg">
-            Tu navegador no soporta audio HTML5.
-          </audio>
-        </div>
-      </div>
-    `;
-    playerContainer.innerHTML = playerHTML;
-  }catch(error){
-    playerContainer.innerHTML = `<p style="color:#f00;">No se pudo cargar el reproductor. Intenta más tarde.</p>`;
-    console.error("Error cargando feed iVoox:", error);
-  }
-}
-
-loadLatestIvooxEpisode();
-</script>
+  <!-- ========================= -->
+  <!-- ¿QUIÉNES SOMOS? --> 
+  <!-- ========================= --> 
+  <section class="about-section"> 
+    <div class="container"> 
+      <div class="about-content"> 
+        <h2 class="section-title">
+          
+          ¿Quiénes Somos?</h2> 
+        <p class="about-text"> 
+        Sonar Rock es una trinchera sonora, un espacio libre y apasionado que nace en Guadalajara, 
+          Jalisco, México. Nuestra misión es simple pero poderosa: abrir un foro auténtico para las 
+          bandas emergentes, apoyar la escena local y mantener viva la esencia del rock en todas sus vertientes.
+          Creemos en la fuerza de la música como motor de cambio, como punto de encuentro y 
+          como refugio de quienes buscan algo distinto a lo convencional. 
+          En Sonar Rock somos más que una radio: somos comunidad, resistencia y pasión por el sonido que nos une. 
+        </p> 
+      </div> 
+    </div> 
   </section>
   
-<!-- ========================= -->
-<!-- STAFF -->
-<!-- ========================= -->
-<section class="staff-section">
-  <div class="container">
-    <h2 class="section-title" style="margin-bottom:40px;">Staff</h2>
-    <div class="staff-grid">
-      <div class="staff-member">
-        <img src="attached_assets/Wendy_1749601460841.jpeg" alt="Wendy" class="staff-image">
-        <h3>Wendy</h3>
-      </div>
-      <div class="staff-member">
-        <img src="attached_assets/Alvaro_1749601460841.jpeg" alt="Alvaro" class="staff-image">
-        <h3>El Contralor</h3>
-      </div>
-      <div class="staff-member">
-        <img src="attached_assets/Hans_1749601460841.jpeg" alt="Hans" class="staff-image">
-        <h3>Hans</h3>
-      </div>
-      <div class="staff-member">
-        <img src="attached_assets/El Chris_1749601460841.jpeg" alt="El Chris" class="staff-image">
-        <h3>El Chris</h3>
+  <!-- ========================= --> 
+  <!-- ¿QUÉ ES SONAR ROCK? -->
+  <!-- ========================= -->
+  <section class="about-section"> 
+    <div class="container"> 
+      <div class="about-content"> 
+      <h2 class="section-title">
+        
+        ¿Qué es Sonar Rock?</h2> 
+        <p class="about-text">
+          Sonar Rock celebra la esencia eterna del rock n’ roll:
+          Su rebeldía frente a lo establecido. Su poesía en cada 
+          letra y acorde. Su energía que enciende escenarios y corazones.
+          Su capacidad de conectar almas más allá de fronteras y generaciones. 
+          Aquí el rock no se escucha de fondo, se vive. Somos un canal donde conviven lo clásico, 
+          lo alternativo y lo emergente, siempre con la autenticidad como bandera.
+        </p>
       </div>
     </div>
-  </div>
+    
+
+  
 </section>
 
-<!-- ========================= -->
-<!-- ¿QUIÉNES SOMOS? -->
-<!-- ========================= -->
-<section class="about-section">
-  <div class="container">
-    <div class="about-content">
-      <h2 class="section-title">¿Quiénes Somos?</h2>
-      <p class="about-text">
-        Sonar Rock es una trinchera sonora, un espacio libre y apasionado que nace en Guadalajara, Jalisco, México.
-        Nuestra misión es simple pero poderosa: abrir un foro auténtico para las bandas emergentes, apoyar la escena local y mantener viva la esencia del rock en todas sus vertientes.
+<!-- ================= JS ================= -->
+<script src="js/radio-player.js" defer></script>
+<script src="js/disco-semana.js" defer></script>
+<script src="js/ivoox-latest.js" defer></script>
 
-        Creemos en la fuerza de la música como motor de cambio, como punto de encuentro y como refugio de quienes buscan algo distinto a lo convencional.
-        En Sonar Rock somos más que una radio: somos comunidad, resistencia y pasión por el sonido que nos une.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- ========================= -->
-<!-- ¿QUÉ ES SONAR ROCK? -->
-<!-- ========================= -->
-<section class="about-section">
-  <div class="container">
-    <div class="about-content">
-      <h2 class="section-title">¿Qué es Sonar Rock?</h2>
-      <p class="about-text">
-        Sonar Rock celebra la esencia eterna del rock n’ roll:
-
-        Su rebeldía frente a lo establecido.
-
-        Su poesía en cada letra y acorde.
-
-        Su energía que enciende escenarios y corazones.
-
-        Su capacidad de conectar almas más allá de fronteras y generaciones.
-
-        Aquí el rock no se escucha de fondo, se vive. Somos un canal donde conviven lo clásico, lo alternativo y lo emergente, siempre con la autenticidad como bandera.
-      </p>
-    </div>
-  </div>
-  
-<!-- ========================= -->
-<!-- JS -->
-<!-- ========================= -->
-
-<!-- PLAYER RADIO EN VIVO -->
-<script src="js/player.js" defer></script>
-
-<!-- DISCO DE LA SEMANA -->
-<script src="js/disco-player.js" defer></script>
-
-<audio controls playsinline>
-  <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-</audio>
-  
 </body>
 </html>

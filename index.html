@@ -95,10 +95,12 @@
 </section>
 
 <!-- ========================= -->
+<!-- ========================= -->
 <!-- SECCIÓN REPRODUCTORES -->
 <!-- ========================= -->
 <section class="players-section">
-  <h3 class="player-title">Disco de la Semana: Aretha Franklin - Lady Soul</h3>
+  <!-- DISCO DE LA SEMANA -->
+  <h3 class="player-title">Disco de la Semana</h3>
   <div class="custom-player disco-player" id="disco-player">
     <img id="cover" src="" alt="Portada Disco">
     <div class="player-info">
@@ -106,6 +108,7 @@
     </div>
   </div>
 
+  <!-- SPOTIFY -->
   <h3 class="player-title">Spotify</h3>
   <div class="custom-player spotify-player">
     <div class="player-info">
@@ -121,6 +124,7 @@
     </div>
   </div>
 
+  <!-- IVOOX -->
   <h3 class="player-title">iVoox</h3>
   <div class="custom-player ivoox-player">
     <div class="player-info">
@@ -146,12 +150,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const audio = document.getElementById("disco-audio");
   const cover = document.getElementById("cover");
   const container = document.getElementById("disco-player");
+  const titleElement = container.previousElementSibling; // h3 justo arriba del reproductor
 
-  if (!audio || !cover || !container) return;
+  if (!audio || !cover || !container || !titleElement) return;
 
   // Mostrar el nombre del archivo como título
   const title = fileName.replace(".mp3", "");
-  document.querySelector('.player-title').textContent = "Disco de la Semana: " + title;
+  titleElement.textContent = "Disco de la Semana: " + title;
 
   // Asignar archivo de audio
   audio.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
@@ -162,7 +167,6 @@ document.addEventListener("DOMContentLoaded", () => {
   cover.classList.add("disco-cover");
 });
 </script>
-
 
 
 <!-- ========================= -->

@@ -6,58 +6,48 @@ document.addEventListener("DOMContentLoaded", () => {
   const volumeSlider = document.getElementById("volume");
   const statusText = document.getElementById("status-text");
 
-  // URL streaming Zeno
   const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
-  let reconnectTimeout;
+  let reconnectTimer;
 
   audio.src = STREAM_URL;
   audio.volume = volumeSlider.value;
 
-  // Función actualizar estado
   function updateStatus(status) {
     statusText.textContent = status.toUpperCase();
-    if(status === "reproduciendo") {
-      statusText.style.color = "#00ff88";
-    } else if(status === "offline") {
-      statusText.style.color = "#ff4d4d";
-    } else {
-      statusText.style.color = "#ffffff";
-    }
+    if(status === "reproduciendo") statusText.style.color = "#00ff88";
+    else if(status === "offline") statusText.style.color = "#ff4d4d";
+    else statusText.style.color = "#ffffff";
   }
 
   updateStatus("offline");
 
-  // Reconectar en caso de error
+  // Reconexión automática
   function tryReconnect() {
-    clearTimeout(reconnectTimeout);
+    clearTimeout(reconnectTimer);
     updateStatus("offline");
-    reconnectTimeout = setTimeout(() => {
+    reconnectTimer = setTimeout(() => {
       audio.load();
-      audio.play().catch(() => {}); // ignora error por autoplay bloqueado
-    }, 5000); // reintenta cada 5 segundos
+      audio.play().catch(() => {}); // autoplay bloqueado
+    }, 5000);
   }
 
+  // Eventos de audio
   audio.addEventListener("playing", () => updateStatus("reproduciendo"));
   audio.addEventListener("pause", () => updateStatus("offline"));
   audio.addEventListener("error", tryReconnect);
   audio.addEventListener("stalled", tryReconnect);
   audio.addEventListener("ended", tryReconnect);
+  audio.addEventListener("canplay", () => console.log("Stream listo para reproducir"));
 
   // Play / Pause
   playBtn.addEventListener("click", () => {
-    if(audio.paused) {
-      audio.play().then(() => {
-        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        updateStatus("reproduciendo");
-      }).catch(err => {
-        console.log("Play bloqueado por navegador:", err);
-        alert("Haz click en Play para iniciar el streaming");
-      });
-    } else {
-      audio.pause();
-      playBtn.innerHTML = '<i class="fas fa-play"></i>';
-      updateStatus("offline");
-    }
+    audio.load(); // fuerza carga del stream
+    audio.play().then(() => {
+      playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    }).catch(err => {
+      console.log("Play bloqueado por navegador", err);
+      alert("Haz click en Play para iniciar el streaming");
+    });
   });
 
   // Stop
@@ -68,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateStatus("offline");
   });
 
-  // Mute / Unmute
+  // Mute
   muteBtn.addEventListener("click", () => {
     audio.muted = !audio.muted;
     muteBtn.innerHTML = audio.muted

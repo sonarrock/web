@@ -7,9 +7,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!audio || !cover || !title || !container) return;
 
+  // Mostrar nombre del disco dentro del contenedor
   title.textContent = fileName.replace(".mp3", "");
+
+  // Asignar archivo de audio
   audio.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
   audio.load();
+
+  // Asignar portada
   cover.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=${Date.now()}`;
   cover.classList.add("disco-cover");
 });

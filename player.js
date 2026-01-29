@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const muteBtn = document.getElementById("mute-btn");
   const volumeSlider = document.getElementById("volume");
   const liveIndicator = document.getElementById("live-indicator");
-  const liveText = liveIndicator.querySelector(".text");
   const playerContainer = document.querySelector(".player-container");
 
   let isPlaying = false;
@@ -32,8 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
 
         liveText.textContent = "EN VIVO";
-        liveIndicator.classList.add("active");
-        playerContainer.classList.add("playing");
+liveText.textContent = "PROGRAMACIÓN";
+liveText.textContent = "OFFLINE";
 
         if (typeof startMatrix === "function") startMatrix();
       }).catch(err => {

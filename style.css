@@ -603,3 +603,73 @@ body {
     margin-left: 10px;
     display: inline-block;
 }
+
+/* ===============================
+   DISCO DE LA SEMANA – FIX FINAL
+=============================== */
+
+.custom-player.disco-player {
+  width: 100%;
+  max-width: 360px;          /* mismo ancho visual */
+  height: 430px;             /* controla el crecimiento */
+  background: #000;
+  border-radius: 18px;
+  border: 2px solid #ff6600;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* HEADER */
+.disco-header {
+  position: relative;
+  height: 300px;
+  overflow: hidden;
+}
+
+.disco-header img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* TITULO */
+.disco-meta {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.85),
+    rgba(0,0,0,0)
+  );
+}
+
+#track-title {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* AUDIO */
+.disco-audio {
+  padding: 10px;
+  background: #0a0a0a;
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.6);
+}
+
+.disco-audio audio {
+  width: 100%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .custom-player.disco-player {
+    max-width: 100%;
+    height: 420px;
+  }
+}
+

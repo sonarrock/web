@@ -1,6 +1,6 @@
 /* ===============================
    RESET Y BASE
-=============================== */
+============================== */
 * {
     margin: 0;
     padding: 0;
@@ -23,7 +23,7 @@ body {
 
 /* ===============================
    HEADER
-=============================== */
+============================== */
 .header {
     background: #0a0a0a;
     padding: 20px 0;
@@ -53,9 +53,15 @@ body {
     text-shadow: 0 0 10px rgba(255,102,0,0.5);
 }
 
+.title-section h2,
+.title-section h3,
+h2, h3 {
+    color: #ff6600;
+}
+
 /* ===============================
    MAIN IMAGE
-=============================== */
+============================== */
 .main-section {
     padding: 40px 0;
 }
@@ -75,96 +81,121 @@ body {
     display: block;
 }
 
-/* =========================
+/* ===============================
    BASE UNIFICADA PARA TODOS LOS REPRODUCTORES
-========================= */
+============================== */
+.players-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+    width: 100%;
+}
+
 .custom-player {
-  display: flex;
-  flex-direction: row;       /* portada a la izquierda, info a la derecha */
-  align-items: center;
-  gap: 20px;
-  width: 360px;              /* ancho base */
-  max-width: 95%;
-  height: 360px;             /* más alto que antes */
-  padding: 20px;
-  border: 3px solid #ff6600;
-  border-radius: 18px;
-  background: rgba(26,26,26,0.7);
-  box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
-  transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    width: 360px;           /* ancho base */
+    max-width: 95%;
+    height: 600px;           /* más largo para todos */
+    padding: 20px;
+    border: 3px solid #ff6600;
+    border-radius: 18px;
+    background: rgba(26,26,26,0.7);
+    box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .custom-player:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 40px rgba(255,102,0,1), 0 0 80px rgba(255,102,0,0.5) inset;
+    transform: translateY(-5px);
+    box-shadow: 0 0 40px rgba(255,102,0,1), 0 0 80px rgba(255,102,0,0.5) inset;
 }
 
 /* PORTADA */
 .custom-player img {
-  width: 150px;
-  height: 150px;
-  border-radius: 12px;
-  object-fit: cover;
-  border: 3px solid #ff6600;
-  box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4);
-  flex-shrink: 0;
+    width: 150px;
+    height: 150px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 3px solid #ff6600;
+    box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4);
+    flex-shrink: 0;
 }
 
 /* INFO DEL REPRODUCTOR */
 .player-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
 }
 
 /* AUDIO HTML5 */
-.player-info audio,
-.player-info iframe {
-  width: 100%;
-  height: 50px;              /* altura base para audio HTML5 */
-  border-radius: 6px;
-  box-shadow: 0 0 15px rgba(255,102,0,0.35);
-  background: #111;
-  border: none;
+.player-info audio {
+    width: 100%;
+    height: 60px;
+    border-radius: 6px;
+    box-shadow: 0 0 15px rgba(255,102,0,0.35);
+    background: #111;
+    border: none;
 }
 
 /* SPOTIFY e IVOOX */
 .spotify-player iframe,
 .ivoox-player iframe {
-  height: 250px;             /* altura mayor que audio normal */
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
+    width: 100%;
+    height: 500px;          /* más alto para uniformidad */
+    border-radius: 12px;
+    border: none;            /* elimina doble marco */
+    box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
 }
 
 /* RESPONSIVE */
+@media (max-width: 1024px) {
+    .custom-player {
+        width: 90%;
+        height: 500px;
+    }
+
+    .spotify-player iframe,
+    .ivoox-player iframe {
+        height: 400px;
+    }
+}
+
 @media (max-width: 768px) {
-  .custom-player {
-    flex-direction: column;
-    height: auto;
-    gap: 15px;
-  }
+    .custom-player {
+        flex-direction: column;
+        height: auto;
+        gap: 15px;
+    }
 
-  .player-info {
-    align-items: center;
-  }
+    .player-info {
+        align-items: center;
+    }
 
-  .player-info audio,
-  .player-info iframe {
-    height: 50px;
-  }
+    .player-info audio,
+    .player-info iframe {
+        height: 50px;
+    }
 
-  .spotify-player iframe,
-  .ivoox-player iframe {
-    height: 200px;
-  }
+    .spotify-player iframe,
+    .ivoox-player iframe {
+        height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .custom-player { width: 95%; height: auto; }
+    .disco-cover { width: 120px; height: 120px; }
 }
 
 /* ===============================
    REDES SOCIALES
-=============================== */
+============================== */
 .social-section {
     padding: 30px 0;
     background: rgba(0,0,0,0.3);
@@ -204,7 +235,7 @@ body {
 
 /* ===============================
    STAFF
-=============================== */
+============================== */
 .staff-section {
     background-image: url('attached_assets/fondostaff.png');
     background-size: cover;
@@ -259,7 +290,7 @@ body {
 
 /* ===============================
    ABOUT
-=============================== */
+============================== */
 .about-section {
     padding: 60px 0;
 }
@@ -279,7 +310,7 @@ body {
 
 /* ===============================
    RESPONSIVE
-=============================== */
+============================== */
 @media (max-width: 768px) {
     .title-section h1 { font-size: 2rem; }
     .main-image { height: 300px; }
@@ -287,6 +318,6 @@ body {
 }
 
 @media (max-width: 480px) {
-    .custom-player { width: 95%; height: 170px; }
+    .custom-player { width: 95%; height: auto; flex-direction: column; gap: 15px; }
     .disco-cover { width: 120px; height: 120px; }
 }

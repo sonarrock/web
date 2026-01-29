@@ -14,11 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
   title.textContent = fileName.replace(".mp3", "");
 
   // Asignar archivo de audio
-  audio.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/" + encodeURIComponent(fileName);
-  audio.load(); // fuerza recarga del audio
+  audio.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/${encodeURIComponent(fileName)}`;
+  audio.load();
 
   // Asignar portada
-  cover.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" + Date.now();
+  cover.src = `https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=${Date.now()}`;
+  cover.classList.add("disco-cover"); // asegura que se aplique el CSS correcto
+
+  // Opcional: reproducir automáticamente
+  // audio.play().catch(e => console.log("Autoplay bloqueado", e));
 
   // -----------------------------
   // ANIMACIÓN HALO
@@ -32,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
       intensity += 0.01 * direction;
       if (intensity > 0.8) direction = -1;
       if (intensity < 0.3) direction = 1;
-      container.style.boxShadow = `0 0 ${30 + intensity*50}px rgba(255,102,0,${intensity})`;
+      container.style.boxShadow = `0 0 ${60 * intensity + 50}px rgba(255,102,0,${intensity})`;
     }, 20);
   });
 

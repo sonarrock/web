@@ -95,53 +95,102 @@
 </section>
 
 <!-- ========================= -->
-<!-- REPRODUCTORES: DISCO / SPOTIFY / IVOOX -->
 <!-- ========================= -->
-<section class="players-section">
+<!-- DISCOS / SPOTIFY / IVOOX -->
+<!-- ========================= -->
+<section class="disco-ivoox-spotify">
 
-  <!-- 1. DISCO DE LA SEMANA -->
+  <!-- TÍTULO DISCO DE LA SEMANA -->
   <h3 class="player-title">Disco de la Semana</h3>
-  <div class="custom-player" id="disco-player">
-    <img id="cover" src="https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg" alt="Portada Disco">
+  <div class="custom-player disco-player" id="disco-player">
+    <img id="cover" src="" alt="Portada Disco">
     <div class="player-info">
-      <div id="track-title">Título del Disco</div>
       <audio id="disco-audio" controls preload="auto"></audio>
     </div>
   </div>
 
-  <!-- 2. SPOTIFY -->
+  <!-- TÍTULO SPOTIFY -->
   <h3 class="player-title">Spotify</h3>
   <div class="custom-player spotify-player">
     <div class="player-info">
       <iframe 
-        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?utm_source=generator" 
-        width="100%" 
-        height="180" 
+        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU" 
         frameborder="0" 
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-        allowfullscreen 
-        loading="lazy">
+        allowfullscreen>
       </iframe>
     </div>
   </div>
 
-  <!-- 3. IVOOX -->
+  <!-- TÍTULO IVOOX -->
   <h3 class="player-title">iVoox</h3>
   <div class="custom-player ivoox-player">
-    <div class="player-info">
-      <iframe 
-        src="https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=141c24" 
-        width="100%" 
-        height="180" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media; fullscreen" 
-        allowfullscreen 
-        loading="lazy">
-      </iframe>
+    <div class="player-info" id="ivoox-container">
+      <!-- iframe se genera automáticamente con JS -->
     </div>
   </div>
 
 </section>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // -----------------------------
+  // DISCO DE LA SEMANA
+  // -----------------------------
+  const fileName = "Aretha Franklin - Lady Soul.mp3"; // Cambiar cada semana si quieres manual
+  const audio = document.getElementById("disco-audio");
+  const cover = document.getElementById("cover");
+
+  // Asignar archivo de audio
+  audio.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/" + encodeURIComponent(fileName);
+  audio.load();
+
+  // Asignar portada
+  cover.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" + Date.now();
+
+ // -----------------------------
+// IVOOX - Último episodio automático
+// -----------------------------
+const ivooxContainer = document.getElementById("ivoox-container");
+
+// Creamos el iframe con la URL real de tu podcast
+const ivooxIframe = document.createElement("iframe");
+ivooxIframe.src = "https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=141c24";
+ivooxIframe.width = "100%";
+ivooxIframe.height = "152"; // igual que Spotify
+ivooxIframe.style.borderRadius = "12px";
+ivooxIframe.frameBorder = "0";
+ivooxIframe.allowFullscreen = true;
+ivooxIframe.scrolling = "no";
+ivooxIframe.loading = "lazy";
+
+ivooxContainer.appendChild(ivooxIframe);
+
+  // -----------------------------
+  // Halo animado Disco de la Semana
+  // -----------------------------
+  const container = document.getElementById("disco-player");
+  let haloInterval;
+  container.addEventListener("mouseenter", () => {
+    clearInterval(haloInterval);
+    let intensity = 0.3;
+    let direction = 1;
+    haloInterval = setInterval(() => {
+      intensity += 0.01 * direction;
+      if (intensity > 0.8) direction = -1;
+      if (intensity < 0.3) direction = 1;
+      container.style.boxShadow = `0 0 ${30 + intensity*50}px rgba(255,102,0,${intensity})`;
+    }, 20);
+  });
+
+  container.addEventListener("mouseleave", () => {
+    clearInterval(haloInterval);
+    container.style.boxShadow = "0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset";
+  });
+
+});
+</script>
+
 
 <!-- ========================= -->
 <!-- STAFF -->

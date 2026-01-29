@@ -6,54 +6,70 @@ document.addEventListener("DOMContentLoaded", () => {
   const muteBtn = document.getElementById("mute-btn");
   const volumeSlider = document.getElementById("volume");
   const liveIndicator = document.getElementById("live-indicator");
+  const liveText = liveIndicator.querySelector(".text");
   const playerContainer = document.querySelector(".player-container");
 
   let isPlaying = false;
 
-  /* =============================== */
-  /* REPRODUCCIÓN Y CONTROL DE AUDIO */
-  /* =============================== */
+  /* ===============================
+     CONFIG STREAM
+  =============================== */
+  audio.preload = "none";
+  audio.volume = volumeSlider.value;
 
-  // Reproducir audio
+  /* ===============================
+     PLAY / PAUSE
+  =============================== */
   playBtn.addEventListener("click", () => {
+
     if (!isPlaying) {
+      audio.load(); // 👈 CLAVE para streams Zeno
+
       audio.play().then(() => {
         isPlaying = true;
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        liveIndicator.textContent = "EN VIVO";
+
+        liveText.textContent = "EN VIVO";
         liveIndicator.classList.add("active");
         playerContainer.classList.add("playing");
 
-        startMatrix();  // Inicia animación de Matrix al reproducir
+        if (typeof startMatrix === "function") startMatrix();
       }).catch(err => {
-        console.error("Error al reproducir:", err);
+        console.error("No se pudo reproducir el stream:", err);
       });
+
     } else {
       audio.pause();
       isPlaying = false;
+
       playBtn.innerHTML = '<i class="fas fa-play"></i>';
-      liveIndicator.textContent = "OFFLINE";
+      liveText.textContent = "PROGRAMACIÓN";
       liveIndicator.classList.remove("active");
       playerContainer.classList.remove("playing");
 
-      stopMatrix();  // Detiene animación de Matrix al pausar
+      if (typeof stopMatrix === "function") stopMatrix();
     }
   });
 
-  // Detener audio
+  /* ===============================
+     STOP (SIN currentTime)
+  =============================== */
   stopBtn.addEventListener("click", () => {
     audio.pause();
-    audio.currentTime = 0;
+    audio.src = audio.src; // 👈 reset seguro para stream
+
     isPlaying = false;
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    liveIndicator.textContent = "OFFLINE";
+    liveText.textContent = "PROGRAMACIÓN";
     liveIndicator.classList.remove("active");
     playerContainer.classList.remove("playing");
 
-    stopMatrix();  // Detiene animación al detener
+    if (typeof stopMatrix === "function") stopMatrix();
   });
 
-  // Mute botón
+  /* ===============================
+     MUTE
+  =============================== */
   muteBtn.addEventListener("click", () => {
     audio.muted = !audio.muted;
     muteBtn.innerHTML = audio.muted
@@ -61,30 +77,24 @@ document.addEventListener("DOMContentLoaded", () => {
       : '<i class="fas fa-volume-up"></i>';
   });
 
-  // Control de volumen
+  /* ===============================
+     VOLUMEN
+  =============================== */
   volumeSlider.addEventListener("input", () => {
     audio.volume = volumeSlider.value;
   });
 
-  /* =============================== */
-  /* EVENTOS DEL STREAM */
-  /* =============================== */
-
-  // Cuando el audio termina
-  audio.addEventListener("ended", () => {
-    isPlaying = false;
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    liveIndicator.textContent = "OFFLINE";
-    liveIndicator.classList.remove("active");
-    playerContainer.classList.remove("playing");
-    stopMatrix();  // Detiene animación al finalizar
-  });
-
-  // Error en el stream
+  /* ===============================
+     EVENTOS STREAM
+  =============================== */
   audio.addEventListener("error", () => {
     console.warn("Stream no disponible");
-    stopMatrix();
+    liveText.textContent = "OFFLINE";
+    liveIndicator.classList.remove("active");
+    playerContainer.classList.remove("playing");
+    isPlaying = false;
+
+    if (typeof stopMatrix === "function") stopMatrix();
   });
 
 });
-

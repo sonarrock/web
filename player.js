@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
+
   const audio = document.getElementById("radio-audio");
   const playBtn = document.getElementById("playPauseBtn");
   const stopBtn = document.getElementById("stop-btn");
@@ -11,19 +13,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let isPlaying = false;
 
-  /* ===============================
-     CONFIG STREAM
-  =============================== */
+  audio.playsInline = true;
   audio.preload = "none";
   audio.volume = volumeSlider.value;
 
   /* ===============================
-     PLAY / PAUSE
+     PLAY / PAUSE — iOS FRIENDLY
   =============================== */
   playBtn.addEventListener("click", () => {
 
     if (!isPlaying) {
-      audio.load(); // 👈 CLAVE para streams Zeno
+
+      // 👇 ASIGNAR STREAM SOLO AQUÍ (gesto del usuario)
+      audio.src = STREAM_URL;
 
       audio.play().then(() => {
         isPlaying = true;
@@ -35,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (typeof startMatrix === "function") startMatrix();
       }).catch(err => {
-        console.error("No se pudo reproducir el stream:", err);
+        console.error("iOS bloqueó el audio:", err);
       });
 
     } else {
@@ -52,11 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ===============================
-     STOP (SIN currentTime)
+     STOP (iOS SAFE)
   =============================== */
   stopBtn.addEventListener("click", () => {
     audio.pause();
-    audio.src = audio.src; // 👈 reset seguro para stream
+    audio.removeAttribute("src"); // 👈 iOS seguro
+    audio.load();
 
     isPlaying = false;
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
@@ -85,10 +88,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ===============================
-     EVENTOS STREAM
+     ERROR STREAM
   =============================== */
   audio.addEventListener("error", () => {
-    console.warn("Stream no disponible");
     liveText.textContent = "OFFLINE";
     liveIndicator.classList.remove("active");
     playerContainer.classList.remove("playing");

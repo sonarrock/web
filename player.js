@@ -2,40 +2,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const audio = document.getElementById("radio-audio");
   const playBtn = document.getElementById("playPauseBtn");
+  const stopBtn = document.getElementById("stop-btn");
+  const muteBtn = document.getElementById("mute-btn");
+  const volume = document.getElementById("volume");
 
-  if (!audio || !playBtn) {
-    console.error("Player no inicializado");
-    return;
-  }
+  audio.src = "https://stream.zeno.fm/ezq3fcuf5ehvv";
+  audio.volume = 1;
 
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  playBtn.onclick = () => {
+    audio.play();
+    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+  };
 
-  const STREAM_URL = isIOS
-    ? "https://node-01.zeno.fm/ezq3fcuf5ehvv"
-    : "https://stream.zeno.fm/ezq3fcuf5ehvv";
+  stopBtn.onclick = () => {
+    audio.pause();
+    audio.currentTime = 0;
+    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+  };
 
-  let isPlaying = false;
+  muteBtn.onclick = () => {
+    audio.muted = !audio.muted;
+    muteBtn.innerHTML = audio.muted
+      ? '<i class="fas fa-volume-mute"></i>'
+      : '<i class="fas fa-volume-up"></i>';
+  };
 
-  playBtn.addEventListener("click", () => {
-
-    if (!isPlaying) {
-
-      audio.src = STREAM_URL;
-      audio.load();
-
-      audio.play().then(() => {
-        isPlaying = true;
-        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-      }).catch(err => {
-        console.error("Error reproducción:", err);
-      });
-
-    } else {
-      audio.pause();
-      isPlaying = false;
-      playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    }
-
-  });
-
+  volume.oninput = e => audio.volume = e.target.value;
 });

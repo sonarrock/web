@@ -95,55 +95,49 @@
 </section>
 
 <!-- ========================= -->
-<!-- DISCO DE LA SEMANA -->
+<!-- REPRODUCTORES: DISCO / SPOTIFY / IVOOX -->
 <!-- ========================= -->
-<div class="custom-player disco-player" id="disco-player">
-    <!-- Portada del disco -->
-    <img id="cover" src="https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=1" alt="Portada Disco">
+<section class="players-section">
 
-    <!-- Información del disco y reproductor -->
+  <!-- 1. DISCO DE LA SEMANA -->
+  <div class="custom-player" id="disco-player">
+    <img id="cover" src="https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg" alt="Portada Disco">
     <div class="player-info">
-        <h2 id="track-title">Título del Disco</h2>
-        <audio id="disco-audio" controls preload="auto">
-            <source src="https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/Aretha%20Franklin%20-%20Lady%20Soul.mp3" type="audio/mpeg">
-            Tu navegador no soporta audio HTML5.
-        </audio>
+      <h3>Disco de la Semana</h3>
+      <div id="track-title">Título del Disco</div>
+      <audio id="disco-audio" controls preload="auto"></audio>
     </div>
-</div>
+  </div>
 
-<!-- ========================= -->
-<!-- SPOTIFY -->
-<!-- ========================= -->
-<div class="custom-player spotify-player">
+  <!-- 2. SPOTIFY -->
+  <div class="custom-player spotify-player">
     <div class="player-info">
-        <h2>Podcast en Spotify</h2>
-        <iframe 
-            src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?utm_source=generator" 
-            width="100%" 
-            height="152" 
-            frameborder="0" 
-            allowfullscreen="" 
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-            loading="lazy">
-        </iframe>
+      <h3>Spotify</h3>
+      <iframe 
+        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU" 
+        frameborder="0" 
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+        allowfullscreen
+        loading="lazy">
+      </iframe>
     </div>
-</div>
+  </div>
 
-<!-- ========================= -->
-<!-- IVOOX -->
-<!-- ========================= -->
-<div class="custom-player ivoox-player">
+  <!-- 3. IVOOX -->
+  <div class="custom-player ivoox-player">
     <div class="player-info">
-        <h2>Último episodio en iVoox</h2>
-        <iframe 
-            src="https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=141c24"
-            width="100%" 
-            height="152" 
-            frameborder="0" 
-            allowfullscreen>
-        </iframe>
+      <h3>iVoox</h3>
+      <iframe 
+        src="https://www.ivoox.com/player_es_podcast_2661206_zp_1.html?c1=141c24" 
+        frameborder="0" 
+        allow="autoplay; encrypted-media; fullscreen" 
+        allowfullscreen
+        loading="lazy">
+      </iframe>
     </div>
-</div>
+  </div>
+
+</section>
 
 <!-- ========================= -->
 <!-- STAFF -->

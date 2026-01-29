@@ -6,34 +6,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const volumeSlider = document.getElementById("volume");
   const statusText = document.getElementById("status-text");
   const timerEl = document.getElementById("timer");
+  const container = document.querySelector(".player-container");
 
   const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
   let reconnectTimer;
   let timerInterval;
   let seconds = 0;
+  let isPlaying = false;
 
   audio.src = STREAM_URL;
   audio.volume = volumeSlider.value;
 
   function updateStatus(status) {
     statusText.textContent = status.toUpperCase();
-    if (status === "REPRODUCIENDO") statusText.style.color = "#00ff88";
-    else if (status === "OFFLINE") statusText.style.color = "#ff4d4d";
+    if(status === "REPRODUCIENDO") statusText.style.color = "#00ff88";
+    else if(status === "OFFLINE") statusText.style.color = "#ff4d4d";
     else statusText.style.color = "#ffffff";
   }
 
   updateStatus("OFFLINE");
 
-  function tryReconnect() {
-    clearTimeout(reconnectTimer);
-    updateStatus("OFFLINE");
-    reconnectTimer = setTimeout(() => {
-      audio.load();
-      audio.play().catch(() => {});
-    }, 5000);
-  }
-
-  // Actualiza contador
   function startTimer() {
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
@@ -50,28 +42,35 @@ document.addEventListener("DOMContentLoaded", () => {
     timerEl.textContent = "00:00";
   }
 
-  // Eventos de audio
-  audio.addEventListener("playing", () => updateStatus("REPRODUCIENDO"));
-  audio.addEventListener("pause", () => updateStatus("OFFLINE"));
-  audio.addEventListener("error", tryReconnect);
-  audio.addEventListener("stalled", tryReconnect);
-  audio.addEventListener("ended", tryReconnect);
+  function tryReconnect() {
+    clearTimeout(reconnectTimer);
+    updateStatus("OFFLINE");
+    isPlaying = false;
+    container.classList.remove("playing");
+    reconnectTimer = setTimeout(() => {
+      audio.load();
+      audio.play().catch(() => {});
+    }, 5000);
+  }
 
   // Play / Pause
   playBtn.addEventListener("click", () => {
-    if (audio.paused) {
-      audio.load();
+    if (!isPlaying) {
+      audio.load(); // fuerza cargar stream
       audio.play().then(() => {
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
         updateStatus("REPRODUCIENDO");
+        container.classList.add("playing");
+        isPlaying = true;
         startTimer();
-        document.querySelector(".player-container").classList.add("playing");
       }).catch(err => console.log("Play bloqueado:", err));
     } else {
       audio.pause();
       playBtn.innerHTML = '<i class="fas fa-play"></i>';
+      updateStatus("OFFLINE");
+      container.classList.remove("playing");
+      isPlaying = false;
       stopTimer();
-      document.querySelector(".player-container").classList.remove("playing");
     }
   });
 
@@ -80,9 +79,10 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.pause();
     audio.currentTime = 0;
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    stopTimer();
     updateStatus("OFFLINE");
-    document.querySelector(".player-container").classList.remove("playing");
+    container.classList.remove("playing");
+    isPlaying = false;
+    stopTimer();
   });
 
   // Mute
@@ -95,4 +95,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Volumen
   volumeSlider.addEventListener("input", e => audio.volume = e.target.value);
+
+  // Reconexión automática en caso de errores
+  audio.addEventListener("error", tryReconnect);
+  audio.addEventListener("stalled", tryReconnect);
+  audio.addEventListener("ended", tryReconnect);
 });

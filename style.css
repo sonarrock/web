@@ -320,6 +320,13 @@ body {
   100% { box-shadow: 0 0 15px rgba(255,102,0,0.4), 0 0 30px rgba(255,102,0,0.2) inset; }
 }
 
+/* Halo animado tipo Disco de la semana */
+@keyframes haloPulse {
+  0% { box-shadow: 0 0 15px rgba(255,102,0,0.4), 0 0 30px rgba(255,102,0,0.2) inset; }
+  50% { box-shadow: 0 0 30px rgba(255,102,0,0.8), 0 0 60px rgba(255,102,0,0.4) inset; }
+  100% { box-shadow: 0 0 15px rgba(255,102,0,0.4), 0 0 30px rgba(255,102,0,0.2) inset; }
+}
+
 .ivoox-player {
   max-width: 650px;
   margin: 0 auto;
@@ -339,6 +346,7 @@ body {
     max-width: 90%;
   }
 }
+
 
 
 /* ========================= */

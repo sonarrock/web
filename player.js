@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Play / Pause
   playBtn.addEventListener("click", () => {
     if (!isPlaying) {
-      audio.load(); // fuerza cargar stream
+      audio.load(); 
       audio.play().then(() => {
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
         updateStatus("REPRODUCIENDO");
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Volumen
   volumeSlider.addEventListener("input", e => audio.volume = e.target.value);
 
-  // Reconexión automática en caso de errores
+  // Reconexión automática
   audio.addEventListener("error", tryReconnect);
   audio.addEventListener("stalled", tryReconnect);
   audio.addEventListener("ended", tryReconnect);

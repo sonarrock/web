@@ -75,92 +75,91 @@ body {
     display: block;
 }
 
-/* ===============================
-   REPRODUCTORES
-=============================== */
-
-/* Contenedor general de todos los reproductores */
-.players-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 40px;
-    width: 100%;
-}
-
-/* Base para todos los reproductores */
+/* =========================
+   BASE UNIFICADA PARA TODOS LOS REPRODUCTORES
+========================= */
 .custom-player {
-    width: 360px;
-    height: 170px;
-    max-width: 95%;
-    background: rgba(26,26,26,0.7);
-    border: 3px solid #ff6600;
-    border-radius: 18px;
-    box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: row;       /* portada a la izquierda, info a la derecha */
+  align-items: center;
+  gap: 20px;
+  width: 360px;              /* ancho base */
+  max-width: 95%;
+  height: 360px;             /* más alto que antes */
+  padding: 20px;
+  border: 3px solid #ff6600;
+  border-radius: 18px;
+  background: rgba(26,26,26,0.7);
+  box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-/* Hover efecto halo y ligero movimiento */
 .custom-player:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0 40px rgba(255,102,0,1), 0 0 80px rgba(255,102,0,0.5) inset;
+  transform: translateY(-5px);
+  box-shadow: 0 0 40px rgba(255,102,0,1), 0 0 80px rgba(255,102,0,0.5) inset;
 }
 
-/* DISCO DE LA SEMANA */
-.disco-player {
-    flex-direction: row;
-    align-items: center;
-    gap: 15px;
+/* PORTADA */
+.custom-player img {
+  width: 150px;
+  height: 150px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 3px solid #ff6600;
+  box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4);
+  flex-shrink: 0;
 }
 
-.disco-cover {
-    width: 150px;
-    height: 150px;
-    border-radius: 12px;
-    object-fit: cover;
-    border: 3px solid #ff6600;
-    box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4);
-    flex-shrink: 0;
-}
-
-/* Player info (titulo y audio) */
+/* INFO DEL REPRODUCTOR */
 .player-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 10px;
-    color: #fff;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
 }
 
-.player-info audio {
-    width: 100%;
-    border-radius: 6px;
-    background: #111;
-    box-shadow: 0 0 15px rgba(255,102,0,0.35);
+/* AUDIO HTML5 */
+.player-info audio,
+.player-info iframe {
+  width: 100%;
+  height: 50px;              /* altura base para audio HTML5 */
+  border-radius: 6px;
+  box-shadow: 0 0 15px rgba(255,102,0,0.35);
+  background: #111;
+  border: none;
 }
 
-/* SPOTIFY */
-.spotify-player iframe {
-    width: 100%;
-    height: 170px;
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
-}
-
-/* IVOOX */
+/* SPOTIFY e IVOOX */
+.spotify-player iframe,
 .ivoox-player iframe {
-    width: 100%;
-    height: 170px;
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
+  height: 250px;             /* altura mayor que audio normal */
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 0 25px rgba(255,102,0,0.8), 0 0 50px rgba(255,102,0,0.4) inset;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .custom-player {
+    flex-direction: column;
+    height: auto;
+    gap: 15px;
+  }
+
+  .player-info {
+    align-items: center;
+  }
+
+  .player-info audio,
+  .player-info iframe {
+    height: 50px;
+  }
+
+  .spotify-player iframe,
+  .ivoox-player iframe {
+    height: 200px;
+  }
 }
 
 /* ===============================

@@ -1,95 +1,106 @@
-/* =========================
-   PLAYER STREAMING – SONAR ROCK
-   ========================= */
-
 .player-section {
-  width: 100%;
   display: flex;
   justify-content: center;
-  margin: 40px 0;
+  align-items: center;
+  padding: 40px 0;
+  position: relative;
 }
 
 .player-container {
   position: relative;
   width: 360px;
   height: 580px;
-  border-radius: 14px;
+  border-radius: 18px;
   overflow: hidden;
-  background: #000;
   box-shadow: 0 10px 30px rgba(0,0,0,0.7);
 }
 
-/* IMAGEN DE PORTADA RADIO */
-.radio-cover {
+.player-bg {
   width: 100%;
-  height: auto;
-  max-height: 360px;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(255,102,0,0.5);
-  margin-bottom: 10px;
+  height: 100%;
   object-fit: cover;
+  position: absolute;
+  top:0; left:0;
+  z-index: 1;
 }
 
-/* CONTENIDO PRINCIPAL (nombre, controles, barra) */
-.player-content {
+.overlay {
   position: absolute;
-  bottom: 16px;
-  left: 16px;
-  right: 16px;
-  z-index: 6;
+  top:0; left:0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: 2;
+}
+
+.player-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  color: #fff;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.85);
   align-items: center;
+  justify-content: flex-start;
+  padding: 20px 0;
 }
 
-/* NOMBRE O ESTADO */
-#now-playing {
-  color: #fff;
-  font-weight: bold;
-  text-align: center;
+.radio-cover {
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid #ff6600;
+  margin-bottom: 15px;
 }
 
-/* CONTROLES */
 .controls {
   display: flex;
-  gap: 12px;
   justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+  background: rgba(0,0,0,0.4);
+  padding: 10px;
+  border-radius: 12px;
 }
 
-.controls .btn {
-  background: #ff6600;
-  border: none;
-  width: 44px;
-  height: 44px;
+.controls button {
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
+  background: #ff6600;
+  color: #fff;
+  border: none;
   cursor: pointer;
+  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 14px rgba(255,102,0,0.8);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.6);
 }
 
-.controls .btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 20px rgba(255,102,0,1);
+.controls button:hover {
+  transform: scale(1.15);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.8);
 }
 
-.controls .btn i {
-  color: #fff;
-  font-size: 14px;
-}
-
-/* BARRA DE PROGRESO + TIEMPO */
-.progress-wrapper {
+#live-indicator {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
+  margin-bottom: 10px;
 }
 
-.progress-container {
-  flex:
+.dot {
+  width: 10px;
+  height: 10px;
+  background: #ff4d4d;
+  border-radius: 50%;
+  animation: pulseDot 1s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}

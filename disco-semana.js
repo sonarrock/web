@@ -7,22 +7,22 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const cover = document.getElementById("cover");
-  const discoAudio = document.getElementById("disco-audio");
   const titleEl = document.getElementById("track-title");
+  const audio = document.getElementById("disco-audio");
 
-  // 🔒 Protección total (nunca vuelve a romper)
-  if (!cover || !discoAudio || !titleEl) {
-    console.warn("Disco de la semana: elementos no encontrados");
+  // Blindaje total
+  if (!cover || !titleEl || !audio) {
+    console.warn("Disco de la Semana: elementos no encontrados");
     return;
   }
+
+  // Título dentro del reproductor
+  titleEl.textContent = discoData.title;
 
   // Portada
   cover.src = discoData.cover;
 
-  // Título dentro del contenedor
-  titleEl.textContent = discoData.title;
-
   // Audio (FORMA CORRECTA)
-  discoAudio.src = discoData.src;
-  discoAudio.load();
+  audio.src = discoData.src;
+  audio.load();
 });

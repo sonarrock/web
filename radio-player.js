@@ -59,6 +59,11 @@ document.addEventListener("DOMContentLoaded", () => {
   playBtn.addEventListener("click", () => {
     if (!isPlaying) { 
       audio.play().then(() => {
+       const discoAudio = document.getElementById("disco-audio");
+if (discoAudio && !discoAudio.paused) {
+  discoAudio.pause();
+}
+      
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
         updateStatus("REPRODUCIENDO");
         container.classList.add("playing");

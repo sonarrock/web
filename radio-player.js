@@ -42,16 +42,18 @@ document.addEventListener("DOMContentLoaded", () => {
     timerEl.textContent = "00:00";
   }
 
-  function tryReconnect() {
-    clearTimeout(reconnectTimer);
-    updateStatus("OFFLINE");
-    isPlaying = false;
-    container.classList.remove("playing");
-    reconnectTimer = setTimeout(() => {
-      audio.load();
-      audio.play().catch(() => {});
-    }, 5000);
-  }
+ function tryReconnect() {
+  clearTimeout(reconnectTimer);
+  updateStatus("OFFLINE");
+  isPlaying = false;
+  container.classList.remove("playing");
+
+  reconnectTimer = setTimeout(() => {
+    audio.load();
+    audio.play().catch(() => {});
+  }, 2000);
+}
+
 
   // Play / Pause
   playBtn.addEventListener("click", () => {

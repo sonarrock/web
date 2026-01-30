@@ -1,10 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("disco-semana.js cargado");
+
   const audio = document.getElementById("disco-audio");
   const cover = document.getElementById("cover");
   const title = document.getElementById("track-title");
 
+  console.log("audio:", audio);
+  console.log("cover:", cover);
+  console.log("title:", title);
+
   if (!audio || !cover || !title) {
-    console.warn("Disco de la semana: elementos no encontrados");
+    console.error("❌ Elementos del Disco de la Semana no encontrados");
     return;
   }
 
@@ -17,5 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   title.textContent = discoData.title;
   cover.src = discoData.cover;
   audio.src = discoData.src;
+
   audio.load();
+  console.log("✅ Disco de la semana listo");
 });

@@ -18,13 +18,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+
   width: 360px;
+  height: 580px;          /* 🎯 tamaño objetivo */
   max-width: 95%;
-  padding: 25px 20px;
+  max-height: 580px;
+
+  padding: 20px;
   border-radius: 20px;
   border: 3px solid #ff6600;
 
-  /* 🎯 FONDO DEL REPRODUCTOR ZENO */
   background: url("web/attached_assets/fondorepro.png") no-repeat center center;
   background-size: cover;
 
@@ -34,7 +37,6 @@
 
   transition: transform 0.3s, box-shadow 0.3s;
 }
-
 .player-container:hover {
   transform: translateY(-5px);
   box-shadow: 0 0 40px rgba(255,102,0,1), 0 0 80px rgba(255,102,0,0.5) inset;

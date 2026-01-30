@@ -162,3 +162,9 @@
     height: 520px;
   }
 }
+
+.player-container.playing {
+  box-shadow:
+    0 0 45px rgba(255,102,0,1),
+    0 0 90px rgba(255,102,0,0.5) inset;
+}

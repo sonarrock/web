@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const statusText = document.getElementById("status-text");
   const timerEl = document.getElementById("timer");
   const container = document.querySelector(".player-container");
+  const liveDot = document.querySelector(".live-badge .dot");
 
   const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
   let reconnectTimer;
@@ -19,12 +20,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateStatus(status) {
     statusText.textContent = status.toUpperCase();
-    if(status === "REPRODUCIENDO") statusText.style.color = "#00ff88";
-    else if(status === "OFFLINE") statusText.style.color = "#ff4d4d";
-    else statusText.style.color = "#ffffff";
+    if (status === "REPRODUCIENDO") {
+      liveDot.classList.add("online");
+    } else {
+      liveDot.classList.remove("online"); // LED fijo rojo OFFLINE
+    }
   }
-
-  updateStatus("OFFLINE");
 
   function startTimer() {
     clearInterval(timerInterval);
@@ -47,16 +48,16 @@ document.addEventListener("DOMContentLoaded", () => {
     updateStatus("OFFLINE");
     isPlaying = false;
     container.classList.remove("playing");
+
     reconnectTimer = setTimeout(() => {
       audio.load();
       audio.play().catch(() => {});
-    }, 5000);
+    }, 2000);
   }
 
   // Play / Pause
   playBtn.addEventListener("click", () => {
     if (!isPlaying) {
-      audio.load(); 
       audio.play().then(() => {
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
         updateStatus("REPRODUCIENDO");
@@ -100,4 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.addEventListener("error", tryReconnect);
   audio.addEventListener("stalled", tryReconnect);
   audio.addEventListener("ended", tryReconnect);
+
+  // Inicial
+  updateStatus("OFFLINE");
 });

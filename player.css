@@ -155,5 +155,14 @@
 
 #radio-audio {
   display: none !important;
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
+
+#radio-audio:focus,
+#radio-audio:active {
+  outline: none !important;
+  box-shadow: none !important;
+}

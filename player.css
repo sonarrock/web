@@ -1,31 +1,37 @@
 /* =============================
-   PLAYER SECTION – verticalidad y estilo
+   PLAYER SECTION – REPRODUCTOR ZENO
 ============================= */
 .player-section {
   display: flex;
-  flex-direction: column;      /* vertical */
-  justify-content: flex-start;  /* empieza desde arriba */
-  align-items: center;         /* centra horizontalmente */
+  flex-direction: column;
+  align-items: center;
   padding: 40px 20px;
   width: 100%;
-  min-height: auto;
   box-sizing: border-box;
 }
 
-/* Contenedor del reproductor */
+/* =============================
+   CONTENEDOR PRINCIPAL
+============================= */
 .player-container {
+  position: relative;
   display: flex;
-  flex-direction: column;      /* columna vertical */
-  align-items: center;         /* centra contenido */
-  width: 360px;                /* ancho fijo para streaming */
+  flex-direction: column;
+  align-items: center;
+  width: 360px;
   max-width: 95%;
-  background: rgba(26,26,26,0.7);
-  border-radius: 18px;
+  padding: 25px 20px;
+  border-radius: 20px;
   border: 3px solid #ff6600;
+
+  /* 🎯 FONDO DEL REPRODUCTOR ZENO */
+  background: url("web/attached_assets/fondorepro.png") no-repeat center center;
+  background-size: cover;
+
   box-shadow: 0 0 30px rgba(255,102,0,0.6);
-  padding: 20px;
   margin-bottom: 40px;
-  animation: haloPulse 3s infinite alternate;
+  overflow: hidden;
+
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
@@ -34,47 +40,37 @@
   box-shadow: 0 0 40px rgba(255,102,0,1), 0 0 80px rgba(255,102,0,0.5) inset;
 }
 
-/* Imagen de fondo */
-.player-bg {
-  width: 100%;
-  height: auto;
-  border-radius: 15px;
-  object-fit: cover;
-  display: block;
-  margin-bottom: -80px; /* overlay sube encima de la imagen */
-}
-
-/* Overlay para el reproductor */
-.overlay {
+/* Oscurecer fondo para legibilidad */
+.player-container::before {
+  content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(transparent, rgba(0,0,0,0.4));
-  border-radius: 15px;
-  pointer-events: none;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1;
 }
 
-/* Contenido del reproductor */
+/* =============================
+   CONTENIDO
+============================= */
 .player-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  z-index: 2;
-  position: relative;
-  padding-top: 20px;
 }
 
-/* Status online/offline */
+/* =============================
+   STATUS ONLINE / OFFLINE
+============================= */
 .live-badge {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
   font-weight: bold;
-  color: #fff;
+  color: #ffffff;
 }
 
 .live-badge .dot {
@@ -85,22 +81,28 @@
   animation: blink 1s infinite;
 }
 
+.live-badge.online .dot {
+  background: #00ff88;
+}
+
 @keyframes blink {
   0%, 50%, 100% { opacity: 1; }
   25%, 75% { opacity: 0; }
 }
 
-.live-badge.online .dot { background: #00ff88; }
-
-/* Timer */
+/* =============================
+   TIMER
+============================= */
 .timer {
   font-size: 1.1rem;
-  color: #fff;
   margin-bottom: 15px;
+  color: #ffffff;
   text-shadow: 0 0 8px rgba(255,102,0,0.6);
 }
 
-/* Controles */
+/* =============================
+   CONTROLES
+============================= */
 .controls {
   display: flex;
   justify-content: center;
@@ -130,29 +132,9 @@
   width: 100px;
 }
 
-
-/* ===============================
-   REPRODUCTOR PRINCIPAL (ZENO)
-=============================== */
-.main-player {
-    padding: 20px;
-    background: url('web/attached_assets/fondorepro.png') no-repeat center center;
-    background-size: cover;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(255,102,0,0.5), 0 0 30px rgba(255,102,0,0.3) inset;
-    max-width: 600px;
-    margin: 40px auto; /* centrado con espacio */
-}
-
-.main-player audio {
-    width: 100%;
-    height: 50px;
-    border-radius: 6px;
-    background: rgba(17,17,17,0.9);
-    border: none;
-    box-shadow: 0 0 10px rgba(255,102,0,0.35);
-}
-
+/* =============================
+   AUDIO ZENO – TOTALMENTE OCULTO
+============================= */
 #radio-audio {
   display: none !important;
   outline: none !important;
@@ -160,24 +142,7 @@
   box-shadow: none !important;
 }
 
-
-#radio-audio:focus,
-#radio-audio:active {
+/* Evitar outlines fantasmas */
+.player-section *:focus {
   outline: none !important;
-  box-shadow: none !important;
-
-   .player-section *:focus {
-  outline: none;
-}
-
-}
-
-/* ===============================
-   AUDIO RADIO ZENO – AISLADO
-=============================== */
-.radio-audio {
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-    background: transparent !important;
 }

@@ -55,8 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Play / Pause
   playBtn.addEventListener("click", () => {
-    if (!isPlaying) {
-      audio.load(); 
+    if (!isPlaying) { 
       audio.play().then(() => {
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
         updateStatus("REPRODUCIENDO");

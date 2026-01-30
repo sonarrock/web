@@ -76,19 +76,22 @@
 }
 
 /* =============================
-   ESTADO ONLINE / OFFLINE
+   STATUS ONLINE / OFFLINE
 ============================= */
 .live-badge {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center; /* centrado arriba de controles */
   gap: 8px;
   font-weight: bold;
   color: #ffffff;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  padding: 5px 10px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
-/* Punto OFFLINE – fijo */
 .live-badge .dot {
   width: 10px;
   height: 10px;
@@ -96,8 +99,7 @@
   background: red;
 }
 
-/* Punto PLAYING – parpadea */
-.live-badge.playing .dot {
+.live-badge.online .dot {
   background: #00ff88;
   animation: blink 1s infinite;
 }
@@ -111,11 +113,26 @@
    TIMER
 ============================= */
 .timer {
-  text-align: center;
-  font-size: 1.05rem;
+  margin-top: 5px;
+  font-size: 1.1rem;
   color: #ffffff;
-  margin-bottom: 12px;
   text-shadow: 0 0 8px rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.35);
+  border-radius: 12px;
+  padding: 2px 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  text-align: center;
+}
+
+/* =============================
+   CONTROLES (ABAJO)
+============================= */
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
 }
 
 .controls button {
@@ -140,64 +157,15 @@
   width: 90px;
 }
 
-/* =============================
-   RESPONSIVE
-============================= */
+/* AUDIO OCULTO (CONTROL JS) */
+#radio-audio {
+  display: none;
+}
+
+/* RESPONSIVE */
 @media (max-width: 480px) {
   .player-container {
     width: 320px;
     height: 520px;
   }
-}
-
-/* =============================
-   MOBILE OPTIMIZADO (≤ 480px)
-============================= */
-@media (max-width: 480px) {
-
-  .player-section {
-    padding: 20px 10px;
-  }
-
-  .player-container {
-    width: 340px;
-    height: 520px;
-    border-radius: 18px;
-  }
-
-  /* Contenido un poco más apretado */
-  .player-content {
-    padding: 20px 16px;
-  }
-
-  /* Indicador + timer más compactos */
-  .live-badge {
-    font-size: 0.9rem;
-  }
-
-  .timer {
-    font-size: 0.95rem;
-    margin-bottom: 8px;
-  }
-
-  /* Botones cómodos para dedo */
-  .controls {
-    gap: 12px;
-  }
-
-  .controls button {
-    width: 56px;
-    height: 56px;
-    font-size: 22px;
-  }
-
-  .controls input[type="range"] {
-    width: 110px;
-  }
-}
-
-.player-container.playing {
-  box-shadow:
-    0 0 45px rgba(255,102,0,1),
-    0 0 90px rgba(255,102,0,0.5) inset;
 }

@@ -1,18 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const fileName = "Aretha Franklin - Lady Soul";
-
   const audio = document.getElementById("disco-audio");
   const cover = document.getElementById("cover");
-  const titleEl = document.getElementById("track-title");
+  const title = document.getElementById("track-title");
 
-  if (!audio || !cover || !titleEl) return;
+  if (!audio || !cover || !title) {
+    console.warn("Disco de la semana: elementos no encontrados");
+    return;
+  }
 
-  titleEl.textContent = fileName;
+  const discoData = {
+    title: "Aretha Franklin – Lady Soul",
+    src: "https://www.dropbox.com/scl/fi/l2n20n2zkwkwxibnggtmh/Aretha-Franklin-Lady-Soul.mp3?dl=1",
+    cover: "web/attached_assets/portada.jpg"
+  };
 
-  // LINK DIRECTO DE GOOGLE DRIVE
-  audio.src = "https://drive.google.com/uc?export=download&id=1MPEw-cYMHhLvv7EbPfJJNII5ZwMWuWhQ";
+  title.textContent = discoData.title;
+  cover.src = discoData.cover;
+  audio.src = discoData.src;
   audio.load();
-
-  // Portada (GitHub o donde la alojes)
-  cover.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg";
 });

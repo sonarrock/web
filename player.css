@@ -165,4 +165,9 @@
 #radio-audio:active {
   outline: none !important;
   box-shadow: none !important;
+
+   .player-section *:focus {
+  outline: none;
+}
+
 }

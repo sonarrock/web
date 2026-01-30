@@ -53,33 +53,63 @@
 
   
 <!-- ========================= -->
-<!-- REPRODUCTOR STREAMING -->
+<!-- ========================= -->
+<!-- REPRODUCTOR STREAMING ZENO -->
 <!-- ========================= -->
 <section class="player-section">
+
   <div class="player-container">
-    <img src="background1.png" alt="Fondo Radio" class="player-bg">
-    <div class="overlay"></div>
 
     <div class="player-content">
+
+      <!-- ESTADO EN VIVO -->
       <div id="live-indicator" class="live-badge">
         <span class="dot"></span>
-        <span class="text" id="status-text">OFFLINE</span>
+        <span id="status-text">OFFLINE</span>
       </div>
+
+      <!-- TIMER -->
       <div id="timer" class="timer">00:00</div>
 
+      <!-- CONTROLES -->
       <div class="controls">
-        <button id="playPauseBtn"><i class="fas fa-play"></i></button>
-        <button id="stop-btn"><i class="fas fa-stop"></i></button>
-        <button id="mute-btn"><i class="fas fa-volume-up"></i></button>
-        <input id="volume" type="range" min="0" max="1" step="0.01" value="1">
+        <button id="playPauseBtn" aria-label="Play / Pause">
+          <i class="fas fa-play"></i>
+        </button>
+
+        <button id="stop-btn" aria-label="Stop">
+          <i class="fas fa-stop"></i>
+        </button>
+
+        <button id="mute-btn" aria-label="Mute">
+          <i class="fas fa-volume-up"></i>
+        </button>
+
+        <input
+          id="volume"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value="1"
+          aria-label="Volume"
+        >
       </div>
 
-     <audio id="radio-audio" class="radio-audio" playsinline preload="none"></audio>
+      <!-- AUDIO (OCULTO, CONTROLADO POR JS) -->
+      <audio
+        id="radio-audio"
+        class="radio-audio"
+        playsinline
+        preload="none">
+      </audio>
 
     </div>
   </div>
+
 </section>
 
+  
 <!-- ========================= -->
 <!-- REDES SOCIALES -->
 <!-- ========================= -->

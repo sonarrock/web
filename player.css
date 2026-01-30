@@ -47,7 +47,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.35); /* antes estaba muy oscuro */
   z-index: 1;
 }
 
@@ -134,17 +134,9 @@
   width: 100px;
 }
 
-/* =============================
-   AUDIO ZENO – TOTALMENTE OCULTO
-============================= */
-#radio-audio {
-  display: none !important;
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Evitar outlines fantasmas */
-.player-section *:focus {
-  outline: none !important;
+@media (max-width: 480px) {
+  .player-container {
+    width: 320px;
+    height: 520px;
+  }
 }

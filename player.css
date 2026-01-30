@@ -80,39 +80,25 @@
 ============================= */
 .live-badge {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 8px;
+
   font-weight: bold;
   color: #ffffff;
 }
 
+/* Punto por defecto: OFFLINE (FIJO) */
 .live-badge .dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: red;
-  animation: blink 1s infinite;
 }
 
-.live-badge.online .dot {
-  background: #00ff88;
-}
-
-@keyframes blink {
-  0%, 50%, 100% { opacity: 1; }
-  25%, 75% { opacity: 0; }
-}
-
-/* =============================
-   TIMER
-============================= */
-.timer {
-  margin-top: 6px;
-  font-size: 1.1rem;
-  color: #ffffff;
-  text-shadow: 0 0 8px rgba(255,102,0,0.6);
-   justify-content: center;
-}
+/* SOLO cuando está reproduciendo */
+.live-badge.playing .dot {
+  background: #00
 
 /* =============================
    CONTROLES (PARTE BAJA)

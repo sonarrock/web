@@ -83,12 +83,12 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
-
   font-weight: bold;
   color: #ffffff;
+  margin-bottom: 4px;
 }
 
-/* Punto por defecto: OFFLINE (FIJO) */
+/* Punto OFFLINE – fijo */
 .live-badge .dot {
   width: 10px;
   height: 10px;
@@ -96,19 +96,26 @@
   background: red;
 }
 
-/* SOLO cuando está reproduciendo */
+/* Punto PLAYING – parpadea */
 .live-badge.playing .dot {
-  background: #00
+  background: #00ff88;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
 
 /* =============================
-   CONTROLES (PARTE BAJA)
+   TIMER
 ============================= */
-.controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 5px;
+.timer {
+  text-align: center;
+  font-size: 1.05rem;
+  color: #ffffff;
+  margin-bottom: 12px;
+  text-shadow: 0 0 8px rgba(0,0,0,0.6);
 }
 
 .controls button {

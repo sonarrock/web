@@ -1,24 +1,28 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const fileName = "Aretha Franklin - Lady Soul.mp3";
-  const audio = document.getElementById("disco-audio");
+
+  const discoData = {
+    title: "Aretha Franklin - Lady Soul",
+    src: "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/Aretha%20Franklin%20-%20Lady%20Soul.mp3",
+    cover: "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg"
+  };
+
   const cover = document.getElementById("cover");
-  const container = document.getElementById("disco-player");
-  const title = document.getElementById("track-title");
+  const discoAudio = document.getElementById("disco-audio");
+  const titleEl = document.getElementById("track-title");
 
-  if (!audio || !cover || !container || !title) return;
+  // 🔒 Protección total (nunca vuelve a romper)
+  if (!cover || !discoAudio || !titleEl) {
+    console.warn("Disco de la semana: elementos no encontrados");
+    return;
+  }
 
-  // Mostrar el nombre del disco en letras blancas dentro del contenedor
-  title.textContent = fileName.replace(".mp3", "");
-  title.style.color = "#ffffff";
-  title.style.fontSize = "1.2rem";
-  title.style.textAlign = "center";
-  title.style.marginBottom = "5px";
+  // Portada
+  cover.src = discoData.cover;
 
-  // Link directo del MP3 en Google Drive
-  audio.src = "https://drive.google.com/uc?export=download&id=1MPEw-cYMHhLvv7EbPfJJNII5ZwMWuWhQ";
-  audio.load();
+  // Título dentro del contenedor
+  titleEl.textContent = discoData.title;
 
-  // Asignar portada
-  cover.src = "https://raw.githubusercontent.com/sonarrock/web/main/El%20Disco%20De%20La%20Semana/portada.jpg?v=" + Date.now();
-  cover.classList.add("disco-cover");
+  // Audio (FORMA CORRECTA)
+  discoAudio.src = discoData.src;
+  discoAudio.load();
 });

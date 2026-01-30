@@ -5,6 +5,13 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("🎵 disco-semana.js cargado");
 
   const discoAudio = document.getElementById("disco-audio");
+  
+discoAudio.addEventListener("play", () => {
+  if (radioAudio && !radioAudio.paused) {
+    radioAudio.pause();
+  }
+});
+
   const cover = document.getElementById("cover");
   const trackTitle = document.getElementById("track-title");
 

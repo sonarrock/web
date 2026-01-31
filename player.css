@@ -184,3 +184,16 @@
     height: 520px;
   }
 }
+
+
+/* =============================
+   SOMBRA INFERIOR UNIFICADA
+============================= */
+.bottom-ui {
+  position: relative;
+  padding: 12px 0 8px;
+
+  /* sombra envolvente inferior */
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.35);
+  border-radius: 18px;
+}

@@ -297,3 +297,33 @@
   pointer-events: none;
   z-index: 1;
 }
+
+
+/* =============================
+   SPOTIFY MOBILE – DEGRADADO VISIBLE REAL
+============================= */
+.player-container.spotify-mobile .player-content::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 260px;
+
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.85),
+    rgba(0, 0, 0, 0.6) 35%,
+    rgba(0, 0, 0, 0.3) 55%,
+    rgba(0, 0, 0, 0.0) 75%
+  );
+
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* aseguramos que UI esté por encima */
+.player-container.spotify-mobile .bottom-ui {
+  position: relative;
+  z-index: 2;
+}

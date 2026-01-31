@@ -197,3 +197,56 @@
   box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.35);
   border-radius: 18px;
 }
+
+
+/* =============================
+   SPOTIFY STYLE (SAFE MODE)
+============================= */
+.player-container.spotify-style {
+
+  /* sensación de profundidad */
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.55),
+    inset 0 -120px 160px rgba(0,0,0,0.55);
+}
+
+/* degradado inferior tipo Spotify */
+.player-container.spotify-style::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.75),
+    rgba(0,0,0,0.45) 35%,
+    rgba(0,0,0,0.15) 60%,
+    transparent
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* UI inferior más compacta */
+.player-container.spotify-style .bottom-ui {
+  padding: 18px 0 10px;
+  gap: 8px;
+}
+
+/* OFFLINE + TIMER más “Spotify” */
+.player-container.spotify-style .live-badge,
+.player-container.spotify-style .timer {
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
+  font-size: 0.9rem;
+}
+
+/* botones más planos */
+.player-container.spotify-style .controls button {
+  background: #1db954; /* verde Spotify */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+}
+
+.player-container.spotify-style .controls button:hover {
+  background: #1ed760;
+  transform: scale(1.08);
+}

@@ -1,63 +1,69 @@
 /* =============================
-   PLAYER SECTION
+   PLAYER SECTION – FONDO GENERAL
 ============================= */
 .player-section {
   display: flex;
   justify-content: center;
   padding: 60px 20px;
-  background: url("/attached_assets/fondorepro.png") center / cover no-repeat;
+  width: 100%;
+  box-sizing: border-box;
+  background: url("/attached_assets/fondorepro.png") no-repeat center center;
+  background-size: cover;
 }
 
 /* =============================
-   PLAYER CONTAINER
+   CONTENEDOR DEL REPRODUCTOR
 ============================= */
 .player-container {
   position: relative;
   width: 360px;
   height: 580px;
   max-width: 95%;
+
   border-radius: 20px;
   border: 3px solid #ff6600;
-  background: url("/attached_assets/player-frame.png") center / cover no-repeat;
+
+  /* IMAGEN LIMPIA, SIN CAPAS */
+  background: url("/attached_assets/player-frame.png") no-repeat center center;
+  background-size: cover;
+
   box-shadow: 0 0 30px rgba(255,102,0,0.6);
   overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.player-container:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 40px rgba(255,102,0,1),
+    0 0 80px rgba(255,102,0,0.35) inset;
 }
 
 /* =============================
-   GLASS CLARO (SIEMPRE)
-============================= */
-.player-container::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255,255,255,0.14);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  pointer-events: none;
-}
-
-/* =============================
-   CONTENT
+   CONTENIDO DEL PLAYER
 ============================= */
 .player-content {
   position: relative;
-  z-index: 2;
+  width: 100%;
   height: 100%;
+
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  align-items: center;
+
   padding: 25px 20px;
+  box-sizing: border-box;
 }
 
 /* =============================
-   BOTTOM UI (GLASS REAL)
+   BLOQUE INFERIOR (SIN GLASS)
 ============================= */
 .bottom-ui {
-  background: rgba(255,255,255,0.22);
-  backdrop-filter: blur(12px);
-  border-radius: 18px;
-  padding: 14px 12px;
-  box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0 6px;
 }
 
 /* =============================
@@ -65,26 +71,56 @@
 ============================= */
 .status-row {
   display: flex;
+  align-items: center;
   gap: 10px;
-  justify-content: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
-.live-badge,
-.timer {
-  background: rgba(0,0,0,0.35);
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 12px;
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: bold;
+  color: #ffffff;
+
+  padding: 5px 10px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 12px;
+}
+
+.live-badge .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: red;
+}
+
+.live-badge.online .dot {
+  background: #00ff88;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
+
+.timer {
+  font-size: 1.1rem;
+  color: #ffffff;
+  background: rgba(0,0,0,0.35);
+  border-radius: 12px;
+  padding: 2px 8px;
+  text-align: center;
 }
 
 /* =============================
-   CONTROLS
+   CONTROLES
 ============================= */
 .controls {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 14px;
   margin-top: 12px;
 }
@@ -97,11 +133,28 @@
   background: linear-gradient(45deg, #ff6600, #ff8833);
   color: #fff;
   font-size: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  transition: transform 0.25s ease;
+}
+
+.controls button:hover {
+  transform: scale(1.1);
+}
+
+.controls input[type="range"] {
+  width: 90px;
 }
 
 /* =============================
-   MOBILE
+   AUDIO OCULTO
+============================= */
+#radio-audio {
+  display: none;
+}
+
+/* =============================
+   RESPONSIVE – MÓVIL
 ============================= */
 @media (max-width: 480px) {
   .player-container {
@@ -114,5 +167,12 @@
     height: 44px;
     font-size: 18px;
   }
-}
 
+  .controls input[type="range"] {
+    width: 70px;
+  }
+
+  .timer {
+    font-size: 0.95rem;
+  }
+}

@@ -200,53 +200,76 @@
 
 
 /* =============================
-   SPOTIFY STYLE (SAFE MODE)
+   SPOTIFY MOBILE STYLE
+   (SAFE – NO ROMPE NADA)
 ============================= */
-.player-container.spotify-style {
+.player-container.spotify-mobile {
 
-  /* sensación de profundidad */
+  /* profundidad tipo app */
   box-shadow:
-    0 25px 60px rgba(0,0,0,0.55),
-    inset 0 -120px 160px rgba(0,0,0,0.55);
+    0 30px 70px rgba(0,0,0,0.65),
+    inset 0 -140px 180px rgba(0,0,0,0.65);
 }
 
-/* degradado inferior tipo Spotify */
-.player-container.spotify-style::after {
+/* degradado inferior estilo Spotify */
+.player-container.spotify-mobile::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(0,0,0,0.75),
-    rgba(0,0,0,0.45) 35%,
-    rgba(0,0,0,0.15) 60%,
-    transparent
+    rgba(0,0,0,0.85),
+    rgba(0,0,0,0.6) 35%,
+    rgba(0,0,0,0.25) 55%,
+    transparent 75%
   );
   pointer-events: none;
   z-index: 1;
 }
 
-/* UI inferior más compacta */
-.player-container.spotify-style .bottom-ui {
-  padding: 18px 0 10px;
-  gap: 8px;
+/* =============================
+   UI INFERIOR COMPACTA
+============================= */
+.player-container.spotify-mobile .bottom-ui {
+  padding: 20px 0 12px;
+  gap: 10px;
 }
 
-/* OFFLINE + TIMER más “Spotify” */
-.player-container.spotify-style .live-badge,
-.player-container.spotify-style .timer {
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(6px);
+/* =============================
+   STATUS + TIMER (SPOTIFY-LIKE)
+============================= */
+.player-container.spotify-mobile .live-badge,
+.player-container.spotify-mobile .timer {
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px);
   font-size: 0.9rem;
+  box-shadow: none;
 }
 
-/* botones más planos */
-.player-container.spotify-style .controls button {
+/* =============================
+   CONTROLES – ESTILO SPOTIFY
+============================= */
+.player-container.spotify-mobile .controls {
+  gap: 18px;
+}
+
+/* Botón PLAY principal */
+.player-container.spotify-mobile .controls button {
   background: #1db954; /* verde Spotify */
-  box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
 
-.player-container.spotify-style .controls button:hover {
+/* Hover / tap */
+.player-container.spotify-mobile .controls button:hover {
   background: #1ed760;
-  transform: scale(1.08);
+  transform: scale(1.1);
+}
+
+/* =============================
+   EFECTO "CARD FLOATING"
+============================= */
+.player-container.spotify-mobile .controls button {
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease;
 }

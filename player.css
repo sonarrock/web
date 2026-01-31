@@ -1,3 +1,4 @@
+
 /* =============================
    PLAYER SECTION – FONDO GENERAL
 ============================= */
@@ -357,6 +358,17 @@
   pointer-events: none;
   z-index: 0;
 }
+
+/* =============================
+   LIMPIEZA TOTAL ZONA SUPERIOR
+============================= */
+.player-container.spotify-mobile::before,
+.player-container.spotify-mobile::after,
+.player-container.spotify-mobile .player-content::before,
+.player-container.spotify-mobile .player-content::after {
+  display: none !important;
+}
+
 
 /* aseguramos UI arriba */
 .player-container.spotify-mobile .player-content > * {

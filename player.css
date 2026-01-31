@@ -8,7 +8,6 @@
   width: 100%;
   box-sizing: border-box;
 
-  /* 🌌 FONDO DE LA SECCIÓN */
   background: url("/attached_assets/fondorepro.png") no-repeat center center;
   background-size: cover;
 }
@@ -25,7 +24,6 @@
   border-radius: 20px;
   border: 3px solid #ff6600;
 
-  /* 🎛️ IMAGEN DEL REPRODUCTOR */
   background: url("/attached_assets/player-frame.png") no-repeat center center;
   background-size: cover;
 
@@ -41,6 +39,20 @@
     0 0 80px rgba(255,102,0,0.45) inset;
 }
 
+/* =============================
+   OSCURECIDO SOLO EN PLAY
+============================= */
+.player-container.playing::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.15),
+    rgba(0,0,0,0.45)
+  );
+  z-index: 1;
+}
 
 /* =============================
    CONTENIDO DEL PLAYER
@@ -54,26 +66,29 @@
 
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* 🔑 controles abajo */
+  justify-content: flex-end; /* ⬅️ antes space-between */
   align-items: center;
 
   padding: 25px 20px;
   box-sizing: border-box;
 }
 
-.player-container.playing::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.15),
-    rgba(0,0,0,0.45)
-  );
-  z-index: 1;
+/* =============================
+   BLOQUE INFERIOR
+============================= */
+.bottom-ui {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-
+/* OFFLINE + TIMER EN LA MISMA FILA */
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
 
 /* =============================
    STATUS ONLINE / OFFLINE
@@ -81,11 +96,10 @@
 .live-badge {
   display: flex;
   align-items: center;
-  justify-content: center; /* centrado arriba de controles */
   gap: 8px;
   font-weight: bold;
   color: #ffffff;
-  margin-bottom: 6px;
+
   padding: 5px 10px;
   background: rgba(0,0,0,0.35);
   border-radius: 12px;
@@ -113,7 +127,6 @@
    TIMER
 ============================= */
 .timer {
-  margin-top: 5px;
   font-size: 1.1rem;
   color: #ffffff;
   text-shadow: 0 0 8px rgba(0,0,0,0.6);
@@ -125,7 +138,7 @@
 }
 
 /* =============================
-   CONTROLES (ABAJO)
+   CONTROLES
 ============================= */
 .controls {
   display: flex;
@@ -157,12 +170,14 @@
   width: 90px;
 }
 
-/* AUDIO OCULTO (CONTROL JS) */
+/* AUDIO OCULTO */
 #radio-audio {
   display: none;
 }
 
-/* RESPONSIVE */
+/* =============================
+   RESPONSIVE
+============================= */
 @media (max-width: 480px) {
   .player-container {
     width: 320px;

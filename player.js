@@ -10,20 +10,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const liveDot = document.querySelector(".live-badge .dot");
 
   const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
+
   let reconnectTimer;
   let timerInterval;
   let seconds = 0;
   let isPlaying = false;
+  let streamLoaded = false;
 
-  audio.src = STREAM_URL;
+  /* =========================
+     CONFIGURACIÓN CLAVE
+  ========================== */
+  audio.preload = "auto";
+  audio.crossOrigin = "anonymous";
   audio.volume = volumeSlider.value;
+  playBtn.disabled = true;
 
+  function loadStream() {
+    audio.src = STREAM_URL + "?t=" + Date.now(); // evita cache
+    audio.load();
+    streamLoaded = true;
+  }
+
+  loadStream();
+
+  /* =========================
+     UI / ESTADO
+  ========================== */
   function updateStatus(status) {
-    statusText.textContent = status.toUpperCase();
+    statusText.textContent = status;
     if (status === "REPRODUCIENDO") {
       liveDot.classList.add("online");
     } else {
-      liveDot.classList.remove("online"); // LED fijo rojo OFFLINE
+      liveDot.classList.remove("online");
     }
   }
 
@@ -43,6 +61,21 @@ document.addEventListener("DOMContentLoaded", () => {
     timerEl.textContent = "00:00";
   }
 
+  /* =========================
+     EVENTOS DE AUDIO
+  ========================== */
+  audio.addEventListener("canplay", () => {
+    playBtn.disabled = false;
+  });
+
+  audio.addEventListener("waiting", () => {
+    updateStatus("CARGANDO");
+  });
+
+  audio.addEventListener("playing", () => {
+    updateStatus("REPRODUCIENDO");
+  });
+
   function tryReconnect() {
     clearTimeout(reconnectTimer);
     updateStatus("OFFLINE");
@@ -50,17 +83,24 @@ document.addEventListener("DOMContentLoaded", () => {
     container.classList.remove("playing");
 
     reconnectTimer = setTimeout(() => {
-      audio.load();
+      loadStream();
       audio.play().catch(() => {});
     }, 2000);
   }
 
-  // Play / Pause
+  audio.addEventListener("error", tryReconnect);
+  audio.addEventListener("stalled", tryReconnect);
+  audio.addEventListener("ended", tryReconnect);
+
+  /* =========================
+     CONTROLES
+  ========================== */
   playBtn.addEventListener("click", () => {
     if (!isPlaying) {
+      if (!streamLoaded) loadStream();
+
       audio.play().then(() => {
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        updateStatus("REPRODUCIENDO");
         container.classList.add("playing");
         isPlaying = true;
         startTimer();
@@ -75,18 +115,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Stop
   stopBtn.addEventListener("click", () => {
     audio.pause();
-    audio.currentTime = 0;
+    audio.removeAttribute("src");
+    audio.load();
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
     updateStatus("OFFLINE");
     container.classList.remove("playing");
     isPlaying = false;
+    streamLoaded = false;
     stopTimer();
   });
 
-  // Mute
   muteBtn.addEventListener("click", () => {
     audio.muted = !audio.muted;
     muteBtn.innerHTML = audio.muted
@@ -94,14 +134,12 @@ document.addEventListener("DOMContentLoaded", () => {
       : '<i class="fas fa-volume-up"></i>';
   });
 
-  // Volumen
-  volumeSlider.addEventListener("input", e => audio.volume = e.target.value);
+  volumeSlider.addEventListener("input", e => {
+    audio.volume = e.target.value;
+  });
 
-  // Reconexión automática
-  audio.addEventListener("error", tryReconnect);
-  audio.addEventListener("stalled", tryReconnect);
-  audio.addEventListener("ended", tryReconnect);
-
-  // Inicial
+  /* =========================
+     ESTADO INICIAL
+  ========================== */
   updateStatus("OFFLINE");
 });

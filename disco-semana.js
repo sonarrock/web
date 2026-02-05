@@ -1,8 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("🎵 Disco de la Semana JS cargado");
+
   const discoAudio = document.getElementById("disco-audio");
   const cover = document.getElementById("cover");
   const trackTitle = document.getElementById("track-title");
   const radioAudio = document.getElementById("radio-audio");
+
+  // 👉 SI NO EXISTE EL REPRODUCTOR, SALIMOS
+  if (!discoAudio || !cover || !trackTitle) {
+    console.warn("ℹ️ Disco de la Semana no está en esta página");
+    return;
+  }
 
   const discoData = {
     title: "Aretha Franklin – Lady Soul",
@@ -32,7 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Desbloqueo audio para Chrome
   document.addEventListener("click", () => {
-    document.querySelectorAll("audio").forEach(audio => audio.load());
+    discoAudio.load();
   }, { once: true });
 });

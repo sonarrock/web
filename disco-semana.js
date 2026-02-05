@@ -1,46 +1,38 @@
-// =========================
-// Disco de la Semana
-// =========================
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🎵 Disco de la Semana JS cargado");
-
   const discoAudio = document.getElementById("disco-audio");
   const cover = document.getElementById("cover");
   const trackTitle = document.getElementById("track-title");
-  const radioAudio = document.getElementById("radio-audio"); // opcional
+  const radioAudio = document.getElementById("radio-audio");
 
-  if (!discoAudio || !cover || !trackTitle) {
-    console.error("❌ Elementos del Disco de la Semana no encontrados");
-    return;
-  }
-
-  // Datos del disco
   const discoData = {
     title: "Aretha Franklin – Lady Soul",
-audio: "disco-semana/aretha-franklin-lady-soul.mp3"
-    cover: "web/disco-semana/portada.jpg"
+    cover: "disco-semana/portada.jpg",
+    audio: "disco-semana/aretha-franklin-lady-soul.mp3"
   };
 
-  // Cargar datos visuales
   cover.src = discoData.cover;
   trackTitle.textContent = discoData.title;
   discoAudio.src = discoData.audio;
 
-  console.log("🎶 Disco preparado:", discoData);
+  function pauseAllExcept(activeAudio) {
+    document.querySelectorAll("audio").forEach(audio => {
+      if (audio !== activeAudio && !audio.paused) {
+        audio.pause();
+      }
+    });
+  }
 
-  // Pausar radio si se reproduce el disco
   discoAudio.addEventListener("play", () => {
-    if (radioAudio && !radioAudio.paused) {
-      radioAudio.pause();
-    }
+    pauseAllExcept(discoAudio);
   });
 
-  // Debug útil
-  discoAudio.addEventListener("error", () => {
-    console.error("❌ Error cargando el audio del disco");
-  });
+  if (radioAudio) {
+    radioAudio.addEventListener("play", () => {
+      pauseAllExcept(radioAudio);
+    });
+  }
 
-  discoAudio.addEventListener("canplay", () => {
-    console.log("✅ Audio listo para reproducirse");
-  });
+  document.addEventListener("click", () => {
+    document.querySelectorAll("audio").forEach(audio => audio.load());
+  }, { once: true });
 });

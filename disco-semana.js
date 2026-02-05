@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("🎵 Disco de la Semana JS cargado");
+
   const audio = document.getElementById("disco-audio");
   const cover = document.getElementById("cover");
   const title = document.getElementById("track-title");
@@ -13,9 +15,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   audio.addEventListener("canplay", () => {
     console.log("✅ Audio listo");
-  });
-
-  audio.addEventListener("error", (e) => {
-    console.error("❌ Error audio:", audio.error);
   });
 });

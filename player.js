@@ -11,47 +11,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
 
-  let reconnectTimer;
   let timerInterval;
   let seconds = 0;
   let isPlaying = false;
-  let streamLoaded = false;
+  let streamInitialized = false;
 
   /* =========================
-     CONFIGURACIÓN CLAVE
+     CONFIGURACIÓN BÁSICA
   ========================== */
-  audio.preload = "auto";
+  audio.preload = "none"; // 🔥 CLAVE
   audio.crossOrigin = "anonymous";
   audio.volume = volumeSlider.value;
-  playBtn.disabled = true;
-
-  function loadStream() {
-    audio.src = STREAM_URL + "?t=" + Date.now(); // evita cache
-    audio.load();
-    streamLoaded = true;
-  }
-
-  loadStream();
 
   /* =========================
-     UI / ESTADO
+     UI
   ========================== */
   function updateStatus(status) {
     statusText.textContent = status;
-    if (status === "REPRODUCIENDO") {
-      liveDot.classList.add("online");
-    } else {
-      liveDot.classList.remove("online");
-    }
+    liveDot.classList.toggle("online", status === "REPRODUCIENDO");
   }
 
   function startTimer() {
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
       seconds++;
-      const m = String(Math.floor(seconds / 60)).padStart(2, "0");
-      const s = String(seconds % 60).padStart(2, "0");
-      timerEl.textContent = `${m}:${s}`;
+      timerEl.textContent =
+        String(Math.floor(seconds / 60)).padStart(2, "0") + ":" +
+        String(seconds % 60).padStart(2, "0");
     }, 1000);
   }
 
@@ -62,53 +48,42 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================
-     EVENTOS DE AUDIO
+     AUDIO EVENTS
   ========================== */
-  audio.addEventListener("canplay", () => {
-    playBtn.disabled = false;
-  });
+  audio.addEventListener("waiting", () => updateStatus("CARGANDO"));
+  audio.addEventListener("playing", () => updateStatus("REPRODUCIENDO"));
+  audio.addEventListener("pause", () => updateStatus("OFFLINE"));
 
-  audio.addEventListener("waiting", () => {
-    updateStatus("CARGANDO");
-  });
-
-  audio.addEventListener("playing", () => {
-    updateStatus("REPRODUCIENDO");
-  });
-
-  function tryReconnect() {
-    clearTimeout(reconnectTimer);
-    updateStatus("OFFLINE");
+  audio.addEventListener("error", () => {
+    updateStatus("ERROR");
     isPlaying = false;
     container.classList.remove("playing");
-
-    reconnectTimer = setTimeout(() => {
-      loadStream();
-      audio.play().catch(() => {});
-    }, 2000);
-  }
-
-  audio.addEventListener("error", tryReconnect);
-  audio.addEventListener("stalled", tryReconnect);
-  audio.addEventListener("ended", tryReconnect);
+  });
 
   /* =========================
      CONTROLES
   ========================== */
   playBtn.addEventListener("click", () => {
     if (!isPlaying) {
-      if (!streamLoaded) loadStream();
+
+      // 🔥 Inicializar stream SOLO en el primer click
+      if (!streamInitialized) {
+        audio.src = STREAM_URL + "?t=" + Date.now();
+        streamInitialized = true;
+      }
 
       audio.play().then(() => {
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
         container.classList.add("playing");
         isPlaying = true;
         startTimer();
-      }).catch(err => console.log("Play bloqueado:", err));
+      }).catch(err => {
+        console.warn("Play bloqueado:", err);
+      });
+
     } else {
       audio.pause();
       playBtn.innerHTML = '<i class="fas fa-play"></i>';
-      updateStatus("OFFLINE");
       container.classList.remove("playing");
       isPlaying = false;
       stopTimer();
@@ -119,12 +94,12 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.pause();
     audio.removeAttribute("src");
     audio.load();
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    updateStatus("OFFLINE");
-    container.classList.remove("playing");
+    streamInitialized = false;
     isPlaying = false;
-    streamLoaded = false;
     stopTimer();
+    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    container.classList.remove("playing");
+    updateStatus("OFFLINE");
   });
 
   muteBtn.addEventListener("click", () => {

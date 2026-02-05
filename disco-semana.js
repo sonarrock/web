@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Datos del disco
   const discoData = {
     title: "Aretha Franklin – Lady Soul",
-    audio: "https://www.dropbox.com/scl/fi/l2n20n2zkwkwxibnggtmh/Aretha-Franklin-Lady-Soul.mp3?raw=1",
+audio: "disco-semana/aretha-franklin-lady-soul.mp3"
     cover: "web/disco-semana/portada.jpg"
   };
 

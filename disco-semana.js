@@ -1,39 +1,21 @@
-console.log("🎵 Disco de la Semana JS cargado");
-
-function initDiscoSemana() {
-  const discoAudio = document.getElementById("disco-audio");
+document.addEventListener("DOMContentLoaded", () => {
+  const audio = document.getElementById("disco-audio");
   const cover = document.getElementById("cover");
-  const trackTitle = document.getElementById("track-title");
+  const title = document.getElementById("track-title");
 
-  if (!discoAudio || !cover || !trackTitle) {
-    return false;
-  }
+  if (!audio || !cover || !title) return;
 
-  const discoData = {
-    title: "Aretha Franklin – Lady Soul",
-    audio: "disco-semana/aretha-franklin-lady-soul.mp3",
-    cover: "disco-semana/portada.jpg"
-  };
+  title.textContent = "Aretha Franklin – Lady Soul";
+  cover.src = "disco-semana/portada.jpg";
 
-  cover.src = discoData.cover;
-  trackTitle.textContent = discoData.title;
-  discoAudio.src = discoData.audio;
+  audio.src = "disco-semana/aretha-franklin-lady-soul-fixed.mp3";
+  audio.load();
 
-  console.log("🎶 Disco de la Semana inicializado");
-  return true;
-}
-
-// Intento inmediato
-if (!initDiscoSemana()) {
-  // Observa cambios en el DOM (cuando otro JS lo reescribe)
-  const observer = new MutationObserver(() => {
-    if (initDiscoSemana()) {
-      observer.disconnect();
-    }
+  audio.addEventListener("canplay", () => {
+    console.log("✅ Audio listo");
   });
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
+  audio.addEventListener("error", (e) => {
+    console.error("❌ Error audio:", audio.error);
   });
-}
+});

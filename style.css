@@ -331,3 +331,15 @@ h1, h2, h3 {
     margin-top: 20px;
 }
 
+/* ===============================
+   AUDIO DISCO DE LA SEMANA (FORZADO)
+=============================== */
+#disco-audio {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative;
+    z-index: 2;
+}

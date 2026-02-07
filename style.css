@@ -349,3 +349,20 @@ h1, h2, h3 {
   visibility: visible !important;
   opacity: 1 !important;
 }
+
+/* ===============================
+   RESTAURAR CONTROLES DISCO
+=============================== */
+#disco-audio::-webkit-media-controls {
+  display: flex !important;
+}
+
+#disco-audio::-webkit-media-controls-panel {
+  display: flex !important;
+}
+
+#disco-audio::-webkit-media-controls-play-button,
+#disco-audio::-webkit-media-controls-timeline,
+#disco-audio::-webkit-media-controls-volume-slider {
+  display: block !important;
+}

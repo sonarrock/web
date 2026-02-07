@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const cover = document.getElementById("cover");
   const trackTitle = document.getElementById("track-title");
 
+  if (!discoAudio) return;
+
   // 🔥 Datos del disco
   const discoData = {
     titulo: "Disco de la Semana",
@@ -24,10 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
     cover.src = discoData.portada;
   }
 
-  // 🔥 AUDIO 
-  if (discoAudio) {
-    discoAudio.src = discoData.audio;
-    discoAudio.load(); // OBLIGATORIO para que aparezcan los controles
-  }
+  // 🎧 AUDIO (CLAVE)
+  discoAudio.src = discoData.audio;
+  discoAudio.load();
 
 });

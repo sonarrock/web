@@ -1,36 +1,34 @@
+/* ===============================
+   DISCO DE LA SEMANA
+=============================== */
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🎵 Disco de la Semana JS cargado");
 
-  // Selecciona elementos del DOM
-  const audio = document.getElementById("disco-audio");
+  const discoAudio = document.getElementById("disco-audio");
   const cover = document.getElementById("cover");
-  const title = document.getElementById("track-title");
+  const trackTitle = document.getElementById("track-title");
 
-  if (!audio || !cover || !title) return;
-
-  // =========================
-  // ⚡ CAMBIA SOLO ESTO CADA SEMANA
-  // =========================
+  // 🔥 Datos del disco (ejemplo)
   const discoData = {
-    title: "Aretha Franklin – Lady Soul",          // Título del disco
-    audio: "disco-semana/aretha-franklin.mp3",    // Archivo MP3
-    cover: "disco-semana/portada.jpg"             // Portada JPG/PNG
+    titulo: "Disco de la Semana",
+    audio: "disco-semana/tema.mp3", // 👈 RUTA REAL AL MP3
+    portada: "disco-semana/portada.jpg"
   };
 
-  // =========================
-  // NO TOCAR LO DEMÁS
-  // =========================
-  title.textContent = discoData.title;
-  cover.src = discoData.cover;
+  // Título
+  if (trackTitle) {
+    trackTitle.textContent = discoData.titulo;
+  }
 
-  audio.src = discoData.audio;
-  audio.load();
+  // Portada
+  if (cover) {
+    cover.src = discoData.portada;
+  }
 
-  audio.addEventListener("canplay", () => {
-    console.log("✅ Audio listo");
-  });
+  // 🔥 AUDIO (CLAVE)
+  if (discoAudio) {
+    discoAudio.src = discoData.audio;
+    discoAudio.load(); // 👈 OBLIGATORIO
+  }
 
-  audio.addEventListener("error", (e) => {
-    console.error("❌ Error cargando el audio:", audio.error);
-  });
 });
+

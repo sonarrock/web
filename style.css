@@ -366,3 +366,13 @@ h1, h2, h3 {
 #disco-audio::-webkit-media-controls-volume-slider {
   display: block !important;
 }
+
+#disco-audio {
+  appearance: auto !important;
+  -webkit-appearance: media-control !important;
+}
+
+#disco-audio::-webkit-media-controls {
+  display: flex !important;
+}
+

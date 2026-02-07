@@ -10,7 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🔥 Datos del disco (ejemplo)
   const discoData = {
     titulo: "Disco de la Semana",
-    audio: "disco-semana/tema.mp3", // 👈 RUTA REAL AL MP3
+    audio: "disco-semana
+/aretha-franklin-lady-soul-fixed.mp3", // 👈 RUTA REAL AL MP3
     portada: "disco-semana/portada.jpg"
   };
 

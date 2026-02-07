@@ -7,12 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const cover = document.getElementById("cover");
   const trackTitle = document.getElementById("track-title");
 
-  // 🔥 Datos del disco (ejemplo)
-  const discoData = {
-    titulo: "Disco de la Semana",
-    audio: "disco-semana/aretha-franklin-lady-soul-fixed.mp3", //SUSTITUIR CADA SEMANA//
-    portada: "disco-semana/portada.jpg"
-  };
+ // 🔥 Datos del disco
+const discoData = {
+  titulo: "Disco de la Semana",
+  audio: "disco-semana/aretha-franklin-lady-soul-fixed.mp3",  //SUSTITUIR//
+  portada: "disco-semana/portada.jpg"
+};
+
 
   // Título
   if (trackTitle) {

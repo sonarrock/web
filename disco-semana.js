@@ -7,13 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const cover = document.getElementById("cover");
   const trackTitle = document.getElementById("track-title");
 
- // 🔥 Datos del disco
-const discoData = {
-  titulo: "Disco de la Semana",
-  audio: "disco-semana/aretha-franklin-lady-soul-fixed.mp3",  //SUSTITUIR//
-  portada: "disco-semana/portada.jpg"
-};
-
+  // 🔥 Datos del disco
+  const discoData = {
+    titulo: "Disco de la Semana",
+    audio: "disco-semana/aretha-franklin-lady-soul-fixed.mp3",
+    portada: "disco-semana/portada.jpg"
+  };
 
   // Título
   if (trackTitle) {
@@ -25,11 +24,10 @@ const discoData = {
     cover.src = discoData.portada;
   }
 
-  // 🔥 AUDIO (CLAVE)
+  // 🔥 AUDIO 
   if (discoAudio) {
     discoAudio.src = discoData.audio;
-    discoAudio.load(); // 👈 OBLIGATORIO
+    discoAudio.load(); // OBLIGATORIO para que aparezcan los controles
   }
 
 });
-

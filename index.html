@@ -74,7 +74,15 @@
         <input id="volume" type="range" min="0" max="1" step="0.01" value="1">
       </div>
 
-      <audio id="radio-audio" playsinline preload="metadata"></audio>
+      <audio
+  id="radio-audio"
+  controls
+  controlslist="nodownload noplaybackrate"
+  playsinline
+  webkit-playsinline
+  preload="metadata">
+</audio>
+
     </div>
 
   </div>

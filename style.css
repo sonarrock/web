@@ -331,10 +331,3 @@ h1, h2, h3 {
     margin-top: 20px;
 }
 
-
-/* =============================
-   AUDIO OCULTO (background)
-============================= */
-audio {
-  display: none;
-}

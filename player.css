@@ -142,6 +142,21 @@
   transform: scale(1.1);
 }
 
+/* 🔥 ESTADO CARGANDO */
+.controls button.loading {
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.controls button.loading i {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 .controls input[type="range"] {
   width: 90px;
 }

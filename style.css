@@ -343,3 +343,8 @@ h1, h2, h3 {
     position: relative;
     z-index: 2;
 }
+
+
+#disco-audio {
+    outline: 2px solid red;
+}

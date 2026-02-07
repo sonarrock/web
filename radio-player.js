@@ -174,4 +174,14 @@ document.addEventListener("DOMContentLoaded", () => {
   volumeSlider.addEventListener("input", e => {
     audio.volume = e.target.value;
   });
-});
+
+  /* =========================
+     VISIBILIDAD (BACKGROUND ANDROID)
+  ========================= */
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden" && isPlaying) {
+      audio.play().catch(() => {});
+    }
+  });
+
+}); // 👈 ÚNICO cierre de DOMContentLoaded

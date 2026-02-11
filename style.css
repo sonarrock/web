@@ -330,3 +330,10 @@ h1, h2, h3 {
     color: #cccccc;
     margin-top: 20px;
 }
+
+@media (max-width: 480px) {
+    .site-wrapper {
+        transform: scale(0.93);
+        transform-origin: top center;
+    }
+}

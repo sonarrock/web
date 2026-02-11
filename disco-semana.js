@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const discoData = {
     titulo: "Disco de la Semana",
-    audio: "disco-semana/aretha-franklin-lady-soul-fixed.mp3",
+    audio: "disco-semana/Van Halen - Van Halen.mp3",
     portada: "disco-semana/portada.jpg"
   };
 

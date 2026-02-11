@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackTitle = document.getElementById("track-title");
 
   const discoData = {
-    titulo: "Disco de la Semana",
+    titulo: "Van Halen - Van Halen",
     audio: "disco-semana/Van Halen - Van Halen.mp3",
     portada: "disco-semana/portada.jpg"
   };

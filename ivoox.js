@@ -1,21 +1,25 @@
-const rssUrl = "https://feeds.ivoox.com/feed_fg_f12661206_filtro_1.xml";
-const apiUrl = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(rssUrl);
+document.addEventListener("DOMContentLoaded", function() {
 
-fetch(apiUrl)
-  .then(res => res.json())
-  .then(data => {
+  const rssUrl = "https://feeds.ivoox.com/feed_fg_f12661206_filtro_1.xml";
+  const apiUrl = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(rssUrl);
 
-    const epi = data.items[0];
+  fetch(apiUrl)
+    .then(res => res.json())
+    .then(data => {
 
-    const title = epi.title;
-    const audioUrl = epi.enclosure.link;
-    const image = epi.thumbnail || data.feed.image || "";
+      const epi = data.items[0];
 
-    document.getElementById("ivoox-title").textContent = title;
-    document.getElementById("ivoox-audio").src = audioUrl;
-    document.getElementById("ivoox-cover").src = image;
+      const title = epi.title;
+      const audioUrl = epi.enclosure.link;
+      const image = epi.thumbnail || data.feed.image || "";
 
-  })
-  .catch(err => {
-    console.error("Error al cargar podcast:", err);
-  });
+      document.getElementById("ivoox-title").textContent = title;
+      document.getElementById("ivoox-audio").src = audioUrl;
+      document.getElementById("ivoox-cover").src = image;
+
+    })
+    .catch(err => {
+      console.error("Error al cargar podcast:", err);
+    });
+
+});

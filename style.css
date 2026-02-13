@@ -351,3 +351,9 @@ h1, h2, h3 {
   align-items: center;
   gap: 15px;
 }
+
+.spotify-player iframe {
+    width: 100%;
+    height: 232px; /* versión grande */
+    min-height: 232px;
+}

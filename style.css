@@ -343,13 +343,6 @@ h1, h2, h3 {
     margin-top: 20px;
 }
 
-@media (max-width: 480px) {
-    .site-wrapper {
-        transform: scale(0.93);
-        transform-origin: top center;
-    }
-}
-
 
 .ivoox-player img {
   width: 120px;

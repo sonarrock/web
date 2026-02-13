@@ -357,3 +357,24 @@ h1, h2, h3 {
     height: 152px;
     min-height: 152px;
 }
+
+/* ===============================
+   COMPACTAR SECCIONES EN MÓVIL
+=============================== */
+
+@media (max-width: 480px) {
+
+    .players-section {
+        padding: 15px 0 !important;
+    }
+
+    .custom-player {
+        padding: 10px !important;
+        gap: 10px !important;
+    }
+
+    .player-title {
+        font-size: 1.1rem;
+    }
+
+}

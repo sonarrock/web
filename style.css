@@ -315,7 +315,9 @@ h1, h2, h3 {
    ABOUT
 =============================== */
 .about-section {
-    padding: 60px 0;
+    position: relative;
+    z-index: 2;
+    background: #0a0a0a;
 }
 
 .about-content {

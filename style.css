@@ -337,3 +337,17 @@ h1, h2, h3 {
         transform-origin: top center;
     }
 }
+
+
+.ivoox-player img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.ivoox-player {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}

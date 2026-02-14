@@ -230,29 +230,24 @@ h2::after {
 }
 
 .staff-member {
-    background: rgba(255, 255, 255, 0.04); /* Más transparente */
-    backdrop-filter: blur(14px); /* Similar al efecto de los reproductores */
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(14px);
 
     border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.12); /* Más sutil */
+    border: 1px solid rgba(255,255,255,0.12);
 
-    padding: 25px;
-    width: 220px;
+    padding: 20px;
+    width: 180px; /* más compacto respecto a la imagen más pequeña */
 
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4); /* Similar a los reproductores */
-}
-
-.staff-member:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
 }
 
 .staff-image {
-    width: 120px; /* Igual que las imágenes de los reproductores */
-    height: 120px;
-    border-radius: 14px; /* Igual que discos/ivox */
+    width: 102px; /* 15% menos que 120px */
+    height: 102px;
+    border-radius: 14px;
     object-fit: cover;
     margin-bottom: 15px;
     transition: transform 0.3s ease;
@@ -262,6 +257,22 @@ h2::after {
     transform: scale(1.05);
 }
 
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .staff-grid {
+        gap: 25px;
+    }
+
+    .staff-member {
+        width: 150px; /* se ajusta mejor en pantallas pequeñas */
+        padding: 15px;
+    }
+
+    .staff-image {
+        width: 85px; /* proporcionalmente más pequeña */
+        height: 85px;
+    }
+}
 
 
 /* ===============================

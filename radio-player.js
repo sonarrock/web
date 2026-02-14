@@ -9,46 +9,48 @@ document.addEventListener("DOMContentLoaded", () => {
   const container = document.querySelector(".player-container");
 
   const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
+  const MAX_RECONNECT_ATTEMPTS = 6;
 
   let timerInterval;
   let reconnectTimer;
+  let reconnectAttempts = 0;
   let seconds = 0;
   let isPlaying = false;
-  let streamInitialized = false; // indica si ya intentamos cargar el stream (src/ load)
-  let userMuted = false; // si el usuario ha tocado mute (para respetar su preferencia)
+  let streamInitialized = false;
+  let userMuted = localStorage.getItem("radioMuted") === "true";
 
   /* =========================
-     CONFIGURACIÓN BÁSICA
+     CONFIGURACIÓN INICIAL
   ========================== */
-  // Más agresivo para acelerar primer click
   audio.preload = "auto";
   audio.crossOrigin = "anonymous";
-  audio.volume = parseFloat(volumeSlider.value) || 1;
+  audio.volume = parseFloat(localStorage.getItem("radioVolume")) || 1;
+  volumeSlider.value = audio.volume;
+  audio.muted = userMuted;
+  muteBtn.innerHTML = audio.muted
+    ? '<i class="fas fa-volume-mute"></i>'
+    : '<i class="fas fa-volume-up"></i>';
 
-  // Precarga suave del stream en segundo plano (sin reproducir)
   (function precacheStream() {
     if (!streamInitialized) {
       audio.src = STREAM_URL;
-      // No hacemos play; solo precargar
       audio.load();
       streamInitialized = true;
     }
   })();
 
   /* =========================
-     UI / ESTADO
+     FUNCIONES UI / STATUS
   ========================== */
   function updateStatus(status) {
     statusText.textContent = status.toUpperCase();
-
-    if (status === "REPRODUCIENDO") {
-      statusText.style.color = "#00ff88";
-    } else if (status === "OFFLINE") {
-      statusText.style.color = "#ff4d4d";
-    } else if (status === "CARGANDO") {
-      statusText.style.color = "#ffd166";
-    } else {
-      statusText.style.color = "#ffffff";
+    switch(status) {
+      case "REPRODUCIENDO": statusText.style.color="#00ff88"; break;
+      case "OFFLINE": statusText.style.color="#ff4d4d"; break;
+      case "CARGANDO": statusText.style.color="#ffd166"; break;
+      case "REINTENTANDO": statusText.style.color="#ffbb33"; break;
+      case "ERROR": statusText.style.color="#ff5555"; break;
+      default: statusText.style.color="#ffffff"; break;
     }
   }
 
@@ -61,10 +63,10 @@ document.addEventListener("DOMContentLoaded", () => {
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
       seconds++;
-      const m = String(Math.floor(seconds / 60)).padStart(2, "0");
-      const s = String(seconds % 60).padStart(2, "0");
+      const m = String(Math.floor(seconds / 60)).padStart(2,"0");
+      const s = String(seconds % 60).padStart(2,"0");
       timerEl.textContent = `${m}:${s}`;
-    }, 1000);
+    },1000);
   }
 
   function stopTimer() {
@@ -74,108 +76,79 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================
-     RECONEXIÓN AUTOMÁTICA
+     RECONEXIÓN SILENCIOSA
   ========================== */
   function tryReconnect() {
     clearTimeout(reconnectTimer);
+    if(reconnectAttempts >= MAX_RECONNECT_ATTEMPTS){
+      updateStatus("ERROR");
+      playBtn.classList.remove("loading");
+      playBtn.innerHTML = '<i class="fas fa-play"></i>';
+      return;
+    }
 
-    updateStatus("OFFLINE");
-    isPlaying = false;
+    reconnectAttempts++;
+    updateStatus("REINTENTANDO");
+    playBtn.classList.add("loading");
+    playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     container.classList.remove("playing");
-    playBtn.classList.remove("loading");
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    isPlaying = false;
 
+    const delay = Math.min(3000 * reconnectAttempts, 15000); // backoff: 3s, 6s, ... max 15s
     reconnectTimer = setTimeout(() => {
-      if (streamInitialized) {
-        audio.load();
-        audio.play().catch(() => {});
-      }
-    }, 2000);
+      audio.load();
+      audio.play().catch(() => tryReconnect());
+    }, delay);
   }
 
   /* =========================
      EVENTOS DE AUDIO
   ========================== */
-  audio.addEventListener("waiting", () => {
-    updateStatus("CARGANDO");
-  });
-
+  audio.addEventListener("waiting", () => updateStatus("CARGANDO"));
   audio.addEventListener("playing", () => {
     updateStatus("REPRODUCIENDO");
     playBtn.classList.remove("loading");
     playBtn.innerHTML = '<i class="fas fa-pause"></i>';
     container.classList.add("playing");
     isPlaying = true;
+    reconnectAttempts = 0;
     startTimer();
-
-    // Autoplay seguro: si el usuario no ha tocado mute, desenmute después de iniciar
-    // para asegurar audio audible en la mayoría de navegadores.
-    if (!userMuted && audio.muted) {
-      // Pequeño retardo para que el sonido no se perciba como abrupto
-      setTimeout(() => {
-        audio.muted = false;
-      }, 800);
-    }
+    if(!userMuted && audio.muted) setTimeout(()=>{audio.muted=false},800);
   });
-
-  audio.addEventListener("pause", () => {
-    if (!audio.ended) {
-      updateStatus("OFFLINE");
-    }
-  });
-
+  audio.addEventListener("pause", ()=>{if(!audio.ended) updateStatus("OFFLINE");});
   audio.addEventListener("error", tryReconnect);
   audio.addEventListener("stalled", tryReconnect);
   audio.addEventListener("ended", tryReconnect);
+  audio.addEventListener("canplaythrough", ()=>{if(!isPlaying) audio.play().catch(()=>{});});
 
   /* =========================
      CONTROLES
   ========================== */
-
-  // ▶️ Play / Pause
-  playBtn.addEventListener("click", () => {
-    if (!isPlaying) {
-
-      // 🔥 inicializar stream SOLO la primera vez
-      if (!streamInitialized) {
+  playBtn.addEventListener("click", ()=>{
+    if(!isPlaying){
+      if(!streamInitialized){
         audio.src = STREAM_URL + "?t=" + Date.now();
         audio.load();
         streamInitialized = true;
       }
 
-      // Pausar otro audio si existe (si aplica)
-      const discoAudio = document.getElementById("disco-audio");
-      if (discoAudio && !discoAudio.paused) {
-        discoAudio.pause();
-      }
-
-      // Modo autoplay seguro: tratar de reproducir con mute temporal
       const wasMuted = audio.muted;
-      if (!wasMuted) {
-        audio.muted = true;
-      }
-
+      if(!wasMuted) audio.muted = true;
       updateStatus("CARGANDO");
-      // Mostrar spinner de carga
       playBtn.classList.add("loading");
-      playBtn.innerHTML = '<i class="fas fa-spinner"></i>';
+      playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-      audio.play().then(() => {
-        // Si no estaba muted por el usuario, desmute tras iniciar
-        if (!userMuted && audio.muted) {
-          setTimeout(() => { audio.muted = false; }, 800);
-        }
-      }).catch(err => {
+      audio.play().then(()=>{
+        if(!userMuted && audio.muted) setTimeout(()=>{audio.muted=false},800);
+      }).catch(err=>{
         console.warn("Play bloqueado:", err);
-        // Revertir estados UI si falla
-        audio.muted = wasMuted; // restaurar estado anterior
+        audio.muted = wasMuted;
         playBtn.classList.remove("loading");
         playBtn.innerHTML = '<i class="fas fa-play"></i>';
       });
-
     } else {
       audio.pause();
-      isPlaying = false;
+      isPlaying=false;
       stopTimer();
       playBtn.classList.remove("loading");
       playBtn.innerHTML = '<i class="fas fa-play"></i>';
@@ -184,46 +157,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ⏹ Stop
-  stopBtn.addEventListener("click", () => {
+  stopBtn.addEventListener("click", ()=>{
     audio.pause();
     audio.removeAttribute("src");
     audio.load();
-    streamInitialized = false;
-
-    // Reset UI
+    streamInitialized=false;
     playBtn.classList.remove("loading");
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    playBtn.innerHTML='<i class="fas fa-play"></i>';
     updateStatus("OFFLINE");
     container.classList.remove("playing");
-    isPlaying = false;
+    isPlaying=false;
     stopTimer();
+    reconnectAttempts = 0;
   });
 
-  // 🔊 Mute
-  muteBtn.addEventListener("click", () => {
+  muteBtn.addEventListener("click", ()=>{
     audio.muted = !audio.muted;
-    // Marca que el usuario ha tocado mute (para respetarlo en autoplay seguro)
-    if (audio.muted) {
-      userMuted = true;
-    }
+    userMuted = audio.muted;
+    localStorage.setItem("radioMuted", userMuted);
     muteBtn.innerHTML = audio.muted
       ? '<i class="fas fa-volume-mute"></i>'
       : '<i class="fas fa-volume-up"></i>';
   });
 
-  // 🔊 Volumen
-  volumeSlider.addEventListener("input", e => {
+  volumeSlider.addEventListener("input", e=>{
     audio.volume = e.target.value;
+    localStorage.setItem("radioVolume", e.target.value);
   });
 
   /* =========================
      VISIBILIDAD (BACKGROUND)
   ========================== */
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden" && isPlaying) {
-      audio.play().catch(() => {});
+  document.addEventListener("visibilitychange", ()=>{
+    if(document.visibilityState==="hidden" && isPlaying){
+      audio.play().catch(()=>{});
     }
   });
-
-}); // 👈 ÚNICO cierre de DOMContentLoaded
+});

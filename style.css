@@ -1,5 +1,5 @@
 /* ===============================
-   RESET Y BASE
+   RESET
 =============================== */
 * {
     margin: 0;
@@ -8,56 +8,60 @@
 }
 
 body {
-    font-family: 'Arial', sans-serif;
-    background: #0a0a0a;
-    color: #ffffff;
-    line-height: 1.6;
-    min-height: 100vh;
+    font-family: 'Inter', Arial, sans-serif;
+    background: #0b0b0c;
+    color: #cfcfcf;
+    line-height: 1.7;
 }
 
+/* ===============================
+   TITULOS
+=============================== */
 h1, h2, h3 {
-    color: #ff6600;
     text-align: center;
-    margin-bottom: 25px;
-    text-shadow: 0 0 8px rgba(255,102,0,0.4);
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    margin-bottom: 35px;
+    color: #ffffff;
+}
+
+/* Línea sutil debajo de títulos */
+h2::after {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 2px;
+    background: #ff7a1a;
+    margin: 15px auto 0;
 }
 
 /* ===============================
    HEADER
 =============================== */
 .header {
-    padding: 20px 0;
-    border-bottom: 2px solid #ff6600;
-}
-
-.logo-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 40px 0 30px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 .logo {
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #ff6600;
-    box-shadow: 0 0 20px rgba(255,102,0,0.4);
 }
 
 /* ===============================
    MAIN IMAGE
 =============================== */
 .main-section {
-    padding: 40px 0;
+    padding: 60px 0;
 }
 
 .main-image-container {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
-    border-radius: 15px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
 
 .main-image {
@@ -69,44 +73,8 @@ h1, h2, h3 {
    PLAYERS SECTION
 =============================== */
 .players-section {
-    position: relative;
-    padding: 80px 15px;
-    overflow: hidden;
-}
-
-/* Fondo */
-.players-section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(circle at center, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 70%),
-        url('../attached_assets/fondoplayer.jpg') center / cover no-repeat;
-    z-index: 0;
-}
-
-.players-section > * {
-    position: relative;
-    z-index: 1;
-}
-
-/* ===============================
-   PLAYER TITLES
-=============================== */
-.player-title {
-    font-size: 1.6rem;
-    letter-spacing: 1px;
-    margin: 40px 0 20px;
-}
-
-.player-title::after {
-    content: "";
-    display: block;
-    width: 60px;
-    height: 3px;
-    background: #ff6600;
-    margin: 10px auto 0;
-    border-radius: 2px;
+    padding: 100px 20px;
+    background: #111;
 }
 
 /* ===============================
@@ -115,42 +83,33 @@ h1, h2, h3 {
 .custom-player {
     display: flex;
     align-items: center;
-    gap: 20px;
-    max-width: 600px;
-    margin: 30px auto;
-    padding: 20px;
+    gap: 25px;
+    max-width: 650px;
+    margin: 40px auto;
+    padding: 30px;
 
-    border-radius: 14px;
-    border: 2px solid rgba(255,102,0,0.6);
+    background: #161616;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.05);
 
-    background: rgba(20,20,20,0.8);
-    backdrop-filter: blur(6px);
-
-    box-shadow:
-        0 10px 30px rgba(0,0,0,0.7),
-        0 0 20px rgba(255,102,0,0.3);
-
-    transition: all 0.3s ease;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    transition: transform 0.3s ease;
 }
 
 .custom-player:hover {
-    transform: translateY(-6px);
-    box-shadow:
-        0 15px 40px rgba(0,0,0,0.9),
-        0 0 30px rgba(255,102,0,0.6);
+    transform: translateY(-5px);
 }
 
 /* ===============================
-   IMAGES
+   IMAGEN DEL DISCO
 =============================== */
 .disco-player img,
 .ivoox-player img {
-    width: 130px;
-    height: 130px;
-    border-radius: 12px;
+    width: 120px;
+    height: 120px;
+    border-radius: 14px;
     object-fit: cover;
     flex-shrink: 0;
-    box-shadow: 0 0 15px rgba(255,102,0,0.5);
 }
 
 /* ===============================
@@ -160,105 +119,98 @@ h1, h2, h3 {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .track-title {
     font-size: 1.1rem;
+    font-weight: 500;
+    color: #ffffff;
 }
 
-/* ===============================
-   AUDIO / IFRAME
-=============================== */
 .player-info audio,
 .player-info iframe {
     width: 100%;
-    border-radius: 10px;
+    border-radius: 12px;
     border: none;
-}
-
-.spotify-player iframe {
-    height: 152px;
 }
 
 /* ===============================
    SOCIAL
 =============================== */
 .social-section {
-    padding: 40px 0;
-    background: #111;
+    padding: 80px 0;
+    background: #0f0f10;
 }
 
 .social-buttons {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
+    gap: 25px;
 }
 
 .social-btn {
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
+    background: #1a1a1a;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    color: white;
+    color: #ffffff;
     text-decoration: none;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
 .social-btn:hover {
-    transform: translateY(-5px);
+    background: #ff7a1a;
+    transform: translateY(-4px);
 }
 
 /* ===============================
    STAFF
 =============================== */
 .staff-section {
-    background: url('attached_assets/fondostaff.png') center / cover no-repeat;
-    padding: 100px 20px;
+    padding: 120px 20px;
+    background: #0b0b0c;
 }
 
 .staff-grid {
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: 40px;
     flex-wrap: wrap;
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
 .staff-member {
-    background: rgba(0,0,0,0.6);
-    padding: 25px;
-    border-radius: 15px;
-    border: 2px solid rgba(255,102,0,0.6);
+    background: #161616;
+    padding: 35px;
+    border-radius: 20px;
     text-align: center;
-    transition: 0.3s ease;
+    width: 260px;
+    transition: transform 0.3s ease;
 }
 
 .staff-member:hover {
-    transform: translateY(-8px);
+    transform: translateY(-6px);
 }
 
 .staff-image {
-    width: 130px;
-    height: 130px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 15px;
-    border: 3px solid #ff6600;
+    margin-bottom: 20px;
 }
 
 /* ===============================
    ABOUT
 =============================== */
 .about-section {
-    padding: 80px 20px;
-    background: #0a0a0a;
+    padding: 120px 20px;
+    background: #111;
 }
 
 .about-content {
@@ -268,44 +220,21 @@ h1, h2, h3 {
 }
 
 .about-text {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: #cccccc;
-    margin-top: 20px;
+    font-size: 1.05rem;
+    color: #b5b5b5;
+    line-height: 1.9;
 }
 
 /* ===============================
    RESPONSIVE
 =============================== */
 @media (max-width: 768px) {
-
     .custom-player {
         flex-direction: column;
         text-align: center;
     }
 
-    .disco-player img,
-    .ivoox-player img {
-        width: 110px;
-        height: 110px;
-    }
-
-    .player-title {
-        font-size: 1.3rem;
-    }
-}
-
-@media (max-width: 480px) {
-
-    .players-section {
-        padding: 50px 15px;
-    }
-
-    .custom-player {
-        padding: 15px;
-    }
-
-    .about-text {
-        font-size: 1rem;
+    .staff-grid {
+        gap: 25px;
     }
 }

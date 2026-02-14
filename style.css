@@ -195,9 +195,31 @@ h2::after {
    STAFF
 =============================== */
 .staff-section {
+    position: relative;
     padding: 120px 20px;
-    background: #0b0b0c;
+    overflow: hidden;
 }
+
+/* Imagen de fondo */
+.staff-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(
+            rgba(255,255,255,0.06),
+            rgba(255,255,255,0.06)
+        ),
+        url('attached_assets/fondostaff.png') center / cover no-repeat;
+    z-index: 0;
+}
+
+/* Contenido por encima */
+.staff-section > * {
+    position: relative;
+    z-index: 1;
+}
+
 
 .staff-grid {
     display: flex;
@@ -209,16 +231,23 @@ h2::after {
 }
 
 .staff-member {
-    background: #161616;
-    padding: 35px;
-    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.15);
+
+    padding: 22px;
+    width: 210px;
+
     text-align: center;
-    width: 260px;
     transition: transform 0.3s ease;
 }
 
 .staff-member:hover {
-    transform: translateY(-6px);
+    transform: translateY(-5px);
+}
+
 }
 
 .staff-image {

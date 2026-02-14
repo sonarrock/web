@@ -73,8 +73,29 @@ h2::after {
    PLAYERS SECTION
 =============================== */
 .players-section {
-    padding: 100px 20px;
-    background: #111;
+    position: relative;
+    padding: 120px 20px;
+    overflow: hidden;
+}
+
+/* Imagen de fondo */
+.players-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: 
+        linear-gradient(
+            rgba(255,255,255,0.08),
+            rgba(255,255,255,0.08)
+        ),
+        url('../attached_assets/fondoplayer.jpg') center / cover no-repeat;
+    z-index: 0;
+}
+
+/* Asegura que el contenido esté arriba */
+.players-section > * {
+    position: relative;
+    z-index: 1;
 }
 
 /* ===============================
@@ -85,20 +106,23 @@ h2::after {
     align-items: center;
     gap: 25px;
     max-width: 650px;
-    margin: 40px auto;
+    margin: 50px auto;
     padding: 30px;
 
-    background: #161616;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
 
-    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
     transition: transform 0.3s ease;
 }
 
 .custom-player:hover {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
 }
+
 
 /* ===============================
    IMAGEN DEL DISCO

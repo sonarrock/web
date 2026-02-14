@@ -17,23 +17,23 @@ body {
 
 h1, h2, h3 {
     color: #ff6600;
-    text-shadow: 0 0 10px rgba(255,102,0,0.5);
+    text-align: center;
+    margin-bottom: 25px;
+    text-shadow: 0 0 8px rgba(255,102,0,0.4);
 }
 
 /* ===============================
    HEADER
 =============================== */
 .header {
-    background: #0a0a0a;
     padding: 20px 0;
     border-bottom: 2px solid #ff6600;
 }
 
 .logo-section {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 20px;
+    align-items: center;
 }
 
 .logo {
@@ -42,7 +42,7 @@ h1, h2, h3 {
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid #ff6600;
-    box-shadow: 0 0 20px rgba(255,102,0,0.3);
+    box-shadow: 0 0 20px rgba(255,102,0,0.4);
 }
 
 /* ===============================
@@ -57,92 +57,96 @@ h1, h2, h3 {
     margin: 0 auto;
     border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
 
 .main-image {
     width: 100%;
-    height: auto;
     display: block;
 }
 
 /* ===============================
-   SECCIÓN REPRODUCTORES
+   PLAYERS SECTION
 =============================== */
 .players-section {
     position: relative;
-    padding: 60px 15px;
-    overflow: hidden; /* IMPORTANTE */
+    padding: 80px 15px;
+    overflow: hidden;
 }
 
-/* Imagen de fondo */
+/* Fondo */
 .players-section::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: url('../attached_assets/fondoplayer.jpg') center / cover no-repeat;
+    background:
+        radial-gradient(circle at center, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 70%),
+        url('../attached_assets/fondoplayer.jpg') center / cover no-repeat;
     z-index: 0;
 }
 
-/* Capa oscura encima del fondo */
-.players-section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
+.players-section > * {
+    position: relative;
     z-index: 1;
 }
 
-/* Contenido encima */
-.players-section > * {
-    position: relative;
-    z-index: 2;
-}
-
-
 /* ===============================
-   TÍTULOS
+   PLAYER TITLES
 =============================== */
 .player-title {
-    color: #ff6600;
-    text-align: center;
-    margin-bottom: 25px;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    margin: 40px 0 20px;
+}
+
+.player-title::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: #ff6600;
+    margin: 10px auto 0;
+    border-radius: 2px;
 }
 
 /* ===============================
-   CONTENEDOR PLAYER
+   PLAYER CARD
 =============================== */
 .custom-player {
     display: flex;
     align-items: center;
     gap: 20px;
-
-    width: 100%;
     max-width: 600px;
-    padding: 15px;
-    margin: 40px auto;
+    margin: 30px auto;
+    padding: 20px;
 
-    border: 3px solid #ff6600;
-    border-radius: 12px;
+    border-radius: 14px;
+    border: 2px solid rgba(255,102,0,0.6);
 
-    background: rgba(26,26,26,0.85);
+    background: rgba(20,20,20,0.8);
+    backdrop-filter: blur(6px);
 
-    box-shadow: 0 0 15px rgba(255,102,0,0.5),
-                0 0 30px rgba(255,102,0,0.3) inset;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.7),
+        0 0 20px rgba(255,102,0,0.3);
+
+    transition: all 0.3s ease;
 }
 
 .custom-player:hover {
-    box-shadow: 0 0 25px rgba(255,102,0,0.8),
-                0 0 50px rgba(255,102,0,0.4) inset;
+    transform: translateY(-6px);
+    box-shadow:
+        0 15px 40px rgba(0,0,0,0.9),
+        0 0 30px rgba(255,102,0,0.6);
 }
 
 /* ===============================
-   PORTADA DISCO
+   IMAGES
 =============================== */
-.disco-player img {
-    width: 140px;
-    height: 140px;
+.disco-player img,
+.ivoox-player img {
+    width: 130px;
+    height: 130px;
     border-radius: 12px;
     object-fit: cover;
     flex-shrink: 0;
@@ -150,98 +154,39 @@ h1, h2, h3 {
 }
 
 /* ===============================
-   INFO
+   PLAYER INFO
 =============================== */
 .player-info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .track-title {
-    color: #ffffff;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 /* ===============================
-   AUDIO NATIVO
+   AUDIO / IFRAME
 =============================== */
-.player-info audio {
-    width: 100%;
-    border-radius: 6px;
-    background: #111;
-    border: none;
-    box-shadow: 0 0 10px rgba(255,102,0,0.35);
-}
-
-/* ===============================
-   IFRAMES
-=============================== */
+.player-info audio,
 .player-info iframe {
     width: 100%;
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 0 15px rgba(255,102,0,0.5),
-                0 0 30px rgba(255,102,0,0.3) inset;
-}
-
-/* ===============================
-   RADIO STREAMING OCULTO
-=============================== */
-#radio-audio {
-    display: none !important;
-    width: 0;
-    height: 0;
-    outline: none;
+    border-radius: 10px;
     border: none;
 }
 
-/* ===============================
-   RESPONSIVE
-=============================== */
-@media (max-width: 768px) {
-    .custom-player {
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        padding: 15px;
-    }
-
-    .player-info {
-        width: 100%;
-        align-items: center;
-        text-align: center;
-    }
-
-    .track-title {
-        text-align: center;
-        font-size: 1.1rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .custom-player {
-        width: 95%;
-        padding: 12px;
-    }
-
-    .disco-player img {
-        width: 110px;
-        height: 110px;
-    }
-
-    .track-title {
-        font-size: 1rem;
-    }
+.spotify-player iframe {
+    height: 152px;
 }
 
 /* ===============================
-   REDES SOCIALES
+   SOCIAL
 =============================== */
 .social-section {
-    padding: 30px 0;
-    background: rgba(0,0,0,0.3);
+    padding: 40px 0;
+    background: #111;
 }
 
 .social-buttons {
@@ -262,28 +207,19 @@ h1, h2, h3 {
     color: white;
     text-decoration: none;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
 .social-btn:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
 }
-
-.whatsapp { background: linear-gradient(45deg, #25d366, #128c7e); }
-.facebook { background: linear-gradient(45deg, #1877f2, #42a5f5); }
-.instagram { background: linear-gradient(45deg, #e4405f, #f77737); }
-.spotify { background: linear-gradient(45deg, #1db954, #1ed760); }
-.ivoox { background: linear-gradient(45deg, #ff6600, #ff8833); }
 
 /* ===============================
    STAFF
 =============================== */
 .staff-section {
-    background-image: url('attached_assets/fondostaff.png');
-    background-size: cover;
-    background-position: center;
-    padding: 80px 0;
+    background: url('attached_assets/fondostaff.png') center / cover no-repeat;
+    padding: 100px 20px;
 }
 
 .staff-grid {
@@ -296,15 +232,12 @@ h1, h2, h3 {
 }
 
 .staff-member {
-    text-align: center;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.6);
+    padding: 25px;
     border-radius: 15px;
-    border: 3px solid #ff6600;
-    box-shadow: 0 0 30px rgba(255,102,0,0.8),
-                0 0 60px rgba(255,102,0,0.4) inset;
-    padding: 20px;
-    transition: transform 0.3s, box-shadow 0.3s;
-    flex: 0 0 200px;
+    border: 2px solid rgba(255,102,0,0.6);
+    text-align: center;
+    transition: 0.3s ease;
 }
 
 .staff-member:hover {
@@ -312,21 +245,19 @@ h1, h2, h3 {
 }
 
 .staff-image {
-    width: 140px;
-    height: 140px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 15px;
     border: 3px solid #ff6600;
-    box-shadow: 0 0 25px rgba(255,102,0,0.6);
 }
 
 /* ===============================
    ABOUT
 =============================== */
 .about-section {
-    position: relative;
-    z-index: 2;
+    padding: 80px 20px;
     background: #0a0a0a;
 }
 
@@ -337,49 +268,44 @@ h1, h2, h3 {
 }
 
 .about-text {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     line-height: 1.8;
     color: #cccccc;
     margin-top: 20px;
 }
 
-
-.ivoox-player img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.ivoox-player {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.spotify-player iframe {
-    width: 100%;
-    height: 152px;
-    min-height: 152px;
-}
-
 /* ===============================
-   COMPACTAR SECCIONES EN MÓVIL
+   RESPONSIVE
 =============================== */
+@media (max-width: 768px) {
+
+    .custom-player {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .disco-player img,
+    .ivoox-player img {
+        width: 110px;
+        height: 110px;
+    }
+
+    .player-title {
+        font-size: 1.3rem;
+    }
+}
 
 @media (max-width: 480px) {
 
     .players-section {
-        padding: 15px 0 !important;
+        padding: 50px 15px;
     }
 
     .custom-player {
-        padding: 10px !important;
-        gap: 10px !important;
+        padding: 15px;
     }
 
-    .player-title {
-        font-size: 1.1rem;
+    .about-text {
+        font-size: 1rem;
     }
-
 }

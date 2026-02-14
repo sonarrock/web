@@ -308,3 +308,141 @@ h2::after {
         gap: 25px;
     }
 }
+
+/* ===============================
+   FONDO CONTINUO Y DIFUMINADO
+=============================== */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(
+            rgba(11,11,12,0.3) 0%,
+            rgba(11,11,12,0.05) 33%,
+            rgba(11,11,12,0.25) 66%,
+            rgba(15,15,16,0.05) 100%
+        ),
+        url('../attached_assets/fondoplayer.jpg') center / cover no-repeat,
+        url('attached_assets/fondostaff.png') center / cover no-repeat,
+        url('../attached_assets/fondo_social.jpg') center / cover no-repeat;
+    background-blend-mode: overlay, overlay, overlay;
+    filter: blur(6px);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ===============================
+   SECCIONES CON CONTENEDORES TRANSPARENTES
+=============================== */
+.players-section,
+.staff-section,
+.social-section {
+    padding: 80px 20px;
+    position: relative;
+    overflow: hidden;
+
+    background: rgba(255,255,255,0.05); /* ligeramente transparente */
+    backdrop-filter: blur(12px); /* interacción con fondo difuminado */
+    border-radius: 20px;
+    margin: 40px auto;
+    max-width: 1100px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.45);
+}
+
+/* ===============================
+   DIFUMINADO ENTRE SECCIONES
+=============================== */
+.players-section::after,
+.staff-section::after,
+.social-section::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 80px;
+    background: linear-gradient(
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,0.25) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Contenido por encima */
+.players-section > *,
+.staff-section > *,
+.social-section > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* ===============================
+   IMÁGENES DE STAFF Y REPRODUCTORES
+=============================== */
+.staff-member,
+.custom-player {
+    background: rgba(255,255,255,0.06); /* transparente para interacción */
+    backdrop-filter: blur(12px); 
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.staff-member:hover,
+.custom-player:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+}
+
+.staff-image,
+.disco-player img,
+.ivoox-player img {
+    border-radius: 14px;
+    object-fit: cover;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    backdrop-filter: blur(4px); /* sutil blur sobre la imagen */
+}
+
+.staff-member:hover .staff-image,
+.custom-player:hover img {
+    transform: scale(1.05);
+    box-shadow: 0 15px 45px rgba(0,0,0,0.4);
+}
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width: 768px) {
+    .players-section,
+    .staff-section,
+    .social-section {
+        padding: 60px 15px;
+        margin: 30px auto;
+    }
+
+    .players-section::after,
+    .staff-section::after,
+    .social-section::after {
+        height: 50px;
+    }
+
+    .staff-member,
+    .custom-player {
+        width: 90%;
+    }
+
+    .staff-image,
+    .disco-player img,
+    .ivoox-player img {
+        width: 85px;
+        height: 85px;
+    }
+}
+

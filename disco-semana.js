@@ -5,9 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackTitle = document.getElementById("track-title");
 
   const discoData = {
-    titulo: "Van Halen - Van Halen",
-    audio: "disco-semana/Van Halen - Van Halen.mp3",
-    portada: "disco-semana/portada.jpeg"
+    titulo: "Prince - Purple Rain",
+    audio: "disco-semana/Prince - Purple Rain.mp3",
+    portada: "disco-semana/portada.jpg"
   };
 
   if (trackTitle) {

@@ -21,18 +21,17 @@ h1, h2, h3 {
     text-align: center;
     font-weight: 600;
     letter-spacing: 1.5px;
-    margin-bottom: 35px;
+    margin-bottom: 30px;
     color: #ffffff;
 }
 
-/* Línea sutil debajo de títulos */
 h2::after {
     content: "";
     display: block;
     width: 50px;
     height: 2px;
     background: #ff7a1a;
-    margin: 15px auto 0;
+    margin: 12px auto 0;
 }
 
 /* ===============================
@@ -52,8 +51,8 @@ h2::after {
 
 .logo-section {
     display: flex;
-    flex-direction: column; /* logo arriba, texto abajo */
-    align-items: center;    /* centra horizontalmente */
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     text-align: center;
 }
@@ -78,83 +77,62 @@ h2::after {
 }
 
 /* ===============================
-   PLAYERS SECTION
+   PLAYERS SECTION (OPTIMIZADA)
 =============================== */
 .players-section {
-    position: relative;
-    padding: 60px 20px; 
-    overflow: hidden;
+    padding: 60px 20px;
+    margin: 40px auto;
+    max-width: 1100px;
+
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+
+    box-shadow: 0 18px 40px rgba(0,0,0,0.4);
 }
 
-/* Imagen de fondo */
-.players-section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: 
-        linear-gradient(
-            rgba(255,255,255,0.08),
-            rgba(255,255,255,0.08)
-        ),
-           z-index: 0;
-}
-
-/* Asegura que el contenido esté arriba */
-.players-section > * {
-    position: relative;
-    z-index: 1;
-}
-
-/* ===============================
-   PLAYER CARD
-=============================== */
 .custom-player {
     display: flex;
     align-items: center;
-    gap: 25px;
-    max-width: 650px;
+    gap: 20px;
+
+    max-width: 600px;
     margin: 25px auto;
-    padding: 30px;
+    padding: 22px;
 
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(8px);
 
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.12);
 
-    box-shadow: 0 25px 60px rgba(0,0,0,0.3);
-    transition: transform 0.3s ease;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+    transition: all 0.3s ease;
 }
 
 .custom-player:hover {
-    transform: translateY(-6px);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 35px rgba(0,0,0,0.4);
 }
 
-
-/* ===============================
-   IMAGEN DEL DISCO
-=============================== */
 .disco-player img,
 .ivoox-player img {
-    width: 120px;
-    height: 120px;
-    border-radius: 14px;
+    width: 105px;
+    height: 105px;
+    border-radius: 12px;
     object-fit: cover;
     flex-shrink: 0;
 }
 
-/* ===============================
-   PLAYER INFO
-=============================== */
 .player-info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .track-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 500;
     color: #ffffff;
 }
@@ -162,7 +140,8 @@ h2::after {
 .player-info audio,
 .player-info iframe {
     width: 100%;
-    border-radius: 12px;
+    height: 120px; /* misma altura para Spotify e iVoox */
+    border-radius: 10px;
     border: none;
 }
 
@@ -170,25 +149,35 @@ h2::after {
    SOCIAL
 =============================== */
 .social-section {
-    padding: 45px 0;
-    background: #0f0f10;
+    padding: 45px 20px;
+    margin: 40px auto;
+    max-width: 1100px;
+
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+
+    box-shadow: 0 18px 40px rgba(0,0,0,0.4);
 }
 
 .social-buttons {
     display: flex;
     justify-content: center;
-    gap: 25px;
+    gap: 18px;
 }
 
 .social-btn {
     width: 65px;
     height: 65px;
     font-size: 1.3rem;
+
     border-radius: 50%;
     background: #1a1a1a;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     color: #ffffff;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -203,92 +192,66 @@ h2::after {
    STAFF
 =============================== */
 .staff-section {
-    position: relative;
-    padding: 120px 20px;
-    overflow: hidden;
-}
+    padding: 60px 20px;
+    margin: 40px auto;
+    max-width: 1100px;
 
-/* Imagen de fondo */
-.staff-section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(
-            rgba(255,255,255,0.04),
-            rgba(255,255,255,0.04)
-        ),
-        url('attached_assets/fondostaff.png') center / cover no-repeat;
-    z-index: 0;
-}
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
 
-/* Contenido por encima */
-.staff-section > * {
-    position: relative;
-    z-index: 1;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.4);
 }
 
 .staff-grid {
     display: flex;
     justify-content: center;
-    gap: 40px;
+    gap: 35px;
     flex-wrap: wrap;
-    max-width: 1100px;
-    margin: 0 auto;
 }
 
 .staff-member {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(14px);
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(8px);
 
-    border-radius: 20px;
+    border-radius: 18px;
     border: 1px solid rgba(255,255,255,0.12);
 
-    padding: 20px;
-    width: 180px; /* más compacto respecto a la imagen más pequeña */
+    padding: 18px;
+    width: 170px;
 
     text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+
+    box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+    transition: all 0.3s ease;
+}
+
+.staff-member:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 35px rgba(0,0,0,0.4);
 }
 
 .staff-image {
-    width: 102px; /* 15% menos que 120px */
-    height: 102px;
-    border-radius: 14px;
+    width: 95px;
+    height: 95px;
+    border-radius: 12px;
     object-fit: cover;
-    margin-bottom: 15px;
-    transition: transform 0.3s ease;
+    margin-bottom: 12px;
 }
-
-.staff-member:hover .staff-image {
-    transform: scale(1.05);
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    .staff-grid {
-        gap: 25px;
-    }
-
-    .staff-member {
-        width: 150px; /* se ajusta mejor en pantallas pequeñas */
-        padding: 15px;
-    }
-
-    .staff-image {
-        width: 85px; /* proporcionalmente más pequeña */
-        height: 85px;
-    }
-}
-
 
 /* ===============================
    ABOUT
 =============================== */
 .about-section {
-    padding: 120px 20px;
-    background: #111;
+    padding: 60px 20px;
+    margin: 40px auto;
+    max-width: 1100px;
+
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+
+    box-shadow: 0 18px 40px rgba(0,0,0,0.4);
 }
 
 .about-content {
@@ -300,163 +263,51 @@ h2::after {
 .about-text {
     font-size: 1.05rem;
     color: #b5b5b5;
-    line-height: 1.9;
+    line-height: 1.8;
 }
 
 /* ===============================
-   RESPONSIVE
-=============================== */
-@media (max-width: 768px) {
-    .custom-player {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .staff-grid {
-        gap: 25px;
-    }
-}
-
-/* ===============================
-   FONDO CONTINUO Y DIFUMINADO
+   FONDO DIFUMINADO GLOBAL
 =============================== */
 body::before {
     content: "";
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
+
     background:
         linear-gradient(
-            rgba(11,11,12,0.3) 0%,
-            rgba(11,11,12,0.05) 33%,
-            rgba(11,11,12,0.25) 66%,
-            rgba(15,15,16,0.05) 100%
+            rgba(11,11,12,0.3),
+            rgba(15,15,16,0.2)
         ),
-        url('../attached_assets/fondoplayer.jpg') center / cover no-repeat,
-        url('attached_assets/fondostaff.png') center / cover no-repeat,
-        url('../attached_assets/fondo_social.jpg') center / cover no-repeat;
-    background-blend-mode: overlay, overlay, overlay;
+        url('attached_assets/fondostaff.png') center / cover no-repeat;
+
     filter: blur(6px);
     z-index: -1;
     pointer-events: none;
 }
 
 /* ===============================
-   SECCIONES CON CONTENEDORES TRANSPARENTES
-=============================== */
-.players-section,
-.staff-section,
-.social-section {
-    padding: 80px 20px;
-    position: relative;
-    overflow: hidden;
-
-    background: rgba(255,255,255,0.05); /* ligeramente transparente */
-    backdrop-filter: blur(12px); /* interacción con fondo difuminado */
-    border-radius: 20px;
-    margin: 40px auto;
-    max-width: 1100px;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.45);
-}
-
-/* ===============================
-   DIFUMINADO ENTRE SECCIONES
-=============================== */
-.players-section::after,
-.staff-section::after,
-.social-section::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -1px;
-    height: 80px;
-    background: linear-gradient(
-        rgba(0,0,0,0) 0%,
-        rgba(0,0,0,0.25) 100%
-    );
-    z-index: 1;
-    pointer-events: none;
-}
-
-/* Contenido por encima */
-.players-section > *,
-.staff-section > *,
-.social-section > * {
-    position: relative;
-    z-index: 2;
-}
-
-/* ===============================
-   IMÁGENES DE STAFF Y REPRODUCTORES
-=============================== */
-.staff-member,
-.custom-player {
-    background: rgba(255,255,255,0.06); /* transparente para interacción */
-    backdrop-filter: blur(12px); 
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.staff-member:hover,
-.custom-player:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
-}
-
-.staff-image,
-.disco-player img,
-.ivoox-player img {
-    border-radius: 14px;
-    object-fit: cover;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    backdrop-filter: blur(4px); /* sutil blur sobre la imagen */
-}
-
-.staff-member:hover .staff-image,
-.custom-player:hover img {
-    transform: scale(1.05);
-    box-shadow: 0 15px 45px rgba(0,0,0,0.4);
-}
-
-/* ===============================
    RESPONSIVE
 =============================== */
 @media (max-width: 768px) {
-    .players-section,
-    .staff-section,
-    .social-section {
-        padding: 60px 15px;
-        margin: 30px auto;
-    }
 
-    .players-section::after,
-    .staff-section::after,
-    .social-section::after {
-        height: 50px;
-    }
-
-    .staff-member,
     .custom-player {
-        width: 90%;
+        flex-direction: column;
+        text-align: center;
     }
 
-    .staff-image,
     .disco-player img,
     .ivoox-player img {
         width: 85px;
         height: 85px;
     }
-.player-info iframe {
-    width: 100%;
-    height: 152px; /* altura tipo Spotify grande */
-    border-radius: 12px;
-    border: none;
-}
-}
 
+    .player-info iframe,
+    .player-info audio {
+        height: 110px;
+    }
+
+    .staff-member {
+        width: 150px;
+    }
+}

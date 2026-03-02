@@ -50,6 +50,14 @@ h2::after {
     object-fit: cover;
 }
 
+.logo-section {
+    display: flex;
+    flex-direction: column; /* logo arriba, texto abajo */
+    align-items: center;    /* centra horizontalmente */
+    justify-content: center;
+    text-align: center;
+}
+
 /* ===============================
    MAIN IMAGE
 =============================== */

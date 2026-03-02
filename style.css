@@ -88,8 +88,7 @@ h2::after {
             rgba(255,255,255,0.08),
             rgba(255,255,255,0.08)
         ),
-        url('../attached_assets/fondoplayer.jpg') center / cover no-repeat;
-    z-index: 0;
+           z-index: 0;
 }
 
 /* Asegura que el contenido esté arriba */

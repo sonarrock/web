@@ -82,7 +82,7 @@ h2::after {
 =============================== */
 .players-section {
     position: relative;
-    padding: 120px 20px;
+    padding: 60px 20px; 
     overflow: hidden;
 }
 

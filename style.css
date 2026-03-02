@@ -170,7 +170,7 @@ h2::after {
    SOCIAL
 =============================== */
 .social-section {
-    padding: 80px 0;
+    padding: 450px 0;
     background: #0f0f10;
 }
 
@@ -181,8 +181,8 @@ h2::after {
 }
 
 .social-btn {
-    width: 55px;
-    height: 55px;
+    width: 65px;
+    height: 65px;
     border-radius: 50%;
     background: #1a1a1a;
     display: flex;

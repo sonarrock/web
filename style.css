@@ -7,11 +7,17 @@
     box-sizing: border-box;
 }
 
+/* ===============================
+   TIPOGRAFÍA GLOBAL
+=============================== */
 body {
     font-family: 'Inter', Arial, sans-serif;
     background: #0b0b0c;
     color: #cfcfcf;
     line-height: 1.7;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* ===============================
@@ -19,10 +25,15 @@ body {
 =============================== */
 h1, h2, h3 {
     text-align: center;
-    font-weight: 600;
-    letter-spacing: 1.5px;
+    font-weight: 700; /* más presencia */
+    letter-spacing: 1.2px;
     margin-bottom: 30px;
     color: #ffffff;
+}
+
+h4, h5, h6 {
+    font-weight: 600;
+    color: #e5e5e5;
 }
 
 h2::after {
@@ -57,6 +68,13 @@ h2::after {
     text-align: center;
 }
 
+/* Branding más potente */
+.title-section h1 {
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
 /* ===============================
    MAIN IMAGE
 =============================== */
@@ -77,7 +95,7 @@ h2::after {
 }
 
 /* ===============================
-   PLAYERS SECTION (OPTIMIZADA)
+   PLAYERS SECTION
 =============================== */
 .players-section {
     padding: 60px 20px;
@@ -132,15 +150,16 @@ h2::after {
 }
 
 .track-title {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     font-weight: 700;
+    letter-spacing: 0.4px;
     color: #ffffff;
 }
 
 .player-info audio,
 .player-info iframe {
     width: 100%;
-    height: 120px; /* misma altura para Spotify e iVoox */
+    height: 120px;
     border-radius: 10px;
     border: none;
 }
@@ -262,6 +281,7 @@ h2::after {
 
 .about-text {
     font-size: 1.05rem;
+    font-weight: 400;
     color: #b5b5b5;
     line-height: 1.8;
 }

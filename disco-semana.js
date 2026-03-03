@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackTitle = document.getElementById("track-title");
 
   const discoData = {
-    titulo: "Prince - Purple Rain",
+    titulo: "Pink Floyd - The Dark Side Of The Moon",
     audio: "disco-semana/Prince - Purple Rain.mp3",
     portada: "disco-semana/portada.jpg"
   };

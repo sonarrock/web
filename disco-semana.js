@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const discoData = {
     titulo: "Pink Floyd - The Dark Side Of The Moon",
-    audio: "disco-semana/Prince - Purple Rain.mp3",
+    audio: "disco-semana/Pink Floyd - The Dark Side Of The Moon.mp3",
     portada: "disco-semana/portada.jpg"
   };
 

@@ -206,7 +206,7 @@ h2::after {
 .staff-grid {
     display: flex;
     justify-content: center;
-    gap: 35px;
+    gap: 30px;
     flex-wrap: wrap;
 }
 
@@ -218,7 +218,7 @@ h2::after {
     border: 1px solid rgba(255,255,255,0.12);
 
     padding: 18px;
-    width: 170px;
+    width: 150px;
 
     text-align: center;
 
@@ -232,8 +232,8 @@ h2::after {
 }
 
 .staff-image {
-    width: 95px;
-    height: 95px;
+    width: 100px;
+    height: 100px;
     border-radius: 12px;
     object-fit: cover;
     margin-bottom: 12px;
@@ -304,10 +304,10 @@ body::before {
 
     .player-info iframe,
     .player-info audio {
-        height: 100px;
+        height: 95px;
     }
 
     .staff-member {
-        width: 120px;
+        width: 100px;
     }
 }

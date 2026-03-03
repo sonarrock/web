@@ -118,14 +118,15 @@ h2::after {
     margin: 20px auto;
     padding: 18px;
 
-    background: #121212; /* negro estilo Spotify */
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.03); /* transparencia clara */
+    backdrop-filter: blur(10px);
 
-    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.10);
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.30);
     transition: all 0.3s ease;
 }
-
 .custom-player:hover {
     transform: translateY(-4px);
     box-shadow: 0 16px 35px rgba(0,0,0,0.4);

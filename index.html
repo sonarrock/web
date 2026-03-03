@@ -109,40 +109,59 @@
     </div>
   </section>
 
-  <!-- ========================= -->
-  <!-- SECCIÓN REPRODUCTORES -->
-  <!-- ========================= -->
-  <section class="players-section">
-    <h3 class="player-title">Disco de la Semana</h3>
+<section class="players-section">
 
-    <div class="custom-player disco-player" id="disco-player">
-      <img id="cover" src="disco-semana/portada.jpg" alt="Portada Disco">
-      <div class="player-info">
-        <div id="track-title"></div>
-        <audio id="disco-audio" controls preload="metadata" playsinline></audio>
-      </div>
+  <!-- ========================= -->
+  <!-- DISCO DE LA SEMANA -->
+  <!-- ========================= -->
+  <h3 class="player-title">Disco de la Semana</h3>
+
+  <div class="custom-player disco-player" id="disco-player">
+    <img id="cover" src="disco-semana/portada.jpg" alt="Portada Disco">
+
+    <div class="player-info">
+      <!-- Se mantiene el ID para JS y se agrega clase para CSS -->
+      <div id="track-title" class="track-title"></div>
+
+      <audio id="disco-audio" controls preload="metadata" playsinline>
+      </audio>
     </div>
-
-   <h3 class="player-title">Spotify</h3>
-<div class="custom-player spotify-player">
-  <div class="player-info">
-    <iframe 
-      src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU"
-      loading="lazy">
-    </iframe>
   </div>
-</div>
 
-<h3 class="player-title">iVoox</h3>
-<div class="custom-player ivoox-player" id="ivoox-player">
-  <img id="ivoox-cover" src="" alt="Portada Episodio">
-  <div class="player-info">
-    <div id="ivoox-title"></div>
-    <audio id="ivoox-audio" controls preload="metadata" playsinline></audio>
+
+  <!-- ========================= -->
+  <!-- SPOTIFY -->
+  <!-- ========================= -->
+  <h3 class="player-title">Spotify</h3>
+
+  <div class="custom-player spotify-player">
+    <div class="player-info">
+      <iframe 
+        src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU"
+        loading="lazy">
+      </iframe>
+    </div>
   </div>
-</div>
+
+
+  <!-- ========================= -->
+  <!-- IVOOX -->
+  <!-- ========================= -->
+  <h3 class="player-title">iVoox</h3>
+
+  <div class="custom-player ivoox-player" id="ivoox-player">
+    <img id="ivoox-cover" src="" alt="Portada Episodio">
+
+    <div class="player-info">
+      <!-- Se mantiene el ID para JS y se agrega clase para CSS -->
+      <div id="ivoox-title" class="track-title"></div>
+
+      <audio id="ivoox-audio" controls preload="metadata" playsinline>
+      </audio>
+    </div>
+  </div>
+
 </section>
-
 <!-- ========================= -->
 <!-- STAFF -->
 <!-- ========================= -->

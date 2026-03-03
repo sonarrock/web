@@ -132,7 +132,7 @@ h2::after {
 }
 
 .track-title {
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: 500;
     color: #ffffff;
 }
@@ -304,10 +304,10 @@ body::before {
 
     .player-info iframe,
     .player-info audio {
-        height: 110px;
+        height: 100px;
     }
 
     .staff-member {
-        width: 150px;
+        width: 120px;
     }
 }

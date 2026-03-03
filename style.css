@@ -116,7 +116,7 @@ h2::after {
 
     max-width: 500px;
     margin: 20px auto;
-    padding: 18px;
+    padding: 12px;
 
     background: rgba(255, 255, 255, 0.03); /* transparencia clara */
     backdrop-filter: blur(10px);

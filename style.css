@@ -154,13 +154,12 @@ h2::after {
     color: #ffffff;
 }
 
-.player-info audio,
-.player-info iframe {
+.player-info audio {
     width: 100%;
-    height: 152px;
-    border-radius: 10px;
-    border: none;
+    height: 152px; /* igual que Spotify */
+    border-radius: 12px;
 }
+
 
 /* ===============================
    SOCIAL

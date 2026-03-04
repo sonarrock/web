@@ -232,11 +232,11 @@ h2::after {
     background: rgba(255,255,255,0.05);
     backdrop-filter: blur(8px);
 
-    border-radius: 16px;
+    border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.12);
 
-    width: 140px;
-    padding: 16px 12px;
+    width: 120px;
+    padding: 14px 12px;
 
     display: flex;
     flex-direction: column;
@@ -267,8 +267,8 @@ h2::after {
 
 .staff-name {
     margin-top: 10px;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 400;
     letter-spacing: 0.5px;
     color: #ffffff;
 }

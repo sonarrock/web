@@ -206,8 +206,9 @@ h2::after {
 }
 
 /* ===============================
-   STAFF
+   STAFF - VERSION MEJORADA
 =============================== */
+
 .staff-section {
     padding: 60px 20px;
     margin: 40px auto;
@@ -231,45 +232,48 @@ h2::after {
     background: rgba(255,255,255,0.05);
     backdrop-filter: blur(8px);
 
-    border-radius: 18px;
+    border-radius: 16px;
     border: 1px solid rgba(255,255,255,0.12);
 
-    width: 130px;
-    padding: 12px 10px; 
+    width: 140px;
+    padding: 16px 12px;
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
 
     text-align: center;
 
-    box-shadow: 0 12px 28px rgba(0,0,0,0.35);
-    transition: all 0.3s ease;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+    transition: all 0.25s ease;
 }
 
 .staff-member:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 18px rgba(0,0,0,0.4);
+    transform: translateY(-6px);
+    box-shadow: 0 18px 30px rgba(0,0,0,0.45);
 }
 
 .staff-image {
-    width: 105px;
-    height: 105px;
-    border-radius: 12px;
+    width: 110px;
+    aspect-ratio: 1 / 1;   /* Siempre cuadrada */
     object-fit: cover;
-    margin: 0; /* quitamos margin-bottom */
+    border-radius: 12px;
+    transition: transform 0.3s ease;
 }
 
-/* Nombre debajo de la imagen */
-.staff-member p,
-.staff-member h4 {
-    margin-top: 6px;
-    margin-bottom: 0;
-    font-weight: 400;
-    color: #ffffff;
-    font-size: 14px;  
+.staff-member:hover .staff-image {
+    transform: scale(1.05);
 }
+
+.staff-name {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+}
+
+
 /* ===============================
    ABOUT
 =============================== */

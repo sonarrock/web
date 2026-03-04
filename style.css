@@ -206,7 +206,7 @@ h2::after {
 }
 
 /* ===============================
-   STAFF - VERSION MEJORADA
+          STAFF 
 =============================== */
 
 .staff-section {
@@ -222,21 +222,22 @@ h2::after {
 }
 
 .staff-grid {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 30px;
-    flex-wrap: wrap;
+    justify-items: center;
 }
 
 .staff-member {
     background: rgba(255,255,255,0.05);
     backdrop-filter: blur(8px);
 
-    border-radius: 12px;
+    border-radius: 16px;
     border: 1px solid rgba(255,255,255,0.12);
 
-    width: 120px;
-    padding: 14px 12px;
+    width: 100%;
+    max-width: 160px;
+    padding: 18px 12px;
 
     display: flex;
     flex-direction: column;
@@ -255,9 +256,9 @@ h2::after {
 
 .staff-image {
     width: 110px;
-    aspect-ratio: 1 / 1;   /* Siempre cuadrada */
+    aspect-ratio: 1 / 1;
     object-fit: cover;
-    border-radius: 12px;
+    border-radius: 50%;   /* 🔥 ahora circular */
     transition: transform 0.3s ease;
 }
 
@@ -266,13 +267,33 @@ h2::after {
 }
 
 .staff-name {
-    margin-top: 10px;
-    font-size: 12px;
-    font-weight: 400;
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: 500;
     letter-spacing: 0.5px;
     color: #ffffff;
 }
 
+/* 📱 Mobile: 2 por fila */
+@media (max-width: 600px) {
+    .staff-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .staff-member {
+        max-width: 100%;
+        padding: 16px 8px;
+    }
+
+    .staff-image {
+        width: 90px;
+    }
+
+    .staff-name {
+        font-size: 13px;
+    }
+}
 
 /* ===============================
    ABOUT
@@ -343,7 +364,4 @@ body::before {
         height: 95px;
     }
 
-    .staff-member {
-        width: 100px;
-    }
-}
+  }

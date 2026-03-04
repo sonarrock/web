@@ -250,7 +250,7 @@ h2::after {
 
 .staff-member:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+    box-shadow: 0 12px 18px rgba(0,0,0,0.4);
 }
 
 .staff-image {
@@ -264,9 +264,9 @@ h2::after {
 /* Nombre debajo de la imagen */
 .staff-member p,
 .staff-member h4 {
-    margin-top: 10px;
+    margin-top: 8px;
     margin-bottom: 0;
-    font-weight: 600;
+    font-weight: 450;
     color: #ffffff;
 }
 

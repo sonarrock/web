@@ -292,10 +292,10 @@ h2::after {
 }
 
 .about-text {
-    font-size: 1.05rem;
-    font-weight: 400;
+    font-size: 0.95rem;
+    font-weight: 350;
     color: #b5b5b5;
-    line-height: 1.8;
+    line-height: 1.5;
 }
 
 /* ===============================

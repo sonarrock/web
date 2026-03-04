@@ -235,12 +235,12 @@ h2::after {
     border: 1px solid rgba(255,255,255,0.12);
 
     width: 130px;
-    padding: 20px 15px; /* padding equilibrado */
+    padding: 12px 10px; 
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* centra verticalmente */
+    justify-content: center;
 
     text-align: center;
 
@@ -254,8 +254,8 @@ h2::after {
 }
 
 .staff-image {
-    width: 95px;
-    height: 95px;
+    width: 105px;
+    height: 105px;
     border-radius: 12px;
     object-fit: cover;
     margin: 0; /* quitamos margin-bottom */
@@ -264,12 +264,12 @@ h2::after {
 /* Nombre debajo de la imagen */
 .staff-member p,
 .staff-member h4 {
-    margin-top: 8px;
+    margin-top: 6px;
     margin-bottom: 0;
-    font-weight: 450;
+    font-weight: 400;
     color: #ffffff;
+    font-size: 14px;  
 }
-
 /* ===============================
    ABOUT
 =============================== */

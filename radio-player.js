@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // CONFIGURACIÓN INICIAL
   // =============================
 
-  audio.preload = "none";
+  audio.preload = "auto";
   audio.crossOrigin = "anonymous";
   audio.volume = parseFloat(localStorage.getItem("radioVolume")) || 1;
   volumeSlider.value = audio.volume;
@@ -53,16 +53,40 @@ document.addEventListener("DOMContentLoaded", () => {
   updateStatus("OFFLINE");
 
   // =============================
+  // PREBUFFER STREAM
+  // =============================
+
+  function initStreamBuffer() {
+
+    if (!streamInitialized) {
+
+      audio.src = STREAM_URL + "?t=" + Date.now();
+      audio.load();
+
+      streamInitialized = true;
+
+      console.log("Stream precargando...");
+
+    }
+
+  }
+
+  // =============================
   // CONTROL GLOBAL ENTRE AUDIOS
   // =============================
 
   document.querySelectorAll("audio").forEach(player => {
+
     player.addEventListener("play", () => {
+
       if (window.globalActiveAudio && window.globalActiveAudio !== player) {
         window.globalActiveAudio.pause();
       }
+
       window.globalActiveAudio = player;
+
     });
+
   });
 
   // =============================
@@ -78,19 +102,30 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================
 
   function startTimer() {
+
     clearInterval(timerInterval);
+
     timerInterval = setInterval(() => {
+
       seconds++;
+
       const m = String(Math.floor(seconds / 60)).padStart(2,"0");
       const s = String(seconds % 60).padStart(2,"0");
+
       timerEl.textContent = `${m}:${s}`;
+
     },1000);
+
   }
 
   function stopTimer() {
+
     clearInterval(timerInterval);
+
     seconds = 0;
+
     timerEl.textContent = "00:00";
+
   }
 
   // =============================
@@ -98,42 +133,61 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================
 
   function startFreezeMonitor() {
+
     clearInterval(freezeMonitor);
+
     freezeMonitor = setInterval(() => {
+
       if (!audio.paused) {
+
         if (audio.currentTime === lastCurrentTime) {
+
           console.warn("Stream congelado detectado");
+
           forceReconnect();
+
         }
+
         lastCurrentTime = audio.currentTime;
+
       }
+
     }, 8000);
+
   }
 
   function stopFreezeMonitor() {
+
     clearInterval(freezeMonitor);
+
   }
 
   // =============================
-  // RECONEXIÓN PROGRESIVA INFINITA
+  // RECONEXIÓN PROGRESIVA
   // =============================
 
   function forceReconnect() {
+
     if (!isPlaying) return;
 
     clearTimeout(reconnectTimer);
 
     reconnectAttempts++;
 
-    updateStatus("RECONectando");
+    updateStatus("RECONECTANDO");
 
     const delay = Math.min(BASE_DELAY * reconnectAttempts, MAX_DELAY);
 
     reconnectTimer = setTimeout(() => {
+
       audio.src = STREAM_URL + "?t=" + Date.now();
+
       audio.load();
+
       audio.play().catch(() => forceReconnect());
+
     }, delay);
+
   }
 
   // =============================
@@ -141,35 +195,59 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================
 
   window.addEventListener("offline", () => {
+
     updateStatus("SIN INTERNET");
+
   });
 
   window.addEventListener("online", () => {
+
     if (isPlaying) {
+
       updateStatus("RECUPERANDO");
+
       forceReconnect();
+
     }
+
   });
 
   // =============================
   // EVENTOS AUDIO
   // =============================
 
+  audio.addEventListener("loadstart", () => {
+
+    updateStatus("CONECTANDO");
+
+  });
+
   audio.addEventListener("waiting", () => {
+
     if (isPlaying) updateStatus("BUFFERING");
+
   });
 
   audio.addEventListener("playing", () => {
+
     updateStatus("REPRODUCIENDO");
+
     container.classList.add("playing");
+
     playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+
     reconnectAttempts = 0;
+
     startTimer();
+
     startFreezeMonitor();
+
   });
 
   audio.addEventListener("pause", () => {
+
     if (!audio.ended) resetUI();
+
   });
 
   audio.addEventListener("stalled", forceReconnect);
@@ -177,13 +255,15 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.addEventListener("ended", forceReconnect);
 
   // =============================
-  // PLAY / PAUSE CON ANTI DOBLE CLICK
+  // PLAY / PAUSE
   // =============================
 
   playBtn.addEventListener("click", () => {
 
     if (clickLock) return;
+
     clickLock = true;
+
     setTimeout(() => clickLock = false, 800);
 
     if (!isPlaying) {
@@ -194,24 +274,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
       window.globalActiveAudio = audio;
 
-      if (!streamInitialized) {
-        audio.src = STREAM_URL + "?t=" + Date.now();
-        streamInitialized = true;
-      }
-
-      audio.load();
-      updateStatus("CARGANDO");
+      updateStatus("CONECTANDO");
 
       audio.play().then(() => {
+
         isPlaying = true;
+
       }).catch(err => {
+
         console.warn("Play bloqueado:", err);
+
         resetUI();
+
       });
 
     } else {
+
       audio.pause();
+
     }
+
   });
 
   // =============================
@@ -219,21 +301,35 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================
 
   stopBtn.addEventListener("click", () => {
+
     audio.pause();
+
     audio.removeAttribute("src");
+
     audio.load();
+
     streamInitialized = false;
+
     reconnectAttempts = 0;
+
     resetUI();
+
   });
 
   function resetUI() {
+
     isPlaying = false;
+
     stopTimer();
+
     stopFreezeMonitor();
+
     container.classList.remove("playing");
+
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
+
     updateStatus("OFFLINE");
+
   }
 
   // =============================
@@ -241,11 +337,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================
 
   muteBtn.addEventListener("click", () => {
+
     audio.muted = !audio.muted;
+
     localStorage.setItem("radioMuted", audio.muted);
+
     muteBtn.innerHTML = audio.muted
       ? '<i class="fas fa-volume-mute"></i>'
       : '<i class="fas fa-volume-up"></i>';
+
   });
 
   // =============================
@@ -253,8 +353,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // =============================
 
   volumeSlider.addEventListener("input", e => {
+
     audio.volume = e.target.value;
+
     localStorage.setItem("radioVolume", e.target.value);
+
   });
+
+  // =============================
+  // INICIAR BUFFER AL CARGAR PAGINA
+  // =============================
+
+  initStreamBuffer();
 
 });

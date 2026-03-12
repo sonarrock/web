@@ -111,23 +111,41 @@
 
 <section class="players-section">
 
-  <!-- ========================= -->
-  <!-- DISCO DE LA SEMANA -->
-  <!-- ========================= -->
-  <h3 class="player-title">Disco de la Semana</h3>
+ <!-- ========================= -->
+<!-- DISCO DE LA SEMANA -->
+<!-- ========================= -->
 
-  <div class="custom-player disco-player" id="disco-player">
-    <img id="cover" src="disco-semana/portada.jpg" alt="Portada Disco">
+<h3 class="player-title">Disco de la Semana</h3>
 
-    <div class="player-info">
-      <!-- Se mantiene el ID para JS y se agrega clase para CSS -->
-      <div id="track-title" class="track-title"></div>
+<div class="custom-player disco-player" id="disco-player">
 
-      <audio id="disco-audio" controls preload="metadata" playsinline>
-      </audio>
+  <img id="cover" src="disco-semana/portada.jpg" alt="Portada Disco">
+
+  <div class="player-info">
+
+    <!-- titulo del album -->
+    <div id="track-title" class="track-title"></div>
+
+    <!-- ondas de audio -->
+    <div class="audio-wave">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
+
+    <!-- reproductor -->
+    <audio 
+      id="disco-audio"
+      controls
+      preload="metadata"
+      playsinline>
+    </audio>
+
   </div>
 
+</div>
 
   <!-- ========================= -->
   <!-- SPOTIFY -->

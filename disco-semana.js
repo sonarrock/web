@@ -5,8 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackTitle = document.getElementById("track-title");
 
   const discoData = {
-    titulo: "Pink Floyd - The Dark Side Of The Moon",
-    audio: "disco-semana/Pink Floyd - The Dark Side Of The Moon.mp3",
+    titulo: "Allman Brothers - At fillmore east",
+    audio: "disco-semana/Allman Brothers - At fillmore east.mp3",
     portada: "disco-semana/portada.jpg"
   };
 

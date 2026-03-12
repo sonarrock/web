@@ -1,5 +1,5 @@
 // ==============================
-// SONAR ROCK - RADIO PLAYER PRO
+// SONAR ROCK - RADIO PLAYER ULTRA
 // ==============================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -18,12 +18,13 @@ const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
 let isPlaying = false;
 let reconnectAttempts = 0;
 let reconnectTimer = null;
+let freezeMonitor = null;
 let timerInterval = null;
+let lastTime = 0;
 let seconds = 0;
-let clickLock = false;
 
 const BASE_DELAY = 2000;
-const MAX_DELAY = 20000;
+const MAX_DELAY = 15000;
 
 window.globalActiveAudio = null;
 
@@ -52,8 +53,8 @@ updateStatus("OFFLINE");
 // STATUS
 // =============================
 
-function updateStatus(status){
-statusText.textContent = status.toUpperCase();
+function updateStatus(text){
+statusText.textContent = text.toUpperCase();
 }
 
 
@@ -81,14 +82,16 @@ timerEl.textContent = `${m}:${s}`;
 function stopTimer(){
 
 clearInterval(timerInterval);
+
 seconds = 0;
-timerEl.textContent="00:00";
+
+timerEl.textContent = "00:00";
 
 }
 
 
 // =============================
-// CONECTAR STREAM
+// INICIAR STREAM
 // =============================
 
 function startStream(){
@@ -105,17 +108,52 @@ isPlaying = true;
 })
 .catch(err=>{
 
-console.warn("Error play:",err);
+console.warn("Play bloqueado",err);
 
 updateStatus("ERROR PLAY");
 
-})
+});
 
 }
 
 
 // =============================
-// RECONEXION PRO
+// DETECTOR DE STREAM CONGELADO
+// =============================
+
+function startFreezeMonitor(){
+
+clearInterval(freezeMonitor);
+
+freezeMonitor = setInterval(()=>{
+
+if(!audio.paused){
+
+if(audio.currentTime === lastTime){
+
+console.warn("Stream congelado");
+
+reconnect();
+
+}
+
+lastTime = audio.currentTime;
+
+}
+
+},8000)
+
+}
+
+function stopFreezeMonitor(){
+
+clearInterval(freezeMonitor);
+
+}
+
+
+// =============================
+// RECONEXION INTELIGENTE
 // =============================
 
 function reconnect(){
@@ -161,11 +199,13 @@ updateStatus("EN VIVO");
 
 container.classList.add("playing");
 
-playBtn.innerHTML='<i class="fas fa-pause"></i>';
+playBtn.innerHTML = '<i class="fas fa-pause"></i>';
 
 reconnectAttempts = 0;
 
 startTimer();
+
+startFreezeMonitor();
 
 });
 
@@ -185,11 +225,6 @@ audio.addEventListener("ended", reconnect);
 // =============================
 
 playBtn.addEventListener("click", ()=>{
-
-if(clickLock) return;
-
-clickLock=true;
-setTimeout(()=>clickLock=false,300);
 
 if(!isPlaying){
 
@@ -219,9 +254,8 @@ stopBtn.addEventListener("click", ()=>{
 audio.pause();
 
 audio.removeAttribute("src");
-audio.load();
 
-reconnectAttempts=0;
+audio.load();
 
 resetUI();
 
@@ -230,13 +264,15 @@ resetUI();
 
 function resetUI(){
 
-isPlaying=false;
+isPlaying = false;
 
 stopTimer();
 
+stopFreezeMonitor();
+
 container.classList.remove("playing");
 
-playBtn.innerHTML='<i class="fas fa-play"></i>';
+playBtn.innerHTML = '<i class="fas fa-play"></i>';
 
 updateStatus("OFFLINE");
 
@@ -247,11 +283,11 @@ updateStatus("OFFLINE");
 // MUTE
 // =============================
 
-muteBtn.addEventListener("click",()=>{
+muteBtn.addEventListener("click", ()=>{
 
-audio.muted=!audio.muted;
+audio.muted = !audio.muted;
 
-localStorage.setItem("radioMuted",audio.muted);
+localStorage.setItem("radioMuted", audio.muted);
 
 muteBtn.innerHTML = audio.muted
 ? '<i class="fas fa-volume-mute"></i>'
@@ -264,11 +300,34 @@ muteBtn.innerHTML = audio.muted
 // VOLUMEN
 // =============================
 
-volumeSlider.addEventListener("input",e=>{
+volumeSlider.addEventListener("input", e=>{
 
-audio.volume=e.target.value;
+audio.volume = e.target.value;
 
-localStorage.setItem("radioVolume",e.target.value);
+localStorage.setItem("radioVolume", e.target.value);
+
+});
+
+
+// =============================
+// INTERNET OFFLINE / ONLINE
+// =============================
+
+window.addEventListener("offline", ()=>{
+
+updateStatus("SIN INTERNET");
+
+});
+
+window.addEventListener("online", ()=>{
+
+if(isPlaying){
+
+updateStatus("RECUPERANDO");
+
+reconnect();
+
+}
 
 });
 

@@ -169,12 +169,17 @@ h2::after {
     filter: contrast(1.05);
 }
 
-/* spotify iframe corregido */
+/* ===============================
+   SPOTIFY EMBED
+=============================== */
+
 .player-info iframe{
+    display:block;
     width:100%;
     max-width:560px;
     height:152px;
     border-radius:12px;
+    margin:20px auto; /* centra horizontalmente */
 }
 
 /* ===============================

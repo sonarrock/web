@@ -1,6 +1,6 @@
-// =====================================================
-// SONAR ROCK - RADIO PLAYER PRO EDITION
-// =====================================================
+// ==============================
+// SONAR ROCK - RADIO PLAYER 
+// ==============================
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -53,15 +53,31 @@ document.addEventListener("DOMContentLoaded", () => {
   updateStatus("OFFLINE");
 
   // =============================
-  // PREBUFFER STREAM
+  // PREBUFFER STREAM MEJORADO
   // =============================
 
   function initStreamBuffer() {
 
     if (!streamInitialized) {
 
-      audio.src = STREAM_URL + "?t=" + Date.now();
+      audio.src = STREAM_URL;
+      audio.preload = "auto";
       audio.load();
+
+      // Micro-play silencioso para forzar buffering
+      audio.muted = true;
+
+      audio.play()
+        .then(() => {
+
+          audio.pause();
+          audio.currentTime = 0;
+          audio.muted = savedMuted;
+
+          console.log("Buffer del stream listo");
+
+        })
+        .catch(()=>{});
 
       streamInitialized = true;
 
@@ -264,7 +280,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     clickLock = true;
 
-    setTimeout(() => clickLock = false, 800);
+    setTimeout(() => clickLock = false, 250);
 
     if (!isPlaying) {
 
@@ -276,11 +292,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       updateStatus("CONECTANDO");
 
-      audio.play().then(() => {
+      if (!streamInitialized) initStreamBuffer();
+
+      audio.play()
+      .then(() => {
 
         isPlaying = true;
 
-      }).catch(err => {
+      })
+      .catch(err => {
 
         console.warn("Play bloqueado:", err);
 

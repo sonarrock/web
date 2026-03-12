@@ -1,389 +1,275 @@
 // ==============================
-// SONAR ROCK - RADIO PLAYER 
+// SONAR ROCK - RADIO PLAYER PRO
 // ==============================
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  const audio = document.getElementById("radio-audio");
-  const playBtn = document.getElementById("playPauseBtn");
-  const stopBtn = document.getElementById("stop-btn");
-  const muteBtn = document.getElementById("mute-btn");
-  const volumeSlider = document.getElementById("volume");
-  const statusText = document.getElementById("status-text");
-  const timerEl = document.getElementById("timer");
-  const container = document.querySelector(".player-container");
+const audio = document.getElementById("radio-audio");
+const playBtn = document.getElementById("playPauseBtn");
+const stopBtn = document.getElementById("stop-btn");
+const muteBtn = document.getElementById("mute-btn");
+const volumeSlider = document.getElementById("volume");
+const statusText = document.getElementById("status-text");
+const timerEl = document.getElementById("timer");
+const container = document.querySelector(".player-container");
 
-  const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
+const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
 
-  // =============================
-  // VARIABLES PRO
-  // =============================
+let isPlaying = false;
+let reconnectAttempts = 0;
+let reconnectTimer = null;
+let timerInterval = null;
+let seconds = 0;
+let clickLock = false;
 
-  let isPlaying = false;
-  let streamInitialized = false;
-  let reconnectAttempts = 0;
-  let reconnectTimer = null;
-  let timerInterval = null;
-  let freezeMonitor = null;
-  let lastCurrentTime = 0;
-  let seconds = 0;
-  let clickLock = false;
+const BASE_DELAY = 2000;
+const MAX_DELAY = 20000;
 
-  const BASE_DELAY = 2000;
-  const MAX_DELAY = 20000;
+window.globalActiveAudio = null;
 
-  window.globalActiveAudio = null;
 
-  // =============================
-  // CONFIGURACIÓN INICIAL
-  // =============================
+// =============================
+// CONFIG INICIAL
+// =============================
 
-  audio.preload = "auto";
-  audio.crossOrigin = "anonymous";
-  audio.volume = parseFloat(localStorage.getItem("radioVolume")) || 1;
-  volumeSlider.value = audio.volume;
+audio.preload = "none";
+audio.crossOrigin = "anonymous";
 
-  const savedMuted = localStorage.getItem("radioMuted") === "true";
-  audio.muted = savedMuted;
+audio.volume = parseFloat(localStorage.getItem("radioVolume")) || 1;
+volumeSlider.value = audio.volume;
 
-  muteBtn.innerHTML = audio.muted
-    ? '<i class="fas fa-volume-mute"></i>'
-    : '<i class="fas fa-volume-up"></i>';
+const savedMuted = localStorage.getItem("radioMuted") === "true";
+audio.muted = savedMuted;
 
-  updateStatus("OFFLINE");
+muteBtn.innerHTML = audio.muted
+? '<i class="fas fa-volume-mute"></i>'
+: '<i class="fas fa-volume-up"></i>';
 
-  // =============================
-  // PREBUFFER STREAM MEJORADO
-  // =============================
+updateStatus("OFFLINE");
 
-  function initStreamBuffer() {
 
-    if (!streamInitialized) {
+// =============================
+// STATUS
+// =============================
 
-      audio.src = STREAM_URL;
-      audio.preload = "auto";
-      audio.load();
+function updateStatus(status){
+statusText.textContent = status.toUpperCase();
+}
 
-      // Micro-play silencioso para forzar buffering
-      audio.muted = true;
 
-      audio.play()
-        .then(() => {
+// =============================
+// TIMER
+// =============================
 
-          audio.pause();
-          audio.currentTime = 0;
-          audio.muted = savedMuted;
+function startTimer(){
 
-          console.log("Buffer del stream listo");
+clearInterval(timerInterval);
 
-        })
-        .catch(()=>{});
+timerInterval = setInterval(()=>{
 
-      streamInitialized = true;
+seconds++;
 
-      console.log("Stream precargando...");
+const m = String(Math.floor(seconds/60)).padStart(2,"0");
+const s = String(seconds%60).padStart(2,"0");
 
-    }
+timerEl.textContent = `${m}:${s}`;
 
-  }
+},1000)
 
-  // =============================
-  // CONTROL GLOBAL ENTRE AUDIOS
-  // =============================
+}
 
-  document.querySelectorAll("audio").forEach(player => {
+function stopTimer(){
 
-    player.addEventListener("play", () => {
+clearInterval(timerInterval);
+seconds = 0;
+timerEl.textContent="00:00";
 
-      if (window.globalActiveAudio && window.globalActiveAudio !== player) {
-        window.globalActiveAudio.pause();
-      }
+}
 
-      window.globalActiveAudio = player;
 
-    });
+// =============================
+// CONECTAR STREAM
+// =============================
 
-  });
+function startStream(){
 
-  // =============================
-  // STATUS
-  // =============================
+audio.src = STREAM_URL + "?nocache=" + Date.now();
 
-  function updateStatus(status) {
-    statusText.textContent = status.toUpperCase();
-  }
+audio.load();
 
-  // =============================
-  // TIMER
-  // =============================
+audio.play()
+.then(()=>{
 
-  function startTimer() {
+isPlaying = true;
 
-    clearInterval(timerInterval);
+})
+.catch(err=>{
 
-    timerInterval = setInterval(() => {
+console.warn("Error play:",err);
 
-      seconds++;
+updateStatus("ERROR PLAY");
 
-      const m = String(Math.floor(seconds / 60)).padStart(2,"0");
-      const s = String(seconds % 60).padStart(2,"0");
+})
 
-      timerEl.textContent = `${m}:${s}`;
+}
 
-    },1000);
 
-  }
+// =============================
+// RECONEXION PRO
+// =============================
 
-  function stopTimer() {
+function reconnect(){
 
-    clearInterval(timerInterval);
+if(!isPlaying) return;
 
-    seconds = 0;
+clearTimeout(reconnectTimer);
 
-    timerEl.textContent = "00:00";
+reconnectAttempts++;
 
-  }
+updateStatus("RECONECTANDO");
 
-  // =============================
-  // MONITOR DE CONGELAMIENTO
-  // =============================
+const delay = Math.min(BASE_DELAY * reconnectAttempts, MAX_DELAY);
 
-  function startFreezeMonitor() {
+reconnectTimer = setTimeout(()=>{
 
-    clearInterval(freezeMonitor);
+startStream();
 
-    freezeMonitor = setInterval(() => {
+},delay)
 
-      if (!audio.paused) {
+}
 
-        if (audio.currentTime === lastCurrentTime) {
 
-          console.warn("Stream congelado detectado");
+// =============================
+// EVENTOS AUDIO
+// =============================
 
-          forceReconnect();
+audio.addEventListener("loadstart", ()=>{
 
-        }
+updateStatus("CONECTANDO");
 
-        lastCurrentTime = audio.currentTime;
+});
 
-      }
+audio.addEventListener("waiting", ()=>{
 
-    }, 8000);
+if(isPlaying) updateStatus("BUFFERING");
 
-  }
+});
 
-  function stopFreezeMonitor() {
+audio.addEventListener("playing", ()=>{
 
-    clearInterval(freezeMonitor);
+updateStatus("EN VIVO");
 
-  }
+container.classList.add("playing");
 
-  // =============================
-  // RECONEXIÓN PROGRESIVA
-  // =============================
+playBtn.innerHTML='<i class="fas fa-pause"></i>';
 
-  function forceReconnect() {
+reconnectAttempts = 0;
 
-    if (!isPlaying) return;
+startTimer();
 
-    clearTimeout(reconnectTimer);
+});
 
-    reconnectAttempts++;
+audio.addEventListener("pause", ()=>{
 
-    updateStatus("RECONECTANDO");
+if(!audio.ended) resetUI();
 
-    const delay = Math.min(BASE_DELAY * reconnectAttempts, MAX_DELAY);
+});
 
-    reconnectTimer = setTimeout(() => {
+audio.addEventListener("stalled", reconnect);
+audio.addEventListener("error", reconnect);
+audio.addEventListener("ended", reconnect);
 
-      audio.src = STREAM_URL + "?t=" + Date.now();
 
-      audio.load();
+// =============================
+// PLAY / PAUSE
+// =============================
 
-      audio.play().catch(() => forceReconnect());
+playBtn.addEventListener("click", ()=>{
 
-    }, delay);
+if(clickLock) return;
 
-  }
+clickLock=true;
+setTimeout(()=>clickLock=false,300);
 
-  // =============================
-  // INTERNET OFFLINE / ONLINE
-  // =============================
+if(!isPlaying){
 
-  window.addEventListener("offline", () => {
+if(window.globalActiveAudio && window.globalActiveAudio !== audio){
+window.globalActiveAudio.pause();
+}
 
-    updateStatus("SIN INTERNET");
+window.globalActiveAudio = audio;
 
-  });
+startStream();
 
-  window.addEventListener("online", () => {
+}else{
 
-    if (isPlaying) {
+audio.pause();
 
-      updateStatus("RECUPERANDO");
+}
 
-      forceReconnect();
+});
 
-    }
 
-  });
+// =============================
+// STOP
+// =============================
 
-  // =============================
-  // EVENTOS AUDIO
-  // =============================
+stopBtn.addEventListener("click", ()=>{
 
-  audio.addEventListener("loadstart", () => {
+audio.pause();
 
-    updateStatus("CONECTANDO");
+audio.removeAttribute("src");
+audio.load();
 
-  });
+reconnectAttempts=0;
 
-  audio.addEventListener("waiting", () => {
+resetUI();
 
-    if (isPlaying) updateStatus("BUFFERING");
+});
 
-  });
 
-  audio.addEventListener("playing", () => {
+function resetUI(){
 
-    updateStatus("REPRODUCIENDO");
+isPlaying=false;
 
-    container.classList.add("playing");
+stopTimer();
 
-    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+container.classList.remove("playing");
 
-    reconnectAttempts = 0;
+playBtn.innerHTML='<i class="fas fa-play"></i>';
 
-    startTimer();
+updateStatus("OFFLINE");
 
-    startFreezeMonitor();
+}
 
-  });
 
-  audio.addEventListener("pause", () => {
+// =============================
+// MUTE
+// =============================
 
-    if (!audio.ended) resetUI();
+muteBtn.addEventListener("click",()=>{
 
-  });
+audio.muted=!audio.muted;
 
-  audio.addEventListener("stalled", forceReconnect);
-  audio.addEventListener("error", forceReconnect);
-  audio.addEventListener("ended", forceReconnect);
+localStorage.setItem("radioMuted",audio.muted);
 
-  // =============================
-  // PLAY / PAUSE
-  // =============================
+muteBtn.innerHTML = audio.muted
+? '<i class="fas fa-volume-mute"></i>'
+: '<i class="fas fa-volume-up"></i>';
 
-  playBtn.addEventListener("click", () => {
+});
 
-    if (clickLock) return;
 
-    clickLock = true;
+// =============================
+// VOLUMEN
+// =============================
 
-    setTimeout(() => clickLock = false, 250);
+volumeSlider.addEventListener("input",e=>{
 
-    if (!isPlaying) {
+audio.volume=e.target.value;
 
-      if (window.globalActiveAudio && window.globalActiveAudio !== audio) {
-        window.globalActiveAudio.pause();
-      }
+localStorage.setItem("radioVolume",e.target.value);
 
-      window.globalActiveAudio = audio;
-
-      updateStatus("CONECTANDO");
-
-      if (!streamInitialized) initStreamBuffer();
-
-      audio.play()
-      .then(() => {
-
-        isPlaying = true;
-
-      })
-      .catch(err => {
-
-        console.warn("Play bloqueado:", err);
-
-        resetUI();
-
-      });
-
-    } else {
-
-      audio.pause();
-
-    }
-
-  });
-
-  // =============================
-  // STOP
-  // =============================
-
-  stopBtn.addEventListener("click", () => {
-
-    audio.pause();
-
-    audio.removeAttribute("src");
-
-    audio.load();
-
-    streamInitialized = false;
-
-    reconnectAttempts = 0;
-
-    resetUI();
-
-  });
-
-  function resetUI() {
-
-    isPlaying = false;
-
-    stopTimer();
-
-    stopFreezeMonitor();
-
-    container.classList.remove("playing");
-
-    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-
-    updateStatus("OFFLINE");
-
-  }
-
-  // =============================
-  // MUTE
-  // =============================
-
-  muteBtn.addEventListener("click", () => {
-
-    audio.muted = !audio.muted;
-
-    localStorage.setItem("radioMuted", audio.muted);
-
-    muteBtn.innerHTML = audio.muted
-      ? '<i class="fas fa-volume-mute"></i>'
-      : '<i class="fas fa-volume-up"></i>';
-
-  });
-
-  // =============================
-  // VOLUMEN
-  // =============================
-
-  volumeSlider.addEventListener("input", e => {
-
-    audio.volume = e.target.value;
-
-    localStorage.setItem("radioVolume", e.target.value);
-
-  });
-
-  // =============================
-  // INICIAR BUFFER AL CARGAR PAGINA
-  // =============================
-
-  initStreamBuffer();
+});
 
 });

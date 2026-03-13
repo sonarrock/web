@@ -288,7 +288,6 @@ h2::after {
     backdrop-filter: blur(10px);
     border-radius: 20px;
 
-    box-shadow: 0 18px 40px rgba(0,0,0,0.4);
 }
 
 .about-content {

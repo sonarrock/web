@@ -297,8 +297,8 @@ h2::after {
 }
 
 .about-text {
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: 1.0rem;
+    font-weight: 800;
     color: #b5b5b5;
     line-height: 1.5;
 }

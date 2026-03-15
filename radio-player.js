@@ -59,6 +59,35 @@ updateStatus("OFFLINE");
 audio.load();
 
 
+  // ======================================
+// STREAM WARM BUFFER (INICIO INSTANTÁNEO)
+// ======================================
+
+let warmBufferReady = false;
+
+function warmStream(){
+
+audio.muted = true;
+
+audio.play().then(()=>{
+
+warmBufferReady = true;
+
+console.log("Stream precalentado");
+
+}).catch(()=>{
+
+// navegador bloqueó autoplay
+console.log("Warmup bloqueado por navegador");
+
+});
+
+}
+
+// precalentar después de cargar
+setTimeout(warmStream,1500);
+
+
 // ======================================
 // PRE-WARM DEL STREAM (buffer rápido)
 // ======================================
@@ -241,15 +270,24 @@ timerEl.textContent = "00:00";
 }
 
 
-// ======================================
-// START STREAM
-// ======================================
-
 function startStream(){
 
+if(warmBufferReady){
+
+audio.muted = false;
 audio.volume = volumeSlider.value || 1;
 
+audio.play();
+
+}else{
+
 audio.play().then(()=>{
+
+audio.muted = false;
+
+});
+
+}
 
 isPlaying = true;
 
@@ -259,14 +297,7 @@ initAudioAnalysis();
 
 }
 
-}).catch(err=>{
-
-console.warn("Play bloqueado", err);
-
-});
-
 }
-
 
 // ======================================
 // STOP STREAM

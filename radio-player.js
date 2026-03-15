@@ -16,13 +16,14 @@ const statusText = document.getElementById("status-text");
 const timerEl = document.getElementById("timer");
 const container = document.querySelector(".player-container");
 
-const canvas = document.getElementById("visualizer");
-const ctx = canvas ? canvas.getContext("2d") : null;
-
 const vuCanvas = document.getElementById("vu-meter");
 const vuCtx = vuCanvas ? vuCanvas.getContext("2d") : null;
 
+
+// ======================================
 // VARIABLES
+// ======================================
+
 let isPlaying = false;
 let reconnectAttempts = 0;
 let reconnectTimer = null;
@@ -30,6 +31,11 @@ let freezeMonitor = null;
 let timerInterval = null;
 let seconds = 0;
 let lastTime = 0;
+
+let audioContext;
+let analyser;
+let source;
+let dataArray;
 
 const BASE_DELAY = 2000;
 const MAX_DELAY = 15000;
@@ -45,51 +51,19 @@ audio.src = STREAM_URL;
 audio.preload = "auto";
 audio.crossOrigin = "anonymous";
 
-// volumen guardado
 audio.volume = parseFloat(localStorage.getItem("radioVolume")) || 1;
 volumeSlider.value = audio.volume;
 
-// mute guardado
 audio.muted = localStorage.getItem("radioMuted") === "true";
 
 updateMuteIcon();
 updateStatus("OFFLINE");
 
-// precarga inicial
 audio.load();
 
 
-  // ======================================
-// STREAM WARM BUFFER (INICIO INSTANTÁNEO)
 // ======================================
-
-let warmBufferReady = false;
-
-function warmStream(){
-
-audio.muted = true;
-
-audio.play().then(()=>{
-
-warmBufferReady = true;
-
-console.log("Stream precalentado");
-
-}).catch(()=>{
-
-// navegador bloqueó autoplay
-console.log("Warmup bloqueado por navegador");
-
-});
-
-}
-
-// precalentar después de cargar
-setTimeout(warmStream,1500);
-
-
-// ======================================
-// PRE-WARM DEL STREAM (buffer rápido)
+// STREAM WARM BUFFER (SOLO UNO)
 // ======================================
 
 setTimeout(()=>{
@@ -103,19 +77,20 @@ audio.currentTime = 0;
 
 audio.muted = localStorage.getItem("radioMuted") === "true";
 
-}).catch(()=>{});
+console.log("Stream precalentado");
 
-},1200);
+}).catch(()=>{
+
+console.log("Warmup bloqueado por navegador");
+
+});
+
+},1500);
 
 
 // ======================================
 // WEB AUDIO API
 // ======================================
-
-let audioContext;
-let analyser;
-let source;
-let dataArray;
 
 function initAudioAnalysis(){
 
@@ -125,57 +100,20 @@ source = audioContext.createMediaElementSource(audio);
 
 analyser = audioContext.createAnalyser();
 
-analyser.fftSize = 256;
+analyser.fftSize = 128;
 
-const bufferLength = analyser.frequencyBinCount;
-
-dataArray = new Uint8Array(bufferLength);
+dataArray = new Uint8Array(analyser.frequencyBinCount);
 
 source.connect(analyser);
 analyser.connect(audioContext.destination);
 
-drawVisualizer();
 drawVUMeter();
 
 }
 
 
 // ======================================
-// VISUALIZADOR
-// ======================================
-
-function drawVisualizer(){
-
-requestAnimationFrame(drawVisualizer);
-
-if(!analyser || !ctx) return;
-
-analyser.getByteFrequencyData(dataArray);
-
-ctx.fillStyle = "#000";
-ctx.fillRect(0,0,canvas.width,canvas.height);
-
-const barWidth = (canvas.width / dataArray.length) * 2;
-
-let x = 0;
-
-for(let i=0;i<dataArray.length;i++){
-
-const barHeight = dataArray[i] * 0.7;
-
-ctx.fillStyle = "#ff6a00";
-
-ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-
-x += barWidth + 1;
-
-}
-
-}
-
-
-// ======================================
-// VU METER
+// VU METER (SUAVE)
 // ======================================
 
 function drawVUMeter(){
@@ -191,38 +129,23 @@ let sum = 0;
 for(let i=0;i<dataArray.length;i++){
 
 let v = (dataArray[i] - 128) / 128;
-sum += v * v;
+sum += v*v;
 
 }
 
-let rms = Math.sqrt(sum / dataArray.length);
+let rms = Math.sqrt(sum/dataArray.length);
 
-let level = rms * vuCanvas.width * 1.4;
+let level = rms * vuCanvas.width * 0.8;
 
 vuCtx.clearRect(0,0,vuCanvas.width,vuCanvas.height);
 
+// fondo
 vuCtx.fillStyle = "#111";
 vuCtx.fillRect(0,0,vuCanvas.width,vuCanvas.height);
 
-// verde
-vuCtx.fillStyle = "#00ff66";
+// barra suave naranja
+vuCtx.fillStyle = "#ff6a00";
 vuCtx.fillRect(0,0,level,vuCanvas.height);
-
-// amarillo
-if(level > vuCanvas.width * 0.6){
-
-vuCtx.fillStyle = "#ffcc00";
-vuCtx.fillRect(vuCanvas.width * 0.6,0,level - vuCanvas.width * 0.6,vuCanvas.height);
-
-}
-
-// rojo
-if(level > vuCanvas.width * 0.85){
-
-vuCtx.fillStyle = "#ff0033";
-vuCtx.fillRect(vuCanvas.width * 0.85,0,level - vuCanvas.width * 0.85,vuCanvas.height);
-
-}
 
 }
 
@@ -270,24 +193,16 @@ timerEl.textContent = "00:00";
 }
 
 
-function startStream(){
+// ======================================
+// START STREAM
+// ======================================
 
-if(warmBufferReady){
+function startStream(){
 
 audio.muted = false;
 audio.volume = volumeSlider.value || 1;
 
-audio.play();
-
-}else{
-
 audio.play().then(()=>{
-
-audio.muted = false;
-
-});
-
-}
 
 isPlaying = true;
 
@@ -297,7 +212,14 @@ initAudioAnalysis();
 
 }
 
+}).catch(err=>{
+
+console.warn("Play bloqueado", err);
+
+});
+
 }
+
 
 // ======================================
 // STOP STREAM

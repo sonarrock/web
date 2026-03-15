@@ -1,5 +1,5 @@
 // ======================================
-// SONAR ROCK - RADIO PLAYER OPTIMIZED
+// SONAR ROCK - RADIO PLAYER PRO
 // ======================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -15,6 +15,10 @@ const volumeSlider = document.getElementById("volume");
 const statusText = document.getElementById("status-text");
 const timerEl = document.getElementById("timer");
 const container = document.querySelector(".player-container");
+const canvas = document.getElementById("visualizer");
+
+// CANVAS
+const ctx = canvas.getContext("2d");
 
 // VARIABLES
 let isPlaying = false;
@@ -22,19 +26,17 @@ let reconnectAttempts = 0;
 let reconnectTimer = null;
 let freezeMonitor = null;
 let timerInterval = null;
-let lastTime = 0;
 let seconds = 0;
+let lastTime = 0;
 
-// CONFIG RECONEXIÓN
 const BASE_DELAY = 2000;
 const MAX_DELAY = 15000;
 
-// CONTROL GLOBAL
 window.globalActiveAudio = null;
 
 
 // ======================================
-// CONFIGURACIÓN INICIAL
+// CONFIG AUDIO
 // ======================================
 
 audio.src = STREAM_URL;
@@ -51,8 +53,72 @@ audio.muted = localStorage.getItem("radioMuted") === "true";
 updateMuteIcon();
 updateStatus("OFFLINE");
 
-// precarga stream
 audio.load();
+
+
+// ======================================
+// WEB AUDIO API
+// ======================================
+
+let audioContext;
+let analyser;
+let source;
+let dataArray;
+
+function initAudioAnalysis(){
+
+audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+source = audioContext.createMediaElementSource(audio);
+
+analyser = audioContext.createAnalyser();
+
+analyser.fftSize = 256;
+
+const bufferLength = analyser.frequencyBinCount;
+
+dataArray = new Uint8Array(bufferLength);
+
+source.connect(analyser);
+analyser.connect(audioContext.destination);
+
+drawVisualizer();
+
+}
+
+
+// ======================================
+// VISUALIZADOR
+// ======================================
+
+function drawVisualizer(){
+
+requestAnimationFrame(drawVisualizer);
+
+if(!analyser) return;
+
+analyser.getByteFrequencyData(dataArray);
+
+ctx.fillStyle = "#000";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+const barWidth = (canvas.width / dataArray.length) * 2;
+
+let x = 0;
+
+for(let i=0;i<dataArray.length;i++){
+
+const barHeight = dataArray[i] * 0.7;
+
+ctx.fillStyle = "#ff6a00";
+
+ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+
+x += barWidth + 1;
+
+}
+
+}
 
 
 // ======================================
@@ -99,21 +165,24 @@ timerEl.textContent = "00:00";
 
 
 // ======================================
-// INICIAR STREAM
+// START STREAM
 // ======================================
 
 function startStream(){
 
-audio.play()
-.then(()=>{
+audio.play().then(()=>{
 
 isPlaying = true;
 
-})
-.catch(err=>{
+if(!audioContext){
+
+initAudioAnalysis();
+
+}
+
+}).catch(err=>{
 
 console.warn("Play bloqueado", err);
-updateStatus("ERROR PLAY");
 
 });
 
@@ -121,12 +190,13 @@ updateStatus("ERROR PLAY");
 
 
 // ======================================
-// DETENER STREAM
+// STOP STREAM
 // ======================================
 
 function stopStream(){
 
 audio.pause();
+
 isPlaying = false;
 
 resetUI();
@@ -135,7 +205,7 @@ resetUI();
 
 
 // ======================================
-// DETECTOR DE CONGELAMIENTO
+// FREEZE MONITOR
 // ======================================
 
 function startFreezeMonitor(){
@@ -149,6 +219,7 @@ if(!audio.paused){
 if(audio.currentTime === lastTime){
 
 console.warn("Stream congelado");
+
 reconnect();
 
 }
@@ -169,7 +240,7 @@ clearInterval(freezeMonitor);
 
 
 // ======================================
-// RECONEXIÓN INTELIGENTE
+// RECONEXIÓN
 // ======================================
 
 function reconnect(){
@@ -189,13 +260,13 @@ reconnectTimer = setTimeout(()=>{
 audio.load();
 audio.play();
 
-}, delay);
+},delay);
 
 }
 
 
 // ======================================
-// EVENTOS DEL AUDIO
+// EVENTOS AUDIO
 // ======================================
 
 audio.addEventListener("loadstart", ()=>{
@@ -206,7 +277,7 @@ updateStatus("CONECTANDO");
 
 audio.addEventListener("playing", ()=>{
 
-updateStatus("EN VIVO");
+updateStatus("LIVE SIGNAL");
 
 container.classList.add("playing");
 
@@ -244,7 +315,6 @@ playBtn.addEventListener("click", ()=>{
 
 if(!isPlaying){
 
-// evitar doble audio en la página
 if(window.globalActiveAudio && window.globalActiveAudio !== audio){
 
 window.globalActiveAudio.pause();

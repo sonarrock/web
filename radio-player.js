@@ -15,10 +15,12 @@ const volumeSlider = document.getElementById("volume");
 const statusText = document.getElementById("status-text");
 const timerEl = document.getElementById("timer");
 const container = document.querySelector(".player-container");
-const canvas = document.getElementById("visualizer");
 
-// CANVAS
-const ctx = canvas.getContext("2d");
+const canvas = document.getElementById("visualizer");
+const ctx = canvas ? canvas.getContext("2d") : null;
+
+const vuCanvas = document.getElementById("vu-meter");
+const vuCtx = vuCanvas ? vuCanvas.getContext("2d") : null;
 
 // VARIABLES
 let isPlaying = false;
@@ -53,7 +55,28 @@ audio.muted = localStorage.getItem("radioMuted") === "true";
 updateMuteIcon();
 updateStatus("OFFLINE");
 
+// precarga inicial
 audio.load();
+
+
+// ======================================
+// PRE-WARM DEL STREAM (buffer rápido)
+// ======================================
+
+setTimeout(()=>{
+
+audio.muted = true;
+
+audio.play().then(()=>{
+
+audio.pause();
+audio.currentTime = 0;
+
+audio.muted = localStorage.getItem("radioMuted") === "true";
+
+}).catch(()=>{});
+
+},1200);
 
 
 // ======================================
@@ -83,6 +106,7 @@ source.connect(analyser);
 analyser.connect(audioContext.destination);
 
 drawVisualizer();
+drawVUMeter();
 
 }
 
@@ -95,7 +119,7 @@ function drawVisualizer(){
 
 requestAnimationFrame(drawVisualizer);
 
-if(!analyser) return;
+if(!analyser || !ctx) return;
 
 analyser.getByteFrequencyData(dataArray);
 
@@ -115,6 +139,59 @@ ctx.fillStyle = "#ff6a00";
 ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
 
 x += barWidth + 1;
+
+}
+
+}
+
+
+// ======================================
+// VU METER
+// ======================================
+
+function drawVUMeter(){
+
+requestAnimationFrame(drawVUMeter);
+
+if(!analyser || !vuCtx) return;
+
+analyser.getByteTimeDomainData(dataArray);
+
+let sum = 0;
+
+for(let i=0;i<dataArray.length;i++){
+
+let v = (dataArray[i] - 128) / 128;
+sum += v * v;
+
+}
+
+let rms = Math.sqrt(sum / dataArray.length);
+
+let level = rms * vuCanvas.width * 1.4;
+
+vuCtx.clearRect(0,0,vuCanvas.width,vuCanvas.height);
+
+vuCtx.fillStyle = "#111";
+vuCtx.fillRect(0,0,vuCanvas.width,vuCanvas.height);
+
+// verde
+vuCtx.fillStyle = "#00ff66";
+vuCtx.fillRect(0,0,level,vuCanvas.height);
+
+// amarillo
+if(level > vuCanvas.width * 0.6){
+
+vuCtx.fillStyle = "#ffcc00";
+vuCtx.fillRect(vuCanvas.width * 0.6,0,level - vuCanvas.width * 0.6,vuCanvas.height);
+
+}
+
+// rojo
+if(level > vuCanvas.width * 0.85){
+
+vuCtx.fillStyle = "#ff0033";
+vuCtx.fillRect(vuCanvas.width * 0.85,0,level - vuCanvas.width * 0.85,vuCanvas.height);
 
 }
 
@@ -170,6 +247,8 @@ timerEl.textContent = "00:00";
 
 function startStream(){
 
+audio.volume = volumeSlider.value || 1;
+
 audio.play().then(()=>{
 
 isPlaying = true;
@@ -219,7 +298,6 @@ if(!audio.paused){
 if(audio.currentTime === lastTime){
 
 console.warn("Stream congelado");
-
 reconnect();
 
 }

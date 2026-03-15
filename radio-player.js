@@ -112,9 +112,11 @@ drawVUMeter();
 }
 
 
-// ======================================
-// VU METER (SUAVE)
-// ======================================
+// ===============
+// VU METER 
+// ===============
+
+let vuLevel = 0;
 
 function drawVUMeter(){
 
@@ -135,20 +137,26 @@ sum += v*v;
 
 let rms = Math.sqrt(sum/dataArray.length);
 
-let level = rms * vuCanvas.width * 0.8;
+// suavizado para evitar saltos bruscos
+vuLevel = vuLevel * 0.85 + rms * 0.15;
+
+let level = vuLevel * vuCanvas.width * 0.6;
 
 vuCtx.clearRect(0,0,vuCanvas.width,vuCanvas.height);
 
-// fondo
-vuCtx.fillStyle = "#111";
+// fondo muy oscuro
+vuCtx.fillStyle = "#0a0a0a";
 vuCtx.fillRect(0,0,vuCanvas.width,vuCanvas.height);
 
-// barra suave naranja
+// barra naranja discreta
 vuCtx.fillStyle = "#ff6a00";
+vuCtx.globalAlpha = 0.6;
+
 vuCtx.fillRect(0,0,level,vuCanvas.height);
 
-}
+vuCtx.globalAlpha = 1;
 
+}
 
 // ======================================
 // STATUS

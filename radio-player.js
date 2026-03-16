@@ -112,51 +112,6 @@ drawVUMeter();
 }
 
 
-// ===============
-// VU METER 
-// ===============
-
-let vuLevel = 0;
-
-function drawVUMeter(){
-
-requestAnimationFrame(drawVUMeter);
-
-if(!analyser || !vuCtx) return;
-
-analyser.getByteTimeDomainData(dataArray);
-
-let sum = 0;
-
-for(let i=0;i<dataArray.length;i++){
-
-let v = (dataArray[i] - 128) / 128;
-sum += v*v;
-
-}
-
-let rms = Math.sqrt(sum/dataArray.length);
-
-// suavizado para evitar saltos bruscos
-vuLevel = vuLevel * 0.85 + rms * 0.15;
-
-let level = vuLevel * vuCanvas.width * 0.6;
-
-vuCtx.clearRect(0,0,vuCanvas.width,vuCanvas.height);
-
-// fondo muy oscuro
-vuCtx.fillStyle = "#0a0a0a";
-vuCtx.fillRect(0,0,vuCanvas.width,vuCanvas.height);
-
-// barra naranja discreta
-vuCtx.fillStyle = "#ff6a00";
-vuCtx.globalAlpha = 0.6;
-
-vuCtx.fillRect(0,0,level,vuCanvas.height);
-
-vuCtx.globalAlpha = 1;
-
-}
 
 // ======================================
 // STATUS

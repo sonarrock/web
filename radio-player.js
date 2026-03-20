@@ -1,8 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const STREAM_URL = "https://stream.zeno.fm";
+    // 1. CONFIGURACIÓN
+    const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
     const audio = document.getElementById("radio-audio");
     const playBtn = document.getElementById("playPauseBtn");
     const stopBtn = document.getElementById("stop-btn");
+    const muteBtn = document.getElementById("mute-btn");
+    const volumeSlider = document.getElementById("volume");
     const statusText = document.getElementById("status-text");
     const timerEl = document.getElementById("timer");
 
@@ -10,17 +13,17 @@ document.addEventListener("DOMContentLoaded", () => {
     let timerInterval = null;
     let seconds = 0;
 
-    // 1. FUNCIÓN PRINCIPAL DE PLAY/PAUSE
+    // 2. FUNCIÓN DE REPRODUCCIÓN (Optimizado para iOS/Android)
     async function togglePlay() {
         if (!isPlaying) {
-            // REGLA DE ORO: Asignar el SRC justo antes del PLAY para evitar bloqueos y desfase
+            // Evita caché y asegura conexión fresca
             audio.src = STREAM_URL + "?t=" + Date.now(); 
             
             try {
                 await audio.play();
                 isPlaying = true;
                 startUI();
-                setupMediaSession(); // Para ver controles en pantalla de bloqueo
+                setupMediaSession(); 
             } catch (err) {
                 console.error("Error al iniciar:", err);
                 resetUI();
@@ -32,13 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function stopStream() {
         audio.pause();
-        audio.src = ""; // Cortamos la descarga de datos por completo
-        audio.load();   // Limpiamos el buffer
+        audio.src = ""; 
+        audio.load();   
         isPlaying = false;
         resetUI();
     }
 
-    // 2. GESTIÓN DE INTERFAZ Y TIEMPO
+    // 3. INTERFAZ Y CONTADORES
     function startUI() {
         playBtn.innerHTML = '<i class="fas fa-pause"></i>';
         statusText.textContent = "EN VIVO";
@@ -56,68 +59,55 @@ document.addEventListener("DOMContentLoaded", () => {
     function resetUI() {
         playBtn.innerHTML = '<i class="fas fa-play"></i>';
         statusText.textContent = "OFFLINE";
-        document.querySelector(".player-container").classList.remove("playing");
+        document.querySelector(".player-container")?.classList.remove("playing");
         clearInterval(timerInterval);
         seconds = 0;
         timerEl.textContent = "00:00";
     }
 
-    // 3. CONTROLES DE PANTALLA DE BLOQUEO (iOS/Android)
+    // 4. PANTALLA DE BLOQUEO (Solo una vez y bien configurado)
     function setupMediaSession() {
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: 'Sonar Rock',
                 artist: 'Radio en Vivo',
-                album: 'Streaming Profesional'
+                album: 'Señal Digital',
+                artwork: [
+                    { src: 'logo-192x192.png', sizes: '192x192', type: 'image/png' },
+                    { src: 'logo-512x512.png', sizes: '512x512', type: 'image/png' }
+                ]
             });
             navigator.mediaSession.setActionHandler('play', togglePlay);
             navigator.mediaSession.setActionHandler('pause', stopStream);
         }
     }
 
-if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-        title: 'Sonar Rock',
-        artist: 'Radio en Vivo',
-        album: 'Señal Digital',
-        artwork: [
-            { src: 'logo-192x192.png', sizes: '192x192', type: 'image/png' },
-            { src: 'logo-512x512.png', sizes: '512x512', type: 'image/png' }
-        ]
+    // 5. VOLUMEN Y MUTE
+    volumeSlider.addEventListener("input", (e) => {
+        audio.volume = e.target.value;
+        audio.muted = false;
+        updateMuteIcon();
     });
 
-    navigator.mediaSession.setActionHandler('play', () => { togglePlay(); });
-    navigator.mediaSession.setActionHandler('pause', () => { stopStream(); });
-}
-
-    if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-        title: 'Sonar Rock',
-        artist: 'Radio en Vivo',
-        album: 'Señal Digital',
-        artwork: [
-            { src: 'logo-192x192.png', sizes: '192x192', type: 'image/png' },
-            { src: 'logo-512x512.png', sizes: '512x512', type: 'image/png' }
-        ]
+    muteBtn.addEventListener("click", () => {
+        audio.muted = !audio.muted;
+        updateMuteIcon();
     });
 
-    navigator.mediaSession.setActionHandler('play', () => { togglePlay(); });
-    navigator.mediaSession.setActionHandler('pause', () => { stopStream(); });
-}
+    function updateMuteIcon() {
+        muteBtn.innerHTML = audio.muted 
+            ? '<i class="fas fa-volume-mute"></i>' 
+            : '<i class="fas fa-volume-up"></i>';
+    }
 
-
-    
-    // EVENTOS DE BOTONES
+    // EVENTOS
     playBtn.addEventListener("click", togglePlay);
     stopBtn.addEventListener("click", stopStream);
 
-    // RECONEXIÓN AUTOMÁTICA SI SE CAE LA SEÑAL
     audio.addEventListener("error", () => {
         if (isPlaying) {
-            console.warn("Señal perdida, reconectando...");
+            statusText.textContent = "RECONECTANDO...";
             setTimeout(togglePlay, 3000); 
         }
     });
 });
-
-

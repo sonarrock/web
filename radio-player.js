@@ -1,45 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
-    
+    const STREAM_URL = "https://stream.zeno.fm";
     const audio = document.getElementById("radio-audio");
     const playBtn = document.getElementById("playPauseBtn");
+    const stopBtn = document.getElementById("stop-btn");
     const statusText = document.getElementById("status-text");
     const timerEl = document.getElementById("timer");
-    const volumeSlider = document.getElementById("volume");
-    const container = document.querySelector(".player-container");
 
     let isPlaying = false;
     let timerInterval = null;
     let seconds = 0;
-    let freezeMonitor = null;
-    let audioContext, analyser, source, dataArray;
 
-    // Configuración Inicial
-    audio.preload = "none"; // Mejor para móviles, carga solo al dar play
-    audio.crossOrigin = "anonymous";
-
-    // 1. FUNCIÓN DE REPRODUCCIÓN (La más importante)
+    // 1. FUNCIÓN PRINCIPAL DE PLAY/PAUSE
     async function togglePlay() {
         if (!isPlaying) {
-            // Reset de URL para saltar caché y evitar desfase (Live real)
-            audio.src = STREAM_URL + "?cache=" + Date.now();
+            // REGLA DE ORO: Asignar el SRC justo antes del PLAY para evitar bloqueos y desfase
+            audio.src = STREAM_URL + "?t=" + Date.now(); 
             
             try {
                 await audio.play();
                 isPlaying = true;
-                updateUI(true);
-                startTimer();
-                startFreezeMonitor();
-                
-                // Activar Web Audio API para visualizador
-                if (!audioContext) {
-                    initAudioAnalysis();
-                } else if (audioContext.state === 'suspended') {
-                    audioContext.resume();
-                }
+                startUI();
+                setupMediaSession(); // Para ver controles en pantalla de bloqueo
             } catch (err) {
-                console.error("Error al reproducir:", err);
-                stopStream();
+                console.error("Error al iniciar:", err);
+                resetUI();
             }
         } else {
             stopStream();
@@ -48,37 +32,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function stopStream() {
         audio.pause();
-        audio.src = ""; // Corta la descarga de datos inmediatamente
+        audio.src = ""; // Cortamos la descarga de datos por completo
+        audio.load();   // Limpiamos el buffer
         isPlaying = false;
-        updateUI(false);
-        stopTimer();
-        stopFreezeMonitor();
+        resetUI();
     }
 
-    // 2. MONITOR DE CONGELAMIENTO (Watchdog)
-    function startFreezeMonitor() {
-        let lastPos = 0;
-        clearInterval(freezeMonitor);
-        freezeMonitor = setInterval(() => {
-            if (isPlaying && !audio.paused) {
-                if (audio.currentTime === lastPos) {
-                    console.warn("Stream congelado, reconectando...");
-                    reconnect();
-                }
-                lastPos = audio.currentTime;
-            }
-        }, 8000);
-    }
-
-    function reconnect() {
-        if (!isPlaying) return;
-        statusText.textContent = "RECONECTANDO...";
-        audio.src = STREAM_URL + "?retry=" + Date.now();
-        audio.play().catch(() => {});
-    }
-
-    // 3. TIMER Y UI
-    function startTimer() {
+    // 2. GESTIÓN DE INTERFAZ Y TIEMPO
+    function startUI() {
+        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        statusText.textContent = "EN VIVO";
+        document.querySelector(".player-container").classList.add("playing");
+        
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             seconds++;
@@ -88,42 +53,37 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1000);
     }
 
-    function stopTimer() {
+    function resetUI() {
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        statusText.textContent = "OFFLINE";
+        document.querySelector(".player-container").classList.remove("playing");
         clearInterval(timerInterval);
         seconds = 0;
         timerEl.textContent = "00:00";
     }
 
-    function updateUI(playing) {
-        if (playing) {
-            statusText.textContent = "LIVE SIGNAL";
-            container.classList.add("playing");
-            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        } else {
-            statusText.textContent = "OFFLINE";
-            container.classList.remove("playing");
-            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    // 3. CONTROLES DE PANTALLA DE BLOQUEO (iOS/Android)
+    function setupMediaSession() {
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: 'Sonar Rock',
+                artist: 'Radio en Vivo',
+                album: 'Streaming Profesional'
+            });
+            navigator.mediaSession.setActionHandler('play', togglePlay);
+            navigator.mediaSession.setActionHandler('pause', stopStream);
         }
     }
 
-    // EVENTOS
+    // EVENTOS DE BOTONES
     playBtn.addEventListener("click", togglePlay);
+    stopBtn.addEventListener("click", stopStream);
 
-    // Manejo de errores de red
+    // RECONEXIÓN AUTOMÁTICA SI SE CAE LA SEÑAL
     audio.addEventListener("error", () => {
-        if (isPlaying) reconnect();
-    });
-
-    audio.addEventListener("waiting", () => {
-        if (isPlaying) statusText.textContent = "BUFFERING...";
-    });
-
-    audio.addEventListener("playing", () => {
-        if (isPlaying) statusText.textContent = "LIVE SIGNAL";
-    });
-
-    // Reset si el usuario cambia de pestaña o el sistema mata el proceso (Android/iOS)
-    window.addEventListener("online", () => {
-        if (isPlaying) reconnect();
+        if (isPlaying) {
+            console.warn("Señal perdida, reconectando...");
+            setTimeout(togglePlay, 3000); 
+        }
     });
 });

@@ -5,8 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackTitle = document.getElementById("track-title");
 
   const discoData = {
-    titulo: "Allman Brothers - At fillmore east",
-    audio: "disco-semana/Allman Brothers - At fillmore east.mp3",
+    titulo: "The Strokes - Is This It",
+    audio: "disco-semana/The Strokes - Is This It.mp3",
     portada: "disco-semana/portada.jpg"
   };
 

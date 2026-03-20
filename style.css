@@ -203,49 +203,69 @@ audio {
     opacity: 0.8;
 }
 
+* ===============================
+   AJUSTE SPOTIFY (IFRAME)
+=============================== */
+.player-info iframe {
+    display: block;
+    width: 100%;
+    max-width: 560px; /* Mantiene el estándar de Spotify */
+    height: 152px;    /* Regresado a tu medida original */
+    border-radius: 12px;
+    margin: 10px auto;
+    border: none;
+}
+
+
 /* ===============================
-   STAFF GRID
+   STAFF (UNA SOLA LÍNEA)
 =============================== */
 .staff-section {
-    padding: 100px 20px;
-    max-width: 1100px;
+    padding: 80px 20px;
     margin: 0 auto;
+    max-width: 1200px;
+    overflow: hidden; /* Evita que el resplandor rompa el layout */
 }
 
 .staff-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 50px;
+    display: flex; /* Cambiado de grid a flex para forzar la línea */
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: nowrap; /* Evita que bajen a la siguiente línea */
+    overflow-x: auto;  /* Permite scroll si no caben todos */
+    padding: 20px 10px;
+    scrollbar-width: none; /* Oculta scrollbar en Firefox */
+}
+
+.staff-grid::-webkit-scrollbar {
+    display: none; /* Oculta scrollbar en Chrome/Safari */
 }
 
 .staff-member {
-    text-align: center;
-}
-
-.staff-image {
+    flex: 0 0 auto; /* Evita que se encojan */
     width: 160px;
-    aspect-ratio: 1/1;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 15px;
-    transition: var(--transition);
-    filter: grayscale(40%);
-    border: 2px solid transparent;
 }
 
-.staff-member:hover .staff-image {
-    filter: grayscale(0%);
-    transform: scale(1.1) rotate(3deg);
-    border-color: var(--primary);
-    box-shadow: 0 15px 30px rgba(255, 122, 26, 0.2);
-}
+/* ===============================
+   RESPONSIVE (CELULAR)
+=============================== */
+@media (max-width: 768px) {
+    .staff-grid {
+        display: grid; /* Volvemos a grid para el control de columnas */
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas (pares) */
+        justify-items: center;
+        gap: 20px;
+        overflow-x: visible;
+    }
 
-.staff-name {
-    font-weight: 700;
-    color: var(--text-light);
-    font-size: 1.1rem;
-}
+    .staff-member {
+        width: 100%; /* Que ocupen su espacio en el grid */
+    }
 
+    .staff-image {
+        width: 130px; /* Un poco más pequeñas para que quepan bien en pares */
+    }
+}
 /* ===============================
    SOCIAL
 =============================== */
@@ -311,10 +331,3 @@ audio {
     }
 }
 
-@media (max-width: 480px) {
-    .staff-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-    .staff-image { width: 120px; }
-}

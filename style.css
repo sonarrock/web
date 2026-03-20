@@ -203,131 +203,246 @@ audio {
     opacity: 0.8;
 }
 
-* ===============================
-   AJUSTE SPOTIFY (IFRAME)
-=============================== */
-.player-info iframe {
-    display: block;
-    width: 100%;
-    max-width: 560px; /* Mantiene el estándar de Spotify */
-    height: 152px;    /* Regresado a tu medida original */
-    border-radius: 12px;
-    margin: 10px auto;
-    border: none;
-}
-
-
 /* ===============================
-   STAFF (UNA SOLA LÍNEA)
+   SPOTIFY EMBED
 =============================== */
-.staff-section {
-    padding: 80px 20px;
-    margin: 0 auto;
-    max-width: 1200px;
-    overflow: hidden; /* Evita que el resplandor rompa el layout */
+
+.player-info iframe{
+    display:block;
+    width:100%;
+    max-width:560px;
+    height:152px;
+    border-radius:12px;
+    margin:20px auto; /* centra horizontalmente */
 }
 
-.staff-grid {
-    display: flex; /* Cambiado de grid a flex para forzar la línea */
-    justify-content: center;
-    gap: 30px;
-    flex-wrap: nowrap; /* Evita que bajen a la siguiente línea */
-    overflow-x: auto;  /* Permite scroll si no caben todos */
-    padding: 20px 10px;
-    scrollbar-width: none; /* Oculta scrollbar en Firefox */
-}
-
-.staff-grid::-webkit-scrollbar {
-    display: none; /* Oculta scrollbar en Chrome/Safari */
-}
-
-.staff-member {
-    flex: 0 0 auto; /* Evita que se encojan */
-    width: 160px;
-}
-
-/* ===============================
-   RESPONSIVE (CELULAR)
-=============================== */
-@media (max-width: 768px) {
-    .staff-grid {
-        display: grid; /* Volvemos a grid para el control de columnas */
-        grid-template-columns: repeat(2, 1fr); /* 2 columnas (pares) */
-        justify-items: center;
-        gap: 20px;
-        overflow-x: visible;
-    }
-
-    .staff-member {
-        width: 100%; /* Que ocupen su espacio en el grid */
-    }
-
-    .staff-image {
-        width: 130px; /* Un poco más pequeñas para que quepan bien en pares */
-    }
-}
 /* ===============================
    SOCIAL
 =============================== */
+.social-section {
+    padding: 45px 20px;
+    margin: 40px auto;
+    max-width: 1100px;
+}
+
 .social-buttons {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    padding: 40px 0;
+    gap: 18px;
 }
 
 .social-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 18px;
-    background: var(--bg-card);
+    width: 65px;
+    height: 65px;
+    font-size: 1.3rem;
+
+    border-radius: 50%;
+    background: #1a1a1a;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    border: 1px solid var(--glass-border);
+
+    color: #ffffff;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .social-btn:hover {
-    background: var(--primary);
-    color: white;
-    transform: translateY(-8px) rotate(8deg);
-    box-shadow: 0 15px 25px rgba(255, 122, 26, 0.4);
+    background: #ff7a1a;
+    transform: translateY(-4px);
+}
+
+/* ===============================
+   STAFF - ESTILO SPOTIFY
+=============================== */
+
+.staff-section {
+    padding: 80px 20px;
+    margin: 40px auto;
+    max-width: 1100px;
+    text-align: center;
+}
+
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 40px;
+    justify-items: center;
+}
+
+.staff-member {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.staff-member:hover {
+    transform: translateY(-6px);
+}
+
+.staff-image {
+    width: 150px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.staff-member:hover .staff-image {
+    transform: scale(1.08);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.45);
+}
+
+.staff-name {
+    margin-top: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    color: #ffffff;
 }
 
 /* ===============================
    ABOUT
 =============================== */
+
 .about-section {
+    padding: 60px 20px;
+    margin: 40px auto;
+    max-width: 1100px;
+
+}
+
+.about-content {
     max-width: 800px;
-    margin: 60px auto;
-    padding: 40px 20px;
-    background: rgba(255,255,255,0.02);
-    border-radius: 30px;
+    margin: 0 auto;
     text-align: center;
 }
 
 .about-text {
-    font-size: 1.1rem;
-    font-weight: 500; /* Reducido de 800 para mejor lectura */
-    color: #a0a0a0;
-    line-height: 1.8;
+    font-size: 1.0rem;
+    font-weight: 800;
+    color: #b5b5b5;
+    line-height: 1.5;
+}
+
+/* ===============================
+   FONDO DIFUMINADO GLOBAL
+=============================== */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            rgba(11,11,12,0.3),
+            rgba(15,15,16,0.2)
+        ),
+        url('attached_assets/fondostaff.png') center / cover no-repeat;
+
+    filter: blur(6px);
+    z-index: -1;
+    pointer-events: none;
 }
 
 /* ===============================
    RESPONSIVE
 =============================== */
+
 @media (max-width: 768px) {
+
     .disco-player {
         flex-direction: column;
         text-align: center;
-        padding: 30px;
+        align-items:center;
     }
-    
-    .track-title {
-        border-left: none;
-        border-bottom: 3px solid var(--primary);
-        padding: 0 0 8px 0;
+
+    .disco-player img {
+        width: 90px;
+        height: 90px;
     }
+
+    .player-info iframe,
+    .player-info audio {
+        width:100%;
+    }
+
 }
 
+@media (max-width: 600px) {
+
+    .staff-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+
+    .staff-image {
+        width: 110px;
+    }
+
+    .staff-name {
+        font-size: 14px;
+    }
+
+}
+
+/* ===============================
+   SONAR ROCK PLAYER PRO EFFECT
+=============================== */
+
+/* CONTENEDOR */
+
+.disco-player{
+    position:relative;
+    overflow:hidden;
+}
+
+/* GLOW NARANJA */
+
+.disco-player::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background:radial-gradient(
+        circle at center,
+        rgba(255,122,26,0.25),
+        transparent 70%
+    );
+
+    opacity:.35;
+    pointer-events:none;
+}
+
+
+/* PORTADA VINILO */
+
+.disco-player img{
+    position:relative;
+    z-index:2;
+    transition:transform .4s ease;
+}
+
+/* VINYL DISC */
+
+.disco-player img::before{
+    content:"";
+}
+
+/* ROTACIÓN CUANDO REPRODUCE */
+
+.disco-player.playing img{
+    animation:vinylSpin 6s linear infinite;
+}
+
+@keyframes vinylSpin{
+    from{
+        transform:rotate(0deg);
+    }
+    to{
+        transform:rotate(360deg);
+    }
+}

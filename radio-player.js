@@ -75,6 +75,38 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+        title: 'Sonar Rock',
+        artist: 'Radio en Vivo',
+        album: 'Señal Digital',
+        artwork: [
+            { src: 'logo-192x192.png', sizes: '192x192', type: 'image/png' },
+            { src: 'logo-512x512.png', sizes: '512x512', type: 'image/png' }
+        ]
+    });
+
+    navigator.mediaSession.setActionHandler('play', () => { togglePlay(); });
+    navigator.mediaSession.setActionHandler('pause', () => { stopStream(); });
+}
+
+    if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+        title: 'Sonar Rock',
+        artist: 'Radio en Vivo',
+        album: 'Señal Digital',
+        artwork: [
+            { src: 'logo-192x192.png', sizes: '192x192', type: 'image/png' },
+            { src: 'logo-512x512.png', sizes: '512x512', type: 'image/png' }
+        ]
+    });
+
+    navigator.mediaSession.setActionHandler('play', () => { togglePlay(); });
+    navigator.mediaSession.setActionHandler('pause', () => { stopStream(); });
+}
+
+
+    
     // EVENTOS DE BOTONES
     playBtn.addEventListener("click", togglePlay);
     stopBtn.addEventListener("click", stopStream);
@@ -87,3 +119,5 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+

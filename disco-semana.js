@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   const audio = document.getElementById("disco-audio");
   const cover = document.getElementById("cover");
   const trackTitle = document.getElementById("track-title");
@@ -16,17 +15,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (cover) {
     cover.src = discoData.portada;
+    cover.alt = discoData.titulo;
   }
 
   if (audio) {
     audio.src = discoData.audio;
-
-    // 🔥 CLAVE: forzar carga antes de mostrar
     audio.load();
-
-    // 🔥 forzar repaint de controles
-    audio.style.display = "block";
     audio.controls = true;
   }
-
 });

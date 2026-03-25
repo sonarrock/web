@@ -1,9 +1,9 @@
-<script>
 document.addEventListener("DOMContentLoaded", () => {
   // =========================
   // CONFIG
   // =========================
   const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
+
   const audio = document.getElementById("radio-audio");
   const playPauseBtn = document.getElementById("playPauseBtn");
   const stopBtn = document.getElementById("stop-btn");
@@ -11,6 +11,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const volume = document.getElementById("volume");
   const timer = document.getElementById("timer");
   const statusText = document.getElementById("status-text");
+  const liveIndicator = document.getElementById("live-indicator");
+
+  if (!audio || !playPauseBtn || !stopBtn || !muteBtn || !volume || !timer || !statusText || !liveIndicator) {
+    console.error("❌ No se encontraron elementos del reproductor en el DOM.");
+    return;
+  }
+
   const playIcon = playPauseBtn.querySelector("i");
   const muteIcon = muteBtn.querySelector("i");
 
@@ -31,8 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.volume = 1;
   audio.muted = false;
 
-  // iOS / Android warm-up
-  // Carga el stream desde el arranque para que no llegue "frío" al primer click
   try {
     audio.load();
   } catch (e) {
@@ -44,13 +49,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   function setStatus(text, live = false) {
     statusText.textContent = text;
-    const indicator = document.getElementById("live-indicator");
+
     if (live) {
-      indicator.classList.add("online");
-      indicator.classList.remove("offline");
+      liveIndicator.classList.add("online");
+      liveIndicator.classList.remove("offline");
     } else {
-      indicator.classList.add("offline");
-      indicator.classList.remove("online");
+      liveIndicator.classList.add("offline");
+      liveIndicator.classList.remove("online");
     }
   }
 
@@ -59,9 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateMuteIcon() {
-    muteIcon.className = audio.muted || audio.volume === 0
-      ? "fas fa-volume-mute"
-      : "fas fa-volume-up";
+    muteIcon.className =
+      audio.muted || audio.volume === 0
+        ? "fas fa-volume-mute"
+        : "fas fa-volume-up";
   }
 
   function startTimer() {
@@ -105,14 +111,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (userUnlocked) return true;
 
     try {
-      // Intento de "despertar" el elemento en un gesto de usuario
       audio.muted = true;
       await audio.play();
       audio.pause();
-      audio.currentTime = 0;
+
+      try {
+        audio.currentTime = 0;
+      } catch (e) {}
+
       audio.muted = isMuted;
       userUnlocked = true;
-      console.log("Audio unlocked");
+      console.log("✅ Audio unlocked");
       return true;
     } catch (err) {
       console.warn("Unlock failed:", err);
@@ -131,23 +140,19 @@ document.addEventListener("DOMContentLoaded", () => {
     setStatus("CONECTANDO...", false);
 
     try {
-      // 1) Desbloquear audio con gesto real
       await unlockAudio();
 
-      // 2) Si el stream está "frío" o atorado, recargarlo
       if (forceReload || audio.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
         safeReloadStream();
         await new Promise(resolve => setTimeout(resolve, 400));
       }
 
-      // 3) Asegurar que el src exista
       if (!audio.src || audio.src.trim() === "") {
         audio.src = STREAM_URL;
         audio.load();
         await new Promise(resolve => setTimeout(resolve, 300));
       }
 
-      // 4) Intentar reproducir
       const playPromise = audio.play();
 
       if (playPromise !== undefined) {
@@ -163,10 +168,9 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.warn("Play error:", err);
 
-      // Reintento inteligente
       if (retryCount < MAX_RETRIES) {
         retryCount++;
-        console.log(`Retry play ${retryCount}/${MAX_RETRIES}`);
+        console.log(`🔁 Retry play ${retryCount}/${MAX_RETRIES}`);
         safeReloadStream();
 
         setTimeout(async () => {
@@ -199,8 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
     isPlaying = false;
     audio.pause();
 
-    // No hacemos destroy completo agresivo cada vez
-    // porque eso a veces rompe el primer play en iOS/Android
     try {
       audio.currentTime = 0;
     } catch (e) {}
@@ -271,7 +273,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   audio.addEventListener("stalled", () => {
-    if (isPlaying) setStatus("RECONectando...", false);
+    if (isPlaying) {
+      setStatus("RECONectando...", false);
+      setTimeout(() => playStream(true), 1200);
+    }
   });
 
   audio.addEventListener("canplay", () => {
@@ -289,7 +294,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   audio.addEventListener("ended", () => {
-    // Algunos streams "ended" falsamente en móviles
     if (isPlaying) {
       setTimeout(() => {
         playStream(true);
@@ -301,7 +305,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // PAGE VISIBILITY
   // =========================
   document.addEventListener("visibilitychange", () => {
-    // Si el usuario vuelve a la pestaña y el stream quedó zombie, lo revivimos
     if (!document.hidden && isPlaying && audio.paused) {
       setTimeout(() => {
         playStream(true);
@@ -316,8 +319,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!userUnlocked) {
       await unlockAudio();
     }
-    window.removeEventListener("touchstart", primeAudio);
-    window.removeEventListener("click", primeAudio);
   };
 
   window.addEventListener("touchstart", primeAudio, { passive: true, once: true });
@@ -329,5 +330,6 @@ document.addEventListener("DOMContentLoaded", () => {
   updatePlayIcon(false);
   updateMuteIcon();
   setStatus("LISTO", false);
+
+  console.log("🎧 Sonar Rock Player listo");
 });
-</script>

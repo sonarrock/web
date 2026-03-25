@@ -5,8 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackTitle = document.getElementById("track-title");
 
   const discoData = {
-    titulo: "The Strokes - Is This It",
-    audio: "disco-semana/The Strokes - Is This It.mp3",
+    titulo: "Radiohead - The Bends",
+    audio: "disco-semana/Radiohead - The Bends.mp3",
     portada: "disco-semana/portada.jpg"
   };
 

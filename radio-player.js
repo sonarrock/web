@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   // CONFIG
   // =========================
-  const STREAM_URL = "https://stream.zeno.fm/abc123xyz";
+  const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
   const audio = document.getElementById("radio-audio");
   const playPauseBtn = document.getElementById("playPauseBtn");
   const stopBtn = document.getElementById("stop-btn");

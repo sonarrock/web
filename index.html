@@ -68,9 +68,9 @@
   <div class="player-container">
     <div class="player-content">
 
-      <div id="live-indicator" class="live-badge">
+      <div id="live-indicator" class="live-badge offline">
         <span class="dot"></span>
-        <span class="text" id="status-text">OFFLINE</span>
+        <span class="text" id="status-text">LISTO</span>
       </div>
 
       <div id="timer" class="timer">00:00</div>
@@ -79,9 +79,11 @@
         <button id="playPauseBtn" type="button" aria-label="Reproducir/Pausar">
           <i class="fas fa-play"></i>
         </button>
+
         <button id="stop-btn" type="button" aria-label="Detener">
           <i class="fas fa-stop"></i>
         </button>
+
         <button id="mute-btn" type="button" aria-label="Silenciar">
           <i class="fas fa-volume-up"></i>
         </button>
@@ -100,6 +102,8 @@
     </div>
   </div>
 </section>
+
+<script src="radio-player.js" defer></script>
  
   <!-- ========================= -->
   <!-- REDES SOCIALES -->
@@ -250,9 +254,7 @@
 </div> <!-- CIERRE CORRECTO site-wrapper -->
 
 <!-- JS -->
-<script src="radio-player.js" defer></script>
 <script src="disco-semana.js" defer></script>
-<script src="ivoox.js" defer></script>
 <script src="discodelasemana.js"></script>
 
   

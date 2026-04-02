@@ -111,7 +111,8 @@ h2::after {
 
 
 /* ===============================
-   REPRODUCTOR (ESTILO PREMIUM)
+   DISCO DE LA SEMANA
+   REPRODUCTOR PREMIUM
 =============================== */
 .disco-player {
     display: flex;
@@ -120,62 +121,168 @@ h2::after {
     max-width: 580px;
     margin: 40px auto;
     padding: 25px;
-    background: rgba(255, 255, 255, 0.03);
+    position: relative;
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, 0.035);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+
     border-radius: 24px;
     border: 1px solid var(--glass-border);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 122, 26, 0.04);
+
     transition: var(--transition);
+}
+
+/* Glow sutil naranja */
+.disco-player::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle at center,
+        rgba(255, 122, 26, 0.18),
+        transparent 70%
+    );
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .disco-player:hover {
     transform: translateY(-5px);
     background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 122, 26, 0.3);
+    border-color: rgba(255, 122, 26, 0.28);
+    box-shadow:
+        0 28px 55px -12px rgba(0, 0, 0, 0.58),
+        0 0 0 1px rgba(255, 122, 26, 0.08);
 }
 
+/* ===============================
+   PORTADA / VINILO
+=============================== */
 .disco-player img {
     width: 120px;
     height: 120px;
-    border-radius: 50%; /* Forma de disco */
+    border-radius: 50%;
     object-fit: cover;
-    box-shadow: 0 0 0 10px rgba(0,0,0,0.2);
     flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    transition: transform 0.4s ease;
+
+    box-shadow:
+        0 0 0 10px rgba(0, 0, 0, 0.22),
+        0 0 0 2px rgba(255, 122, 26, 0.14),
+        0 14px 28px rgba(0, 0, 0, 0.38);
 }
 
-/* Animación Vinilo (se activa con la clase .playing via JS) */
-.playing img {
-    animation: vinylSpin 4s linear infinite;
+/* Rotación SOLO cuando está reproduciendo */
+.disco-player.playing img {
+    animation: vinylSpin 6s linear infinite;
 }
 
 @keyframes vinylSpin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-.player-info {
+/* ===============================
+   INFO
+=============================== */
+.disco-player .player-info {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 15px;
+    position: relative;
+    z-index: 2;
 }
 
-.track-title {
+.disco-player .track-title {
     font-size: 1rem;
     font-weight: 800;
     color: var(--text-light);
     text-transform: uppercase;
     border-left: 4px solid var(--primary);
     padding-left: 12px;
+    line-height: 1.4;
+    letter-spacing: 0.4px;
 }
 
-/* Estilo Audio Nativo */
-audio {
+/* ===============================
+   AUDIO NATIVO (SOLO ESTE PLAYER)
+=============================== */
+.disco-player audio {
     width: 100%;
     height: 35px;
-    filter: invert(1) hue-rotate(160deg) brightness(1.2); /* Machea el color naranja */
-    opacity: 0.8;
+    opacity: 0.85;
+    filter: invert(1) hue-rotate(160deg) brightness(1.15);
+    border-radius: 10px;
+}
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width: 768px) {
+    .disco-player {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+        gap: 18px;
+        padding: 22px;
+    }
+
+    .disco-player img {
+        width: 95px;
+        height: 95px;
+    }
+
+    .disco-player .player-info {
+        width: 100%;
+        align-items: center;
+    }
+
+    .disco-player .track-title {
+        border-left: none;
+        border-bottom: 3px solid var(--primary);
+        padding-left: 0;
+        padding-bottom: 8px;
+        text-align: center;
+    }
+
+    .disco-player audio {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .disco-player {
+        margin: 28px auto;
+        padding: 18px;
+        border-radius: 20px;
+    }
+
+    .disco-player img {
+        width: 88px;
+        height: 88px;
+    }
+
+    .disco-player .track-title {
+        font-size: 0.95rem;
+    }
+
+    .disco-player audio {
+        height: 32px;
+    }
 }
 
 /* ===============================

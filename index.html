@@ -14,7 +14,6 @@
 
  <!-- CSS -->
 <link href="style.css" rel="stylesheet">
-<link href="player.css" rel="stylesheet">
 
 <!-- Iconos -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -49,60 +48,69 @@
     </div>
   </header>
 
-  <!-- ========================= -->
-  <!-- IMAGEN PRINCIPAL -->
-  <!-- ========================= -->
-  <section class="main-section">
-    <div class="container">
-      <div class="main-image-container">
-        <img src="attached_assets/sonarrock.png" alt="Sonar Rock" class="main-image">
-      </div>
+
+<!-- ========================= -->
+<!-- SONAR ROCK PLAYER -->
+<!-- ========================= -->
+
+<section class="sonar-player-wrap">
+  <div class="sonar-player" id="sonarPlayer">
+
+    <!-- Cover / Logo -->
+    <div class="sonar-cover-box">
+      <img src="https://www.sonarrock.com/wp-content/uploads/2025/07/sonarrock-logo.png" alt="Sonar Rock" class="sonar-cover" id="stationCover">
+      <div class="live-badge">● EN VIVO</div>
     </div>
-  </section>
 
-<!-- ========================= -->
-<!-- REPRODUCTOR STREAMING -->
-<!-- ========================= -->
-<section class="player-section">
-  <div class="player-container">
-    <div class="player-content">
+    <!-- Info -->
+    <div class="sonar-info">
+      <p class="station-label">RADIO ONLINE</p>
+      <h2 class="station-name">SONAR ROCK</h2>
+      <p class="station-tagline" id="trackInfo">Transmitiendo rock sin concesiones</p>
 
-      <div id="live-indicator" class="live-badge offline">
-        <span class="dot"></span>
-        <span class="text" id="status-text">LISTO</span>
+      <!-- Visualizer -->
+      <div class="visualizer" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
       </div>
 
-      <div id="timer" class="timer">00:00</div>
-
+      <!-- Controls -->
       <div class="controls">
-        <button id="playPauseBtn" type="button" aria-label="Reproducir/Pausar">
-          <i class="fas fa-play"></i>
+        <button id="playBtn" class="main-btn" aria-label="Reproducir o pausar">
+          <span id="playIcon">▶</span>
         </button>
 
-        <button id="stop-btn" type="button" aria-label="Detener">
-          <i class="fas fa-stop"></i>
+        <button id="shareBtn" class="secondary-btn" aria-label="Compartir">
+          ⤴
         </button>
 
-        <button id="mute-btn" type="button" aria-label="Silenciar">
-          <i class="fas fa-volume-up"></i>
-        </button>
-
-        <input id="volume" type="range" min="0" max="1" step="0.01" value="1" />
+        <a id="openExternal" class="secondary-btn" href="#" target="_blank" rel="noopener" aria-label="Abrir reproductor externo">
+          ↗
+        </a>
       </div>
 
-      <audio
-        id="radio-audio"
-        preload="auto"
-        playsinline
-        webkit-playsinline
-        crossorigin="anonymous">
-      </audio>
+      <!-- Volume -->
+      <div class="volume-wrap">
+        <span class="volume-icon">🔊</span>
+        <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1">
+      </div>
 
+      <!-- Status -->
+      <div class="status-row">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Listo para reproducir</span>
+      </div>
     </div>
-  </div>
-</section>
 
-<script src="radio-player.js" defer></script>
+    <!-- Hidden Audio -->
+    <audio id="radioPlayer" preload="none" playsinline>
+      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+      Tu navegador no soporta audio HTML5.
+    </audio>
+
+  </div>
+</section> 
+
  
   <!-- ========================= -->
   <!-- REDES SOCIALES -->

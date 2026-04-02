@@ -2,188 +2,133 @@ document.addEventListener("DOMContentLoaded", () => {
   const audio = document.getElementById("radioPlayer");
   const playBtn = document.getElementById("playBtn");
   const playIcon = document.getElementById("playIcon");
-  const shareBtn = document.getElementById("shareBtn");
+  const muteBtn = document.getElementById("muteBtn");
+  const muteIcon = document.getElementById("muteIcon");
   const volumeControl = document.getElementById("volumeControl");
+  const volumeEmoji = document.getElementById("volumeEmoji");
   const statusText = document.getElementById("statusText");
   const statusDot = document.getElementById("statusDot");
-  const visualizer = document.querySelector(".visualizer");
-  const player = document.getElementById("sonarPlayer");
+  const visualizer = document.getElementById("visualizer");
 
-  if (!audio || !playBtn || !playIcon) return;
+  if (!audio || !playBtn) return;
 
   const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
 
-  let isPlaying = false;
-  let reconnectTimeout = null;
-
-  // =========================
-  // CONFIG INICIAL
-  // =========================
   audio.src = STREAM_URL;
+  audio.volume = 1;
+  audio.muted = false;
   audio.preload = "none";
-  audio.playsInline = true;
-  audio.crossOrigin = "anonymous";
+  audio.setAttribute("playsinline", "");
+  audio.setAttribute("webkit-playsinline", "");
 
-  // =========================
-  // VOLUMEN GUARDADO
-  // =========================
-  const savedVolume = localStorage.getItem("sonarrock_volume");
-  if (savedVolume !== null) {
-    audio.volume = parseFloat(savedVolume);
-    volumeControl.value = savedVolume;
-  } else {
-    audio.volume = 1;
-    volumeControl.value = 1;
-  }
+  let isPlaying = false;
 
-  // =========================
-  // HELPERS UI
-  // =========================
   function setStatus(text, live = false) {
-    statusText.textContent = text;
-    statusDot.classList.toggle("live", live);
+    if (statusText) statusText.textContent = text;
+    if (statusDot) {
+      statusDot.classList.toggle("live", live);
+    }
   }
 
-  function setPlayingUI(playing) {
+  function updatePlayUI(playing) {
     isPlaying = playing;
-    playIcon.textContent = playing ? "❚❚" : "▶";
-
-    if (visualizer) {
-      visualizer.classList.toggle("playing", playing);
-    }
-
-    if (player) {
-      player.classList.toggle("is-playing", playing);
-    }
+    if (playIcon) playIcon.textContent = playing ? "❚❚" : "▶";
+    if (visualizer) visualizer.classList.toggle("playing", playing);
+    setStatus(playing ? "Transmitiendo en vivo" : "Listo para reproducir", playing);
   }
 
-  function clearReconnect() {
-    if (reconnectTimeout) {
-      clearTimeout(reconnectTimeout);
-      reconnectTimeout = null;
+  function updateMuteUI() {
+    const muted = audio.muted || audio.volume === 0;
+
+    if (muteIcon) muteIcon.textContent = muted ? "🔇" : "🔊";
+    if (volumeEmoji) volumeEmoji.textContent = muted ? "🔇" : "🔊";
+
+    if (volumeControl) {
+      volumeControl.value = audio.muted ? 0 : audio.volume;
     }
   }
 
-  function tryReconnect() {
-    clearReconnect();
-
-    if (!isPlaying) return;
-
-    setStatus("Reconectando señal...", false);
-
-    reconnectTimeout = setTimeout(() => {
-      audio.load();
-      audio.play().catch(() => {
-        setPlayingUI(false);
-        setStatus("No se pudo reconectar", false);
-      });
-    }, 3000);
-  }
-
-  // =========================
-  // PLAY / PAUSE
-  // =========================
-  playBtn.addEventListener("click", async () => {
+  async function playStream() {
     try {
-      if (audio.paused) {
-        setStatus("Conectando señal...", false);
-        await audio.play();
-      } else {
-        audio.pause();
+      setStatus("Conectando con la señal...", false);
+
+      if (audio.src !== STREAM_URL) {
+        audio.src = STREAM_URL;
       }
+
+      await audio.play();
+      updatePlayUI(true);
     } catch (error) {
-      console.error("Error al reproducir:", error);
-      setPlayingUI(false);
-      setStatus("Toca play para iniciar", false);
+      console.error("Error al reproducir stream:", error);
+      updatePlayUI(false);
+      setStatus("Toca reproducir nuevamente", false);
+    }
+  }
+
+  function pauseStream() {
+    audio.pause();
+    updatePlayUI(false);
+  }
+
+  playBtn.addEventListener("click", async () => {
+    if (audio.paused) {
+      await playStream();
+    } else {
+      pauseStream();
     }
   });
 
-  // =========================
-  // COMPARTIR
-  // =========================
-  shareBtn.addEventListener("click", async () => {
-    const shareData = {
-      title: "Sonar Rock",
-      text: "Escucha Sonar Rock - La Radio Independiente 🎸",
-      url: window.location.href
-    };
+  muteBtn?.addEventListener("click", () => {
+    audio.muted = !audio.muted;
 
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        setStatus("Enlace copiado para compartir", false);
-        setTimeout(() => {
-          if (isPlaying) {
-            setStatus("Señal en vivo activa", true);
-          } else {
-            setStatus("Listo para reproducir", false);
-          }
-        }, 2500);
-      }
-    } catch (err) {
-      console.warn("Compartir cancelado o no disponible");
+    if (!audio.muted && audio.volume === 0) {
+      audio.volume = 1;
+      if (volumeControl) volumeControl.value = 1;
     }
+
+    updateMuteUI();
   });
 
-  // =========================
-  // VOLUMEN
-  // =========================
-  volumeControl.addEventListener("input", () => {
-    const vol = parseFloat(volumeControl.value);
-    audio.volume = vol;
-    localStorage.setItem("sonarrock_volume", vol);
+  volumeControl?.addEventListener("input", (e) => {
+    const value = parseFloat(e.target.value);
+    audio.volume = value;
+    audio.muted = value === 0;
+    updateMuteUI();
   });
 
-  // =========================
-  // EVENTOS DEL STREAM
-  // =========================
+  audio.addEventListener("playing", () => {
+    updatePlayUI(true);
+  });
+
+  audio.addEventListener("pause", () => {
+    updatePlayUI(false);
+  });
+
+  audio.addEventListener("waiting", () => {
+    setStatus("Bufferizando señal...", false);
+  });
+
+  audio.addEventListener("stalled", () => {
+    setStatus("Reconectando señal...", false);
+  });
+
   audio.addEventListener("loadstart", () => {
     setStatus("Cargando stream...", false);
   });
 
-  audio.addEventListener("waiting", () => {
-    if (isPlaying) {
-      setStatus("Buffering en vivo...", false);
-    }
-  });
-
-  audio.addEventListener("playing", () => {
-    clearReconnect();
-    setPlayingUI(true);
-    setStatus("Señal en vivo activa", true);
-  });
-
-  audio.addEventListener("pause", () => {
-    clearReconnect();
-    setPlayingUI(false);
-    setStatus("Pausado", false);
-  });
-
-  audio.addEventListener("stalled", () => {
-    if (isPlaying) {
-      setStatus("Señal interrumpida...", false);
-      tryReconnect();
-    }
-  });
-
-  audio.addEventListener("suspend", () => {
-    if (isPlaying) {
-      setStatus("Esperando datos...", false);
-    }
-  });
-
   audio.addEventListener("error", () => {
-    console.error("Error de stream:", audio.error);
-    setPlayingUI(false);
-    setStatus("Error al conectar señal", false);
-    tryReconnect();
+    updatePlayUI(false);
+    setStatus("Error al conectar con la señal", false);
   });
 
-  // =========================
-  // ESTADO INICIAL
-  // =========================
-  setStatus("Listo para reproducir", false);
-  setPlayingUI(false);
+  audio.addEventListener("volumechange", updateMuteUI);
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && isPlaying && audio.paused) {
+      playStream();
+    }
+  });
+
+  updateMuteUI();
+  updatePlayUI(false);
 });

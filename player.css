@@ -12,7 +12,7 @@
 
 .sonar-player {
   width: 100%;
-  max-width: 980px;
+  max-width: 860px;
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 28px;
@@ -37,8 +37,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at top right, rgba(255, 120, 0, 0.14), transparent 35%),
-    radial-gradient(circle at bottom left, rgba(255, 80, 0, 0.08), transparent 35%);
+    radial-gradient(circle at top right, rgba(255, 120, 0, 0.14), transparent 65%),
+    radial-gradient(circle at bottom left, rgba(255, 80, 0, 0.08), transparent 65%);
   pointer-events: none;
   z-index: 0;
 }
@@ -74,7 +74,7 @@
 .sonar-player .live-badge {
   position: absolute;
   top: 14px;
-  left: 14px;
+  right: 14px;
   background: rgba(0,0,0,0.75);
   border: 1px solid rgba(255, 80, 80, 0.35);
   color: #ff5e5e;

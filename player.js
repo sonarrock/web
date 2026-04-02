@@ -2,28 +2,82 @@ document.addEventListener("DOMContentLoaded", () => {
   const audio = document.getElementById("radioPlayer");
   const playBtn = document.getElementById("playBtn");
   const playIcon = document.getElementById("playIcon");
-  const muteBtn = document.getElementById("muteBtn");
   const shareBtn = document.getElementById("shareBtn");
-  const popupBtn = document.getElementById("popupBtn");
   const volumeControl = document.getElementById("volumeControl");
   const statusText = document.getElementById("statusText");
   const statusDot = document.getElementById("statusDot");
-  const visualizer = document.getElementById("visualizer");
+  const visualizer = document.querySelector(".visualizer");
+  const player = document.getElementById("sonarPlayer");
 
-  if (!audio || !playBtn) return;
+  if (!audio || !playBtn || !playIcon) return;
 
   const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
-  const SITE_URL = window.location.href;
+
+  let isPlaying = false;
+  let reconnectTimeout = null;
+
+  // =========================
+  // CONFIG INICIAL
+  // =========================
+  audio.src = STREAM_URL;
+  audio.preload = "none";
+  audio.playsInline = true;
+  audio.crossOrigin = "anonymous";
 
   // =========================
   // VOLUMEN GUARDADO
   // =========================
-  const savedVolume = localStorage.getItem("sonarVolume");
+  const savedVolume = localStorage.getItem("sonarrock_volume");
   if (savedVolume !== null) {
     audio.volume = parseFloat(savedVolume);
-    if (volumeControl) volumeControl.value = savedVolume;
+    volumeControl.value = savedVolume;
   } else {
     audio.volume = 1;
+    volumeControl.value = 1;
+  }
+
+  // =========================
+  // HELPERS UI
+  // =========================
+  function setStatus(text, live = false) {
+    statusText.textContent = text;
+    statusDot.classList.toggle("live", live);
+  }
+
+  function setPlayingUI(playing) {
+    isPlaying = playing;
+    playIcon.textContent = playing ? "❚❚" : "▶";
+
+    if (visualizer) {
+      visualizer.classList.toggle("playing", playing);
+    }
+
+    if (player) {
+      player.classList.toggle("is-playing", playing);
+    }
+  }
+
+  function clearReconnect() {
+    if (reconnectTimeout) {
+      clearTimeout(reconnectTimeout);
+      reconnectTimeout = null;
+    }
+  }
+
+  function tryReconnect() {
+    clearReconnect();
+
+    if (!isPlaying) return;
+
+    setStatus("Reconectando señal...", false);
+
+    reconnectTimeout = setTimeout(() => {
+      audio.load();
+      audio.play().catch(() => {
+        setPlayingUI(false);
+        setStatus("No se pudo reconectar", false);
+      });
+    }, 3000);
   }
 
   // =========================
@@ -32,188 +86,104 @@ document.addEventListener("DOMContentLoaded", () => {
   playBtn.addEventListener("click", async () => {
     try {
       if (audio.paused) {
-        updateStatus("Conectando al stream...", "loading");
-
-        if (!audio.src) {
-          audio.src = STREAM_URL;
-        }
-
+        setStatus("Conectando señal...", false);
         await audio.play();
       } else {
         audio.pause();
       }
     } catch (error) {
       console.error("Error al reproducir:", error);
-      updateStatus("No se pudo reproducir", "error");
+      setPlayingUI(false);
+      setStatus("Toca play para iniciar", false);
     }
   });
 
   // =========================
-  // EVENTOS AUDIO
+  // COMPARTIR
   // =========================
-  audio.addEventListener("play", () => {
-    playIcon.textContent = "❚❚";
-    updateStatus("Transmitiendo en vivo", "live");
-    visualizer?.classList.add("playing");
-  });
+  shareBtn.addEventListener("click", async () => {
+    const shareData = {
+      title: "Sonar Rock",
+      text: "Escucha Sonar Rock - La Radio Independiente 🎸",
+      url: window.location.href
+    };
 
-  audio.addEventListener("pause", () => {
-    playIcon.textContent = "▶";
-    updateStatus("Pausado", "");
-    visualizer?.classList.remove("playing");
-  });
-
-  audio.addEventListener("waiting", () => {
-    updateStatus("Cargando señal...", "loading");
-  });
-
-  audio.addEventListener("stalled", () => {
-    updateStatus("Reconectando...", "loading");
-  });
-
-  audio.addEventListener("error", () => {
-    updateStatus("Error de conexión", "error");
-    visualizer?.classList.remove("playing");
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        setStatus("Enlace copiado para compartir", false);
+        setTimeout(() => {
+          if (isPlaying) {
+            setStatus("Señal en vivo activa", true);
+          } else {
+            setStatus("Listo para reproducir", false);
+          }
+        }, 2500);
+      }
+    } catch (err) {
+      console.warn("Compartir cancelado o no disponible");
+    }
   });
 
   // =========================
   // VOLUMEN
   // =========================
-  if (volumeControl) {
-    volumeControl.addEventListener("input", () => {
-      audio.volume = parseFloat(volumeControl.value);
-      localStorage.setItem("sonarVolume", volumeControl.value);
-
-      if (audio.volume === 0) {
-        audio.muted = true;
-        muteBtn.textContent = "🔇";
-      } else {
-        audio.muted = false;
-        muteBtn.textContent = "🔊";
-      }
-    });
-  }
+  volumeControl.addEventListener("input", () => {
+    const vol = parseFloat(volumeControl.value);
+    audio.volume = vol;
+    localStorage.setItem("sonarrock_volume", vol);
+  });
 
   // =========================
-  // MUTE
+  // EVENTOS DEL STREAM
   // =========================
-  if (muteBtn) {
-    muteBtn.addEventListener("click", () => {
-      audio.muted = !audio.muted;
-      muteBtn.textContent = audio.muted ? "🔇" : "🔊";
-    });
-  }
+  audio.addEventListener("loadstart", () => {
+    setStatus("Cargando stream...", false);
+  });
 
-  // =========================
-  // SHARE
-  // =========================
-  if (shareBtn) {
-    shareBtn.addEventListener("click", async () => {
-      const shareData = {
-        title: "Sonar Rock - La Radio Independiente",
-        text: "Escucha Sonar Rock en vivo 🔥",
-        url: SITE_URL
-      };
-
-      try {
-        if (navigator.share) {
-          await navigator.share(shareData);
-        } else {
-          await navigator.clipboard.writeText(SITE_URL);
-          alert("Enlace copiado al portapapeles");
-        }
-      } catch (error) {
-        console.warn("Compartir cancelado:", error);
-      }
-    });
-  }
-
-  // =========================
-  // POPUP PLAYER
-  // =========================
-  if (popupBtn) {
-    popupBtn.addEventListener("click", () => {
-      const popup = window.open("", "SonarRockPlayer", "width=420,height=720");
-
-      if (!popup) return;
-
-      popup.document.write(`
-        <!DOCTYPE html>
-        <html lang="es">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Sonar Rock Player</title>
-          <style>
-            body {
-              margin: 0;
-              font-family: Inter, sans-serif;
-              background: #0b0b0c;
-              color: white;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              min-height: 100vh;
-              padding: 20px;
-              box-sizing: border-box;
-            }
-            .mini-player {
-              width: 100%;
-              max-width: 340px;
-              background: linear-gradient(145deg, #121212, #1d1d1d);
-              border: 1px solid rgba(255,120,0,.2);
-              border-radius: 24px;
-              padding: 24px;
-              text-align: center;
-              box-shadow: 0 20px 40px rgba(0,0,0,.45);
-            }
-            img {
-              width: 100%;
-              border-radius: 18px;
-              margin-bottom: 18px;
-            }
-            h1 {
-              margin: 0 0 10px;
-              font-size: 28px;
-            }
-            p {
-              color: rgba(255,255,255,.75);
-              margin-bottom: 20px;
-            }
-            audio {
-              width: 100%;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="mini-player">
-            <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock">
-            <h1>SONAR ROCK</h1>
-            <p>La Radio Independiente</p>
-            <audio controls autoplay playsinline>
-              <source src="${STREAM_URL}" type="audio/mpeg">
-            </audio>
-          </div>
-        </body>
-        </html>
-      `);
-
-      popup.document.close();
-    });
-  }
-
-  // =========================
-  // STATUS
-  // =========================
-  function updateStatus(text, state = "") {
-    if (statusText) statusText.textContent = text;
-
-    if (statusDot) {
-      statusDot.classList.remove("live", "loading", "error");
-
-      if (state) {
-        statusDot.classList.add(state);
-      }
+  audio.addEventListener("waiting", () => {
+    if (isPlaying) {
+      setStatus("Buffering en vivo...", false);
     }
-  }
+  });
+
+  audio.addEventListener("playing", () => {
+    clearReconnect();
+    setPlayingUI(true);
+    setStatus("Señal en vivo activa", true);
+  });
+
+  audio.addEventListener("pause", () => {
+    clearReconnect();
+    setPlayingUI(false);
+    setStatus("Pausado", false);
+  });
+
+  audio.addEventListener("stalled", () => {
+    if (isPlaying) {
+      setStatus("Señal interrumpida...", false);
+      tryReconnect();
+    }
+  });
+
+  audio.addEventListener("suspend", () => {
+    if (isPlaying) {
+      setStatus("Esperando datos...", false);
+    }
+  });
+
+  audio.addEventListener("error", () => {
+    console.error("Error de stream:", audio.error);
+    setPlayingUI(false);
+    setStatus("Error al conectar señal", false);
+    tryReconnect();
+  });
+
+  // =========================
+  // ESTADO INICIAL
+  // =========================
+  setStatus("Listo para reproducir", false);
+  setPlayingUI(false);
 });

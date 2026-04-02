@@ -1,530 +1,227 @@
-/* =========================
-   SONAR ROCK PLAYER V2 PRO
-========================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const audio = document.getElementById("radioPlayer");
+  const playBtn = document.getElementById("playBtn");
+  const playIcon = document.getElementById("playIcon");
+  const shareBtn = document.getElementById("shareBtn");
+  const volumeControl = document.getElementById("volumeControl");
+  const statusText = document.getElementById("statusText");
+  const statusDot = document.getElementById("statusDot");
+  const visualizer = document.querySelector(".visualizer");
+  const player = document.getElementById("sonarPlayer");
 
-.sonar-player-wrap {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 30px 15px;
-  box-sizing: border-box;
-}
+  // MINI PLAYER
+  const miniPlayer = document.getElementById("miniPlayer");
+  const miniPlayBtn = document.getElementById("miniPlayBtn");
+  const miniPlayIcon = document.getElementById("miniPlayIcon");
+  const miniStatus = document.getElementById("miniStatus");
 
-.sonar-player {
-  width: 100%;
-  max-width: 860px;
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 28px;
-  align-items: center;
-  background: linear-gradient(145deg, rgba(15,15,15,0.98), rgba(28,28,28,0.96));
-  border: 1px solid rgba(255, 120, 0, 0.18);
-  border-radius: 26px;
-  padding: 28px;
-  box-shadow:
-    0 0 0 1px rgba(255, 115, 0, 0.06),
-    0 15px 45px rgba(0,0,0,0.45),
-    0 0 30px rgba(255, 115, 0, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
+  if (!audio || !playBtn || !playIcon) return;
 
-.sonar-player::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at top right, rgba(255, 120, 0, 0.14), transparent 65%),
-    radial-gradient(circle at bottom left, rgba(255, 80, 0, 0.08), transparent 65%);
-  pointer-events: none;
-  z-index: 0;
-}
+  const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
+  let isPlaying = false;
+  let reconnectTimeout = null;
 
-.sonar-player > * {
-  position: relative;
-  z-index: 1;
-}
+  // =========================
+  // CONFIG INICIAL
+  // =========================
+  audio.src = STREAM_URL;
+  audio.preload = "none";
+  audio.playsInline = true;
+  audio.crossOrigin = "anonymous";
 
-/* =========================
-   COVER / LOGO
-========================= */
-
-.sonar-cover-box {
-  position: relative;
-  width: 100%;
-}
-
-.sonar-cover {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  border-radius: 22px;
-  border: 1px solid rgba(255, 120, 0, 0.22);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.02),
-    0 10px 35px rgba(0,0,0,0.35),
-    0 0 25px rgba(255, 120, 0, 0.12);
-  background: #111;
-  display: block;
-}
-
-.live-badge {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  background: rgba(0,0,0,0.75);
-  border: 1px solid rgba(255, 80, 80, 0.35);
-  color: #ff5e5e;
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-/* =========================
-   INFO
-========================= */
-
-.sonar-info {
-  position: relative;
-}
-
-.station-label {
-  color: #ff8a2a;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  margin: 0 0 8px;
-  text-transform: uppercase;
-}
-
-.station-name {
-  color: #fff;
-  font-size: clamp(30px, 4vw, 52px);
-  line-height: 1;
-  margin: 0 0 12px;
-  font-weight: 900;
-  letter-spacing: 1px;
-}
-
-.station-tagline {
-  color: rgba(255,255,255,0.75);
-  font-size: 16px;
-  line-height: 1.6;
-  margin: 0 0 20px;
-}
-
-/* =========================
-   VISUALIZER
-========================= */
-
-.visualizer {
-  display: flex;
-  align-items: flex-end;
-  gap: 6px;
-  height: 46px;
-  margin: 10px 0 28px;
-}
-
-.visualizer span {
-  display: block;
-  width: 8px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #ff9a3d, #ff5c00);
-  height: 14px;
-  animation: sonarBars 1.1s infinite ease-in-out;
-  opacity: 0.25;
-  transform-origin: bottom;
-}
-
-.visualizer.playing span {
-  opacity: 1;
-}
-
-.visualizer.playing span:nth-child(1)  { animation-delay: 0s; }
-.visualizer.playing span:nth-child(2)  { animation-delay: 0.1s; }
-.visualizer.playing span:nth-child(3)  { animation-delay: 0.2s; }
-.visualizer.playing span:nth-child(4)  { animation-delay: 0.3s; }
-.visualizer.playing span:nth-child(5)  { animation-delay: 0.4s; }
-.visualizer.playing span:nth-child(6)  { animation-delay: 0.2s; }
-.visualizer.playing span:nth-child(7)  { animation-delay: 0.15s; }
-.visualizer.playing span:nth-child(8)  { animation-delay: 0.35s; }
-.visualizer.playing span:nth-child(9)  { animation-delay: 0.25s; }
-.visualizer.playing span:nth-child(10) { animation-delay: 0.05s; }
-
-@keyframes sonarBars {
-  0%, 100% { height: 12px; }
-  50% { height: 42px; }
-}
-
-/* =========================
-   CONTROLES
-========================= */
-
-.controls {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
-.main-btn,
-.secondary-btn {
-  border: none;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: inherit;
-}
-
-.main-btn {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ff8a00, #ff5100);
-  color: #fff;
-  font-size: 28px;
-  font-weight: bold;
-  box-shadow:
-    0 12px 28px rgba(255, 102, 0, 0.35),
-    0 0 18px rgba(255, 115, 0, 0.25);
-}
-
-.main-btn:hover {
-  transform: translateY(-2px) scale(1.03);
-}
-
-.secondary-btn {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.05);
-  color: #fff;
-  font-size: 22px;
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-.secondary-btn:hover {
-  background: rgba(255, 120, 0, 0.12);
-  border-color: rgba(255, 120, 0, 0.28);
-  transform: translateY(-2px);
-}
-
-/* =========================
-   VOLUMEN
-========================= */
-
-.volume-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.volume-icon {
-  font-size: 18px;
-  opacity: 0.85;
-}
-
-#volumeControl {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  max-width: 280px;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.12);
-  outline: none;
-}
-
-#volumeControl::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #ff7a00;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(255, 120, 0, 0.35);
-}
-
-#volumeControl::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #ff7a00;
-  cursor: pointer;
-  border: none;
-}
-
-/* =========================
-   STATUS
-========================= */
-
-.status-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: rgba(255,255,255,0.72);
-  font-size: 14px;
-}
-
-.status-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #666;
-  box-shadow: 0 0 0 transparent;
-  transition: all 0.3s ease;
-}
-
-.status-dot.live {
-  background: #00e676;
-  box-shadow: 0 0 14px rgba(0, 230, 118, 0.7);
-}
-
-.status-dot.loading {
-  background: #ffb300;
-  box-shadow: 0 0 14px rgba(255, 179, 0, 0.7);
-}
-
-.status-dot.error {
-  background: #ff5252;
-  box-shadow: 0 0 14px rgba(255, 82, 82, 0.7);
-}
-
-/* =========================
-   AUDIO OCULTO
-========================= */
-
-#radioPlayer {
-  display: none;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 768px) {
-  .sonar-player {
-    grid-template-columns: 1fr;
-    padding: 20px;
-    gap: 20px;
-    border-radius: 22px;
+  // =========================
+  // VOLUMEN GUARDADO
+  // =========================
+  const savedVolume = localStorage.getItem("sonarrock_volume");
+  if (savedVolume !== null) {
+    audio.volume = parseFloat(savedVolume);
+    if (volumeControl) volumeControl.value = savedVolume;
+  } else {
+    audio.volume = 1;
+    if (volumeControl) volumeControl.value = 1;
   }
 
-  .station-name {
-    font-size: 34px;
+  // =========================
+  // HELPERS UI
+  // =========================
+  function setStatus(text, live = false) {
+    if (statusText) statusText.textContent = text;
+    if (statusDot) statusDot.classList.toggle("live", live);
+    if (miniStatus) miniStatus.textContent = text;
+    if (miniPlayer) miniPlayer.classList.toggle("live", live);
   }
 
-  .main-btn {
-    width: 66px;
-    height: 66px;
-    font-size: 24px;
+  function setPlayingUI(playing) {
+    isPlaying = playing;
+
+    if (playIcon) playIcon.textContent = playing ? "❚❚" : "▶";
+    if (miniPlayIcon) miniPlayIcon.textContent = playing ? "❚❚" : "▶";
+
+    if (visualizer) {
+      visualizer.classList.toggle("playing", playing);
+    }
+
+    if (player) {
+      player.classList.toggle("is-playing", playing);
+    }
   }
 
-  .secondary-btn {
-    width: 48px;
-    height: 48px;
-    font-size: 20px;
+  function clearReconnect() {
+    if (reconnectTimeout) {
+      clearTimeout(reconnectTimeout);
+      reconnectTimeout = null;
+    }
   }
 
-  #volumeControl {
-    max-width: 100%;
-  }
-}
+  function tryReconnect() {
+    clearReconnect();
 
-@media (max-width: 480px) {
-  .sonar-player-wrap {
-    padding: 20px 12px;
-  }
+    if (!isPlaying) return;
 
-  .sonar-player {
-    padding: 18px;
-    gap: 18px;
-  }
+    setStatus("Reconectando señal...", false);
 
-  .station-label {
-    font-size: 12px;
-    letter-spacing: 1.5px;
+    reconnectTimeout = setTimeout(() => {
+      audio.load();
+      audio.play().catch(() => {
+        setPlayingUI(false);
+        setStatus("No se pudo reconectar", false);
+      });
+    }, 3000);
   }
 
-  .station-name {
-    font-size: 30px;
+  async function togglePlayback() {
+    try {
+      if (audio.paused) {
+        setStatus("Conectando señal...", false);
+        await audio.play();
+      } else {
+        audio.pause();
+      }
+    } catch (error) {
+      console.error("Error al reproducir:", error);
+      setPlayingUI(false);
+      setStatus("Toca play para iniciar", false);
+    }
   }
 
-  .station-tagline {
-    font-size: 15px;
+  // =========================
+  // BOTONES
+  // =========================
+  playBtn.addEventListener("click", togglePlayback);
+
+  if (miniPlayBtn) {
+    miniPlayBtn.addEventListener("click", togglePlayback);
   }
 
-  .live-badge {
-    font-size: 11px;
-    padding: 7px 10px;
-  }
-}
+  if (shareBtn) {
+    shareBtn.addEventListener("click", async () => {
+      const shareData = {
+        title: "Sonar Rock",
+        text: "Escucha Sonar Rock - La Radio Independiente 🎸",
+        url: window.location.href
+      };
 
-/* =========================
-   ESTADO ACTIVO / PLAYING
-========================= */
-
-.sonar-player.is-playing {
-  box-shadow:
-    0 0 0 1px rgba(255, 115, 0, 0.10),
-    0 18px 50px rgba(0,0,0,0.52),
-    0 0 40px rgba(255, 115, 0, 0.18);
-  border-color: rgba(255, 140, 0, 0.28);
-}
-
-.sonar-player.is-playing .sonar-cover {
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.02),
-    0 10px 35px rgba(0,0,0,0.35),
-    0 0 32px rgba(255, 120, 0, 0.18);
-}
-
-.sonar-player.is-playing .main-btn {
-  transform: scale(1.03);
-  box-shadow:
-    0 12px 28px rgba(255, 102, 0, 0.40),
-    0 0 24px rgba(255, 115, 0, 0.30);
-}/* =========================
-   MINI PLAYER STICKY
-========================= */
-
-.mini-player {
-  position: fixed;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%) translateY(120%);
-  width: calc(100% - 24px);
-  max-width: 720px;
-  background: rgba(12,12,12,0.94);
-  border: 1px solid rgba(255, 120, 0, 0.18);
-  border-radius: 18px;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  box-shadow:
-    0 18px 45px rgba(0,0,0,0.42),
-    0 0 24px rgba(255,115,0,0.10);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  z-index: 9999;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.35s ease;
-}
-
-.mini-player.show {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
-}
-
-.mini-player-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.mini-live-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #666;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-}
-
-.mini-player.live .mini-live-dot {
-  background: #00e676;
-  box-shadow: 0 0 14px rgba(0, 230, 118, 0.8);
-}
-
-.mini-meta {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.mini-title {
-  color: #fff;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 1px;
-}
-
-.mini-status {
-  color: rgba(255,255,255,0.72);
-  font-size: 13px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mini-play-btn {
-  width: 52px;
-  height: 52px;
-  border: none;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ff8a00, #ff5100);
-  color: #fff;
-  font-size: 22px;
-  font-weight: bold;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow:
-    0 10px 24px rgba(255, 102, 0, 0.34),
-    0 0 16px rgba(255, 115, 0, 0.24);
-  transition: all 0.25s ease;
-}
-
-.mini-play-btn:hover {
-  transform: scale(1.04);
-}
-
-/* Espacio para que no tape contenido */
-body.has-mini-player {
-  padding-bottom: 95px;
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .mini-player {
-    bottom: 12px;
-    width: calc(100% - 16px);
-    padding: 12px 14px;
-    border-radius: 16px;
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          await navigator.clipboard.writeText(window.location.href);
+          setStatus("Enlace copiado para compartir", false);
+          setTimeout(() => {
+            if (isPlaying) {
+              setStatus("Señal en vivo activa", true);
+            } else {
+              setStatus("Listo para reproducir", false);
+            }
+          }, 2500);
+        }
+      } catch (err) {
+        console.warn("Compartir cancelado o no disponible");
+      }
+    });
   }
 
-  .mini-title {
-    font-size: 12px;
+  // =========================
+  // VOLUMEN
+  // =========================
+  if (volumeControl) {
+    volumeControl.addEventListener("input", () => {
+      const vol = parseFloat(volumeControl.value);
+      audio.volume = vol;
+      localStorage.setItem("sonarrock_volume", vol);
+    });
   }
 
-  .mini-status {
-    font-size: 12px;
+  // =========================
+  // EVENTOS STREAM
+  // =========================
+  audio.addEventListener("loadstart", () => {
+    setStatus("Cargando stream...", false);
+  });
+
+  audio.addEventListener("waiting", () => {
+    if (isPlaying) {
+      setStatus("Buffering en vivo...", false);
+    }
+  });
+
+  audio.addEventListener("playing", () => {
+    clearReconnect();
+    setPlayingUI(true);
+    setStatus("Señal en vivo activa", true);
+  });
+
+  audio.addEventListener("pause", () => {
+    clearReconnect();
+    setPlayingUI(false);
+    setStatus("Pausado", false);
+  });
+
+  audio.addEventListener("stalled", () => {
+    if (isPlaying) {
+      setStatus("Señal interrumpida...", false);
+      tryReconnect();
+    }
+  });
+
+  audio.addEventListener("suspend", () => {
+    if (isPlaying) {
+      setStatus("Esperando datos...", false);
+    }
+  });
+
+  audio.addEventListener("error", () => {
+    console.error("Error de stream:", audio.error);
+    setPlayingUI(false);
+    setStatus("Error al conectar señal", false);
+    tryReconnect();
+  });
+
+  // =========================
+  // MINI PLAYER STICKY
+  // =========================
+  function handleMiniPlayerVisibility() {
+    if (!player || !miniPlayer) return;
+
+    const rect = player.getBoundingClientRect();
+    const playerOutOfView = rect.bottom < 80;
+
+    if (playerOutOfView) {
+      miniPlayer.classList.add("show");
+      document.body.classList.add("has-mini-player");
+    } else {
+      miniPlayer.classList.remove("show");
+      document.body.classList.remove("has-mini-player");
+    }
   }
 
-  .mini-play-btn {
-    width: 48px;
-    height: 48px;
-    font-size: 20px;
-  }
-}
+  window.addEventListener("scroll", handleMiniPlayerVisibility, { passive: true });
+  window.addEventListener("resize", handleMiniPlayerVisibility);
+  handleMiniPlayerVisibility();
 
+  // =========================
+  // ESTADO INICIAL
+  // =========================
+  setStatus("Listo para reproducir", false);
+  setPlayingUI(false);
+});

@@ -1,7 +1,12 @@
+// ===============================
+// SONAR ROCK - DISCO DE LA SEMANA
+// ===============================
+
 document.addEventListener("DOMContentLoaded", () => {
   const audio = document.getElementById("disco-audio");
   const cover = document.getElementById("cover");
   const trackTitle = document.getElementById("track-title");
+  const player = document.getElementById("disco-player");
 
   const discoData = {
     titulo: "Radiohead - The Bends",
@@ -23,4 +28,18 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.load();
     audio.controls = true;
   }
+
+  if (!audio || !player) return;
+
+  audio.addEventListener("play", () => {
+    player.classList.add("playing");
+  });
+
+  audio.addEventListener("pause", () => {
+    player.classList.remove("playing");
+  });
+
+  audio.addEventListener("ended", () => {
+    player.classList.remove("playing");
+  });
 });

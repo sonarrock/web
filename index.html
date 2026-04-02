@@ -49,7 +49,11 @@
     </div>
   </header>
 
-  <section class="sonar-player-wrap">
+<!-- ========================= -->
+<!-- SONAR ROCK PLAYER v4 PRO -->
+<!-- ========================= -->
+
+<section class="sonar-player-wrap">
   <div class="sonar-player" id="sonarPlayer">
 
     <!-- Cover / Logo -->
@@ -77,21 +81,13 @@
         </button>
 
         <button id="muteBtn" class="secondary-btn" aria-label="Silenciar o activar sonido">
-          🔊
-        </button>
-
-        <button id="shareBtn" class="secondary-btn" aria-label="Compartir">
-          ⤴
-        </button>
-
-        <button id="popupBtn" class="secondary-btn" aria-label="Abrir mini reproductor">
-          ↗
+          <span id="muteIcon">🔊</span>
         </button>
       </div>
 
       <!-- Volume -->
       <div class="volume-wrap">
-        <span class="volume-icon">🔊</span>
+        <span class="volume-icon" id="volumeEmoji">🔊</span>
         <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1">
       </div>
 
@@ -103,7 +99,7 @@
     </div>
 
     <!-- Hidden Audio -->
-    <audio id="radioPlayer" preload="none" playsinline>
+    <audio id="radioPlayer" preload="none" playsinline webkit-playsinline>
       <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
       Tu navegador no soporta audio HTML5.
     </audio>

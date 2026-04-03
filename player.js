@@ -1,16 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   const audio = document.getElementById("radioPlayer");
   const player = document.getElementById("sonarPlayer");
-
   const playBtn = document.getElementById("playBtn");
   const playIcon = document.getElementById("playIcon");
-
   const muteBtn = document.getElementById("muteBtn");
   const muteIcon = document.getElementById("muteIcon");
-
   const volumeControl = document.getElementById("volumeControl");
   const volumeEmoji = document.getElementById("volumeEmoji");
-
   const statusText = document.getElementById("statusText");
   const statusDot = document.getElementById("statusDot");
 
@@ -28,13 +24,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let isPlaying = false;
   let reconnectTimer = null;
   let reconnectAttempts = 0;
-  const maxReconnectAttempts = 8;
+  const maxReconnectAttempts = 6;
 
-  audio.preload = "metadata";
+  // Fuente directa más limpia
   audio.src = STREAM_URL;
+  audio.preload = "metadata";
+  audio.crossOrigin = "anonymous";
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
-  audio.crossOrigin = "anonymous";
 
   // =========================
   // CARGAR CONFIG GUARDADA
@@ -56,6 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (statusText) statusText.textContent = text;
     if (miniStatus) miniStatus.textContent = text;
     if (statusDot) statusDot.classList.toggle("live", live);
+    if (player) player.classList.toggle("is-live", live);
+    if (miniPlayer) miniPlayer.classList.toggle("live", live);
   }
 
   function updatePlayUI(playing) {
@@ -65,17 +64,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (miniPlayIcon) miniPlayIcon.textContent = playing ? "❚❚" : "▶";
 
     if (player) player.classList.toggle("playing", playing);
-    if (miniPlayer) miniPlayer.classList.toggle("playing", playing);
 
-    setStatus(playing ? "Transmitiendo en vivo" : "Listo para reproducir", playing);
+    setStatus(
+      playing ? "Transmitiendo en vivo" : "Listo para reproducir",
+      playing
+    );
   }
 
   function updateMuteUI() {
     const muted = audio.muted || audio.volume === 0;
-    const icon = muted ? "🔇" : "🔊";
 
-    if (muteIcon) muteIcon.textContent = icon;
-    if (volumeEmoji) volumeEmoji.textContent = icon;
+    if (muteIcon) muteIcon.textContent = muted ? "🔇" : "🔊";
+    if (volumeEmoji) volumeEmoji.textContent = muted ? "🔇" : "🔊";
 
     if (volumeControl) {
       volumeControl.value = audio.muted ? 0 : audio.volume;
@@ -110,13 +110,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     reconnectTimer = setTimeout(async () => {
       try {
+        audio.pause();
         audio.src = STREAM_URL + "?t=" + Date.now();
+        audio.load();
         await audio.play();
       } catch (error) {
         console.error("Reconexión fallida:", error);
         scheduleReconnect();
       }
-    }, 2200);
+    }, 1800);
   }
 
   async function playStream() {
@@ -126,8 +128,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setStatus("Conectando con la señal...", false);
 
-      // cache-bust suave para evitar stream colgado
-      audio.src = STREAM_URL + "?t=" + Date.now();
+      // No recargamos brutalmente si ya trae src listo
+      if (!audio.src || !audio.src.includes("zeno.fm")) {
+        audio.src = STREAM_URL;
+        audio.load();
+      }
 
       await audio.play();
       updatePlayUI(true);
@@ -144,21 +149,15 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePlayUI(false);
   }
 
-  async function togglePlay() {
+  function togglePlay() {
     if (audio.paused) {
-      await playStream();
+      playStream();
     } else {
       pauseStream();
     }
   }
 
-  // =========================
-  // EVENTOS BOTONES
-  // =========================
-  playBtn.addEventListener("click", togglePlay);
-  miniPlayBtn?.addEventListener("click", togglePlay);
-
-  muteBtn?.addEventListener("click", () => {
+  function toggleMute() {
     audio.muted = !audio.muted;
 
     if (!audio.muted && audio.volume === 0) {
@@ -168,7 +167,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateMuteUI();
     saveAudioPrefs();
-  });
+  }
+
+  // =========================
+  // EVENTOS BOTONES
+  // =========================
+  playBtn.addEventListener("click", togglePlay);
+  miniPlayBtn?.addEventListener("click", togglePlay);
+  muteBtn?.addEventListener("click", toggleMute);
 
   volumeControl?.addEventListener("input", (e) => {
     const value = parseFloat(e.target.value);
@@ -215,7 +221,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   audio.addEventListener("error", () => {
     console.error("Error en stream");
-
     if (isPlaying) {
       setStatus("Error en la señal, reconectando...", false);
       scheduleReconnect();
@@ -241,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // =========================
-  // MINI PLAYER MÓVIL
+  // MINI PLAYER STICKY
   // =========================
   function handleMiniPlayer() {
     if (!miniPlayer) return;
@@ -255,11 +260,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("resize", handleMiniPlayer);
   handleMiniPlayer();
-
-  // =========================
-  // PRE-CALENTAR STREAM
-  // =========================
-  audio.load();
 
   // =========================
   // INIT

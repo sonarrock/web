@@ -13,8 +13,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link href="style.css?v=6" rel="stylesheet">
-  <link href="player.css?v=6" rel="stylesheet">
+  <link href="style.css?v=8" rel="stylesheet">
+  <link href="player.css?v=8" rel="stylesheet">
 
   <!-- Iconos -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -40,8 +40,6 @@
   <!-- ========================= -->
   <header class="header">
     <div class="container">
-      <div class="logo-section">
-        <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
         <div class="title-section">
           <h1>LA RADIO INDEPENDIENTE</h1>
         </div>
@@ -49,31 +47,18 @@
     </div>
   </header>
 
-  <!-- ========================= -->
-<!-- SONAR ROCK PLAYER v6 BLACK GLASS -->
-<!-- ========================= -->
-
 <section class="sonar-player-wrap">
   <div class="sonar-player" id="sonarPlayer">
 
-    <!-- Cover / Logo -->
     <div class="sonar-cover-box">
       <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock" class="sonar-cover" id="stationCover">
     </div>
 
-    <!-- Info -->
     <div class="sonar-info">
       <p class="station-label">RADIO ONLINE</p>
       <h3 class="station-name">SONAR ROCK</h3>
       <p class="station-tagline" id="trackInfo">Transmitiendo rock sin concesiones</p>
 
-      <!-- Visualizer -->
-      <div class="visualizer" id="visualizer" aria-hidden="true">
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span><span></span><span></span>
-      </div>
-
-      <!-- Controls -->
       <div class="controls">
         <button id="playBtn" class="main-btn" aria-label="Reproducir o pausar">
           <span id="playIcon">▶</span>
@@ -84,42 +69,43 @@
         </button>
       </div>
 
-      <!-- Volume -->
       <div class="volume-wrap">
         <span class="volume-icon" id="volumeEmoji">🔊</span>
         <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1">
       </div>
 
-      <!-- Status -->
       <div class="status-row">
         <span class="status-dot" id="statusDot"></span>
         <span id="statusText">Listo para reproducir</span>
       </div>
     </div>
 
-    <!-- Hidden Audio -->
-    <audio id="radioPlayer" preload="auto" playsinline webkit-playsinline></audio>
+    <audio id="radioPlayer" preload="metadata" playsinline webkit-playsinline>
+      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
+      Tu navegador no soporta audio HTML5.
+    </audio>
   </div>
 </section>
 
+<!-- ========================= -->
+  <!-- MINI PLYER -->
+  <!-- ========================= -->
   
-  <!-- ========================= -->
-  <!-- MINI PLAYER STICKY -->
-  <!-- ========================= -->
-  <div class="mini-player" id="miniPlayer">
-    <div class="mini-player-left">
-      <div class="mini-live-dot" id="miniLiveDot"></div>
-      <div class="mini-meta">
-        <span class="mini-title">SONAR ROCK</span>
-        <span class="mini-status" id="miniStatus">Listo para reproducir</span>
-      </div>
+ <div class="mini-player" id="miniPlayer">
+  <div class="mini-player-left">
+    <div class="mini-live-dot"></div>
+    <div class="mini-meta">
+      <span class="mini-title">SONAR ROCK</span>
+      <span class="mini-status" id="miniStatus">Listo para reproducir</span>
     </div>
-
-    <button id="miniPlayBtn" class="mini-play-btn" aria-label="Reproducir o pausar">
-      <span id="miniPlayIcon">▶</span>
-    </button>
   </div>
 
+  <button id="miniPlayBtn" class="mini-play-btn" aria-label="Reproducir o pausar">
+    <span id="miniPlayIcon">▶</span>
+  </button>
+</div>
+
+  
   <!-- ========================= -->
   <!-- REDES SOCIALES -->
   <!-- ========================= -->
@@ -248,8 +234,8 @@
 </div>
 
 <!-- JS -->
-<script src="disco-semana.js?v=6" defer></script>
-<script src="player.js?v=6" defer></script>
+<script src="disco-semana.js?v=8" defer></script>
+<script src="player.js?v=8" defer></script>
 
 </body>
 </html>

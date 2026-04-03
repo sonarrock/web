@@ -1,15 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
   const audio = document.getElementById("radioPlayer");
   const player = document.getElementById("sonarPlayer");
+
   const playBtn = document.getElementById("playBtn");
   const playIcon = document.getElementById("playIcon");
+
   const muteBtn = document.getElementById("muteBtn");
   const muteIcon = document.getElementById("muteIcon");
+
   const volumeControl = document.getElementById("volumeControl");
   const volumeEmoji = document.getElementById("volumeEmoji");
+
   const statusText = document.getElementById("statusText");
   const statusDot = document.getElementById("statusDot");
-  const visualizer = document.getElementById("visualizer");
 
   const miniPlayer = document.getElementById("miniPlayer");
   const miniPlayBtn = document.getElementById("miniPlayBtn");
@@ -25,20 +28,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let isPlaying = false;
   let reconnectTimer = null;
   let reconnectAttempts = 0;
-  let hasWarmedUp = false;
-  let userPaused = false;
   const maxReconnectAttempts = 8;
 
-  // =========================
-  // CONFIG AUDIO
-  // =========================
-  audio.preload = "auto";
-  audio.crossOrigin = "anonymous";
+  audio.preload = "metadata";
+  audio.src = STREAM_URL;
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
+  audio.crossOrigin = "anonymous";
 
   // =========================
-  // CARGAR PREFERENCIAS
+  // CARGAR CONFIG GUARDADA
   // =========================
   const savedVolume = localStorage.getItem(STORAGE_VOLUME);
   const savedMuted = localStorage.getItem(STORAGE_MUTED);
@@ -51,21 +50,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // HELPERS UI
+  // HELPERS
   // =========================
   function setStatus(text, live = false) {
     if (statusText) statusText.textContent = text;
     if (miniStatus) miniStatus.textContent = text;
     if (statusDot) statusDot.classList.toggle("live", live);
-
-    if (player) {
-      player.classList.toggle("is-live", live);
-      player.classList.toggle("playing", live);
-    }
-
-    if (miniPlayer) {
-      miniPlayer.classList.toggle("live", live);
-    }
   }
 
   function updatePlayUI(playing) {
@@ -74,16 +64,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (playIcon) playIcon.textContent = playing ? "❚❚" : "▶";
     if (miniPlayIcon) miniPlayIcon.textContent = playing ? "❚❚" : "▶";
 
-    if (visualizer) visualizer.classList.toggle("playing", playing);
+    if (player) player.classList.toggle("playing", playing);
+    if (miniPlayer) miniPlayer.classList.toggle("playing", playing);
 
     setStatus(playing ? "Transmitiendo en vivo" : "Listo para reproducir", playing);
   }
 
   function updateMuteUI() {
     const muted = audio.muted || audio.volume === 0;
+    const icon = muted ? "🔇" : "🔊";
 
-    if (muteIcon) muteIcon.textContent = muted ? "🔇" : "🔊";
-    if (volumeEmoji) volumeEmoji.textContent = muted ? "🔇" : "🔊";
+    if (muteIcon) muteIcon.textContent = icon;
+    if (volumeEmoji) volumeEmoji.textContent = icon;
 
     if (volumeControl) {
       volumeControl.value = audio.muted ? 0 : audio.volume;
@@ -102,25 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function getFreshStreamURL() {
-    return `${STREAM_URL}?t=${Date.now()}`;
-  }
-
-  function warmUpStream() {
-    if (hasWarmedUp) return;
-    hasWarmedUp = true;
-
-    try {
-      audio.src = getFreshStreamURL();
-      audio.load();
-      setStatus("Señal lista", false);
-    } catch (err) {
-      console.warn("Warm-up falló:", err);
-    }
-  }
-
   function scheduleReconnect() {
-    if (!isPlaying || userPaused) return;
+    if (!isPlaying) return;
 
     if (reconnectAttempts >= maxReconnectAttempts) {
       setStatus("No se pudo reconectar la señal", false);
@@ -135,32 +110,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     reconnectTimer = setTimeout(async () => {
       try {
-        audio.src = getFreshStreamURL();
-        audio.load();
+        audio.src = STREAM_URL + "?t=" + Date.now();
         await audio.play();
       } catch (error) {
         console.error("Reconexión fallida:", error);
         scheduleReconnect();
       }
-    }, 1800);
+    }, 2200);
   }
 
   async function playStream() {
     try {
-      userPaused = false;
       clearReconnect();
       reconnectAttempts = 0;
 
       setStatus("Conectando con la señal...", false);
 
-      audio.src = getFreshStreamURL();
-      audio.load();
+      // cache-bust suave para evitar stream colgado
+      audio.src = STREAM_URL + "?t=" + Date.now();
 
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        await playPromise;
-      }
-
+      await audio.play();
       updatePlayUI(true);
     } catch (error) {
       console.error("Error al reproducir stream:", error);
@@ -170,30 +139,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function pauseStream() {
-    userPaused = true;
     clearReconnect();
     audio.pause();
     updatePlayUI(false);
   }
 
-  // =========================
-  // BOTONES
-  // =========================
-  playBtn.addEventListener("click", async () => {
+  async function togglePlay() {
     if (audio.paused) {
       await playStream();
     } else {
       pauseStream();
     }
-  });
+  }
 
-  miniPlayBtn?.addEventListener("click", async () => {
-    if (audio.paused) {
-      await playStream();
-    } else {
-      pauseStream();
-    }
-  });
+  // =========================
+  // EVENTOS BOTONES
+  // =========================
+  playBtn.addEventListener("click", togglePlay);
+  miniPlayBtn?.addEventListener("click", togglePlay);
 
   muteBtn?.addEventListener("click", () => {
     audio.muted = !audio.muted;
@@ -227,26 +190,24 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   audio.addEventListener("pause", () => {
-    if (!reconnectTimer && userPaused) {
+    if (!reconnectTimer) {
       updatePlayUI(false);
     }
   });
 
   audio.addEventListener("waiting", () => {
-    if (isPlaying && !userPaused) {
-      setStatus("Bufferizando señal...", false);
-    }
+    if (isPlaying) setStatus("Bufferizando señal...", false);
   });
 
   audio.addEventListener("stalled", () => {
-    if (isPlaying && !userPaused) {
+    if (isPlaying) {
       setStatus("Señal detenida, reconectando...", false);
       scheduleReconnect();
     }
   });
 
   audio.addEventListener("suspend", () => {
-    if (isPlaying && !userPaused) {
+    if (isPlaying) {
       setStatus("Señal suspendida, reconectando...", false);
       scheduleReconnect();
     }
@@ -254,7 +215,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   audio.addEventListener("error", () => {
     console.error("Error en stream");
-    if (isPlaying && !userPaused) {
+
+    if (isPlaying) {
       setStatus("Error en la señal, reconectando...", false);
       scheduleReconnect();
     } else {
@@ -264,13 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   audio.addEventListener("loadstart", () => {
-    if (!userPaused) setStatus("Cargando stream...", false);
-  });
-
-  audio.addEventListener("canplay", () => {
-    if (!isPlaying && !userPaused) {
-      setStatus("Señal lista", false);
-    }
+    if (isPlaying) setStatus("Cargando stream...", false);
   });
 
   audio.addEventListener("volumechange", updateMuteUI);
@@ -279,42 +235,35 @@ document.addEventListener("DOMContentLoaded", () => {
   // VISIBILIDAD / iPHONE
   // =========================
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && isPlaying && audio.paused && !userPaused) {
+    if (!document.hidden && isPlaying && audio.paused) {
       playStream();
     }
   });
 
   // =========================
-  // MINI PLAYER SHOW/HIDE
+  // MINI PLAYER MÓVIL
   // =========================
-  function toggleMiniPlayer() {
+  function handleMiniPlayer() {
     if (!miniPlayer) return;
 
-    const isMobile = window.innerWidth <= 768;
-    const scrollY = window.scrollY || window.pageYOffset;
-
-    if (isMobile && scrollY > 280) {
+    if (window.innerWidth <= 768) {
       miniPlayer.classList.add("show");
     } else {
       miniPlayer.classList.remove("show");
     }
   }
 
-  window.addEventListener("scroll", toggleMiniPlayer, { passive: true });
-  window.addEventListener("resize", toggleMiniPlayer);
+  window.addEventListener("resize", handleMiniPlayer);
+  handleMiniPlayer();
 
   // =========================
-  // WARM-UP TEMPRANO
+  // PRE-CALENTAR STREAM
   // =========================
-  warmUpStream();
-
-  window.addEventListener("touchstart", warmUpStream, { once: true, passive: true });
-  window.addEventListener("click", warmUpStream, { once: true, passive: true });
+  audio.load();
 
   // =========================
   // INIT
   // =========================
   updateMuteUI();
   updatePlayUI(false);
-  toggleMiniPlayer();
 });

@@ -2,14 +2,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const audio = document.getElementById("radioPlayer");
   const playerWrap = document.querySelector(".sonar-player-wrap");
   const player = document.getElementById("sonarPlayer");
+
   const playBtn = document.getElementById("playBtn");
   const playIcon = document.getElementById("playIcon");
+
+  const miniPlayBtn = document.getElementById("miniPlayBtn");
+  const miniPlayIcon = document.getElementById("miniPlayIcon");
+
   const muteBtn = document.getElementById("muteBtn");
   const muteIcon = document.getElementById("muteIcon");
+
   const volumeControl = document.getElementById("volumeControl");
   const volumeEmoji = document.getElementById("volumeEmoji");
+
   const statusText = document.getElementById("statusText");
   const statusDot = document.getElementById("statusDot");
+
+  const miniStatus = document.getElementById("miniStatus");
+  const miniLiveDot = document.getElementById("miniLiveDot");
+  const miniPlayer = document.getElementById("miniPlayer");
+
   const visualizer = document.getElementById("visualizer");
 
   if (!audio || !playBtn) return;
@@ -46,14 +58,23 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   function setStatus(text, live = false) {
     if (statusText) statusText.textContent = text;
+    if (miniStatus) miniStatus.textContent = text;
+
     if (statusDot) statusDot.classList.toggle("live", live);
+    if (miniLiveDot) miniLiveDot.classList.toggle("live", live);
+
     if (player) player.classList.toggle("is-live", live);
   }
 
   function updatePlayUI(playing) {
     isPlaying = playing;
+
     if (playIcon) playIcon.textContent = playing ? "❚❚" : "▶";
+    if (miniPlayIcon) miniPlayIcon.textContent = playing ? "❚❚" : "▶";
+
     if (visualizer) visualizer.classList.toggle("playing", playing);
+    if (player) player.classList.toggle("playing", playing);
+
     setStatus(playing ? "Transmitiendo en vivo" : "Listo para reproducir", playing);
   }
 
@@ -82,6 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function scheduleReconnect() {
     if (!isPlaying) return;
+
     if (reconnectAttempts >= maxReconnectAttempts) {
       setStatus("No se pudo reconectar la señal", false);
       updatePlayUI(false);
@@ -127,16 +149,19 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePlayUI(false);
   }
 
-  // =========================
-  // EVENTOS BOTONES
-  // =========================
-  playBtn.addEventListener("click", async () => {
+  async function togglePlay() {
     if (audio.paused) {
       await playStream();
     } else {
       pauseStream();
     }
-  });
+  }
+
+  // =========================
+  // EVENTOS BOTONES
+  // =========================
+  playBtn.addEventListener("click", togglePlay);
+  miniPlayBtn?.addEventListener("click", togglePlay);
 
   muteBtn?.addEventListener("click", () => {
     audio.muted = !audio.muted;
@@ -220,19 +245,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // =========================
-  // STICKY MINI PLAYER MÓVIL
+  // MINI PLAYER MÓVIL
   // =========================
-  function handleStickyMini() {
-    if (!playerWrap) return;
+  function handleMiniPlayer() {
+    if (!miniPlayer || !playerWrap) return;
+
     if (window.innerWidth <= 768) {
-      playerWrap.classList.add("sticky-mini");
+      miniPlayer.classList.add("show");
     } else {
-      playerWrap.classList.remove("sticky-mini");
+      miniPlayer.classList.remove("show");
     }
   }
 
-  window.addEventListener("resize", handleStickyMini);
-  handleStickyMini();
+  window.addEventListener("resize", handleMiniPlayer);
+  handleMiniPlayer();
 
   // =========================
   // INIT

@@ -20,8 +20,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const miniLiveDot = document.getElementById("miniLiveDot");
 
   const trackInfo = document.getElementById("trackInfo");
+  const trackArtist = document.getElementById("trackArtist");
   const miniPlayer = document.getElementById("miniPlayer");
+
   const stationCover = document.getElementById("stationCover");
+  const liveBadge = document.getElementById("liveBadge");
 
   if (!audio || !playBtn) return;
 
@@ -30,20 +33,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
   const METADATA_URL = "https://giss.tv:667/status-json.xsl";
+  const MOUNTPOINT = "sonarrock.mp3";
+
+  const DEFAULT_TRACK_TEXT = "Transmitiendo rock sin concesiones";
+  const DEFAULT_ARTIST_TEXT = "Señal lista";
+  const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
 
   const STORAGE_VOLUME = "sonarrock_volume";
   const STORAGE_MUTED = "sonarrock_muted";
-
-  const DEFAULT_TRACK_TEXT = "Transmitiendo rock sin concesiones";
-  const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
-  const TARGET_MOUNT = "/sonarrock.mp3";
 
   let isPlaying = false;
   let reconnectTimer = null;
   let reconnectAttempts = 0;
   let metadataTimer = null;
-  let lastTrack = "";
-  let lastCoverQuery = "";
+  let lastMetadataTitle = "";
+  let currentCoverUrl = DEFAULT_COVER;
 
   const maxReconnectAttempts = 8;
 
@@ -72,14 +76,16 @@ document.addEventListener("DOMContentLoaded", () => {
   function setStatus(text, live = false) {
     if (statusText) statusText.textContent = text;
     if (miniStatus) miniStatus.textContent = text;
+
     if (statusDot) statusDot.classList.toggle("live", live);
     if (miniLiveDot) miniLiveDot.classList.toggle("live", live);
+    if (liveBadge) liveBadge.classList.toggle("live", live);
     if (player) player.classList.toggle("is-live", live);
   }
 
-  function updateTrack(text) {
-    const safeText = text && text.trim() ? text.trim() : DEFAULT_TRACK_TEXT;
-    if (trackInfo) trackInfo.textContent = safeText;
+  function updateTrack(title, artist = DEFAULT_ARTIST_TEXT) {
+    if (trackInfo) trackInfo.textContent = title || DEFAULT_TRACK_TEXT;
+    if (trackArtist) trackArtist.textContent = artist || DEFAULT_ARTIST_TEXT;
   }
 
   function updatePlayUI(playing) {
@@ -90,12 +96,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (player) player.classList.toggle("playing", playing);
 
-    setStatus(playing ? "Transmitiendo en vivo" : "Listo para reproducir", playing);
-
     if (!playing) {
+      setStatus("Listo para reproducir", false);
       stopMetadataPolling();
-      updateTrack(DEFAULT_TRACK_TEXT);
-      resetCover();
     }
   }
 
@@ -122,103 +125,125 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // =========================
-  // COVER ART
-  // =========================
-  function resetCover() {
-    if (!stationCover) return;
-    stationCover.src = DEFAULT_COVER;
-    stationCover.classList.add("is-fallback");
-    lastCoverQuery = "";
-  }
-
   function setCover(url) {
-    if (!stationCover || !url) return;
-    stationCover.src = url;
-    stationCover.classList.remove("is-fallback");
+    if (!stationCover) return;
+
+    const finalUrl = url || DEFAULT_COVER;
+    if (finalUrl === currentCoverUrl) return;
+
+    stationCover.style.opacity = "0.55";
+
+    const img = new Image();
+    img.onload = () => {
+      stationCover.src = finalUrl;
+      currentCoverUrl = finalUrl;
+      stationCover.style.opacity = "1";
+    };
+    img.onerror = () => {
+      stationCover.src = DEFAULT_COVER;
+      currentCoverUrl = DEFAULT_COVER;
+      stationCover.style.opacity = "1";
+    };
+    img.src = finalUrl;
   }
 
-  function normalizeTrackTitle(title) {
-    if (!title) return "";
-
-    return title
-      .replace(/^NOW:\s*/i, "")
-      .replace(/\s+/g, " ")
-      .replace(/_/g, " ")
-      .trim();
+  function resetMetadataUI() {
+    updateTrack(DEFAULT_TRACK_TEXT, DEFAULT_ARTIST_TEXT);
+    setCover(DEFAULT_COVER);
   }
 
-  function splitArtistTitle(track) {
-    if (!track || !track.includes(" - ")) {
-      return { artist: "", title: track || "" };
+  // =========================
+  // PARSE TITLE
+  // =========================
+  function parseTitle(rawTitle = "") {
+    if (!rawTitle || typeof rawTitle !== "string") {
+      return {
+        artist: "",
+        title: DEFAULT_TRACK_TEXT
+      };
     }
 
-    const parts = track.split(" - ");
-    const artist = parts.shift().trim();
-    const title = parts.join(" - ").trim();
+    const cleaned = rawTitle
+      .replace(/\s+/g, " ")
+      .replace(/^NOW:\s*/i, "")
+      .trim();
 
-    return { artist, title };
+    const separators = [" - ", " – ", " — "];
+    let parts = null;
+
+    for (const sep of separators) {
+      if (cleaned.includes(sep)) {
+        parts = cleaned.split(sep);
+        break;
+      }
+    }
+
+    if (parts && parts.length >= 2) {
+      const artist = parts.shift().trim();
+      const title = parts.join(" - ").trim();
+
+      return {
+        artist: artist || "",
+        title: title || cleaned
+      };
+    }
+
+    return {
+      artist: "",
+      title: cleaned
+    };
   }
 
-  async function fetchCoverArt(trackTitle) {
-    if (!trackTitle) {
-      resetCover();
+  // =========================
+  // PORTADA (ITUNES)
+  // =========================
+  async function fetchAlbumArt(artist, title) {
+    if (!artist && !title) {
+      setCover(DEFAULT_COVER);
       return;
     }
 
-    const normalized = normalizeTrackTitle(trackTitle);
-
-    if (!normalized || normalized === lastCoverQuery) return;
-    lastCoverQuery = normalized;
-
-    const { artist, title } = splitArtistTitle(normalized);
-
-    const query = encodeURIComponent(`${artist} ${title}`.trim());
-
     try {
-      const response = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1`);
-      if (!response.ok) throw new Error("No se pudo consultar portada");
+      const query = encodeURIComponent(`${artist} ${title}`.trim());
+      const url = `https://itunes.apple.com/search?term=${query}&entity=song&limit=1`;
 
-      const data = await response.json();
-
-      if (data.results && data.results.length > 0) {
-        const artwork =
-          data.results[0].artworkUrl100
-            ?.replace("100x100bb", "600x600bb")
-            ?.replace("100x100", "600x600");
-
-        if (artwork) {
-          setCover(artwork);
-          return;
-        }
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) {
+        setCover(DEFAULT_COVER);
+        return;
       }
 
-      resetCover();
+      const data = await response.json();
+      const result = data?.results?.[0];
+
+      if (result?.artworkUrl100) {
+        const hiResCover = result.artworkUrl100.replace("100x100bb", "600x600bb");
+        setCover(hiResCover);
+      } else {
+        setCover(DEFAULT_COVER);
+      }
     } catch (error) {
-      console.warn("No se encontró portada:", error);
-      resetCover();
+      console.warn("No se pudo cargar portada:", error);
+      setCover(DEFAULT_COVER);
     }
   }
 
   // =========================
-  // METADATA
+  // METADATA GISS / ICECAST
   // =========================
-  function findCorrectSource(sourceData) {
-    if (!sourceData) return null;
+  function getMountSource(data) {
+    const sources = data?.icestats?.source;
+    if (!sources) return null;
 
-    const sources = Array.isArray(sourceData) ? sourceData : [sourceData];
+    if (Array.isArray(sources)) {
+      return sources.find((src) => {
+        const listen = (src.listenurl || "").toLowerCase();
+        const name = (src.server_name || "").toLowerCase();
+        return listen.includes(MOUNTPOINT.toLowerCase()) || name.includes("sonarrock");
+      }) || null;
+    }
 
-    return sources.find((s) => {
-      const listen = (s.listenurl || "").toLowerCase();
-      const serverUrl = (s.server_url || "").toLowerCase();
-      const mountGuess = (s.server_name || "").toLowerCase();
-
-      return (
-        listen.includes("sonarrock.mp3") ||
-        serverUrl.includes("sonarrock.mp3") ||
-        mountGuess.includes("sonarrock")
-      );
-    }) || null;
+    return sources;
   }
 
   async function fetchMetadata() {
@@ -230,22 +255,37 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!response.ok) return;
 
       const data = await response.json();
-      const source = findCorrectSource(data?.icestats?.source);
+      const source = getMountSource(data);
 
-      if (!source) return;
+      if (!source) {
+        setStatus("Señal fuera del aire", false);
+        resetMetadataUI();
+        return;
+      }
 
-      const title =
+      const isReallyLive = !!source.stream_start_iso8601;
+
+      if (!isReallyLive) {
+        setStatus("Señal fuera del aire", false);
+        resetMetadataUI();
+        return;
+      }
+
+      setStatus("Transmitiendo en vivo", true);
+
+      const rawTitle =
         source.title ||
         source.artist ||
-        source.server_name ||
+        source.server_description ||
         DEFAULT_TRACK_TEXT;
 
-      const cleanTitle = normalizeTrackTitle(title);
+      if (rawTitle !== lastMetadataTitle) {
+        lastMetadataTitle = rawTitle;
 
-      if (cleanTitle && cleanTitle !== lastTrack) {
-        lastTrack = cleanTitle;
-        updateTrack(cleanTitle);
-        fetchCoverArt(cleanTitle);
+        const parsed = parseTitle(rawTitle);
+        updateTrack(parsed.title, parsed.artist || "SONAR ROCK");
+
+        fetchAlbumArt(parsed.artist, parsed.title);
       }
     } catch (error) {
       console.warn("Metadata no disponible:", error);
@@ -255,7 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function startMetadataPolling() {
     stopMetadataPolling();
     fetchMetadata();
-    metadataTimer = setInterval(fetchMetadata, 15000);
+    metadataTimer = setInterval(fetchMetadata, 12000);
   }
 
   function stopMetadataPolling() {
@@ -438,6 +478,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   updateMuteUI();
   updatePlayUI(false);
-  updateTrack(DEFAULT_TRACK_TEXT);
-  resetCover();
+  resetMetadataUI();
+
+  // Consulta metadata aunque no esté reproduciendo
+  // para que el badge EN VIVO refleje si el mountpoint existe.
+  fetchMetadata();
+  setInterval(fetchMetadata, 15000);
 });

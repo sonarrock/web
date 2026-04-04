@@ -48,7 +48,7 @@
   </header>
 
 <!-- ========================= -->
-<!-- SONAR ROCK PLAYER v9 -->
+<!-- SONAR ROCK PLAYER v10 NOW PLAYING -->
 <!-- ========================= -->
 
 <section class="sonar-player-wrap">
@@ -57,13 +57,19 @@
     <!-- Cover / Logo -->
     <div class="sonar-cover-box">
       <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock" class="sonar-cover" id="stationCover">
+      <div class="live-badge" id="liveBadge">● EN VIVO</div>
     </div>
 
     <!-- Info -->
     <div class="sonar-info">
       <p class="station-label">RADIO ONLINE</p>
       <h3 class="station-name">SONAR ROCK</h3>
-      <p class="station-tagline" id="trackInfo">Transmitiendo rock sin concesiones</p>
+
+      <!-- NOW PLAYING -->
+      <div class="now-playing-box">
+        <span class="now-playing-label">AHORA SUENA</span>
+        <p class="station-tagline" id="trackInfo">Transmitiendo rock sin concesiones</p>
+      </div>
 
       <!-- Controls -->
       <div class="controls">
@@ -90,13 +96,29 @@
     </div>
 
     <!-- Hidden Audio -->
-    <audio id="radioPlayer" preload="metadata" playsinline webkit-playsinline>
+    <audio id="radioPlayer" preload="none" playsinline webkit-playsinline>
       <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
       Tu navegador no soporta audio HTML5.
     </audio>
   </div>
 </section>
 
+<!-- ========================= -->
+<!-- MINI PLAYER STICKY -->
+<!-- ========================= -->
+<div class="mini-player" id="miniPlayer">
+  <div class="mini-player-left">
+    <div class="mini-live-dot" id="miniLiveDot"></div>
+    <div class="mini-meta">
+      <span class="mini-title">SONAR ROCK</span>
+      <span class="mini-status" id="miniStatus">Listo para reproducir</span>
+    </div>
+  </div>
+
+  <button id="miniPlayBtn" class="mini-play-btn" aria-label="Reproducir o pausar">
+    <span id="miniPlayIcon">▶</span>
+  </button>
+</div>
   
 <!-- ========================= -->
   <!-- MINI PLYER -->

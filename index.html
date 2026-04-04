@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sonar Rock - La Radio Independiente</title>
 
-  <link rel="preconnect" href="https://stream.zeno.fm" crossorigin>
-  <link rel="dns-prefetch" href="https://stream.zeno.fm">
+  <link rel="preconnect" href="https://giss.tv" crossorigin>
+  <link rel="dns-prefetch" href="https://giss.tv">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link href="style.css?v=9" rel="stylesheet">
-  <link href="player.css?v=9" rel="stylesheet">
+  <link href="style.css?v=10" rel="stylesheet">
+  <link href="player.css?v=10" rel="stylesheet">
 
   <!-- Iconos -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -40,92 +40,84 @@
   <!-- ========================= -->
   <header class="header">
     <div class="container">
-        <div class="title-section">
-          <h1>LA RADIO INDEPENDIENTE</h1>
-        </div>
+      <div class="title-section">
+        <h1>LA RADIO INDEPENDIENTE</h1>
       </div>
     </div>
   </header>
 
-<!-- ========================= -->
-<!-- SONAR ROCK PLAYER v11 METADATA EDITION -->
-<!-- ========================= -->
+  <!-- ========================= -->
+  <!-- SONAR ROCK PLAYER -->
+  <!-- ========================= -->
+  <section class="sonar-player-wrap">
+    <div class="sonar-player" id="sonarPlayer">
 
-<section class="sonar-player-wrap">
-  <div class="sonar-player" id="sonarPlayer">
+      <!-- Cover / Logo -->
+      <div class="sonar-cover-box">
+        <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock" class="sonar-cover" id="stationCover">
+        <div class="live-badge" id="liveBadge">● EN VIVO</div>
+      </div>
 
-    <!-- Cover / Logo -->
-    <div class="sonar-cover-box">
-      <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock" class="sonar-cover" id="stationCover">
-      <div class="live-badge" id="liveBadge">● EN VIVO</div>
-    </div>
+      <!-- Info -->
+      <div class="sonar-info">
+        <p class="station-label">RADIO ONLINE</p>
+        <h3 class="station-name">SONAR ROCK</h3>
 
-    <!-- Info -->
-    <div class="sonar-info">
-      <p class="station-label">RADIO ONLINE</p>
-      <h3 class="station-name">SONAR ROCK</h3>
-
-      <!-- NOW PLAYING -->
-      <div class="now-playing-box">
-        <span class="now-playing-label">AHORA SUENA</span>
-
-        <p class="track-artist" id="trackArtist">Sonar Rock</p>
-        <p class="track-title-live" id="trackTitleLive">Transmitiendo rock sin concesiones</p>
-
-        <div class="track-marquee-mask">
+        <!-- NOW PLAYING -->
+        <div class="now-playing-box">
+          <span class="now-playing-label">AHORA SUENA</span>
           <p class="station-tagline" id="trackInfo">Transmitiendo rock sin concesiones</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+          <button id="playBtn" class="main-btn" aria-label="Reproducir o pausar">
+            <span id="playIcon">▶</span>
+          </button>
+
+          <button id="muteBtn" class="secondary-btn" aria-label="Silenciar o activar sonido">
+            <span id="muteIcon">🔊</span>
+          </button>
+        </div>
+
+        <!-- Volume -->
+        <div class="volume-wrap">
+          <span class="volume-icon" id="volumeEmoji">🔊</span>
+          <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1" aria-label="Control de volumen">
+        </div>
+
+        <!-- Status -->
+        <div class="status-row">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Listo para reproducir</span>
         </div>
       </div>
 
-      <!-- Controls -->
-      <div class="controls">
-        <button id="playBtn" class="main-btn" aria-label="Reproducir o pausar">
-          <span id="playIcon">▶</span>
-        </button>
+      <!-- Hidden Audio -->
+      <audio id="radioPlayer" preload="none" playsinline webkit-playsinline crossorigin="anonymous">
+        <source src="https://giss.tv:667/sonarrock.mp3" type="audio/mpeg">
+        Tu navegador no soporta audio HTML5.
+      </audio>
+    </div>
+  </section>
 
-        <button id="muteBtn" class="secondary-btn" aria-label="Silenciar o activar sonido">
-          <span id="muteIcon">🔊</span>
-        </button>
-      </div>
-
-      <!-- Volume -->
-      <div class="volume-wrap">
-        <span class="volume-icon" id="volumeEmoji">🔊</span>
-        <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1">
-      </div>
-
-      <!-- Status -->
-      <div class="status-row">
-        <span class="status-dot" id="statusDot"></span>
-        <span id="statusText">Listo para reproducir</span>
+  <!-- ========================= -->
+  <!-- MINI PLAYER STICKY -->
+  <!-- ========================= -->
+  <div class="mini-player" id="miniPlayer">
+    <div class="mini-player-left">
+      <div class="mini-live-dot" id="miniLiveDot"></div>
+      <div class="mini-meta">
+        <span class="mini-title">SONAR ROCK</span>
+        <span class="mini-status" id="miniStatus">Listo para reproducir</span>
       </div>
     </div>
 
-    <!-- Hidden Audio -->
-    <audio id="radioPlayer" preload="none" playsinline webkit-playsinline>
-      <source src="https://stream.zeno.fm/ezq3fcuf5ehvv" type="audio/mpeg">
-      Tu navegador no soporta audio HTML5.
-    </audio>
-  </div>
-</section>
-
-<!-- ========================= -->
-<!-- MINI PLAYER STICKY -->
-<!-- ========================= -->
-<div class="mini-player" id="miniPlayer">
-  <div class="mini-player-left">
-    <div class="mini-live-dot" id="miniLiveDot"></div>
-    <div class="mini-meta">
-      <span class="mini-title">SONAR ROCK</span>
-      <span class="mini-status" id="miniStatus">Listo para reproducir</span>
-    </div>
+    <button id="miniPlayBtn" class="mini-play-btn" aria-label="Reproducir o pausar">
+      <span id="miniPlayIcon">▶</span>
+    </button>
   </div>
 
-  <button id="miniPlayBtn" class="mini-play-btn" aria-label="Reproducir o pausar">
-    <span id="miniPlayIcon">▶</span>
-  </button>
-</div>  
-  
   <!-- ========================= -->
   <!-- REDES SOCIALES -->
   <!-- ========================= -->
@@ -133,11 +125,11 @@
     <div class="container">
       <h2 class="section-title">Redes Sociales</h2>
       <div class="social-buttons">
-        <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" class="social-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
-        <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
-        <a href="https://www.instagram.com/sonar_rockgdl" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
-        <a href="https://open.spotify.com/show/6mPcjQLeDdCwxzJe3PLlyU" target="_blank" class="social-btn spotify"><i class="fab fa-spotify"></i></a>
-        <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox"><i class="fas fa-podcast"></i></a>
+        <a href="https://chat.whatsapp.com/L3qooPAvdXMBmos5oWTKgH" target="_blank" rel="noopener noreferrer" class="social-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://www.instagram.com/sonar_rockgdl" target="_blank" rel="noopener noreferrer" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
+        <a href="https://open.spotify.com/show/6mPcjQLeDdCwxzJe3PLlyU" target="_blank" rel="noopener noreferrer" class="social-btn spotify"><i class="fab fa-spotify"></i></a>
+        <a href="https://go.ivoox.com/sq/2661206" target="_blank" rel="noopener noreferrer" class="social-btn ivoox"><i class="fas fa-podcast"></i></a>
       </div>
     </div>
   </section>
@@ -183,7 +175,6 @@
       <h2 class="section-title" style="margin-bottom:40px;">Staff</h2>
 
       <div class="staff-grid">
-
         <div class="staff-member">
           <img src="attached_assets/Wendy_1749601460841.jpeg" alt="Wendy" class="staff-image">
           <h3 class="staff-name">Wendy</h3>
@@ -208,7 +199,6 @@
           <img src="attached_assets/El Chris_1749601460841.jpeg" alt="El Chris" class="staff-image">
           <h3 class="staff-name">El Chris</h3>
         </div>
-
       </div>
     </div>
   </section>
@@ -254,8 +244,8 @@
 </div>
 
 <!-- JS -->
-<script src="disco-semana.js?v=9" defer></script>
-<script src="player.js?v=9" defer></script>
+<script src="disco-semana.js?v=10" defer></script>
+<script src="player.js?v=10" defer></script>
 
 </body>
 </html>

@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
   const audio = document.getElementById("radioPlayer");
-  const playerWrap = document.querySelector(".sonar-player-wrap");
   const player = document.getElementById("sonarPlayer");
 
   const playBtn = document.getElementById("playBtn");
@@ -21,6 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const miniLiveDot = document.getElementById("miniLiveDot");
 
   const trackInfo = document.getElementById("trackInfo");
+  const trackArtist = document.getElementById("trackArtist");
+  const trackTitleLive = document.getElementById("trackTitleLive");
+  const stationCover = document.getElementById("stationCover");
   const miniPlayer = document.getElementById("miniPlayer");
 
   if (!audio || !playBtn) return;
@@ -30,20 +32,28 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   const STREAM_URL = "https://stream.zeno.fm/ezq3fcuf5ehvv";
 
-  // AQUÍ VAS A PONER TU ENDPOINT REAL SI GissTV / Icecast LO DA
-  // Ejemplo:
-  // const METADATA_URL = "https://tuservidor.com/status-json.xsl";
-  const METADATA_URL = "";
+  // ESTE SERÁ TU PROXY PHP
+  const METADATA_URL = "/metadata.php";
+
+  // Si GISS tiene tu estación identificable, ajusta esto si hace falta
+  const STATION_MATCHERS = [
+    "sonarrock",
+    "sonar rock",
+    "ezq3fcuf5ehvv"
+  ];
+
+  const DEFAULT_TRACK_TEXT = "Transmitiendo rock sin concesiones";
+  const DEFAULT_ARTIST_TEXT = "Sonar Rock";
+  const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
 
   const STORAGE_VOLUME = "sonarrock_volume";
   const STORAGE_MUTED = "sonarrock_muted";
-
-  const DEFAULT_TRACK_TEXT = "Transmitiendo rock sin concesiones";
 
   let isPlaying = false;
   let reconnectTimer = null;
   let reconnectAttempts = 0;
   let metadataTimer = null;
+  let lastTrackRaw = "";
   const maxReconnectAttempts = 8;
 
   audio.src = STREAM_URL;
@@ -76,11 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (player) player.classList.toggle("is-live", live);
   }
 
-  function updateTrack(text) {
-    const safeText = text && text.trim() ? text.trim() : DEFAULT_TRACK_TEXT;
-    if (trackInfo) trackInfo.textContent = safeText;
-  }
-
   function updatePlayUI(playing) {
     isPlaying = playing;
 
@@ -93,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!playing) {
       stopMetadataPolling();
-      updateTrack(DEFAULT_TRACK_TEXT);
+      resetTrackDisplay();
     }
   }
 
@@ -120,6 +125,105 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function resetTrackDisplay() {
+    if (trackArtist) trackArtist.textContent = DEFAULT_ARTIST_TEXT;
+    if (trackTitleLive) trackTitleLive.textContent = DEFAULT_TRACK_TEXT;
+    if (trackInfo) trackInfo.textContent = DEFAULT_TRACK_TEXT;
+    if (stationCover) stationCover.src = DEFAULT_COVER;
+  }
+
+  function updateTrackUI(artist, title, raw) {
+    const safeArtist = artist?.trim() || DEFAULT_ARTIST_TEXT;
+    const safeTitle = title?.trim() || DEFAULT_TRACK_TEXT;
+    const safeRaw = raw?.trim() || `${safeArtist} - ${safeTitle}`;
+
+    if (trackArtist) trackArtist.textContent = safeArtist;
+    if (trackTitleLive) trackTitleLive.textContent = safeTitle;
+    if (trackInfo) trackInfo.textContent = safeRaw;
+    if (miniStatus) miniStatus.textContent = safeTitle;
+  }
+
+  // =========================
+  // LIMPIEZA METADATA
+  // =========================
+  function cleanTitle(title = "") {
+    return title
+      .replace(/^NOW:\s*/i, "")
+      .replace(/_/g, "'")
+      .replace(/\s+/g, " ")
+      .replace(/\|/g, " - ")
+      .trim();
+  }
+
+  function parseTrack(rawTitle = "") {
+    const cleaned = cleanTitle(rawTitle);
+
+    if (!cleaned) {
+      return {
+        artist: DEFAULT_ARTIST_TEXT,
+        title: DEFAULT_TRACK_TEXT,
+        raw: DEFAULT_TRACK_TEXT
+      };
+    }
+
+    if (cleaned.includes(" - ")) {
+      const parts = cleaned.split(" - ");
+      const artist = parts[0]?.trim() || DEFAULT_ARTIST_TEXT;
+      const title = parts.slice(1).join(" - ").trim() || DEFAULT_TRACK_TEXT;
+
+      return { artist, title, raw: cleaned };
+    }
+
+    return {
+      artist: DEFAULT_ARTIST_TEXT,
+      title: cleaned,
+      raw: cleaned
+    };
+  }
+
+  function isLikelyOurStation(source) {
+    const haystack = [
+      source?.listenurl,
+      source?.server_name,
+      source?.server_description,
+      source?.title,
+      source?.server_url
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return STATION_MATCHERS.some(match => haystack.includes(match));
+  }
+
+  // =========================
+  // COVER ART
+  // =========================
+  async function updateCover(artist, title) {
+    if (!artist && !title) {
+      if (stationCover) stationCover.src = DEFAULT_COVER;
+      return;
+    }
+
+    try {
+      const query = encodeURIComponent(`${artist} ${title}`);
+      const res = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1`);
+      const data = await res.json();
+
+      if (data?.results?.length > 0) {
+        const artwork = data.results[0].artworkUrl100?.replace("100x100", "600x600");
+        if (artwork && stationCover) {
+          stationCover.src = artwork;
+          return;
+        }
+      }
+
+      if (stationCover) stationCover.src = DEFAULT_COVER;
+    } catch (error) {
+      console.warn("No se pudo actualizar portada:", error);
+      if (stationCover) stationCover.src = DEFAULT_COVER;
+    }
+  }
+
   // =========================
   // METADATA
   // =========================
@@ -133,43 +237,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!response.ok) return;
 
-      const contentType = response.headers.get("content-type") || "";
+      const data = await response.json();
 
-      // CASO 1: JSON (Icecast status-json.xsl)
-      if (contentType.includes("application/json") || contentType.includes("text/json")) {
-        const data = await response.json();
+      let sources = data?.icestats?.source || [];
+      if (!Array.isArray(sources)) sources = [sources];
 
-        let title = "";
+      let station = sources.find(isLikelyOurStation);
 
-        if (data?.icestats?.source) {
-          const source = Array.isArray(data.icestats.source)
-            ? data.icestats.source[0]
-            : data.icestats.source;
-
-          title =
-            source?.title ||
-            source?.server_name ||
-            source?.listenurl ||
-            "";
-        }
-
-        if (title) updateTrack(title);
-        return;
+      if (!station && sources.length > 0) {
+        station = sources[0];
       }
 
-      // CASO 2: HTML / texto (Shoutcast 7.html o status.xsl)
-      const raw = await response.text();
+      if (!station) return;
 
-      // Busca "Artist - Song"
-      const cleaned = raw.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+      const rawTitle =
+        station?.title ||
+        station?.artist ||
+        station?.server_name ||
+        "";
 
-      if (cleaned && cleaned.length > 3) {
-        const match = cleaned.match(/([A-Za-z0-9À-ÿ&()[\].,'"\-\/ ]+\s-\s[A-Za-z0-9À-ÿ&()[\].,'"\-\/ ]+)/);
+      if (!rawTitle || rawTitle === lastTrackRaw) return;
 
-        if (match && match[1]) {
-          updateTrack(match[1]);
-        }
-      }
+      lastTrackRaw = rawTitle;
+
+      const parsed = parseTrack(rawTitle);
+
+      updateTrackUI(parsed.artist, parsed.title, parsed.raw);
+      updateCover(parsed.artist, parsed.title);
     } catch (error) {
       console.warn("Metadata no disponible:", error);
     }
@@ -177,8 +271,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function startMetadataPolling() {
     stopMetadataPolling();
-
-    if (!METADATA_URL) return;
 
     fetchMetadata();
     metadataTimer = setInterval(fetchMetadata, 15000);
@@ -364,5 +456,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   updateMuteUI();
   updatePlayUI(false);
-  updateTrack(DEFAULT_TRACK_TEXT);
+  resetTrackDisplay();
 });

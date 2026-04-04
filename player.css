@@ -1,6 +1,6 @@
 /* =========================
-   SONAR ROCK PLAYER v10.5
-   GISS EDITION
+   SONAR ROCK PLAYER v11
+   GISS + COVER ART EDITION
 ========================= */
 
 .sonar-player-wrap {
@@ -71,7 +71,7 @@
     0 12px 36px rgba(0,0,0,0.35);
   background: #111;
   display: block;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, filter 0.35s ease;
 }
 
 .sonar-player.playing .sonar-cover {
@@ -79,6 +79,12 @@
   box-shadow:
     0 0 0 1px rgba(255,255,255,0.03),
     0 14px 42px rgba(0,0,0,0.42);
+}
+
+.sonar-cover.is-fallback {
+  object-fit: contain;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(20,20,20,1), rgba(8,8,8,1));
 }
 
 .live-badge {
@@ -154,7 +160,6 @@
   line-height: 1.5;
   margin: 0;
   word-break: break-word;
-  min-height: 24px;
 }
 
 /* =========================

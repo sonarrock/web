@@ -1,6 +1,6 @@
 /* =========================
-   SONAR ROCK PLAYER v11
-   GISS + COVER ART EDITION
+   SONAR ROCK PLAYER v12
+   GISS + REAL METADATA + REAL LIVE
 ========================= */
 
 .sonar-player-wrap {
@@ -71,7 +71,7 @@
     0 12px 36px rgba(0,0,0,0.35);
   background: #111;
   display: block;
-  transition: transform 0.35s ease, box-shadow 0.35s ease, filter 0.35s ease;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, opacity 0.3s ease;
 }
 
 .sonar-player.playing .sonar-cover {
@@ -81,17 +81,11 @@
     0 14px 42px rgba(0,0,0,0.42);
 }
 
-.sonar-cover.is-fallback {
-  object-fit: contain;
-  padding: 12px;
-  background: linear-gradient(180deg, rgba(20,20,20,1), rgba(8,8,8,1));
-}
-
 .live-badge {
   position: absolute;
   top: 14px;
   right: 14px;
-  background: rgba(0,0,0,0.58);
+  background: rgba(80, 80, 80, 0.55);
   border: 1px solid rgba(255,255,255,0.10);
   color: #ffffff;
   padding: 8px 12px;
@@ -102,6 +96,13 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   white-space: nowrap;
+  transition: all 0.25s ease;
+}
+
+.live-badge.live {
+  background: rgba(255, 70, 70, 0.22);
+  border-color: rgba(255, 120, 120, 0.35);
+  box-shadow: 0 0 18px rgba(255, 80, 80, 0.18);
 }
 
 /* =========================
@@ -155,8 +156,17 @@
 }
 
 .station-tagline {
-  color: rgba(255,255,255,0.92);
-  font-size: 16px;
+  color: rgba(255,255,255,0.96);
+  font-size: 18px;
+  line-height: 1.4;
+  margin: 0 0 6px;
+  word-break: break-word;
+  font-weight: 700;
+}
+
+.station-artist {
+  color: rgba(255,255,255,0.68);
+  font-size: 14px;
   line-height: 1.5;
   margin: 0;
   word-break: break-word;
@@ -303,8 +313,8 @@
 }
 
 .status-dot.live {
-  background: #ffffff;
-  box-shadow: 0 0 14px rgba(255,255,255,0.55);
+  background: #ff3b3b;
+  box-shadow: 0 0 14px rgba(255,59,59,0.65);
 }
 
 /* =========================
@@ -358,8 +368,8 @@
 }
 
 .mini-live-dot.live {
-  background: #ffffff;
-  box-shadow: 0 0 10px rgba(255,255,255,0.55);
+  background: #ff3b3b;
+  box-shadow: 0 0 10px rgba(255,59,59,0.65);
 }
 
 .mini-meta {
@@ -493,8 +503,12 @@ button {
   }
 
   .station-tagline {
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .station-artist {
+    font-size: 13px;
   }
 
   .controls {

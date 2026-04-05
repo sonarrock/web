@@ -444,30 +444,35 @@ document.addEventListener("DOMContentLoaded", () => {
   // PLAY / PAUSE
   // =========================
   async function playStream() {
-    try {
-      clearReconnect();
-      reconnectAttempts = 0;
-      isUserPaused = false;
-      isRecovering = false;
-      playbackStartedAt = Date.now();
+  try {
+    clearReconnect();
+    reconnectAttempts = 0;
+    isUserPaused = false;
+    isRecovering = false;
+    playbackStartedAt = Date.now();
 
-      setStatus("Conectando con la señal...", false);
+    setStatus("Conectando con la señal...", false);
 
-      if (!audio.src || !audio.src.includes(STREAM_URL)) {
-        audio.src = STREAM_URL;
-      }
-
-      await audio.play();
-
-      updatePlayUI(true);
-      startMetadataPolling();
-    } catch (error) {
-      console.error("Error al reproducir stream:", error);
-      updatePlayUI(false);
-      setStatus("Toca reproducir nuevamente", false);
+    // Pausar Disco de la Semana si está sonando
+    const discoAudio = document.getElementById("disco-audio");
+    if (discoAudio && !discoAudio.paused) {
+      discoAudio.pause();
     }
-  }
 
+    if (!audio.src || !audio.src.includes(STREAM_URL)) {
+      audio.src = STREAM_URL;
+    }
+
+    await audio.play();
+
+    updatePlayUI(true);
+    startMetadataPolling();
+  } catch (error) {
+    console.error("Error al reproducir stream:", error);
+    updatePlayUI(false);
+    setStatus("Toca reproducir nuevamente", false);
+  }
+}
   function pauseStream() {
     clearReconnect();
     stopMetadataPolling();

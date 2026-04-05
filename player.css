@@ -27,7 +27,7 @@
 ========================= */
 .sonar-player {
   width: 100%;
-  max-width: 920px;
+  max-width: 860px;
   margin: 20px auto 40px;
   padding: 28px;
   border-radius: var(--sr-radius);
@@ -502,7 +502,7 @@
 
 .spotify-player-info iframe {
   width: 100%;
-  min-height: 352px;
+  min-height: 152px;
   border: none;
   border-radius: 18px;
   display: block;

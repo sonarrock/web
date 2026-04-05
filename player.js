@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const maxReconnectAttempts = 6;
   const reconnectDelay = 4000;
-  const startupGraceMs = 10000; // tolerancia al inicio (MAC FIX)
+  const startupGraceMs = 10000;
   const metadataIntervalMs = 12000;
   const passiveMetadataIntervalMs = 15000;
 
@@ -185,11 +185,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!songToast || !toastSong || !songText) return;
 
     toastSong.textContent = songText;
-    songToast.classList.add("show");
+    songToast.classList.remove("hidden");
 
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(() => {
-      songToast.classList.remove("show");
+      songToast.classList.add("hidden");
     }, 3500);
   }
 
@@ -405,7 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // RECONEXIÓN INTELIGENTE (MAC FIX)
+  // RECONEXIÓN INTELIGENTE
   // =========================
   async function recoverPlayback(forceReload = false) {
     if (!isPlaying || isUserPaused || isRecovering) return;
@@ -453,7 +453,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setStatus("Conectando con la señal...", false);
 
-      // IMPORTANTE: NO resetear src siempre (MAC FIX)
       if (!audio.src || !audio.src.includes(STREAM_URL)) {
         audio.src = STREAM_URL;
       }
@@ -537,7 +536,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setStatus("Bufferizando señal...", false);
 
-    // NO reconectar de inmediato al inicio (MAC FIX)
     if (!withinStartupGrace()) {
       recoverPlayback(false);
     }
@@ -546,7 +544,6 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.addEventListener("stalled", () => {
     if (!isPlaying || isUserPaused) return;
 
-    // tolerancia durante arranque
     if (withinStartupGrace()) {
       setStatus("Estabilizando señal...", false);
       return;
@@ -556,12 +553,8 @@ document.addEventListener("DOMContentLoaded", () => {
     recoverPlayback(false);
   });
 
-  // IMPORTANTE:
-  // ya NO usamos suspend para reconectar
   audio.addEventListener("suspend", () => {
     if (!isPlaying || isUserPaused) return;
-
-    // Safari/Chrome en Mac disparan esto aunque no sea error real
     setStatus("Transmitiendo en vivo", true);
   });
 
@@ -652,5 +645,6 @@ document.addEventListener("DOMContentLoaded", () => {
   updateMuteUI();
   updatePlayUI(false);
   resetMetadataUI();
+  songToast?.classList.add("hidden");
   startPassiveMetadataPolling();
 });

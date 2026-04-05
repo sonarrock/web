@@ -35,36 +35,47 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!audio || !playBtn) return;
 
   // =========================
-  // CONFIG GISS FINAL
+  // CONFIG
   // =========================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
-  const STATUS_URL = "https://giss.tv:667/status-json.xsl";
-  const NOW_PLAYING_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
-  const ARTWORK_URL = "https://giss.tv/player/earp.php?url=https://giss.tv:667/sonarrock.mp3";
+  const METADATA_URL = "https://giss.tv:667/status-json.xsl";
+  const GISS_NOWPLAYING_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
   const MOUNTPOINT = "sonarrock.mp3";
 
   const DEFAULT_TRACK_TEXT = "Transmitiendo rock sin concesiones";
-  const DEFAULT_ARTIST_TEXT = "SONAR ROCK";
+  const DEFAULT_ARTIST_TEXT = "Señal lista";
   const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
 
   const STORAGE_VOLUME = "sonarrock_volume";
   const STORAGE_MUTED = "sonarrock_muted";
 
+  const maxReconnectAttempts = 6;
+  const reconnectDelay = 4000;
+  const startupGraceMs = 10000; // tolerancia al inicio (MAC FIX)
+  const metadataIntervalMs = 12000;
+  const passiveMetadataIntervalMs = 15000;
+
+  // =========================
+  // STATE
+  // =========================
   let isPlaying = false;
   let reconnectTimer = null;
   let reconnectAttempts = 0;
   let metadataTimer = null;
-  let stationCheckTimer = null;
+  let passiveMetadataTimer = null;
   let deferredPrompt = null;
   let toastTimer = null;
 
+  let currentCoverUrl = DEFAULT_COVER;
   let lastMetadataTitle = "";
   let lastTrackShown = "";
-  let currentCoverUrl = DEFAULT_COVER;
-  let stationIsLive = false;
+  let isUserPaused = false;
+  let playbackStartedAt = 0;
+  let isRecovering = false;
 
-  const maxReconnectAttempts = 8;
-
+  // =========================
+  // AUDIO BASE
+  // =========================
   audio.src = STREAM_URL;
   audio.preload = "none";
   audio.setAttribute("playsinline", "");
@@ -110,12 +121,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (player) player.classList.toggle("playing", playing);
 
-    if (!playing) {
-      if (stationIsLive) {
-        setStatus("Transmitiendo en vivo", true);
-      } else {
-        setStatus("Listo para reproducir", false);
-      }
+    if (!playing && isUserPaused) {
+      setStatus("Listo para reproducir", false);
       stopMetadataPolling();
     }
   }
@@ -141,6 +148,10 @@ document.addEventListener("DOMContentLoaded", () => {
       clearTimeout(reconnectTimer);
       reconnectTimer = null;
     }
+  }
+
+  function withinStartupGrace() {
+    return Date.now() - playbackStartedAt < startupGraceMs;
   }
 
   function setCover(url) {
@@ -170,13 +181,13 @@ document.addEventListener("DOMContentLoaded", () => {
     setCover(DEFAULT_COVER);
   }
 
-  function showSongToast(songTitle) {
-    if (!songToast || !toastSong || !songTitle) return;
+  function showSongToast(songText) {
+    if (!songToast || !toastSong || !songText) return;
 
-    toastSong.textContent = songTitle;
+    toastSong.textContent = songText;
     songToast.classList.add("show");
 
-    clearTimeout(toastTimer);
+    if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(() => {
       songToast.classList.remove("show");
     }, 3500);
@@ -196,9 +207,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const cleaned = rawTitle
       .replace(/\s+/g, " ")
       .replace(/^NOW:\s*/i, "")
-      .replace(/^-\s*/, "")
-      .replace(/\s*-\s*$/, "")
       .trim();
+
+    if (cleaned === "-" || cleaned === "- ," || cleaned === ", -" || cleaned === " - ") {
+      return {
+        artist: "",
+        title: DEFAULT_TRACK_TEXT
+      };
+    }
 
     const separators = [" - ", " – ", " — "];
     let parts = null;
@@ -222,39 +238,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return {
       artist: "",
-      title: cleaned || DEFAULT_TRACK_TEXT
+      title: cleaned
     };
   }
 
   // =========================
-  // PORTADA GISS + FALLBACK ITUNES
+  // PORTADA (ITUNES)
   // =========================
   async function fetchAlbumArt(artist, title) {
-    // 1) Intento con endpoint oficial de GISS
-    try {
-      const response = await fetch(`${ARTWORK_URL}&t=${Date.now()}`, {
-        cache: "no-store"
-      });
-
-      if (response.ok) {
-        const data = await response.text();
-        const artworkUrl = data.trim();
-
-        if (
-          artworkUrl &&
-          artworkUrl.startsWith("http") &&
-          !artworkUrl.includes("noart") &&
-          !artworkUrl.includes("default")
-        ) {
-          setCover(artworkUrl);
-          return;
-        }
-      }
-    } catch (error) {
-      console.warn("GISS artwork no disponible:", error);
-    }
-
-    // 2) Fallback con iTunes
     if (!artist && !title) {
       setCover(DEFAULT_COVER);
       return;
@@ -286,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // ESTADO REAL DEL MOUNTPOINT
+  // METADATA GISS / ICECAST
   // =========================
   function getMountSource(data) {
     const sources = data?.icestats?.source;
@@ -308,90 +299,79 @@ document.addEventListener("DOMContentLoaded", () => {
     return sources;
   }
 
-  async function checkStationLive() {
+  async function fetchNowPlayingFallback() {
     try {
-      const response = await fetch(`${STATUS_URL}?t=${Date.now()}`, {
+      const response = await fetch(`${GISS_NOWPLAYING_URL}&t=${Date.now()}`, {
         cache: "no-store"
       });
 
-      if (!response.ok) {
-        stationIsLive = false;
-        if (!isPlaying) setStatus("Señal fuera del aire", false);
-        return false;
-      }
+      if (!response.ok) return "";
 
-      const data = await response.json();
-      const source = getMountSource(data);
-
-      if (!source || !source.stream_start_iso8601) {
-        stationIsLive = false;
-        if (!isPlaying) {
-          setStatus("Señal fuera del aire", false);
-          resetMetadataUI();
-        }
-        return false;
-      }
-
-      stationIsLive = true;
-
-      if (!isPlaying) {
-        setStatus("Transmitiendo en vivo", true);
-      }
-
-      return true;
+      const text = await response.text();
+      return (text || "").trim();
     } catch (error) {
-      console.warn("No se pudo verificar estado de la estación:", error);
-      stationIsLive = false;
-      if (!isPlaying) setStatus("Señal no disponible", false);
-      return false;
+      console.warn("Fallback now playing no disponible:", error);
+      return "";
     }
   }
 
-  // =========================
-  // METADATA GISS OFICIAL
-  // =========================
   async function fetchMetadata() {
     try {
-      const live = await checkStationLive();
-
-      if (!live) {
-        lastMetadataTitle = "";
-        return;
-      }
-
-      const response = await fetch(`${NOW_PLAYING_URL}&t=${Date.now()}`, {
+      const response = await fetch(`${METADATA_URL}?t=${Date.now()}`, {
         cache: "no-store"
       });
 
       if (!response.ok) return;
 
-      const rawText = (await response.text()).trim();
+      const data = await response.json();
+      const source = getMountSource(data);
 
-      // Si está al aire pero no manda metadata útil
-      if (!rawText) {
-        updateTrack(DEFAULT_TRACK_TEXT, DEFAULT_ARTIST_TEXT);
-        setCover(DEFAULT_COVER);
+      if (!source) {
+        setStatus("Señal fuera del aire", false);
+        resetMetadataUI();
         return;
       }
 
-      if (rawText !== lastMetadataTitle) {
-        lastMetadataTitle = rawText;
+      const isReallyLive = !!source.stream_start_iso8601;
 
-        const parsed = parseTitle(rawText);
-        const finalArtist = parsed.artist || DEFAULT_ARTIST_TEXT;
+      if (!isReallyLive) {
+        setStatus("Señal fuera del aire", false);
+        resetMetadataUI();
+        return;
+      }
+
+      setStatus("Transmitiendo en vivo", true);
+
+      let rawTitle =
+        source.title ||
+        source.artist ||
+        source.server_description ||
+        "";
+
+      if (!rawTitle || rawTitle.trim() === "-" || rawTitle.trim() === "- ,") {
+        const fallbackTitle = await fetchNowPlayingFallback();
+        if (fallbackTitle) rawTitle = fallbackTitle;
+      }
+
+      if (!rawTitle) {
+        rawTitle = DEFAULT_TRACK_TEXT;
+      }
+
+      if (rawTitle !== lastMetadataTitle) {
+        lastMetadataTitle = rawTitle;
+
+        const parsed = parseTitle(rawTitle);
+        const finalArtist = parsed.artist || "SONAR ROCK";
         const finalTitle = parsed.title || DEFAULT_TRACK_TEXT;
 
         updateTrack(finalTitle, finalArtist);
-
-        const nowTrackKey = `${finalArtist} - ${finalTitle}`.trim();
-
-        if (nowTrackKey !== lastTrackShown && lastTrackShown !== "") {
-          showSongToast(nowTrackKey);
-        }
-
-        lastTrackShown = nowTrackKey;
-
         fetchAlbumArt(parsed.artist, parsed.title);
+
+        const currentTrackKey = `${finalArtist} - ${finalTitle}`;
+        if (currentTrackKey !== lastTrackShown && finalTitle !== DEFAULT_TRACK_TEXT) {
+          lastTrackShown = currentTrackKey;
+          showSongToast(currentTrackKey);
+        }
       }
     } catch (error) {
       console.warn("Metadata no disponible:", error);
@@ -401,7 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function startMetadataPolling() {
     stopMetadataPolling();
     fetchMetadata();
-    metadataTimer = setInterval(fetchMetadata, 12000);
+    metadataTimer = setInterval(fetchMetadata, metadataIntervalMs);
   }
 
   function stopMetadataPolling() {
@@ -411,24 +391,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function startStationCheck() {
-    stopStationCheck();
-    checkStationLive();
-    stationCheckTimer = setInterval(checkStationLive, 15000);
+  function startPassiveMetadataPolling() {
+    stopPassiveMetadataPolling();
+    fetchMetadata();
+    passiveMetadataTimer = setInterval(fetchMetadata, passiveMetadataIntervalMs);
   }
 
-  function stopStationCheck() {
-    if (stationCheckTimer) {
-      clearInterval(stationCheckTimer);
-      stationCheckTimer = null;
+  function stopPassiveMetadataPolling() {
+    if (passiveMetadataTimer) {
+      clearInterval(passiveMetadataTimer);
+      passiveMetadataTimer = null;
     }
   }
 
   // =========================
-  // RECONEXIÓN
+  // RECONEXIÓN INTELIGENTE (MAC FIX)
   // =========================
-  function scheduleReconnect() {
-    if (!isPlaying) return;
+  async function recoverPlayback(forceReload = false) {
+    if (!isPlaying || isUserPaused || isRecovering) return;
 
     if (reconnectAttempts >= maxReconnectAttempts) {
       setStatus("No se pudo reconectar la señal", false);
@@ -436,20 +416,28 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    clearReconnect();
+    isRecovering = true;
     reconnectAttempts++;
+    clearReconnect();
 
     setStatus(`Reconectando señal... (${reconnectAttempts})`, false);
 
     reconnectTimer = setTimeout(async () => {
       try {
-        audio.src = STREAM_URL + "?t=" + Date.now();
+        if (forceReload) {
+          audio.pause();
+          audio.src = `${STREAM_URL}?t=${Date.now()}`;
+          audio.load();
+        }
+
         await audio.play();
+        isRecovering = false;
       } catch (error) {
         console.error("Reconexión fallida:", error);
-        scheduleReconnect();
+        isRecovering = false;
+        recoverPlayback(true);
       }
-    }, 2500);
+    }, reconnectDelay);
   }
 
   // =========================
@@ -459,9 +447,17 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       clearReconnect();
       reconnectAttempts = 0;
+      isUserPaused = false;
+      isRecovering = false;
+      playbackStartedAt = Date.now();
+
       setStatus("Conectando con la señal...", false);
 
-      audio.src = STREAM_URL + "?t=" + Date.now();
+      // IMPORTANTE: NO resetear src siempre (MAC FIX)
+      if (!audio.src || !audio.src.includes(STREAM_URL)) {
+        audio.src = STREAM_URL;
+      }
+
       await audio.play();
 
       updatePlayUI(true);
@@ -476,6 +472,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function pauseStream() {
     clearReconnect();
     stopMetadataPolling();
+    isUserPaused = true;
+    isRecovering = false;
     audio.pause();
     updatePlayUI(false);
   }
@@ -489,7 +487,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // EVENTOS BOTONES
+  // BOTONES
   // =========================
   playBtn.addEventListener("click", togglePlay);
   miniPlayBtn?.addEventListener("click", togglePlay);
@@ -522,83 +520,84 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.addEventListener("playing", () => {
     clearReconnect();
     reconnectAttempts = 0;
+    isRecovering = false;
     updatePlayUI(true);
+    setStatus("Transmitiendo en vivo", true);
     startMetadataPolling();
   });
 
   audio.addEventListener("pause", () => {
-    if (!reconnectTimer) {
+    if (isUserPaused) {
       updatePlayUI(false);
     }
   });
 
   audio.addEventListener("waiting", () => {
-    if (isPlaying) setStatus("Bufferizando señal...", false);
+    if (!isPlaying || isUserPaused) return;
+
+    setStatus("Bufferizando señal...", false);
+
+    // NO reconectar de inmediato al inicio (MAC FIX)
+    if (!withinStartupGrace()) {
+      recoverPlayback(false);
+    }
   });
 
   audio.addEventListener("stalled", () => {
-    if (isPlaying) {
-      setStatus("Señal detenida, reconectando...", false);
-      scheduleReconnect();
+    if (!isPlaying || isUserPaused) return;
+
+    // tolerancia durante arranque
+    if (withinStartupGrace()) {
+      setStatus("Estabilizando señal...", false);
+      return;
     }
+
+    setStatus("Señal detenida, recuperando...", false);
+    recoverPlayback(false);
   });
 
+  // IMPORTANTE:
+  // ya NO usamos suspend para reconectar
   audio.addEventListener("suspend", () => {
-    if (isPlaying) {
-      setStatus("Señal suspendida, reconectando...", false);
-      scheduleReconnect();
-    }
+    if (!isPlaying || isUserPaused) return;
+
+    // Safari/Chrome en Mac disparan esto aunque no sea error real
+    setStatus("Transmitiendo en vivo", true);
   });
 
   audio.addEventListener("error", () => {
     console.error("Error en stream");
-    if (isPlaying) {
-      setStatus("Error en la señal, reconectando...", false);
-      scheduleReconnect();
-    } else {
+
+    if (!isPlaying || isUserPaused) {
       updatePlayUI(false);
       setStatus("Error al conectar con la señal", false);
+      return;
     }
+
+    setStatus("Error en la señal, recuperando...", false);
+    recoverPlayback(true);
   });
 
   audio.addEventListener("loadstart", () => {
-    if (isPlaying) setStatus("Cargando stream...", false);
+    if (isPlaying && !withinStartupGrace()) {
+      setStatus("Cargando stream...", false);
+    }
+  });
+
+  audio.addEventListener("canplay", () => {
+    if (isPlaying) {
+      setStatus("Señal lista", true);
+    }
   });
 
   audio.addEventListener("volumechange", updateMuteUI);
 
   // =========================
-  // PWA INSTALL
-  // =========================
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-
-    if (installBar) installBar.style.display = "flex";
-    if (installBtn) installBtn.style.display = "inline-flex";
-  });
-
-  installBtn?.addEventListener("click", async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-
-    if (installBar) installBar.style.display = "none";
-  });
-
-  window.addEventListener("appinstalled", () => {
-    if (installBar) installBar.style.display = "none";
-    deferredPrompt = null;
-  });
-
-  // =========================
   // VISIBILIDAD / iPHONE
   // =========================
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && isPlaying && audio.paused) {
-      playStream();
+    if (!document.hidden && isPlaying && audio.paused && !isUserPaused) {
+      recoverPlayback(false);
     }
   });
 
@@ -619,13 +618,39 @@ document.addEventListener("DOMContentLoaded", () => {
   handleMiniPlayer();
 
   // =========================
+  // PWA INSTALL
+  // =========================
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    if (installBar) installBar.classList.add("show");
+    if (installBtn) installBtn.style.display = "inline-flex";
+  });
+
+  installBtn?.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+
+    if (choice.outcome === "accepted") {
+      if (installBar) installBar.classList.remove("show");
+    }
+
+    deferredPrompt = null;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    if (installBar) installBar.classList.remove("show");
+    deferredPrompt = null;
+  });
+
+  // =========================
   // INIT
   // =========================
   updateMuteUI();
   updatePlayUI(false);
   resetMetadataUI();
-
-  // Verifica EN VIVO aunque nadie esté escuchando
-  startStationCheck();
-  fetchMetadata();
+  startPassiveMetadataPolling();
 });

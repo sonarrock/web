@@ -23,12 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackArtist = document.getElementById("trackArtist");
   const miniPlayer = document.getElementById("miniPlayer");
 
-  const installBtn = document.getElementById("installBtn");
-  const installBar = document.getElementById("installBar");
-
-  const songToast = document.getElementById("songToast");
-  const toastSong = document.getElementById("toastSong");
-
   const stationCover = document.getElementById("stationCover");
   const liveBadge = document.getElementById("liveBadge");
 
@@ -48,16 +42,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const STORAGE_VOLUME = "sonarrock_volume";
   const STORAGE_MUTED = "sonarrock_muted";
 
-  let isPlaying = false;
-let reconnectTimer = null;
-let reconnectAttempts = 0;
-let metadataTimer = null;
-let deferredPrompt = null;
-let lastTrackShown = "";
-let toastTimer = null;
+  const maxReconnectAttempts = 8;
 
-const maxReconnectAttempts = 8;
-  
+  let isPlaying = false;
+  let reconnectTimer = null;
+  let reconnectAttempts = 0;
+  let metadataTimer = null;
+  let backgroundMetadataTimer = null;
+  let lastMetadataTitle = "";
+  let currentCoverUrl = DEFAULT_COVER;
+
   audio.src = STREAM_URL;
   audio.preload = "none";
   audio.setAttribute("playsinline", "");
@@ -157,6 +151,7 @@ const maxReconnectAttempts = 8;
   function resetMetadataUI() {
     updateTrack(DEFAULT_TRACK_TEXT, DEFAULT_ARTIST_TEXT);
     setCover(DEFAULT_COVER);
+    lastMetadataTitle = "";
   }
 
   // =========================
@@ -175,6 +170,18 @@ const maxReconnectAttempts = 8;
       .replace(/^NOW:\s*/i, "")
       .trim();
 
+    if (
+      cleaned === "-" ||
+      cleaned === "- ," ||
+      cleaned === "," ||
+      cleaned.toLowerCase() === "undefined"
+    ) {
+      return {
+        artist: "SONAR ROCK",
+        title: DEFAULT_TRACK_TEXT
+      };
+    }
+
     const separators = [" - ", " – ", " — "];
     let parts = null;
 
@@ -190,14 +197,14 @@ const maxReconnectAttempts = 8;
       const title = parts.join(" - ").trim();
 
       return {
-        artist: artist || "",
-        title: title || cleaned
+        artist: artist || "SONAR ROCK",
+        title: title || DEFAULT_TRACK_TEXT
       };
     }
 
     return {
-      artist: "",
-      title: cleaned
+      artist: "SONAR ROCK",
+      title: cleaned || DEFAULT_TRACK_TEXT
     };
   }
 
@@ -243,11 +250,20 @@ const maxReconnectAttempts = 8;
     if (!sources) return null;
 
     if (Array.isArray(sources)) {
-      return sources.find((src) => {
-        const listen = (src.listenurl || "").toLowerCase();
-        const name = (src.server_name || "").toLowerCase();
-        return listen.includes(MOUNTPOINT.toLowerCase()) || name.includes("sonarrock");
-      }) || null;
+      return (
+        sources.find((src) => {
+          const listen = (src.listenurl || "").toLowerCase();
+          const name = (src.server_name || "").toLowerCase();
+          const desc = (src.server_description || "").toLowerCase();
+
+          return (
+            listen.includes(MOUNTPOINT.toLowerCase()) ||
+            name.includes("sonar rock") ||
+            name.includes("sonarrock") ||
+            desc.includes("sonar rock")
+          );
+        }) || null
+      );
     }
 
     return sources;
@@ -270,7 +286,10 @@ const maxReconnectAttempts = 8;
         return;
       }
 
-      const isReallyLive = !!source.stream_start_iso8601;
+      const isReallyLive =
+        !!source.stream_start_iso8601 ||
+        !!source.listenurl ||
+        !!source.server_name;
 
       if (!isReallyLive) {
         setStatus("Señal fuera del aire", false);
@@ -286,12 +305,12 @@ const maxReconnectAttempts = 8;
         source.server_description ||
         DEFAULT_TRACK_TEXT;
 
+      const parsed = parseTitle(rawTitle);
+
+      updateTrack(parsed.title, parsed.artist || "SONAR ROCK");
+
       if (rawTitle !== lastMetadataTitle) {
         lastMetadataTitle = rawTitle;
-
-        const parsed = parseTitle(rawTitle);
-        updateTrack(parsed.title, parsed.artist || "SONAR ROCK");
-
         fetchAlbumArt(parsed.artist, parsed.title);
       }
     } catch (error) {
@@ -310,6 +329,12 @@ const maxReconnectAttempts = 8;
       clearInterval(metadataTimer);
       metadataTimer = null;
     }
+  }
+
+  function startBackgroundMetadataPolling() {
+    if (backgroundMetadataTimer) clearInterval(backgroundMetadataTimer);
+    fetchMetadata();
+    backgroundMetadataTimer = setInterval(fetchMetadata, 15000);
   }
 
   // =========================
@@ -486,9 +511,5 @@ const maxReconnectAttempts = 8;
   updateMuteUI();
   updatePlayUI(false);
   resetMetadataUI();
-
-  // Consulta metadata aunque no esté reproduciendo
-  // para que el badge EN VIVO refleje si el mountpoint existe.
-  fetchMetadata();
-  setInterval(fetchMetadata, 15000);
+  startBackgroundMetadataPolling();
 });

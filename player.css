@@ -80,7 +80,7 @@
 .station-cover {
   width: 160px;
   height: 160px;
-  border-radius: 50%;
+  border-radius: 18px;
   object-fit: cover;
   box-shadow:
     0 0 0 10px rgba(0,0,0,0.18),
@@ -89,14 +89,12 @@
   transition: transform 0.4s ease, opacity 0.35s ease;
   display: block;
 }
-
 .sonar-player.playing .station-cover {
   animation: sonarSpin 8s linear infinite;
 }
 
-@keyframes sonarSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+.sonar-player.playing .station-cover {
+  transform: scale(1.02);
 }
 
 /* =========================
@@ -414,6 +412,10 @@
   -webkit-backdrop-filter: blur(16px);
 }
 
+.mini-player.show {
+  display: flex;
+}
+
 .mini-left {
   display: flex;
   align-items: center;
@@ -540,19 +542,19 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .hero-player-section {
     padding: 10px 16px 0;
   }
 
   .cover-wrap {
-    width: 130px;
-    height: 130px;
+    width: 112px;
+    height: 112px;
   }
 
   .station-cover {
-    width: 130px;
-    height: 130px;
+    width: 112px;
+    height: 112px;
   }
 
   .sonar-track-title {

@@ -23,34 +23,47 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackArtist = document.getElementById("trackArtist");
   const miniPlayer = document.getElementById("miniPlayer");
 
+  const installBtn = document.getElementById("installBtn");
+  const installBar = document.getElementById("installBar");
+
+  const songToast = document.getElementById("songToast");
+  const toastSong = document.getElementById("toastSong");
+
   const stationCover = document.getElementById("stationCover");
   const liveBadge = document.getElementById("liveBadge");
 
   if (!audio || !playBtn) return;
 
   // =========================
-  // CONFIG
+  // CONFIG GISS FINAL
   // =========================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
-  const METADATA_URL = "https://giss.tv:667/status-json.xsl";
+  const STATUS_URL = "https://giss.tv:667/status-json.xsl";
+  const NOW_PLAYING_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
+  const ARTWORK_URL = "https://giss.tv/player/earp.php?url=https://giss.tv:667/sonarrock.mp3";
   const MOUNTPOINT = "sonarrock.mp3";
 
   const DEFAULT_TRACK_TEXT = "Transmitiendo rock sin concesiones";
-  const DEFAULT_ARTIST_TEXT = "Señal lista";
+  const DEFAULT_ARTIST_TEXT = "SONAR ROCK";
   const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
 
   const STORAGE_VOLUME = "sonarrock_volume";
   const STORAGE_MUTED = "sonarrock_muted";
 
-  const maxReconnectAttempts = 8;
-
   let isPlaying = false;
   let reconnectTimer = null;
   let reconnectAttempts = 0;
   let metadataTimer = null;
-  let backgroundMetadataTimer = null;
+  let stationCheckTimer = null;
+  let deferredPrompt = null;
+  let toastTimer = null;
+
   let lastMetadataTitle = "";
+  let lastTrackShown = "";
   let currentCoverUrl = DEFAULT_COVER;
+  let stationIsLive = false;
+
+  const maxReconnectAttempts = 8;
 
   audio.src = STREAM_URL;
   audio.preload = "none";
@@ -98,7 +111,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (player) player.classList.toggle("playing", playing);
 
     if (!playing) {
-      setStatus("Listo para reproducir", false);
+      if (stationIsLive) {
+        setStatus("Transmitiendo en vivo", true);
+      } else {
+        setStatus("Listo para reproducir", false);
+      }
       stopMetadataPolling();
     }
   }
@@ -151,7 +168,18 @@ document.addEventListener("DOMContentLoaded", () => {
   function resetMetadataUI() {
     updateTrack(DEFAULT_TRACK_TEXT, DEFAULT_ARTIST_TEXT);
     setCover(DEFAULT_COVER);
-    lastMetadataTitle = "";
+  }
+
+  function showSongToast(songTitle) {
+    if (!songToast || !toastSong || !songTitle) return;
+
+    toastSong.textContent = songTitle;
+    songToast.classList.add("show");
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      songToast.classList.remove("show");
+    }, 3500);
   }
 
   // =========================
@@ -168,19 +196,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const cleaned = rawTitle
       .replace(/\s+/g, " ")
       .replace(/^NOW:\s*/i, "")
+      .replace(/^-\s*/, "")
+      .replace(/\s*-\s*$/, "")
       .trim();
-
-    if (
-      cleaned === "-" ||
-      cleaned === "- ," ||
-      cleaned === "," ||
-      cleaned.toLowerCase() === "undefined"
-    ) {
-      return {
-        artist: "SONAR ROCK",
-        title: DEFAULT_TRACK_TEXT
-      };
-    }
 
     const separators = [" - ", " – ", " — "];
     let parts = null;
@@ -197,21 +215,46 @@ document.addEventListener("DOMContentLoaded", () => {
       const title = parts.join(" - ").trim();
 
       return {
-        artist: artist || "SONAR ROCK",
-        title: title || DEFAULT_TRACK_TEXT
+        artist: artist || "",
+        title: title || cleaned
       };
     }
 
     return {
-      artist: "SONAR ROCK",
+      artist: "",
       title: cleaned || DEFAULT_TRACK_TEXT
     };
   }
 
   // =========================
-  // PORTADA (ITUNES)
+  // PORTADA GISS + FALLBACK ITUNES
   // =========================
   async function fetchAlbumArt(artist, title) {
+    // 1) Intento con endpoint oficial de GISS
+    try {
+      const response = await fetch(`${ARTWORK_URL}&t=${Date.now()}`, {
+        cache: "no-store"
+      });
+
+      if (response.ok) {
+        const data = await response.text();
+        const artworkUrl = data.trim();
+
+        if (
+          artworkUrl &&
+          artworkUrl.startsWith("http") &&
+          !artworkUrl.includes("noart") &&
+          !artworkUrl.includes("default")
+        ) {
+          setCover(artworkUrl);
+          return;
+        }
+      }
+    } catch (error) {
+      console.warn("GISS artwork no disponible:", error);
+    }
+
+    // 2) Fallback con iTunes
     if (!artist && !title) {
       setCover(DEFAULT_COVER);
       return;
@@ -243,7 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // METADATA GISS / ICECAST
+  // ESTADO REAL DEL MOUNTPOINT
   // =========================
   function getMountSource(data) {
     const sources = data?.icestats?.source;
@@ -254,13 +297,9 @@ document.addEventListener("DOMContentLoaded", () => {
         sources.find((src) => {
           const listen = (src.listenurl || "").toLowerCase();
           const name = (src.server_name || "").toLowerCase();
-          const desc = (src.server_description || "").toLowerCase();
-
           return (
             listen.includes(MOUNTPOINT.toLowerCase()) ||
-            name.includes("sonar rock") ||
-            name.includes("sonarrock") ||
-            desc.includes("sonar rock")
+            name.includes("sonarrock")
           );
         }) || null
       );
@@ -269,48 +308,89 @@ document.addEventListener("DOMContentLoaded", () => {
     return sources;
   }
 
+  async function checkStationLive() {
+    try {
+      const response = await fetch(`${STATUS_URL}?t=${Date.now()}`, {
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        stationIsLive = false;
+        if (!isPlaying) setStatus("Señal fuera del aire", false);
+        return false;
+      }
+
+      const data = await response.json();
+      const source = getMountSource(data);
+
+      if (!source || !source.stream_start_iso8601) {
+        stationIsLive = false;
+        if (!isPlaying) {
+          setStatus("Señal fuera del aire", false);
+          resetMetadataUI();
+        }
+        return false;
+      }
+
+      stationIsLive = true;
+
+      if (!isPlaying) {
+        setStatus("Transmitiendo en vivo", true);
+      }
+
+      return true;
+    } catch (error) {
+      console.warn("No se pudo verificar estado de la estación:", error);
+      stationIsLive = false;
+      if (!isPlaying) setStatus("Señal no disponible", false);
+      return false;
+    }
+  }
+
+  // =========================
+  // METADATA GISS OFICIAL
+  // =========================
   async function fetchMetadata() {
     try {
-      const response = await fetch(`${METADATA_URL}?t=${Date.now()}`, {
+      const live = await checkStationLive();
+
+      if (!live) {
+        lastMetadataTitle = "";
+        return;
+      }
+
+      const response = await fetch(`${NOW_PLAYING_URL}&t=${Date.now()}`, {
         cache: "no-store"
       });
 
       if (!response.ok) return;
 
-      const data = await response.json();
-      const source = getMountSource(data);
+      const rawText = (await response.text()).trim();
 
-      if (!source) {
-        setStatus("Señal fuera del aire", false);
-        resetMetadataUI();
+      // Si está al aire pero no manda metadata útil
+      if (!rawText) {
+        updateTrack(DEFAULT_TRACK_TEXT, DEFAULT_ARTIST_TEXT);
+        setCover(DEFAULT_COVER);
         return;
       }
 
-      const isReallyLive =
-        !!source.stream_start_iso8601 ||
-        !!source.listenurl ||
-        !!source.server_name;
+      if (rawText !== lastMetadataTitle) {
+        lastMetadataTitle = rawText;
 
-      if (!isReallyLive) {
-        setStatus("Señal fuera del aire", false);
-        resetMetadataUI();
-        return;
-      }
+        const parsed = parseTitle(rawText);
+        const finalArtist = parsed.artist || DEFAULT_ARTIST_TEXT;
+        const finalTitle = parsed.title || DEFAULT_TRACK_TEXT;
 
-      setStatus("Transmitiendo en vivo", true);
+        updateTrack(finalTitle, finalArtist);
 
-      const rawTitle =
-        source.title ||
-        source.artist ||
-        source.server_description ||
-        DEFAULT_TRACK_TEXT;
+        const nowTrackKey = `${finalArtist} - ${finalTitle}`.trim();
 
-      const parsed = parseTitle(rawTitle);
+        if (nowTrackKey !== lastTrackShown && lastTrackShown !== "") {
+          showSongToast(nowTrackKey);
+        }
 
-      updateTrack(parsed.title, parsed.artist || "SONAR ROCK");
+        lastTrackShown = nowTrackKey;
 
-      if (rawTitle !== lastMetadataTitle) {
-        lastMetadataTitle = rawTitle;
         fetchAlbumArt(parsed.artist, parsed.title);
       }
     } catch (error) {
@@ -331,10 +411,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function startBackgroundMetadataPolling() {
-    if (backgroundMetadataTimer) clearInterval(backgroundMetadataTimer);
-    fetchMetadata();
-    backgroundMetadataTimer = setInterval(fetchMetadata, 15000);
+  function startStationCheck() {
+    stopStationCheck();
+    checkStationLive();
+    stationCheckTimer = setInterval(checkStationLive, 15000);
+  }
+
+  function stopStationCheck() {
+    if (stationCheckTimer) {
+      clearInterval(stationCheckTimer);
+      stationCheckTimer = null;
+    }
   }
 
   // =========================
@@ -481,6 +568,32 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.addEventListener("volumechange", updateMuteUI);
 
   // =========================
+  // PWA INSTALL
+  // =========================
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    if (installBar) installBar.style.display = "flex";
+    if (installBtn) installBtn.style.display = "inline-flex";
+  });
+
+  installBtn?.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+
+    if (installBar) installBar.style.display = "none";
+  });
+
+  window.addEventListener("appinstalled", () => {
+    if (installBar) installBar.style.display = "none";
+    deferredPrompt = null;
+  });
+
+  // =========================
   // VISIBILIDAD / iPHONE
   // =========================
   document.addEventListener("visibilitychange", () => {
@@ -511,5 +624,8 @@ document.addEventListener("DOMContentLoaded", () => {
   updateMuteUI();
   updatePlayUI(false);
   resetMetadataUI();
-  startBackgroundMetadataPolling();
+
+  // Verifica EN VIVO aunque nadie esté escuchando
+  startStationCheck();
+  fetchMetadata();
 });

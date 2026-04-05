@@ -122,13 +122,15 @@ h2::after {
 
 .logo-section {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
 }
 
-/* FIX logo gigante */
+/* Logo fijo a la izquierda */
 .logo-section img,
 .header .logo,
 .logo {
@@ -142,24 +144,40 @@ h2::after {
     object-fit: cover;
     border: 4px solid var(--glass-border);
     box-shadow: 0 0 30px rgba(0,0,0,0.5);
-    margin: 0 auto 12px;
     display: block;
     flex-shrink: 0;
+    margin: 0;
 }
 
 .title-section {
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    width: auto;
 }
 
 .title-section h1 {
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: clamp(2rem, 5vw, 3.4rem);
     text-transform: uppercase;
     letter-spacing: 4px;
     background: linear-gradient(to bottom, #fff, #888);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: 0;
+    line-height: 1;
 }
+
+.site-tagline {
+    margin-top: 10px;
+    font-size: clamp(1rem, 2vw, 1.35rem);
+    font-weight: 700;
+    color: #d5d5d5;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    line-height: 1.2;
+}
+
 /* ===============================
    SECCIÓN PLAYERS
 =============================== */

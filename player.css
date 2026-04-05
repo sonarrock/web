@@ -190,9 +190,10 @@
 .station-artist {
   color: rgba(255,255,255,0.68);
   font-size: 14px;
-  line-height: 1.5;
-  margin: 0;
-  word-break: break-word;
+  line-height: 1.4;
+  margin-top: 6px;
+  margin-bottom: 0;
+  letter-spacing: 0.4px;
 }
 
 /* =========================
@@ -547,6 +548,11 @@ button {
   }
 }
 
+@media (max-width: 480px) {
+  .station-artist {
+    font-size: 13px;
+  }
+}
 /* =========================
    SONAR ROCK PRO UI
 ========================= */

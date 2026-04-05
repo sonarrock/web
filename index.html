@@ -2,9 +2,22 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Sonar Rock - La Radio Independiente</title>
 
+  <!-- SEO / META -->
+  <meta name="description" content="Sonar Rock - La radio independiente con rock sin concesiones, transmisión en vivo, podcasts y contenido alternativo.">
+  <meta name="theme-color" content="#ff6600">
+  <meta name="google" content="notranslate">
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- PWA / APP -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Sonar Rock">
+
+  <!-- PRECONNECT / DNS -->
   <link rel="preconnect" href="https://giss.tv" crossorigin>
   <link rel="dns-prefetch" href="https://giss.tv">
 
@@ -13,135 +26,202 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- FUENTES -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link href="style.css?v=13" rel="stylesheet">
-  <link href="player.css?v=13" rel="stylesheet">
+  <link href="style.css?v=15" rel="stylesheet">
+  <link href="player.css?v=15" rel="stylesheet">
 
-  <!-- Iconos -->
+  <!-- ICONOS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-  <!-- PWA & Favicons -->
+  <!-- PWA -->
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#ff6600">
+
+  <!-- FAVICONS -->
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
   <link rel="shortcut icon" href="/icons/favicon.ico">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="google" content="notranslate">
-</head>
 
+  <!-- OPEN GRAPH / SOCIAL -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Sonar Rock - La Radio Independiente">
+  <meta property="og:description" content="Rock sin concesiones. Escucha Sonar Rock en vivo desde cualquier dispositivo.">
+  <meta property="og:image" content="https://www.sonarrock.com/icons/apple-touch-icon.png">
+  <meta property="og:url" content="https://www.sonarrock.com/">
+  <meta property="og:site_name" content="Sonar Rock">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sonar Rock - La Radio Independiente">
+  <meta name="twitter:description" content="Rock sin concesiones. Escucha Sonar Rock en vivo desde cualquier dispositivo.">
+  <meta name="twitter:image" content="https://www.sonarrock.com/icons/apple-touch-icon.png">
+</head>
 <body>
 
-<div class="site-wrapper">
-
-  <!-- ========================= -->
-  <!-- HEADER -->
-  <!-- ========================= -->
-  <header class="header">
+  <!-- =========================
+       HEADER
+  ========================== -->
+  <header class="site-header">
     <div class="container">
-      <div class="title-section">
-        <h1>LA RADIO INDEPENDIENTE</h1>
+      <div class="brand-wrap">
+        <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock" class="site-logo">
+        <div class="brand-text">
+          <h1>Sonar Rock</h1>
+          <p>La radio independiente</p>
+        </div>
       </div>
+
+      <button id="installBtn" class="install-btn" type="button" hidden>
+        <i class="fa-solid fa-download"></i>
+        Instalar Sonar Rock
+      </button>
     </div>
   </header>
 
-  <!-- ========================= -->
-  <!-- SONAR ROCK PLAYER v12 -->
-  <!-- ========================= -->
-  <section class="sonar-player-wrap">
-    <div class="sonar-player" id="sonarPlayer">
-
-      <!-- Cover / Logo -->
-      <div class="sonar-cover-box">
-        <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock" class="sonar-cover" id="stationCover">
-        <div class="live-badge" id="liveBadge">● EN VIVO</div>
-      </div>
-
-      <!-- Info -->
-      <div class="sonar-info">
-        <p class="station-label">RADIO ONLINE</p>
-        <h3 class="station-name">SONAR ROCK</h3>
-
-        <!-- NOW PLAYING -->
-        <div class="now-playing-box">
-          <span class="now-playing-label">AHORA ESCUCHAS</span>
-          <p class="station-tagline" id="trackInfo">Transmitiendo rock sin concesiones</p>
-          <p class="station-artist" id="trackArtist">Señal lista</p>
-        </div>
-
-        <!-- Controls -->
-        <div class="controls">
-          <button id="playBtn" class="main-btn" aria-label="Reproducir o pausar">
-            <span id="playIcon">▶</span>
-          </button>
-
-          <button id="muteBtn" class="secondary-btn" aria-label="Silenciar o activar sonido">
-            <span id="muteIcon">🔊</span>
-          </button>
-        </div>
-
-        <!-- Volume -->
-        <div class="volume-wrap">
-          <span class="volume-icon" id="volumeEmoji">🔊</span>
-          <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1">
-        </div>
-
-        <!-- Status -->
-        <div class="status-row">
-          <span class="status-dot" id="statusDot"></span>
-          <span id="statusText">Listo para reproducir</span>
-        </div>
-      </div>
-
-      <!-- Hidden Audio -->
-      <audio id="radioPlayer" preload="none" playsinline webkit-playsinline>
-        <source src="https://giss.tv:667/sonarrock.mp3" type="audio/mpeg">
-        Tu navegador no soporta audio HTML5.
-      </audio>
+  <!-- =========================
+       BARRA INSTALAR APP
+  ========================== -->
+  <div id="installBar" class="install-bar hidden">
+    <div class="install-bar-inner">
+      <span>Instala Sonar Rock en tu dispositivo</span>
+      <button id="installBtnBar" type="button">Instalar</button>
     </div>
-  </section>
+  </div>
 
-  <!-- ========================= -->
-  <!-- MINI PLAYER STICKY -->
-  <!-- ========================= -->
-  <div class="mini-player" id="miniPlayer">
-    <div class="mini-player-left">
-      <div class="mini-live-dot" id="miniLiveDot"></div>
+  <!-- =========================
+       MAIN
+  ========================== -->
+  <main class="main-content">
+
+    <!-- =========================
+         SONAR ROCK PLAYER
+    ========================== -->
+    <section class="hero-player-section">
+      <div class="container">
+
+        <div id="sonarPlayer" class="sonar-player">
+
+          <!-- COVER -->
+          <div class="cover-wrap">
+            <img
+              id="stationCover"
+              src="attached_assets/logo_1749601460841.jpeg"
+              alt="Portada Sonar Rock"
+              class="station-cover"
+            >
+            <div id="liveBadge" class="live-badge">
+              <span class="live-pulse"></span>
+              EN VIVO
+            </div>
+          </div>
+
+          <!-- INFO -->
+          <div class="player-info">
+            <p class="eyebrow">Transmitiendo ahora</p>
+            <h2 id="trackInfo" class="track-title">Transmitiendo rock sin concesiones</h2>
+            <p id="trackArtist" class="track-artist">Señal lista</p>
+
+            <div class="status-row">
+              <span id="statusDot" class="status-dot"></span>
+              <span id="statusText">Listo para reproducir</span>
+            </div>
+          </div>
+
+          <!-- CONTROLES -->
+          <div class="player-controls">
+            <button id="playBtn" class="play-btn" type="button" aria-label="Reproducir">
+              <span id="playIcon">▶</span>
+            </button>
+
+            <button id="muteBtn" class="mute-btn" type="button" aria-label="Silenciar">
+              <span id="muteIcon">🔊</span>
+            </button>
+
+            <div class="volume-wrap">
+              <span id="volumeEmoji" class="volume-emoji">🔊</span>
+              <input
+                id="volumeControl"
+                class="volume-slider"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value="1"
+                aria-label="Volumen"
+              >
+            </div>
+          </div>
+
+          <!-- AUDIO -->
+          <audio id="radioPlayer" preload="none" playsinline webkit-playsinline></audio>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================
+         ACCESOS RÁPIDOS
+    ========================== -->
+    <section class="quick-links-section">
+      <div class="container">
+        <div class="quick-links-grid">
+
+          <a class="quick-card" href="https://giss.tv/interface/new.php?mp=sonarrock.mp3" target="_blank" rel="noopener noreferrer">
+            <i class="fa-solid fa-comments"></i>
+            <span>Chat en vivo</span>
+          </a>
+
+          <a class="quick-card" href="https://giss.tv/mapuse/map-leaflet.php?search=sonarrock.mp3" target="_blank" rel="noopener noreferrer">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <span>Mapa de oyentes</span>
+          </a>
+
+          <a class="quick-card" href="https://giss.tv/gstats/index.html" target="_blank" rel="noopener noreferrer">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Estadísticas</span>
+          </a>
+
+          <a class="quick-card" href="https://giss.tv:667/sonarrock.mp3" target="_blank" rel="noopener noreferrer">
+            <i class="fa-solid fa-signal"></i>
+            <span>Stream directo</span>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================
+         TOAST NUEVA CANCIÓN
+    ========================== -->
+    <div id="songToast" class="song-toast hidden">
+      <div class="song-toast-inner">
+        <i class="fa-solid fa-music"></i>
+        <span id="toastSong">Nueva canción al aire</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- =========================
+       MINI PLAYER MOBILE
+  ========================== -->
+  <div id="miniPlayer" class="mini-player">
+    <div class="mini-left">
+      <span id="miniLiveDot" class="mini-live-dot"></span>
       <div class="mini-meta">
-        <span class="mini-title">SONAR ROCK</span>
-        <span class="mini-status" id="miniStatus">Listo para reproducir</span>
+        <span class="mini-title">Sonar Rock</span>
+        <span id="miniStatus" class="mini-status">Listo para reproducir</span>
       </div>
     </div>
 
-    <button id="miniPlayBtn" class="mini-play-btn" aria-label="Reproducir o pausar">
+    <button id="miniPlayBtn" class="mini-play-btn" type="button" aria-label="Reproducir">
       <span id="miniPlayIcon">▶</span>
     </button>
   </div>
 
-  <!-- ========================= -->
-<!-- INSTALL APP / TOAST -->
-<!-- ========================= -->
-
-<div class="install-bar" id="installBar">
-  <button id="installBtn" class="install-btn">
-    <i class="fas fa-download"></i>
-    Instalar Sonar Rock
-  </button>
-</div>
-
-<div class="song-toast" id="songToast">
-  <div class="song-toast-inner">
-    <div class="toast-live-dot"></div>
-    <div class="toast-text">
-      <span class="toast-label">AHORA SUENA</span>
-      <span class="toast-song" id="toastSong">Transmitiendo rock sin concesiones</span>
-    </div>
-  </div>
-</div>
 
   <!-- ========================= -->
   <!-- REDES SOCIALES -->
@@ -154,7 +234,6 @@
         <a href="https://www.facebook.com/share/19CxAjJvb8/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
         <a href="https://www.instagram.com/sonar_rockgdl" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
         <a href="https://open.spotify.com/show/6mPcjQLeDdCwxzJe3PLlyU" target="_blank" class="social-btn spotify"><i class="fab fa-spotify"></i></a>
-        <a href="https://go.ivoox.com/sq/2661206" target="_blank" class="social-btn ivoox"><i class="fas fa-podcast"></i></a>
       </div>
     </div>
   </section>
@@ -274,5 +353,16 @@
 <script src="disco-semana.js?v=13" defer></script>
 <script src="player.js?v=13" defer></script>
 
+  <script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js")
+        .then(() => console.log("Service Worker registrado"))
+        .catch((err) => console.warn("SW error:", err));
+    });
+  }
+</script>
+
+ 
 </body>
 </html>

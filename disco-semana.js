@@ -3,11 +3,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const cover = document.getElementById("cover");
   const trackTitle = document.getElementById("track-title");
   const player = document.getElementById("disco-player");
+  const radioAudio = document.getElementById("radioPlayer");
 
   if (!audio || !cover || !trackTitle || !player) return;
 
   try {
-    const response = await fetch("disco-semana.json");
+    const response = await fetch("disco-semana.json", { cache: "no-store" });
 
     if (!response.ok) {
       throw new Error("No se pudo cargar disco-semana.json");
@@ -26,9 +27,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     audio.src = discoData.audio || "";
     audio.load();
 
-    // Animación vinilo
+    // Si se reproduce el disco, pausa la radio
     audio.addEventListener("play", () => {
       player.classList.add("playing");
+
+      if (radioAudio && !radioAudio.paused) {
+        radioAudio.pause();
+      }
     });
 
     audio.addEventListener("pause", () => {
@@ -37,6 +42,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     audio.addEventListener("ended", () => {
       player.classList.remove("playing");
+    });
+
+    audio.addEventListener("error", () => {
+      player.classList.remove("playing");
+      console.error("Error cargando audio de Disco de la Semana");
     });
 
   } catch (error) {

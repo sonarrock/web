@@ -2,521 +2,526 @@
    VARIABLES Y CONFIGURACIÓN
 =============================== */
 :root {
-    --primary: #ff7a1a;
-    --primary-hover: #ff954d;
-    --bg-dark: #0b0b0c;
-    --bg-card: rgba(255, 255, 255, 0.05);
-    --text-main: #cfcfcf;
-    --text-light: #ffffff;
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --primary: #ff7a1a;
+  --primary-hover: #ff954d;
+  --bg-dark: #0b0b0c;
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --text-main: #cfcfcf;
+  --text-light: #ffffff;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* ===============================
    RESET & BASE
 =============================== */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 body {
-    font-family: var(--font-main);
-    background: var(--bg-dark);
-    color: var(--text-main);
-    line-height: 1.6;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
+  font-family: var(--font-main);
+  background: var(--bg-dark);
+  color: var(--text-main);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Fondo global difuminado */
 body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background:
-        linear-gradient(rgba(11,11,12,0.45), rgba(11,11,12,0.75)),
-        url('attached_assets/fondostaff.png') center / cover no-repeat;
-    filter: blur(8px);
-    transform: scale(1.08);
-    z-index: -1;
-    pointer-events: none;
-    will-change: transform;
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(rgba(11,11,12,0.45), rgba(11,11,12,0.75)),
+    url('attached_assets/fondostaff.png') center / cover no-repeat;
+  filter: blur(8px);
+  transform: scale(1.08);
+  z-index: -1;
+  pointer-events: none;
+  will-change: transform;
 }
 
 a {
-    text-decoration: none;
-    color: inherit;
-    transition: var(--transition);
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
 }
 
 img {
-    max-width: 100%;
-    display: block;
+  max-width: 100%;
+  display: block;
 }
 
 /* ===============================
    LAYOUT BASE
 =============================== */
 .site-wrapper {
-    width: 100%;
-    position: relative;
-    z-index: 1;
+  width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .container {
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 20px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 /* ===============================
    TIPOGRAFÍA
 =============================== */
 h1, h2, h3 {
-    text-align: center;
-    color: var(--text-light);
-    font-weight: 800;
-    letter-spacing: -0.02em;
+  text-align: center;
+  color: var(--text-light);
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 h2 {
-    font-size: 2rem;
-    margin-bottom: 40px;
-    position: relative;
+  font-size: 2rem;
+  margin-bottom: 40px;
+  position: relative;
 }
 
 h2::after {
-    content: "";
-    display: block;
-    width: 40px;
-    height: 3px;
-    background: var(--primary);
-    margin: 15px auto 0;
-    border-radius: 2px;
+  content: "";
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: var(--primary);
+  margin: 15px auto 0;
+  border-radius: 2px;
 }
 
 .player-title {
-    text-align: center;
-    color: #fff;
-    font-size: 1.4rem;
-    margin: 25px 0 15px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
+  text-align: center;
+  color: #fff;
+  font-size: 1.4rem;
+  margin: 25px 0 15px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
 }
 
 /* ===============================
    HEADER
 =============================== */
 .header {
-    padding: 50px 20px 30px;
-    text-align: center;
+  padding: 50px 20px 30px;
+  text-align: center;
 }
 
 .logo-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-    max-width: 900px;
-    margin: 0 auto;
-    text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: left;
 }
 
-/* Logo fijo a la izquierda */
 .logo-section img,
 .header .logo,
 .logo {
-    width: 150px !important;
-    height: 150px !important;
-    max-width: 150px !important;
-    max-height: 150px !important;
-    min-width: 150px;
-    min-height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid var(--glass-border);
-    box-shadow: 0 0 30px rgba(0,0,0,0.5);
-    display: block;
-    flex-shrink: 0;
-    margin: 0;
+  width: 150px !important;
+  height: 150px !important;
+  max-width: 150px !important;
+  max-height: 150px !important;
+  min-width: 150px;
+  min-height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--glass-border);
+  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  display: block;
+  flex-shrink: 0;
+  margin: 0;
 }
 
 .title-section {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    width: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: auto;
 }
 
 .title-section h1 {
-    font-size: clamp(2rem, 5vw, 3.4rem);
-    text-transform: uppercase;
-    letter-spacing: 4px;
-    background: linear-gradient(to bottom, #fff, #888);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin: 0;
-    line-height: 1;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  background: linear-gradient(to bottom, #fff, #888);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+  line-height: 1;
 }
 
 .site-tagline {
-    margin-top: 10px;
-    font-size: clamp(1rem, 2vw, 1.35rem);
-    font-weight: 700;
-    color: #d5d5d5;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    line-height: 1.2;
+  margin-top: 10px;
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-weight: 700;
+  color: #d5d5d5;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  line-height: 1.2;
 }
 
 /* ===============================
    SECCIÓN PLAYERS
 =============================== */
 .players-section {
-    padding: 20px;
-    max-width: 1100px;
-    margin: 0 auto 40px;
+  padding: 20px;
+  max-width: 1100px;
+  margin: 0 auto 40px;
 }
 
 /* ===============================
    DISCO DE LA SEMANA
 =============================== */
 .disco-player {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-    max-width: 580px;
-    margin: 40px auto;
-    padding: 25px;
-    position: relative;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.035);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-radius: 24px;
-    border: 1px solid var(--glass-border);
-    box-shadow:
-        0 25px 50px -12px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(255, 122, 26, 0.04);
-    transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  max-width: 580px;
+  margin: 40px auto;
+  padding: 25px;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 24px;
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 122, 26, 0.04);
+  transition: var(--transition);
 }
 
 .disco-player::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        circle at center,
-        rgba(255, 122, 26, 0.18),
-        transparent 70%
-    );
-    opacity: 0.35;
-    pointer-events: none;
-    z-index: 0;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 122, 26, 0.18),
+    transparent 70%
+  );
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .disco-player:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 122, 26, 0.28);
-    box-shadow:
-        0 28px 55px -12px rgba(0, 0, 0, 0.58),
-        0 0 0 1px rgba(255, 122, 26, 0.08);
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 122, 26, 0.28);
+  box-shadow:
+    0 28px 55px -12px rgba(0, 0, 0, 0.58),
+    0 0 0 1px rgba(255, 122, 26, 0.08);
 }
 
 .disco-player img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 2;
-    transition: transform 0.4s ease;
-    box-shadow:
-        0 0 0 10px rgba(0, 0, 0, 0.22),
-        0 0 0 2px rgba(255, 122, 26, 0.14),
-        0 14px 28px rgba(0, 0, 0, 0.38);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.4s ease;
+  box-shadow:
+    0 0 0 10px rgba(0, 0, 0, 0.22),
+    0 0 0 2px rgba(255, 122, 26, 0.14),
+    0 14px 28px rgba(0, 0, 0, 0.38);
 }
 
 .disco-player.playing img {
-    animation: vinylSpin 6s linear infinite;
+  animation: vinylSpin 6s linear infinite;
 }
 
 @keyframes vinylSpin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.disco-player .player-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    position: relative;
-    z-index: 2;
+.disco-player-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: relative;
+  z-index: 2;
+  width: 100%;
 }
 
-.disco-player .track-title {
-    font-size: 1rem;
-    font-weight: 800;
-    color: var(--text-light);
-    text-transform: uppercase;
-    border-left: 4px solid var(--primary);
-    padding-left: 12px;
-    line-height: 1.4;
-    letter-spacing: 0.4px;
+.disco-track-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-light);
+  text-transform: uppercase;
+  border-left: 4px solid var(--primary);
+  padding-left: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.4px;
 }
 
 .disco-player audio {
-    width: 100%;
-    height: 35px;
-    opacity: 0.85;
-    filter: invert(1) hue-rotate(160deg) brightness(1.15);
-    border-radius: 10px;
+  width: 100%;
+  height: 35px;
+  opacity: 0.85;
+  filter: invert(1) hue-rotate(160deg) brightness(1.15);
+  border-radius: 10px;
 }
 
 /* ===============================
    SPOTIFY EMBED
 =============================== */
 .spotify-player {
-    max-width: 580px;
-    margin: 0 auto 40px;
+  max-width: 560px;
+  margin: 0 auto 40px;
 }
 
-.spotify-player .player-info iframe {
-    display: block;
-    width: 100%;
-    max-width: 560px;
-    height: 152px;
-    border-radius: 12px;
-    margin: 20px auto;
+.spotify-player-info {
+  width: 100%;
+}
+
+.spotify-player-info iframe {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: 152px;
+  border-radius: 12px;
+  margin: 20px auto;
+  border: none;
 }
 
 /* ===============================
    SOCIAL
 =============================== */
 .social-section {
-    padding: 45px 20px;
-    margin: 40px auto;
-    max-width: 1100px;
+  padding: 45px 20px;
+  margin: 40px auto;
+  max-width: 1100px;
 }
 
 .social-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 18px;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
 }
 
 .social-btn {
-    width: 65px;
-    height: 65px;
-    font-size: 1.3rem;
-    border-radius: 50%;
-    background: #1a1a1a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    text-decoration: none;
-    transition: all 0.3s ease;
+  width: 65px;
+  height: 65px;
+  font-size: 1.3rem;
+  border-radius: 50%;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  text-decoration: none;
+  transition: all 0.3s ease;
 }
 
 .social-btn:hover {
-    background: #ff7a1a;
-    transform: translateY(-4px);
+  background: #ff7a1a;
+  transform: translateY(-4px);
 }
 
 /* ===============================
    STAFF
 =============================== */
 .staff-section {
-    padding: 80px 20px;
-    margin: 40px auto;
-    max-width: 1100px;
-    text-align: center;
+  padding: 80px 20px;
+  margin: 40px auto;
+  max-width: 1100px;
+  text-align: center;
 }
 
 .staff-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 40px;
-    justify-items: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 40px;
+  justify-items: center;
 }
 
 .staff-member {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease;
 }
 
 .staff-member:hover {
-    transform: translateY(-6px);
+  transform: translateY(-6px);
 }
 
 .staff-image {
-    width: 150px;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 50%;
-    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  width: 150px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 50%;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
 .staff-member:hover .staff-image {
-    transform: scale(1.08);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.45);
+  transform: scale(1.08);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.45);
 }
 
 .staff-name {
-    margin-top: 16px;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0.6px;
-    color: #ffffff;
+  margin-top: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: #ffffff;
 }
 
 /* ===============================
    ABOUT
 =============================== */
 .about-section {
-    padding: 60px 20px;
-    margin: 40px auto;
-    max-width: 1100px;
+  padding: 60px 20px;
+  margin: 40px auto;
+  max-width: 1100px;
 }
 
 .about-content {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .about-text {
-    font-size: 1rem;
-    font-weight: 800;
-    color: #b5b5b5;
-    line-height: 1.5;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #b5b5b5;
+  line-height: 1.5;
 }
 
 /* ===============================
    RESPONSIVE
 =============================== */
 @media (max-width: 768px) {
-    .disco-player {
-        flex-direction: column;
-        text-align: center;
-        align-items: center;
-        gap: 18px;
-        padding: 22px;
-    }
+  .header {
+    padding: 38px 20px 20px;
+  }
 
-    .disco-player img {
-        width: 95px;
-        height: 95px;
-    }
+  .logo-section {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
 
-    .disco-player .player-info {
-        width: 100%;
-        align-items: center;
-    }
+  .logo-section img,
+  .header .logo,
+  .logo {
+    width: 120px !important;
+    height: 120px !important;
+    max-width: 120px !important;
+    max-height: 120px !important;
+    min-width: 120px;
+    min-height: 120px;
+  }
 
-    .disco-player .track-title {
-        border-left: none;
-        border-bottom: 3px solid var(--primary);
-        padding-left: 0;
-        padding-bottom: 8px;
-        text-align: center;
-    }
+  .title-section {
+    align-items: center;
+    text-align: center;
+  }
 
-    .disco-player audio,
-    .spotify-player .player-info iframe {
-        width: 100%;
-    }
+  .title-section h1 {
+    letter-spacing: 2px;
+  }
 
-    .social-buttons {
-        gap: 14px;
-    }
+  .site-tagline {
+    margin-top: 8px;
+    font-size: 1rem;
+    letter-spacing: 1px;
+  }
 
-    .social-btn {
-        width: 58px;
-        height: 58px;
-        font-size: 1.15rem;
-    }
+  .disco-player {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    gap: 18px;
+    padding: 22px;
+  }
 
-    h2 {
-        font-size: 1.75rem;
-    }
+  .disco-player img {
+    width: 95px;
+    height: 95px;
+  }
 
-    .player-title {
-        font-size: 1.2rem;
-    }
+  .disco-player-info {
+    width: 100%;
+    align-items: center;
+  }
+
+  .disco-track-title {
+    border-left: none;
+    border-bottom: 3px solid var(--primary);
+    padding-left: 0;
+    padding-bottom: 8px;
+    text-align: center;
+  }
+
+  .disco-player audio,
+  .spotify-player-info iframe {
+    width: 100%;
+  }
+
+  .social-buttons {
+    gap: 14px;
+  }
+
+  .social-btn {
+    width: 58px;
+    height: 58px;
+    font-size: 1.15rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  .player-title {
+    font-size: 1.2rem;
+  }
 }
 
 @media (max-width: 600px) {
-    .staff-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
-    }
+  .staff-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
 
-    .staff-image {
-        width: 110px;
-    }
+  .staff-image {
+    width: 110px;
+  }
 
-    .staff-name {
-        font-size: 14px;
-    }
+  .staff-name {
+    font-size: 14px;
+  }
 
-    .about-text {
-        font-size: 0.96rem;
-    }
+  .about-text {
+    font-size: 0.96rem;
+  }
 }
-
-    .header {
-        padding: 38px 20px 20px;
-    }
-
-    .logo-section {
-        flex-direction: column;
-        text-align: center;
-        gap: 16px;
-    }
-
-    .logo-section img,
-    .header .logo,
-    .logo {
-        width: 120px !important;
-        height: 120px !important;
-        max-width: 120px !important;
-        max-height: 120px !important;
-        min-width: 120px;
-        min-height: 120px;
-    }
-
-    .title-section {
-        align-items: center;
-        text-align: center;
-    }
-
-    .title-section h1 {
-        letter-spacing: 2px;
-    }
-
-    .site-tagline {
-        margin-top: 8px;
-        font-size: 1rem;
-        letter-spacing: 1px;
-    }

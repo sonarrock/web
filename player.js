@@ -23,6 +23,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackArtist = document.getElementById("trackArtist");
   const miniPlayer = document.getElementById("miniPlayer");
 
+  const installBtn = document.getElementById("installBtn");
+  const installBar = document.getElementById("installBar");
+
+  const songToast = document.getElementById("songToast");
+  const toastSong = document.getElementById("toastSong");
+
   const stationCover = document.getElementById("stationCover");
   const liveBadge = document.getElementById("liveBadge");
 
@@ -43,14 +49,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const STORAGE_MUTED = "sonarrock_muted";
 
   let isPlaying = false;
-  let reconnectTimer = null;
-  let reconnectAttempts = 0;
-  let metadataTimer = null;
-  let lastMetadataTitle = "";
-  let currentCoverUrl = DEFAULT_COVER;
+let reconnectTimer = null;
+let reconnectAttempts = 0;
+let metadataTimer = null;
+let deferredPrompt = null;
+let lastTrackShown = "";
+let toastTimer = null;
 
-  const maxReconnectAttempts = 8;
-
+const maxReconnectAttempts = 8;
+  
   audio.src = STREAM_URL;
   audio.preload = "none";
   audio.setAttribute("playsinline", "");

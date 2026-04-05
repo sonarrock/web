@@ -485,23 +485,38 @@ h2::after {
     }
 }
 
-@media (max-width: 480px) {
-    .disco-player {
-        margin: 28px auto;
-        padding: 18px;
-        border-radius: 20px;
+    .header {
+        padding: 38px 20px 20px;
     }
 
-    .disco-player img {
-        width: 88px;
-        height: 88px;
+    .logo-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
     }
 
-    .disco-player .track-title {
-        font-size: 0.95rem;
+    .logo-section img,
+    .header .logo,
+    .logo {
+        width: 120px !important;
+        height: 120px !important;
+        max-width: 120px !important;
+        max-height: 120px !important;
+        min-width: 120px;
+        min-height: 120px;
     }
 
-    .disco-player audio {
-        height: 32px;
+    .title-section {
+        align-items: center;
+        text-align: center;
     }
-}
+
+    .title-section h1 {
+        letter-spacing: 2px;
+    }
+
+    .site-tagline {
+        margin-top: 8px;
+        font-size: 1rem;
+        letter-spacing: 1px;
+    }

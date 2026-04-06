@@ -81,67 +81,82 @@
 
         <div id="sonarPlayer" class="sonar-player">
 
-          <!-- GLOW FX -->
-          <div class="player-glow player-glow-1"></div>
-          <div class="player-glow player-glow-2"></div>
+  <!-- COLUMNA IZQUIERDA -->
+  <div class="cover-wrap">
+    <img
+      id="stationCover"
+      src="attached_assets/logo_1749601460841.jpeg"
+      alt="Portada Sonar Rock"
+      class="station-cover"
+    >
 
-          <!-- COVER -->
-          <div class="cover-wrap">
-            <div class="cover-frame">
-              <img
-                id="stationCover"
-                src="attached_assets/logo_1749601460841.jpeg"
-                alt="Portada Sonar Rock"
-                class="station-cover"
-              >
-            </div>
+    <div id="liveBadge" class="live-badge">
+      <span class="live-pulse"></span>
+      EN VIVO
+    </div>
 
-            <div id="liveBadge" class="live-badge">
-              <span class="live-pulse"></span>
-              EN VIVO
-            </div>
-          </div>
+    <div class="sonar-player-info">
+      <p class="eyebrow">Transmitiendo ahora</p>
+      <h3 id="trackInfo" class="sonar-track-title">Transmitiendo rock sin concesiones</h3>
+      <p id="trackArtist" class="sonar-track-artist">Señal lista</p>
 
-          <!-- INFO -->
-          <div class="sonar-player-info">
-            <p class="eyebrow">Transmitiendo ahora</p>
-            <h3 id="trackInfo" class="sonar-track-title">Transmitiendo rock sin concesiones</h3>
-            <p id="trackArtist" class="sonar-track-artist">Señal lista</p>
+      <div class="status-row">
+        <span id="statusDot" class="status-dot"></span>
+        <span id="statusText">Listo para reproducir</span>
+      </div>
+    </div>
+  </div>
 
-            <div class="status-row">
-              <span id="statusDot" class="status-dot"></span>
-              <span id="statusText">Listo para reproducir</span>
-            </div>
-          </div>
+  <!-- COLUMNA CENTRAL -->
+  <div class="player-visual">
+    <div class="visual-panel">
+      <div class="eq-wrap">
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+      </div>
+      <div class="eq-base-line"></div>
+    </div>
+  </div>
 
-          <!-- CONTROLES -->
-          <div class="player-controls">
-            <button id="playBtn" class="play-btn" type="button" aria-label="Reproducir">
-              <span id="playIcon">▶</span>
-            </button>
+  <!-- COLUMNA DERECHA -->
+  <div class="player-controls">
+    <button id="playBtn" class="play-btn" type="button" aria-label="Reproducir">
+      <span id="playIcon">▶</span>
+    </button>
 
-            <button id="muteBtn" class="mute-btn" type="button" aria-label="Silenciar">
-              <span id="muteIcon">🔊</span>
-            </button>
+    <button id="muteBtn" class="mute-btn" type="button" aria-label="Silenciar">
+      <span id="muteIcon">🔊</span>
+    </button>
 
-            <div class="volume-wrap">
-              <span id="volumeEmoji" class="volume-emoji">🔊</span>
-              <input
-                id="volumeControl"
-                class="volume-slider"
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value="1"
-                aria-label="Volumen"
-              >
-            </div>
-          </div>
+    <div class="volume-wrap">
+      <span id="volumeEmoji" class="volume-emoji">🔊</span>
+      <input
+        id="volumeControl"
+        class="volume-slider"
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value="1"
+        aria-label="Volumen"
+      >
+    </div>
+  </div>
 
-          <!-- AUDIO -->
-          <audio id="radioPlayer" preload="none" playsinline webkit-playsinline></audio>
-        </div>
+  <!-- AUDIO -->
+  <audio id="radioPlayer" preload="none" playsinline webkit-playsinline></audio>
+
+      </div>
       </div>
     </section>
 

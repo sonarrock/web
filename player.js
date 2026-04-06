@@ -205,6 +205,71 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
+  // FIX ENCODING / TEXTO SUCIO
+  // =========================
+  function tryDecodeLatin1ToUtf8(str = "") {
+    try {
+      return decodeURIComponent(escape(str));
+    } catch {
+      return str;
+    }
+  }
+
+  function looksMisencoded(str = "") {
+    return /Ã.|Â.|â.|ð|�/.test(str);
+  }
+
+  function normalizeWeirdChars(str = "") {
+    return str
+      .replace(/[“”„‟]/g, '"')
+      .replace(/[‘’‚‛]/g, "'")
+      .replace(/[‐-‒–—―]/g, "-")
+      .replace(/\u00A0/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function cleanMetadataText(str = "") {
+    if (!str || typeof str !== "string") return "";
+
+    let fixed = str.trim();
+
+    // Si parece venir mal codificado, intenta repararlo
+    if (looksMisencoded(fixed)) {
+      fixed = tryDecodeLatin1ToUtf8(fixed);
+    }
+
+    // Segunda pasada por si sigue roto
+    if (looksMisencoded(fixed)) {
+      fixed = tryDecodeLatin1ToUtf8(fixed);
+    }
+
+    fixed = normalizeWeirdChars(fixed);
+
+    // Limpieza de basura común
+    fixed = fixed
+      .replace(/\s*\|\s*SONAR ROCK\s*$/i, "")
+      .replace(/\s*\|\s*LIVE\s*$/i, "")
+      .replace(/\s*\|\s*RADIO\s*$/i, "")
+      .replace(/^\-+\s*/, "")
+      .replace(/\s*\-+\s*$/, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+
+    return fixed;
+  }
+
+  function normalizeSearchText(str = "") {
+    return cleanMetadataText(str)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // quita acentos solo para búsquedas
+      .replace(/[^\w\s\-&']/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+
+  // =========================
   // PARSE TITLE
   // =========================
   function parseTitle(rawTitle = "") {
@@ -253,18 +318,21 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  // =========================
+   // =========================
   // PORTADA (ITUNES)
   // =========================
   async function fetchAlbumArt(artist, title) {
-    if (!artist && !title) {
+    const cleanArtist = normalizeSearchText(artist || "");
+    const cleanTitle = normalizeSearchText(title || "");
+
+    if (!cleanArtist && !cleanTitle) {
       setCover(DEFAULT_COVER);
       return;
     }
 
     try {
-      const query = encodeURIComponent(`${artist} ${title}`.trim());
-      const url = `https://itunes.apple.com/search?term=${query}&entity=song&limit=1`;
+      const query = encodeURIComponent(`${cleanArtist} ${cleanTitle}`.trim());
+      const url = `https://itunes.apple.com/search?term=${query}&entity=song&limit=5`;
 
       const response = await fetch(url, { cache: "no-store" });
       if (!response.ok) {
@@ -273,10 +341,26 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const data = await response.json();
-      const result = data?.results?.[0];
+      const results = Array.isArray(data?.results) ? data.results : [];
 
-      if (result?.artworkUrl100) {
-        const hiResCover = result.artworkUrl100.replace("100x100bb", "600x600bb");
+      if (!results.length) {
+        setCover(DEFAULT_COVER);
+        return;
+      }
+
+      // Preferir coincidencia más lógica
+      const bestMatch =
+        results.find(item => {
+          const a = normalizeSearchText(item.artistName || "");
+          const t = normalizeSearchText(item.trackName || "");
+          return (
+            (cleanArtist && a.includes(cleanArtist)) ||
+            (cleanTitle && t.includes(cleanTitle))
+          );
+        }) || results[0];
+
+      if (bestMatch?.artworkUrl100) {
+        const hiResCover = bestMatch.artworkUrl100.replace("100x100bb", "600x600bb");
         setCover(hiResCover);
       } else {
         setCover(DEFAULT_COVER);
@@ -286,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setCover(DEFAULT_COVER);
     }
   }
-
+  
   // =========================
   // METADATA GISS / ICECAST
   // =========================
@@ -319,7 +403,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!response.ok) return "";
 
       const text = await response.text();
-      return (text || "").trim();
+return cleanMetadataText((text || "").trim());
     } catch (error) {
       console.warn("Fallback now playing no disponible:", error);
       return "";
@@ -353,11 +437,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setStatus("Transmitiendo en vivo", true);
 
-      let rawTitle =
-        source.title ||
-        source.artist ||
-        source.server_description ||
-        "";
+      let rawTitle = cleanMetadataText(
+  source.title ||
+  source.artist ||
+  source.server_description ||
+  ""
+);
 
       if (!rawTitle || rawTitle.trim() === "-" || rawTitle.trim() === "- ,") {
         const fallbackTitle = await fetchNowPlayingFallback();
@@ -372,8 +457,8 @@ document.addEventListener("DOMContentLoaded", () => {
         lastMetadataTitle = rawTitle;
 
         const parsed = parseTitle(rawTitle);
-        const finalArtist = parsed.artist || "SONAR ROCK";
-        const finalTitle = parsed.title || DEFAULT_TRACK_TEXT;
+        const finalArtist = cleanMetadataText(parsed.artist || "SONAR ROCK");
+        const finalTitle = cleanMetadataText(parsed.title || DEFAULT_TRACK_TEXT);
 
         updateTrack(finalTitle, finalArtist);
         fetchAlbumArt(parsed.artist, parsed.title);

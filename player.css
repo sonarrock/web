@@ -1,6 +1,6 @@
-/* =========================================
-   SONAR ROCK PLAYER — PREMIUM FINAL LIMPIO
-========================================= */
+/* ===================
+   SONAR ROCK PLAYER 
+====================== */
 
 :root {
   --sr-primary: #ff7a1a;
@@ -15,16 +15,12 @@
   --sr-transition: all 0.35s ease;
 }
 
-/* =========================
-   HERO SECTION
-========================= */
+/* HERO */
 .hero-player-section {
   padding: 20px 20px 10px;
 }
 
-/* =========================
-   PLAYER CARD
-========================= */
+/* PLAYER CARD */
 .sonar-player {
   width: 100%;
   max-width: 860px;
@@ -56,18 +52,10 @@
     radial-gradient(circle at top left, rgba(255,122,26,0.16), transparent 35%),
     radial-gradient(circle at bottom right, rgba(0,180,255,0.12), transparent 35%);
   pointer-events: none;
+
 }
 
-.sonar-player.is-live {
-  box-shadow:
-    0 25px 60px rgba(0,0,0,0.5),
-    0 0 0 1px rgba(255,122,26,0.08),
-    0 0 36px rgba(255,122,26,0.10);
-}
-
-/* =========================
-   COVER
-========================= */
+/* COVER */
 .cover-wrap {
   position: relative;
   z-index: 2;
@@ -89,17 +77,12 @@
   transition: transform 0.4s ease, opacity 0.35s ease;
   display: block;
 }
-.sonar-player.playing .station-cover {
-  animation: sonarSpin 8s linear infinite;
-}
 
 .sonar-player.playing .station-cover {
   transform: scale(1.02);
 }
 
-/* =========================
-   LIVE BADGE
-========================= */
+/* LIVE BADGE */
 .live-badge {
   position: absolute;
   bottom: 8px;
@@ -136,23 +119,12 @@
 }
 
 @keyframes pulseLive {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  70% {
-    transform: scale(1.35);
-    opacity: 0.4;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0% { transform: scale(1); opacity: 1; }
+  70% { transform: scale(1.35); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-/* =========================
-   INFO PRINCIPAL
-========================= */
+/* INFO */
 .sonar-player-info {
   position: relative;
   z-index: 2;
@@ -212,9 +184,7 @@
   box-shadow: 0 0 10px var(--sr-live);
 }
 
-/* =========================
-   CONTROLES
-========================= */
+/* CONTROLES */
 .player-controls {
   display: flex;
   align-items: center;
@@ -226,7 +196,7 @@
   min-width: 230px;
 }
 
-/* BOTÓN PLAY */
+/* PLAY */
 .play-btn {
   width: 82px !important;
   height: 82px !important;
@@ -269,7 +239,7 @@
   transform: translateX(2px);
 }
 
-/* BOTÓN MUTE */
+/* MUTE */
 .mute-btn {
   width: 58px !important;
   height: 58px !important;
@@ -300,9 +270,7 @@
   line-height: 1 !important;
 }
 
-/* =========================
-   VOLUMEN
-========================= */
+/* VOLUMEN */
 .volume-wrap {
   display: flex;
   align-items: center;
@@ -350,16 +318,12 @@
   cursor: pointer;
 }
 
-/* =========================
-   AUDIO HIDDEN
-========================= */
+/* AUDIO HIDDEN */
 #radioPlayer {
   display: none;
 }
 
-/* =========================
-   TOAST CANCIÓN
-========================= */
+/* TOAST */
 .song-toast {
   position: fixed;
   bottom: 100px;
@@ -391,9 +355,7 @@
   -webkit-backdrop-filter: blur(14px);
 }
 
-/* =========================
-   MINI PLAYER MOBILE
-========================= */
+/* MINI PLAYER */
 .mini-player {
   position: fixed;
   bottom: 16px;
@@ -480,39 +442,7 @@
   transform: translateX(1px);
 }
 
-/* =========================
-   DISCO DE LA SEMANA
-========================= */
-.disco-player-info {
-  width: 100%;
-}
-
-.disco-track-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 12px;
-  line-height: 1.35;
-}
-
-/* =========================
-   SPOTIFY
-========================= */
-.spotify-player-info {
-  width: 100%;
-}
-
-.spotify-player-info iframe {
-  width: 100%;
-  min-height: 152px;
-  border: none;
-  border-radius: 18px;
-  display: block;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
+/* RESPONSIVE */
 @media (max-width: 900px) {
   .sonar-player {
     grid-template-columns: 1fr;
@@ -542,19 +472,19 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .hero-player-section {
     padding: 10px 16px 0;
   }
 
   .cover-wrap {
-    width: 112px;
-    height: 112px;
+    width: 130px;
+    height: 130px;
   }
 
   .station-cover {
-    width: 112px;
-    height: 112px;
+    width: 130px;
+    height: 130px;
   }
 
   .sonar-track-title {
@@ -592,7 +522,9 @@
   }
 
   .mini-player {
-    display: flex;
+    bottom: 14px;
+    left: 14px;
+    right: 14px;
   }
 }
 
@@ -639,9 +571,5 @@
 
   .mini-status {
     max-width: 160px;
-  }
-
-  .spotify-player-info iframe {
-    min-height: 152px;
   }
 }

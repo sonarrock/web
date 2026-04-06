@@ -165,25 +165,33 @@ document.addEventListener("DOMContentLoaded", () => {
     return Date.now() - playbackStartedAt < startupGraceMs;
   }
 
-  function setCover(url) {
+    function setCover(url) {
     if (!stationCover) return;
 
     const finalUrl = url || DEFAULT_COVER;
     if (finalUrl === currentCoverUrl) return;
 
-    stationCover.style.opacity = "0.45";
+    stationCover.classList.add("loading-cover");
 
     const img = new Image();
     img.onload = () => {
       stationCover.src = finalUrl;
       currentCoverUrl = finalUrl;
-      stationCover.style.opacity = "1";
+
+      requestAnimationFrame(() => {
+        stationCover.classList.remove("loading-cover");
+      });
     };
+
     img.onerror = () => {
       stationCover.src = DEFAULT_COVER;
       currentCoverUrl = DEFAULT_COVER;
-      stationCover.style.opacity = "1";
+
+      requestAnimationFrame(() => {
+        stationCover.classList.remove("loading-cover");
+      });
     };
+
     img.src = finalUrl;
   }
 

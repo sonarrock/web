@@ -1,44 +1,52 @@
-/* ===================
-   SONAR ROCK PLAYER 
-====================== */
+/* =========================================
+   SONAR ROCK PLAYER V2 PREMIUM
+========================================= */
 
 :root {
   --sr-primary: #ff7a1a;
-  --sr-primary-soft: rgba(255, 122, 26, 0.16);
+  --sr-primary-2: #ff9a3d;
+  --sr-electric: #27c7ff;
+  --sr-electric-2: #0078ff;
   --sr-bg: rgba(255, 255, 255, 0.05);
   --sr-border: rgba(255, 255, 255, 0.12);
   --sr-text: #ffffff;
   --sr-subtext: #b8b8b8;
   --sr-live: #ff3b3b;
   --sr-shadow: 0 22px 55px rgba(0,0,0,0.42);
-  --sr-radius: 28px;
+  --sr-radius: 30px;
   --sr-transition: all 0.35s ease;
 }
 
-/* HERO */
+/* =========================
+   HERO SECTION
+========================= */
 .hero-player-section {
-  padding: 20px 20px 10px;
+  padding: 16px 20px 10px;
 }
 
-/* PLAYER CARD */
+/* =========================
+   PLAYER CARD
+========================= */
 .sonar-player {
   width: 100%;
-  max-width: 860px;
+  max-width: 980px;
   margin: 20px auto 40px;
-  padding: 28px;
+  padding: 34px;
   border-radius: var(--sr-radius);
   background: linear-gradient(
     145deg,
-    rgba(255,255,255,0.06),
+    rgba(255,255,255,0.07),
     rgba(255,255,255,0.03)
   );
-  border: 1px solid var(--sr-border);
-  box-shadow: var(--sr-shadow);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.42),
+    0 0 0 1px rgba(255,255,255,0.03);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
   display: grid;
-  grid-template-columns: 170px 1fr auto;
-  gap: 28px;
+  grid-template-columns: 210px 1fr auto;
+  gap: 32px;
   align-items: center;
   position: relative;
   overflow: hidden;
@@ -49,48 +57,101 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at top left, rgba(255,122,26,0.16), transparent 35%),
-    radial-gradient(circle at bottom right, rgba(0,180,255,0.12), transparent 35%);
+    radial-gradient(circle at top left, rgba(255,122,26,0.18), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(39,199,255,0.12), transparent 35%);
   pointer-events: none;
-
 }
 
-/* COVER */
+.player-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.player-glow-1 {
+  width: 220px;
+  height: 220px;
+  background: rgba(255, 122, 26, 0.12);
+  top: -60px;
+  left: -40px;
+}
+
+.player-glow-2 {
+  width: 240px;
+  height: 240px;
+  background: rgba(39, 199, 255, 0.10);
+  right: -80px;
+  bottom: -100px;
+}
+
+.sonar-player.is-live {
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.5),
+    0 0 0 1px rgba(255,122,26,0.08),
+    0 0 36px rgba(255,122,26,0.10);
+}
+
+/* =========================
+   COVER
+========================= */
 .cover-wrap {
   position: relative;
   z-index: 2;
-  width: 160px;
-  height: 160px;
+  width: 200px;
+  height: 200px;
   margin: 0 auto;
   flex-shrink: 0;
 }
 
-.station-cover {
-  width: 160px;
-  height: 160px;
-  border-radius: 18px;
-  object-fit: cover;
+.cover-frame {
+  width: 200px;
+  height: 200px;
+  padding: 10px;
+  border-radius: 28px;
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.02)
+  );
+  border: 1px solid rgba(255,255,255,0.12);
   box-shadow:
-    0 0 0 10px rgba(0,0,0,0.18),
-    0 0 0 2px rgba(255,122,26,0.14),
-    0 18px 35px rgba(0,0,0,0.38);
-  transition: transform 0.4s ease, opacity 0.35s ease;
+    0 20px 45px rgba(0,0,0,0.35),
+    0 0 0 1px rgba(255,122,26,0.06);
+}
+
+.station-cover {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px; /* CUADRADA premium */
+  object-fit: cover;
   display: block;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05),
+    0 18px 35px rgba(0,0,0,0.35);
+  transition: transform 0.4s ease, opacity 0.35s ease, box-shadow 0.35s ease;
 }
 
 .sonar-player.playing .station-cover {
   transform: scale(1.02);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08),
+    0 24px 40px rgba(0,0,0,0.4),
+    0 0 30px rgba(255,122,26,0.12);
 }
 
-/* LIVE BADGE */
+/* =========================
+   LIVE BADGE
+========================= */
 .live-badge {
   position: absolute;
-  bottom: 8px;
-  right: -6px;
-  background: rgba(15,15,15,0.94);
+  bottom: -10px;
+  right: -10px;
+  background: rgba(12,12,12,0.95);
   color: #fff;
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 7px 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 8px 13px;
   border-radius: 999px;
   font-size: 0.78rem;
   font-weight: 800;
@@ -124,7 +185,9 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* INFO */
+/* =========================
+   INFO PRINCIPAL
+========================= */
 .sonar-player-info {
   position: relative;
   z-index: 2;
@@ -133,41 +196,44 @@
 
 .eyebrow {
   color: var(--sr-primary);
-  font-size: 0.8rem;
-  font-weight: 800;
-  letter-spacing: 1.8px;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .sonar-track-title {
-  font-size: clamp(1.2rem, 2vw, 1.8rem);
-  font-weight: 800;
-  line-height: 1.2;
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-weight: 900;
+  line-height: 1.12;
   color: var(--sr-text);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   word-break: break-word;
+  text-wrap: balance;
 }
 
 .sonar-track-artist {
-  font-size: 1rem;
+  font-size: 1.02rem;
   color: var(--sr-subtext);
-  font-weight: 600;
-  margin-bottom: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: 0.2px;
 }
 
 .status-row {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 15px;
+  padding: 11px 16px;
   border-radius: 999px;
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.08);
   font-size: 0.92rem;
   color: #ddd;
-  font-weight: 600;
+  font-weight: 700;
   flex-wrap: nowrap;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
 }
 
 .status-dot {
@@ -184,7 +250,9 @@
   box-shadow: 0 0 10px var(--sr-live);
 }
 
-/* CONTROLES */
+/* =========================
+   CONTROLES
+========================= */
 .player-controls {
   display: flex;
   align-items: center;
@@ -193,15 +261,15 @@
   flex-wrap: wrap;
   position: relative;
   z-index: 2;
-  min-width: 230px;
+  min-width: 250px;
 }
 
-/* PLAY */
+/* BOTÓN PLAY */
 .play-btn {
-  width: 82px !important;
-  height: 82px !important;
-  min-width: 82px;
-  min-height: 82px;
+  width: 86px !important;
+  height: 86px !important;
+  min-width: 86px;
+  min-height: 86px;
   border: none;
   border-radius: 50% !important;
   background: radial-gradient(circle at 30% 30%, #35d7ff, #0078ff) !important;
@@ -239,7 +307,7 @@
   transform: translateX(2px);
 }
 
-/* MUTE */
+/* BOTÓN MUTE */
 .mute-btn {
   width: 58px !important;
   height: 58px !important;
@@ -270,13 +338,19 @@
   line-height: 1 !important;
 }
 
-/* VOLUMEN */
+/* =========================
+   VOLUMEN
+========================= */
 .volume-wrap {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  max-width: 230px;
+  max-width: 240px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 .volume-emoji {
@@ -318,12 +392,16 @@
   cursor: pointer;
 }
 
-/* AUDIO HIDDEN */
+/* =========================
+   AUDIO HIDDEN
+========================= */
 #radioPlayer {
   display: none;
 }
 
-/* TOAST */
+/* =========================
+   TOAST CANCIÓN
+========================= */
 .song-toast {
   position: fixed;
   bottom: 100px;
@@ -355,14 +433,16 @@
   -webkit-backdrop-filter: blur(14px);
 }
 
-/* MINI PLAYER */
+/* =========================
+   MINI PLAYER MOBILE
+========================= */
 .mini-player {
   position: fixed;
   bottom: 16px;
   left: 16px;
   right: 16px;
   z-index: 9998;
-  background: rgba(15,15,15,0.92);
+  background: rgba(15,15,15,0.88);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 22px;
   padding: 12px 14px;
@@ -372,10 +452,6 @@
   box-shadow: 0 18px 40px rgba(0,0,0,0.35);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-}
-
-.mini-player.show {
-  display: flex;
 }
 
 .mini-left {
@@ -442,13 +518,45 @@
   transform: translateX(1px);
 }
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
+/* =========================
+   DISCO DE LA SEMANA
+========================= */
+.disco-player-info {
+  width: 100%;
+}
+
+.disco-track-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+/* =========================
+   SPOTIFY
+========================= */
+.spotify-player-info {
+  width: 100%;
+}
+
+.spotify-player-info iframe {
+  width: 100%;
+  min-height: 152px;
+  border: none;
+  border-radius: 18px;
+  display: block;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 980px) {
   .sonar-player {
     grid-template-columns: 1fr;
     text-align: center;
-    gap: 22px;
-    padding: 24px 20px;
+    gap: 24px;
+    padding: 28px 22px;
   }
 
   .sonar-player-info {
@@ -477,18 +585,18 @@
     padding: 10px 16px 0;
   }
 
-  .cover-wrap {
-    width: 130px;
-    height: 130px;
+  .cover-wrap,
+  .cover-frame {
+    width: 160px;
+    height: 160px;
   }
 
   .station-cover {
-    width: 130px;
-    height: 130px;
+    border-radius: 18px;
   }
 
   .sonar-track-title {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
 
   .sonar-track-artist {
@@ -496,10 +604,10 @@
   }
 
   .play-btn {
-    width: 76px !important;
-    height: 76px !important;
-    min-width: 76px;
-    min-height: 76px;
+    width: 78px !important;
+    height: 78px !important;
+    min-width: 78px;
+    min-height: 78px;
   }
 
   #playIcon {
@@ -522,26 +630,24 @@
   }
 
   .mini-player {
-    bottom: 14px;
-    left: 14px;
-    right: 14px;
+    display: flex;
   }
 }
 
 @media (max-width: 480px) {
   .sonar-player {
-    padding: 20px 16px;
-    border-radius: 22px;
+    padding: 22px 16px;
+    border-radius: 24px;
   }
 
-  .cover-wrap {
-    width: 112px;
-    height: 112px;
+  .cover-wrap,
+  .cover-frame {
+    width: 138px;
+    height: 138px;
   }
 
   .station-cover {
-    width: 112px;
-    height: 112px;
+    border-radius: 16px;
   }
 
   .play-btn {
@@ -571,5 +677,9 @@
 
   .mini-status {
     max-width: 160px;
+  }
+
+  .spotify-player-info iframe {
+    min-height: 152px;
   }
 }

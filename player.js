@@ -23,12 +23,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackArtist = document.getElementById("trackArtist");
   const miniPlayer = document.getElementById("miniPlayer");
 
+  const installBtn = document.getElementById("installBtn");
+  const installBar = document.getElementById("installBar");
+
   const songToast = document.getElementById("songToast");
   const toastSong = document.getElementById("toastSong");
 
   const stationCover = document.getElementById("stationCover");
-  const eqVisualizer = document.getElementById("eqVisualizer");
-  const eqBars = eqVisualizer ? eqVisualizer.querySelectorAll("span") : [];
+
+  const vuCanvas = document.getElementById("vuMeter");
+  const vuCtx = vuCanvas ? vuCanvas.getContext("2d") : null;
 
   if (!audio || !playBtn) return;
 
@@ -41,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const MOUNTPOINT = "sonarrock.mp3";
 
   const DEFAULT_TRACK_TEXT = "Transmitiendo rock sin concesiones";
-  const DEFAULT_ARTIST_TEXT = "SONAR ROCK";
+  const DEFAULT_ARTIST_TEXT = "Señal lista";
   const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
 
   const STORAGE_VOLUME = "sonarrock_volume";
@@ -61,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let reconnectAttempts = 0;
   let metadataTimer = null;
   let passiveMetadataTimer = null;
+  let deferredPrompt = null;
   let toastTimer = null;
 
   let currentCoverUrl = DEFAULT_COVER;
@@ -70,8 +75,15 @@ document.addEventListener("DOMContentLoaded", () => {
   let playbackStartedAt = 0;
   let isRecovering = false;
 
-  let eqAnimationFrame = null;
-  let eqPulse = 0;
+  // VISUALIZER
+  let audioCtx = null;
+  let analyser = null;
+  let sourceNode = null;
+  let dataArray = null;
+  let animationFrame = null;
+  let visualizerMode = "fallback"; // real | fallback
+  let fakeBars = [];
+  let visualizerInitialized = false;
 
   // =========================
   // AUDIO BASE
@@ -120,12 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (player) player.classList.toggle("playing", playing);
 
-    if (playing) {
-      startVisualizer();
-    } else {
-      stopVisualizer();
-    }
-
     if (!playing && isUserPaused) {
       setStatus("Listo para reproducir", false);
       stopMetadataPolling();
@@ -165,30 +171,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const finalUrl = url || DEFAULT_COVER;
     if (finalUrl === currentCoverUrl) return;
 
-    stationCover.style.opacity = "0.35";
-    stationCover.style.transform = "scale(0.98)";
+    stationCover.style.opacity = "0.45";
 
     const img = new Image();
     img.onload = () => {
       stationCover.src = finalUrl;
       currentCoverUrl = finalUrl;
-
-      requestAnimationFrame(() => {
-        stationCover.style.opacity = "1";
-        stationCover.style.transform = isPlaying ? "scale(1.015)" : "scale(1)";
-      });
+      stationCover.style.opacity = "1";
     };
-
     img.onerror = () => {
       stationCover.src = DEFAULT_COVER;
       currentCoverUrl = DEFAULT_COVER;
-
-      requestAnimationFrame(() => {
-        stationCover.style.opacity = "1";
-        stationCover.style.transform = isPlaying ? "scale(1.015)" : "scale(1)";
-      });
+      stationCover.style.opacity = "1";
     };
-
     img.src = finalUrl;
   }
 
@@ -207,59 +202,6 @@ document.addEventListener("DOMContentLoaded", () => {
     toastTimer = setTimeout(() => {
       songToast.classList.add("hidden");
     }, 3500);
-  }
-
-  function animateButton(btn) {
-    if (!btn) return;
-    btn.classList.add("pressed");
-    setTimeout(() => btn.classList.remove("pressed"), 140);
-  }
-
-  // =========================
-  // VISUALIZER REALISTA
-  // =========================
-  function startVisualizer() {
-    stopVisualizer();
-
-    const animate = () => {
-      if (!eqBars.length) return;
-
-      const vol = audio.muted ? 0 : audio.volume;
-      eqPulse += 0.12;
-
-      eqBars.forEach((bar, i) => {
-        const wave =
-          Math.sin(eqPulse + i * 0.55) * 0.5 +
-          Math.sin(eqPulse * 1.8 + i * 0.3) * 0.35 +
-          Math.sin(eqPulse * 2.5 + i * 0.18) * 0.2;
-
-        const randomBoost = Math.random() * 0.22;
-        const intensity = Math.max(0.12, (wave + 1) / 2 + randomBoost);
-        const baseHeight = 8;
-        const maxHeight = 34;
-        const height = baseHeight + intensity * maxHeight * (0.35 + vol * 0.95);
-
-        bar.style.height = `${height}px`;
-        bar.style.opacity = `${0.35 + intensity * 0.65}`;
-      });
-
-      eqAnimationFrame = requestAnimationFrame(animate);
-    };
-
-    animate();
-  }
-
-  function stopVisualizer() {
-    if (eqAnimationFrame) {
-      cancelAnimationFrame(eqAnimationFrame);
-      eqAnimationFrame = null;
-    }
-
-    eqBars.forEach((bar, i) => {
-      const idle = 8 + (i % 3) * 3;
-      bar.style.height = `${idle}px`;
-      bar.style.opacity = "0.35";
-    });
   }
 
   // =========================
@@ -474,13 +416,169 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // RECONEXIÓN
+  // VISUALIZER REAL / FALLBACK
+  // =========================
+  function resizeCanvas() {
+    if (!vuCanvas) return;
+    const rect = vuCanvas.getBoundingClientRect();
+    vuCanvas.width = Math.max(320, Math.floor(rect.width * window.devicePixelRatio));
+    vuCanvas.height = Math.max(78, Math.floor(rect.height * window.devicePixelRatio));
+  }
+
+  function initFakeBars() {
+    if (!vuCanvas) return;
+    const bars = 42;
+    fakeBars = Array.from({ length: bars }, (_, i) => ({
+      value: 0.15 + Math.random() * 0.25,
+      speed: 0.01 + Math.random() * 0.025,
+      offset: Math.random() * Math.PI * 2,
+      index: i
+    }));
+  }
+
+  async function initVisualizer() {
+    if (visualizerInitialized || !vuCanvas || !vuCtx) return;
+    visualizerInitialized = true;
+
+    resizeCanvas();
+    initFakeBars();
+
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) throw new Error("Web Audio API no soportada");
+
+      audioCtx = new AudioContextClass();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.82;
+
+      sourceNode = audioCtx.createMediaElementSource(audio);
+      sourceNode.connect(analyser);
+      analyser.connect(audioCtx.destination);
+
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
+      visualizerMode = "real";
+    } catch (error) {
+      console.warn("Visualizer real no disponible, usando fallback:", error);
+      visualizerMode = "fallback";
+    }
+
+    drawVisualizer();
+  }
+
+  function drawRoundedBar(ctx, x, y, w, h, r) {
+    const radius = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + w - radius, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+    ctx.lineTo(x + w, y + h - radius);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+    ctx.lineTo(x + radius, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawVisualizer() {
+    if (!vuCanvas || !vuCtx) return;
+
+    const ctx = vuCtx;
+    const w = vuCanvas.width;
+    const h = vuCanvas.height;
+    const dpr = window.devicePixelRatio || 1;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // fondo glow
+    const bgGlow = ctx.createLinearGradient(0, 0, w, 0);
+    bgGlow.addColorStop(0, "rgba(255,122,26,0.04)");
+    bgGlow.addColorStop(0.5, "rgba(0,180,255,0.045)");
+    bgGlow.addColorStop(1, "rgba(255,122,26,0.04)");
+    ctx.fillStyle = bgGlow;
+    ctx.fillRect(0, 0, w, h);
+
+    const bars = 42;
+    const gap = 8 * dpr;
+    const barWidth = (w - gap * (bars - 1)) / bars;
+    const centerY = h / 2;
+    const maxHeight = h * 0.72;
+
+    let values = new Array(bars).fill(0.08);
+
+    if (visualizerMode === "real" && analyser && dataArray) {
+      analyser.getByteFrequencyData(dataArray);
+
+      for (let i = 0; i < bars; i++) {
+        const dataIndex = Math.floor((i / bars) * dataArray.length);
+        const raw = dataArray[dataIndex] / 255;
+        const boosted = Math.pow(raw, 1.18) * 1.35;
+        values[i] = Math.min(1, boosted);
+      }
+    } else {
+      const t = Date.now() * 0.0022;
+      fakeBars.forEach((bar, i) => {
+        const activeBoost = isPlaying ? 1 : 0.35;
+        const volumeBoost = Math.max(0.25, audio.volume || 0.25);
+        const pulse = (Math.sin(t * (1.4 + bar.speed * 8) + bar.offset) + 1) / 2;
+        const drift = (Math.sin(t * 0.55 + i * 0.4) + 1) / 2;
+        values[i] = (0.08 + pulse * 0.34 + drift * 0.16) * activeBoost * volumeBoost;
+      });
+    }
+
+    // línea base
+    ctx.beginPath();
+    ctx.moveTo(0, centerY);
+    ctx.lineTo(w, centerY);
+    ctx.strokeStyle = "rgba(255,255,255,0.05)";
+    ctx.lineWidth = 1 * dpr;
+    ctx.stroke();
+
+    for (let i = 0; i < bars; i++) {
+      const x = i * (barWidth + gap);
+      const val = values[i];
+      const barH = Math.max(8 * dpr, val * maxHeight);
+
+      const y = centerY - barH / 2;
+
+      const grad = ctx.createLinearGradient(0, y, 0, y + barH);
+      grad.addColorStop(0, "rgba(255,255,255,0.98)");
+      grad.addColorStop(0.22, "rgba(110,210,255,0.95)");
+      grad.addColorStop(0.58, "rgba(255,122,26,0.95)");
+      grad.addColorStop(1, "rgba(255,90,0,0.92)");
+
+      ctx.shadowBlur = 14 * dpr;
+      ctx.shadowColor = "rgba(255,122,26,0.18)";
+      ctx.fillStyle = grad;
+
+      drawRoundedBar(ctx, x, y, barWidth, barH, 12 * dpr);
+
+      // glow superior sutil
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "rgba(255,255,255,0.12)";
+      drawRoundedBar(ctx, x, y, barWidth, Math.max(4 * dpr, barH * 0.12), 10 * dpr);
+    }
+
+    animationFrame = requestAnimationFrame(drawVisualizer);
+  }
+
+  function stopVisualizer() {
+    if (animationFrame) {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = null;
+    }
+  }
+
+  // =========================
+  // RECONEXIÓN INTELIGENTE
   // =========================
   async function recoverPlayback(forceReload = false) {
     if (!isPlaying || isUserPaused || isRecovering) return;
 
     if (reconnectAttempts >= maxReconnectAttempts) {
-      setStatus("No se pudo reconectar", false);
+      setStatus("No se pudo reconectar la señal", false);
       updatePlayUI(false);
       return;
     }
@@ -526,6 +624,12 @@ document.addEventListener("DOMContentLoaded", () => {
         audio.src = STREAM_URL;
       }
 
+      await initVisualizer();
+
+      if (audioCtx && audioCtx.state === "suspended") {
+        await audioCtx.resume();
+      }
+
       await audio.play();
 
       updatePlayUI(true);
@@ -547,9 +651,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function togglePlay() {
-    animateButton(playBtn);
-    animateButton(miniPlayBtn);
-
     if (audio.paused) {
       playStream();
     } else {
@@ -564,8 +665,6 @@ document.addEventListener("DOMContentLoaded", () => {
   miniPlayBtn?.addEventListener("click", togglePlay);
 
   muteBtn?.addEventListener("click", () => {
-    animateButton(muteBtn);
-
     audio.muted = !audio.muted;
 
     if (!audio.muted && audio.volume === 0) {
@@ -681,8 +780,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  window.addEventListener("resize", handleMiniPlayer);
+  window.addEventListener("resize", () => {
+    handleMiniPlayer();
+    resizeCanvas();
+  });
+
   handleMiniPlayer();
+
+  // =========================
+  // PWA INSTALL
+  // =========================
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    if (installBar) installBar.classList.add("show");
+    if (installBtn) installBtn.style.display = "inline-flex";
+  });
+
+  installBtn?.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+
+    if (choice.outcome === "accepted") {
+      if (installBar) installBar.classList.remove("show");
+    }
+
+    deferredPrompt = null;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    if (installBar) installBar.classList.remove("show");
+    deferredPrompt = null;
+  });
 
   // =========================
   // INIT
@@ -692,5 +824,14 @@ document.addEventListener("DOMContentLoaded", () => {
   resetMetadataUI();
   songToast?.classList.add("hidden");
   startPassiveMetadataPolling();
-  stopVisualizer();
+
+  resizeCanvas();
+  initFakeBars();
+  drawVisualizer();
+
+  window.addEventListener("beforeunload", () => {
+    stopVisualizer();
+    stopMetadataPolling();
+    stopPassiveMetadataPolling();
+  });
 });

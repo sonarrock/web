@@ -27,18 +27,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const toastSong = document.getElementById("toastSong");
 
   const stationCover = document.getElementById("stationCover");
-  const liveBadge = document.getElementById("liveBadge");
+  const eqVisualizer = document.getElementById("eqVisualizer");
+  const eqBars = eqVisualizer ? eqVisualizer.querySelectorAll("span") : [];
 
   if (!audio || !playBtn) return;
 
+  // =========================
   // CONFIG
+  // =========================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
   const METADATA_URL = "https://giss.tv:667/status-json.xsl";
   const GISS_NOWPLAYING_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
   const MOUNTPOINT = "sonarrock.mp3";
 
   const DEFAULT_TRACK_TEXT = "Transmitiendo rock sin concesiones";
-  const DEFAULT_ARTIST_TEXT = "Señal lista";
+  const DEFAULT_ARTIST_TEXT = "SONAR ROCK";
   const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
 
   const STORAGE_VOLUME = "sonarrock_volume";
@@ -50,7 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const metadataIntervalMs = 12000;
   const passiveMetadataIntervalMs = 15000;
 
+  // =========================
   // STATE
+  // =========================
   let isPlaying = false;
   let reconnectTimer = null;
   let reconnectAttempts = 0;
@@ -65,14 +70,21 @@ document.addEventListener("DOMContentLoaded", () => {
   let playbackStartedAt = 0;
   let isRecovering = false;
 
+  let eqAnimationFrame = null;
+  let eqPulse = 0;
+
+  // =========================
   // AUDIO BASE
+  // =========================
   audio.src = STREAM_URL;
   audio.preload = "none";
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
   audio.crossOrigin = "anonymous";
 
-  // CONFIG GUARDADA
+  // =========================
+  // CARGAR CONFIG GUARDADA
+  // =========================
   const savedVolume = localStorage.getItem(STORAGE_VOLUME);
   const savedMuted = localStorage.getItem(STORAGE_MUTED);
 
@@ -83,14 +95,15 @@ document.addEventListener("DOMContentLoaded", () => {
     volumeControl.value = audio.muted ? 0 : audio.volume;
   }
 
+  // =========================
   // HELPERS UI
+  // =========================
   function setStatus(text, live = false) {
     if (statusText) statusText.textContent = text;
     if (miniStatus) miniStatus.textContent = text;
 
     if (statusDot) statusDot.classList.toggle("live", live);
     if (miniLiveDot) miniLiveDot.classList.toggle("live", live);
-    if (liveBadge) liveBadge.classList.toggle("live", live);
     if (player) player.classList.toggle("is-live", live);
   }
 
@@ -106,6 +119,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (miniPlayIcon) miniPlayIcon.textContent = playing ? "❚❚" : "▶";
 
     if (player) player.classList.toggle("playing", playing);
+
+    if (playing) {
+      startVisualizer();
+    } else {
+      stopVisualizer();
+    }
 
     if (!playing && isUserPaused) {
       setStatus("Listo para reproducir", false);
@@ -146,19 +165,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const finalUrl = url || DEFAULT_COVER;
     if (finalUrl === currentCoverUrl) return;
 
-    stationCover.style.opacity = "0.55";
+    stationCover.style.opacity = "0.35";
+    stationCover.style.transform = "scale(0.98)";
 
     const img = new Image();
     img.onload = () => {
       stationCover.src = finalUrl;
       currentCoverUrl = finalUrl;
-      stationCover.style.opacity = "1";
+
+      requestAnimationFrame(() => {
+        stationCover.style.opacity = "1";
+        stationCover.style.transform = isPlaying ? "scale(1.015)" : "scale(1)";
+      });
     };
+
     img.onerror = () => {
       stationCover.src = DEFAULT_COVER;
       currentCoverUrl = DEFAULT_COVER;
-      stationCover.style.opacity = "1";
+
+      requestAnimationFrame(() => {
+        stationCover.style.opacity = "1";
+        stationCover.style.transform = isPlaying ? "scale(1.015)" : "scale(1)";
+      });
     };
+
     img.src = finalUrl;
   }
 
@@ -179,7 +209,62 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3500);
   }
 
+  function animateButton(btn) {
+    if (!btn) return;
+    btn.classList.add("pressed");
+    setTimeout(() => btn.classList.remove("pressed"), 140);
+  }
+
+  // =========================
+  // VISUALIZER REALISTA
+  // =========================
+  function startVisualizer() {
+    stopVisualizer();
+
+    const animate = () => {
+      if (!eqBars.length) return;
+
+      const vol = audio.muted ? 0 : audio.volume;
+      eqPulse += 0.12;
+
+      eqBars.forEach((bar, i) => {
+        const wave =
+          Math.sin(eqPulse + i * 0.55) * 0.5 +
+          Math.sin(eqPulse * 1.8 + i * 0.3) * 0.35 +
+          Math.sin(eqPulse * 2.5 + i * 0.18) * 0.2;
+
+        const randomBoost = Math.random() * 0.22;
+        const intensity = Math.max(0.12, (wave + 1) / 2 + randomBoost);
+        const baseHeight = 8;
+        const maxHeight = 34;
+        const height = baseHeight + intensity * maxHeight * (0.35 + vol * 0.95);
+
+        bar.style.height = `${height}px`;
+        bar.style.opacity = `${0.35 + intensity * 0.65}`;
+      });
+
+      eqAnimationFrame = requestAnimationFrame(animate);
+    };
+
+    animate();
+  }
+
+  function stopVisualizer() {
+    if (eqAnimationFrame) {
+      cancelAnimationFrame(eqAnimationFrame);
+      eqAnimationFrame = null;
+    }
+
+    eqBars.forEach((bar, i) => {
+      const idle = 8 + (i % 3) * 3;
+      bar.style.height = `${idle}px`;
+      bar.style.opacity = "0.35";
+    });
+  }
+
+  // =========================
   // PARSE TITLE
+  // =========================
   function parseTitle(rawTitle = "") {
     if (!rawTitle || typeof rawTitle !== "string") {
       return {
@@ -226,7 +311,9 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
+  // =========================
   // PORTADA (ITUNES)
+  // =========================
   async function fetchAlbumArt(artist, title) {
     if (!artist && !title) {
       setCover(DEFAULT_COVER);
@@ -258,7 +345,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // =========================
   // METADATA GISS / ICECAST
+  // =========================
   function getMountSource(data) {
     const sources = data?.icestats?.source;
     if (!sources) return null;
@@ -307,7 +396,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const source = getMountSource(data);
 
       if (!source) {
-        setStatus("Señal fuera del aire", false);
+        setStatus("Fuera de línea", false);
+        resetMetadataUI();
+        return;
+      }
+
+      const isReallyLive = !!source.stream_start_iso8601;
+
+      if (!isReallyLive) {
+        setStatus("Fuera de línea", false);
         resetMetadataUI();
         return;
       }
@@ -376,12 +473,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // =========================
   // RECONEXIÓN
+  // =========================
   async function recoverPlayback(forceReload = false) {
     if (!isPlaying || isUserPaused || isRecovering) return;
 
     if (reconnectAttempts >= maxReconnectAttempts) {
-      setStatus("No se pudo reconectar la señal", false);
+      setStatus("No se pudo reconectar", false);
       updatePlayUI(false);
       return;
     }
@@ -410,7 +509,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }, reconnectDelay);
   }
 
+  // =========================
   // PLAY / PAUSE
+  // =========================
   async function playStream() {
     try {
       clearReconnect();
@@ -420,12 +521,6 @@ document.addEventListener("DOMContentLoaded", () => {
       playbackStartedAt = Date.now();
 
       setStatus("Conectando con la señal...", false);
-
-      // Pausar Disco de la Semana si está sonando
-      const discoAudio = document.getElementById("disco-audio");
-      if (discoAudio && !discoAudio.paused) {
-        discoAudio.pause();
-      }
 
       if (!audio.src || !audio.src.includes(STREAM_URL)) {
         audio.src = STREAM_URL;
@@ -452,6 +547,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function togglePlay() {
+    animateButton(playBtn);
+    animateButton(miniPlayBtn);
+
     if (audio.paused) {
       playStream();
     } else {
@@ -459,11 +557,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // =========================
   // BOTONES
+  // =========================
   playBtn.addEventListener("click", togglePlay);
   miniPlayBtn?.addEventListener("click", togglePlay);
 
   muteBtn?.addEventListener("click", () => {
+    animateButton(muteBtn);
+
     audio.muted = !audio.muted;
 
     if (!audio.muted && audio.volume === 0) {
@@ -485,7 +587,9 @@ document.addEventListener("DOMContentLoaded", () => {
     saveAudioPrefs();
   });
 
+  // =========================
   // EVENTOS AUDIO
+  // =========================
   audio.addEventListener("playing", () => {
     clearReconnect();
     reconnectAttempts = 0;
@@ -555,14 +659,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   audio.addEventListener("volumechange", updateMuteUI);
 
+  // =========================
   // VISIBILIDAD / iPHONE
+  // =========================
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden && isPlaying && audio.paused && !isUserPaused) {
       recoverPlayback(false);
     }
   });
 
+  // =========================
   // MINI PLAYER MÓVIL
+  // =========================
   function handleMiniPlayer() {
     if (!miniPlayer) return;
 
@@ -576,10 +684,13 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("resize", handleMiniPlayer);
   handleMiniPlayer();
 
+  // =========================
   // INIT
+  // =========================
   updateMuteUI();
   updatePlayUI(false);
   resetMetadataUI();
   songToast?.classList.add("hidden");
   startPassiveMetadataPolling();
+  stopVisualizer();
 });

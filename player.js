@@ -23,9 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackArtist = document.getElementById("trackArtist");
   const miniPlayer = document.getElementById("miniPlayer");
 
-  const installBtn = document.getElementById("installBtn");
-  const installBar = document.getElementById("installBar");
-
   const songToast = document.getElementById("songToast");
   const toastSong = document.getElementById("toastSong");
 
@@ -34,9 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!audio || !playBtn) return;
 
-  // =========================
   // CONFIG
-  // =========================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
   const METADATA_URL = "https://giss.tv:667/status-json.xsl";
   const GISS_NOWPLAYING_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
@@ -55,15 +50,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const metadataIntervalMs = 12000;
   const passiveMetadataIntervalMs = 15000;
 
-  // =========================
   // STATE
-  // =========================
   let isPlaying = false;
   let reconnectTimer = null;
   let reconnectAttempts = 0;
   let metadataTimer = null;
   let passiveMetadataTimer = null;
-  let deferredPrompt = null;
   let toastTimer = null;
 
   let currentCoverUrl = DEFAULT_COVER;
@@ -73,18 +65,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let playbackStartedAt = 0;
   let isRecovering = false;
 
-  // =========================
   // AUDIO BASE
-  // =========================
   audio.src = STREAM_URL;
   audio.preload = "none";
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
   audio.crossOrigin = "anonymous";
 
-  // =========================
-  // CARGAR CONFIG GUARDADA
-  // =========================
+  // CONFIG GUARDADA
   const savedVolume = localStorage.getItem(STORAGE_VOLUME);
   const savedMuted = localStorage.getItem(STORAGE_MUTED);
 
@@ -95,9 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
     volumeControl.value = audio.muted ? 0 : audio.volume;
   }
 
-  // =========================
   // HELPERS UI
-  // =========================
   function setStatus(text, live = false) {
     if (statusText) statusText.textContent = text;
     if (miniStatus) miniStatus.textContent = text;
@@ -193,9 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3500);
   }
 
-  // =========================
   // PARSE TITLE
-  // =========================
   function parseTitle(rawTitle = "") {
     if (!rawTitle || typeof rawTitle !== "string") {
       return {
@@ -242,9 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  // =========================
   // PORTADA (ITUNES)
-  // =========================
   async function fetchAlbumArt(artist, title) {
     if (!artist && !title) {
       setCover(DEFAULT_COVER);
@@ -276,9 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // =========================
   // METADATA GISS / ICECAST
-  // =========================
   function getMountSource(data) {
     const sources = data?.icestats?.source;
     if (!sources) return null;
@@ -327,14 +307,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const source = getMountSource(data);
 
       if (!source) {
-        setStatus("Señal fuera del aire", false);
-        resetMetadataUI();
-        return;
-      }
-
-      const isReallyLive = !!source.stream_start_iso8601;
-
-      if (!isReallyLive) {
         setStatus("Señal fuera del aire", false);
         resetMetadataUI();
         return;
@@ -404,9 +376,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // =========================
-  // RECONEXIÓN INTELIGENTE
-  // =========================
+  // RECONEXIÓN
   async function recoverPlayback(forceReload = false) {
     if (!isPlaying || isUserPaused || isRecovering) return;
 
@@ -440,39 +410,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }, reconnectDelay);
   }
 
-  // =========================
   // PLAY / PAUSE
-  // =========================
   async function playStream() {
-  try {
-    clearReconnect();
-    reconnectAttempts = 0;
-    isUserPaused = false;
-    isRecovering = false;
-    playbackStartedAt = Date.now();
+    try {
+      clearReconnect();
+      reconnectAttempts = 0;
+      isUserPaused = false;
+      isRecovering = false;
+      playbackStartedAt = Date.now();
 
-    setStatus("Conectando con la señal...", false);
+      setStatus("Conectando con la señal...", false);
 
-    // Pausar Disco de la Semana si está sonando
-    const discoAudio = document.getElementById("disco-audio");
-    if (discoAudio && !discoAudio.paused) {
-      discoAudio.pause();
+      // Pausar Disco de la Semana si está sonando
+      const discoAudio = document.getElementById("disco-audio");
+      if (discoAudio && !discoAudio.paused) {
+        discoAudio.pause();
+      }
+
+      if (!audio.src || !audio.src.includes(STREAM_URL)) {
+        audio.src = STREAM_URL;
+      }
+
+      await audio.play();
+
+      updatePlayUI(true);
+      startMetadataPolling();
+    } catch (error) {
+      console.error("Error al reproducir stream:", error);
+      updatePlayUI(false);
+      setStatus("Toca reproducir nuevamente", false);
     }
-
-    if (!audio.src || !audio.src.includes(STREAM_URL)) {
-      audio.src = STREAM_URL;
-    }
-
-    await audio.play();
-
-    updatePlayUI(true);
-    startMetadataPolling();
-  } catch (error) {
-    console.error("Error al reproducir stream:", error);
-    updatePlayUI(false);
-    setStatus("Toca reproducir nuevamente", false);
   }
-}
+
   function pauseStream() {
     clearReconnect();
     stopMetadataPolling();
@@ -490,9 +459,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // =========================
   // BOTONES
-  // =========================
   playBtn.addEventListener("click", togglePlay);
   miniPlayBtn?.addEventListener("click", togglePlay);
 
@@ -518,9 +485,7 @@ document.addEventListener("DOMContentLoaded", () => {
     saveAudioPrefs();
   });
 
-  // =========================
   // EVENTOS AUDIO
-  // =========================
   audio.addEventListener("playing", () => {
     clearReconnect();
     reconnectAttempts = 0;
@@ -590,18 +555,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   audio.addEventListener("volumechange", updateMuteUI);
 
-  // =========================
   // VISIBILIDAD / iPHONE
-  // =========================
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden && isPlaying && audio.paused && !isUserPaused) {
       recoverPlayback(false);
     }
   });
 
-  // =========================
   // MINI PLAYER MÓVIL
-  // =========================
   function handleMiniPlayer() {
     if (!miniPlayer) return;
 
@@ -615,38 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("resize", handleMiniPlayer);
   handleMiniPlayer();
 
-  // =========================
-  // PWA INSTALL
-  // =========================
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-
-    if (installBar) installBar.classList.add("show");
-    if (installBtn) installBtn.style.display = "inline-flex";
-  });
-
-  installBtn?.addEventListener("click", async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-
-    if (choice.outcome === "accepted") {
-      if (installBar) installBar.classList.remove("show");
-    }
-
-    deferredPrompt = null;
-  });
-
-  window.addEventListener("appinstalled", () => {
-    if (installBar) installBar.classList.remove("show");
-    deferredPrompt = null;
-  });
-
-  // =========================
   // INIT
-  // =========================
   updateMuteUI();
   updatePlayUI(false);
   resetMetadataUI();

@@ -20,19 +20,17 @@
   <!-- PRECONNECT / DNS -->
   <link rel="preconnect" href="https://giss.tv" crossorigin>
   <link rel="dns-prefetch" href="https://giss.tv">
-
   <link rel="preconnect" href="https://itunes.apple.com" crossorigin>
   <link rel="dns-prefetch" href="https://itunes.apple.com">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- FUENTES -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link href="style.css?v=17" rel="stylesheet">
-  <link href="player.css?v=17" rel="stylesheet">
+  <link href="style.css?v=20" rel="stylesheet">
+  <link href="player.css?v=20" rel="stylesheet">
 
   <!-- ICONOS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -56,35 +54,48 @@
 </head>
 <body>
 
+  <!-- AURAS / FX -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-grid"></div>
+
+  <!-- HEADER -->
   <header class="header">
     <div class="logo-section">
       <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
 
       <div class="title-section">
+        <p class="kicker">Rock • Comunidad • Resistencia</p>
         <h1>Sonar Rock</h1>
-        <h2 class="title section">La Radio Independiente</h2>
+        <h2 class="site-tagline">La Radio Independiente</h2>
       </div>
     </div>
   </header>
 
+  <!-- MAIN -->
   <main class="main-content">
 
-  
-    <!-- PLAYER PRINCIPAL -->
-    
+    <!-- HERO PLAYER -->
     <section class="hero-player-section">
       <div class="container">
 
         <div id="sonarPlayer" class="sonar-player">
 
+          <!-- GLOW FX -->
+          <div class="player-glow player-glow-1"></div>
+          <div class="player-glow player-glow-2"></div>
+
           <!-- COVER -->
           <div class="cover-wrap">
-            <img
-              id="stationCover"
-              src="attached_assets/logo_1749601460841.jpeg"
-              alt="Portada Sonar Rock"
-              class="station-cover"
-            >
+            <div class="cover-frame">
+              <img
+                id="stationCover"
+                src="attached_assets/logo_1749601460841.jpeg"
+                alt="Portada Sonar Rock"
+                class="station-cover"
+              >
+            </div>
+
             <div id="liveBadge" class="live-badge">
               <span class="live-pulse"></span>
               EN VIVO
@@ -130,7 +141,6 @@
 
           <!-- AUDIO -->
           <audio id="radioPlayer" preload="none" playsinline webkit-playsinline></audio>
-
         </div>
       </div>
     </section>
@@ -180,7 +190,9 @@
     <h3 class="player-title">Disco de la Semana</h3>
 
     <div class="custom-player disco-player" id="disco-player">
-      <img id="cover" src="disco-semana/portada.jpg" alt="Portada Disco">
+      <div class="disco-cover-wrap">
+        <img id="cover" src="disco-semana/portada.jpg" alt="Portada Disco">
+      </div>
 
       <div class="disco-player-info">
         <div id="track-title" class="disco-track-title"></div>
@@ -274,8 +286,8 @@
   </section>
 
   <!-- JS -->
-  <script src="disco-semana.js?v=14" defer></script>
-  <script src="player.js?v=14" defer></script>
+  <script src="disco-semana.js?v=20" defer></script>
+  <script src="player.js?v=20" defer></script>
 
   <script>
     if ("serviceWorker" in navigator) {

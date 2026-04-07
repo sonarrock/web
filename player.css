@@ -511,7 +511,7 @@
 /* =========================
    RESPONSIVE
 ========================= */
-@media (max-width: 900px) {
+@media (max-width: 700px) {
   .sonar-player {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -524,8 +524,8 @@
 
   .cover-wrap,
   .station-cover {
-    width: 136px;
-    height: 136px;
+    width: 126px;
+    height: 126px;
   }
 
   .player-right {
@@ -533,7 +533,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 680px) {
   .hero-player-section {
     padding: 10px 16px 0;
   }
@@ -586,8 +586,8 @@
   }
 
   .play-btn {
-    width: 72px !important;
-    height: 72px !important;
+    width: 65px !important;
+    height: 65px !important;
     min-width: 72px;
     min-height: 72px;
   }
@@ -597,8 +597,8 @@
   }
 
   .mute-btn {
-    width: 52px !important;
-    height: 52px !important;
+    width: 48px !important;
+    height: 48px !important;
   }
 
   .status-row {

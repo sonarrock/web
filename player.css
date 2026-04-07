@@ -680,3 +680,33 @@
     min-height: 152px;
   }
 }
+
+  function setCover(url) {
+    if (!stationCover) return;
+
+    const finalUrl = url || DEFAULT_COVER;
+    if (finalUrl === currentCoverUrl) return;
+
+    stationCover.classList.add("loading-cover");
+
+    const img = new Image();
+    img.onload = () => {
+      stationCover.src = finalUrl;
+      currentCoverUrl = finalUrl;
+
+      requestAnimationFrame(() => {
+        stationCover.classList.remove("loading-cover");
+      });
+    };
+
+    img.onerror = () => {
+      stationCover.src = DEFAULT_COVER;
+      currentCoverUrl = DEFAULT_COVER;
+
+      requestAnimationFrame(() => {
+        stationCover.classList.remove("loading-cover");
+      });
+    };
+
+    img.src = finalUrl;
+  }

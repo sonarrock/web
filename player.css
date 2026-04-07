@@ -511,7 +511,7 @@
 /* =========================
    RESPONSIVE
 ========================= */
-@media (max-width: 900px) {
+@media (max-width: 700px) {
   .sonar-player {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -533,7 +533,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .hero-player-section {
     padding: 10px 16px 0;
   }

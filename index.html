@@ -29,8 +29,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link href="style.css?v=11" rel="stylesheet">
-  <link href="player.css?v=11" rel="stylesheet">
+  <link href="style.css?v=16" rel="stylesheet">
+  <link href="player.css?v=16" rel="stylesheet">
 
   <!-- ICONOS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -75,72 +75,86 @@
   <!-- MAIN -->
   <main class="main-content">
 
-    <!-- HERO PLAYER -->
+
+<!-- =========================
+     SONAR ROCK PLAYER V12
+========================== -->
 <section class="hero-player-section">
   <div class="container">
 
     <div id="sonarPlayer" class="sonar-player">
 
-    <!-- COVER -->
-<div class="cover-wrap">
-  <img
-    id="stationCover"
-    src="attached_assets/logo_1749601460841.jpeg"
-    alt="Portada Sonar Rock"
-    class="station-cover"
-  >
-</div>
+      <!-- COLUMNA IZQUIERDA -->
+      <div class="player-left">
 
-<!-- INFO -->
-<div class="sonar-player-info">
-  <p class="eyebrow">Estas Escuchando</p>
-  <h3 id="trackInfo" class="sonar-track-title">Transmitiendo rock sin payola</h3>
-  <p id="trackArtist" class="sonar-track-artist">Señal lista</p>
+        <!-- COVER -->
+        <div class="cover-wrap">
+          <img
+            id="stationCover"
+            src="attached_assets/logo_1749601460841.jpeg"
+            alt="Portada Sonar Rock"
+            class="station-cover"
+          >
+        </div>
 
-  <div class="status-row">
-    <span id="statusDot" class="status-dot"></span>
-    <span id="statusText">Listo para reproducir</span>
-  </div>
+        <!-- INFO -->
+        <div class="sonar-player-info">
+          <p class="eyebrow">Transmitiendo ahora</p>
+          <h3 id="trackInfo" class="sonar-track-title">Transmitiendo rock sin concesiones</h3>
+          <p id="trackArtist" class="sonar-track-artist">Señal lista</p>
 
-  <!-- VU METER REAL -->
-  <div class="vu-meter-wrap">
-    <canvas id="vuMeter" class="vu-meter" width="560" height="88"></canvas>
-  </div>
-</div>
+          <div class="status-row">
+            <span id="statusDot" class="status-dot"></span>
+            <span id="statusText">Listo para reproducir</span>
+          </div>
+        </div>
 
-<!-- CONTROLES -->
-<div class="player-controls">
-  <div class="buttons-row">
-    <button id="playBtn" class="play-btn" type="button" aria-label="Reproducir">
-      <span id="playIcon">▶</span>
-    </button>
+      </div>
 
-    <button id="muteBtn" class="mute-btn" type="button" aria-label="Silenciar">
-      <span id="muteIcon">🔊</span>
-    </button>
-  </div>
+      <!-- COLUMNA DERECHA -->
+      <div class="player-right">
 
-  <div class="volume-wrap premium-volume">
-    <span id="volumeEmoji" class="volume-emoji">🔊</span>
-    <input
-      id="volumeControl"
-      class="volume-slider"
-      type="range"
-      min="0"
-      max="1"
-      step="0.01"
-      value="1"
-      aria-label="Volumen"
-    >
-  </div>
-</div>
+        <!-- VU METER REAL -->
+        <div class="vu-wrap" aria-hidden="true">
+          <canvas id="vuMeter" width="320" height="90"></canvas>
+        </div>
 
-<!-- AUDIO -->
-<audio id="radioPlayer" preload="none" playsinline webkit-playsinline></audio>
-      
+        <!-- CONTROLES -->
+        <div class="player-controls">
+          <div class="buttons-row">
+            <button id="playBtn" class="play-btn" type="button" aria-label="Reproducir">
+              <span id="playIcon">▶</span>
+            </button>
+
+            <button id="muteBtn" class="mute-btn" type="button" aria-label="Silenciar">
+              <span id="muteIcon">🔊</span>
+            </button>
+          </div>
+
+          <div class="volume-wrap">
+            <span id="volumeEmoji" class="volume-emoji">🔊</span>
+            <input
+              id="volumeControl"
+              class="volume-slider"
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value="1"
+              aria-label="Volumen"
+            >
+          </div>
+        </div>
+
+      </div>
+
+      <!-- AUDIO -->
+      <audio id="radioPlayer" preload="none" playsinline webkit-playsinline></audio>
+
     </div>
   </div>
 </section>
+    
     
     <!-- TOAST NUEVA CANCIÓN -->
     <div id="songToast" class="song-toast hidden">
@@ -283,8 +297,8 @@
   </section>
 
   <!-- JS -->
-  <script src="disco-semana.js?v=11" defer></script>
-  <script src="player.js?v=11" defer></script>
+  <script src="disco-semana.js?v=16" defer></script>
+  <script src="player.js?v=12" defer></script>
 
   <script>
     if ("serviceWorker" in navigator) {

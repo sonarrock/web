@@ -95,15 +95,15 @@
    COVER CUADRADA
 ========================= */
 .cover-wrap {
-  width: 160px;
-  height: 160px;
+  width: 148px;
+  height: 148px;
   position: relative;
   flex-shrink: 0;
 }
 
 .station-cover {
-  width: 160px;
-  height: 160px;
+  width: 148px;
+  height: 148px;
   border-radius: 22px;
   object-fit: cover;
   box-shadow:
@@ -145,7 +145,7 @@
 
 .sonar-track-title {
   font-size: clamp(1.14rem, 1.9vw, 1.72rem);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.18;
   color: var(--sr-text);
   margin-bottom: 7px;
@@ -153,7 +153,7 @@
 }
 
 .sonar-track-artist {
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   color: var(--sr-subtext);
   font-weight: 650;
   margin-bottom: 14px;
@@ -511,7 +511,7 @@
 /* =========================
    RESPONSIVE
 ========================= */
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .sonar-player {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -524,8 +524,8 @@
 
   .cover-wrap,
   .station-cover {
-    width: 126px;
-    height: 126px;
+    width: 136px;
+    height: 136px;
   }
 
   .player-right {
@@ -533,7 +533,7 @@
   }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 768px) {
   .hero-player-section {
     padding: 10px 16px 0;
   }
@@ -586,8 +586,8 @@
   }
 
   .play-btn {
-    width: 65px !important;
-    height: 65px !important;
+    width: 72px !important;
+    height: 72px !important;
     min-width: 72px;
     min-height: 72px;
   }
@@ -597,8 +597,8 @@
   }
 
   .mute-btn {
-    width: 48px !important;
-    height: 48px !important;
+    width: 52px !important;
+    height: 52px !important;
   }
 
   .status-row {

@@ -20,17 +20,19 @@
   <!-- PRECONNECT / DNS -->
   <link rel="preconnect" href="https://giss.tv" crossorigin>
   <link rel="dns-prefetch" href="https://giss.tv">
+
   <link rel="preconnect" href="https://itunes.apple.com" crossorigin>
   <link rel="dns-prefetch" href="https://itunes.apple.com">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- FUENTES -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link href="style.css?v=16" rel="stylesheet">
-  <link href="player.css?v=16" rel="stylesheet">
+  <link href="style.css?v=20" rel="stylesheet">
+  <link href="player.css?v=20" rel="stylesheet">
 
   <!-- ICONOS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -54,109 +56,102 @@
 </head>
 <body>
 
-  <!-- AURAS / FX -->
-  <div class="bg-orb orb-1"></div>
-  <div class="bg-orb orb-2"></div>
-  <div class="bg-grid"></div>
-
-  <!-- HEADER -->
   <header class="header">
     <div class="logo-section">
       <img src="attached_assets/logo_1749601460841.jpeg" alt="Sonar Rock Logo" class="logo">
 
       <div class="title-section">
-        <p class="kicker">Rock • Comunidad • Resistencia</p>
         <h1>Sonar Rock</h1>
         <h2 class="site-tagline">La Radio Independiente</h2>
       </div>
     </div>
   </header>
 
-  <!-- MAIN -->
+  <!-- =========================
+       MAIN
+  ========================== -->
   <main class="main-content">
 
+    <!-- =========================
+         SONAR ROCK PLAYER
+    ========================== -->
+    <section class="hero-player-section">
+      <div class="container">
 
-<!-- =========================
-     SONAR ROCK PLAYER V12
-========================== -->
-<section class="hero-player-section">
-  <div class="container">
+        <div id="sonarPlayer" class="sonar-player">
 
-    <div id="sonarPlayer" class="sonar-player">
+          <!-- COLUMNA IZQUIERDA -->
+          <div class="player-left">
 
-      <!-- COLUMNA IZQUIERDA -->
-      <div class="player-left">
+            <!-- COVER -->
+            <div class="cover-wrap">
+              <img
+                id="stationCover"
+                src="attached_assets/logo_1749601460841.jpeg"
+                alt="Portada Sonar Rock"
+                class="station-cover"
+              >
+            </div>
 
-        <!-- COVER -->
-        <div class="cover-wrap">
-          <img
-            id="stationCover"
-            src="attached_assets/logo_1749601460841.jpeg"
-            alt="Portada Sonar Rock"
-            class="station-cover"
-          >
-        </div>
+            <!-- INFO -->
+            <div class="sonar-player-info">
+              <p class="eyebrow">Transmitiendo ahora</p>
+              <h3 id="trackInfo" class="sonar-track-title">Transmitiendo rock sin concesiones</h3>
+              <p id="trackArtist" class="sonar-track-artist">Señal lista</p>
 
-        <!-- INFO -->
-        <div class="sonar-player-info">
-          <p class="eyebrow">Transmitiendo ahora</p>
-          <h3 id="trackInfo" class="sonar-track-title">Transmitiendo rock sin concesiones</h3>
-          <p id="trackArtist" class="sonar-track-artist">Señal lista</p>
-
-          <div class="status-row">
-            <span id="statusDot" class="status-dot"></span>
-            <span id="statusText">Listo para reproducir</span>
+              <div class="status-row">
+                <span id="statusDot" class="status-dot"></span>
+                <span id="statusText" class="status-text">Listo para reproducir</span>
+              </div>
+            </div>
           </div>
-        </div>
 
+          <!-- COLUMNA DERECHA -->
+          <div class="player-right">
+
+            <!-- VU -->
+            <div class="vu-wrap" aria-hidden="true">
+              <canvas id="vuCanvas" class="vu-canvas" width="340" height="78"></canvas>
+            </div>
+
+            <!-- CONTROLES -->
+            <div class="player-controls">
+              <div class="top-buttons">
+                <button id="playBtn" class="play-btn" type="button" aria-label="Reproducir">
+                  <span id="playIcon">▶</span>
+                </button>
+
+                <button id="muteBtn" class="mute-btn" type="button" aria-label="Silenciar">
+                  <span id="muteIcon">🔊</span>
+                </button>
+              </div>
+
+              <div class="volume-wrap">
+                <span id="volumeEmoji" class="volume-emoji">🔊</span>
+                <input
+                  id="volumeControl"
+                  class="volume-slider"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="1"
+                  aria-label="Volumen"
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- AUDIO -->
+          <audio id="radioPlayer" preload="none" playsinline webkit-playsinline></audio>
+
+        </div>
       </div>
+    </section>
 
-      <!-- COLUMNA DERECHA -->
-      <div class="player-right">
-
-        <!-- VU METER REAL -->
-        <div class="vu-wrap" aria-hidden="true">
-          <canvas id="vuMeter" width="320" height="90"></canvas>
-        </div>
-
-        <!-- CONTROLES -->
-        <div class="player-controls">
-          <div class="buttons-row">
-            <button id="playBtn" class="play-btn" type="button" aria-label="Reproducir">
-              <span id="playIcon">▶</span>
-            </button>
-
-            <button id="muteBtn" class="mute-btn" type="button" aria-label="Silenciar">
-              <span id="muteIcon">🔊</span>
-            </button>
-          </div>
-
-          <div class="volume-wrap">
-            <span id="volumeEmoji" class="volume-emoji">🔊</span>
-            <input
-              id="volumeControl"
-              class="volume-slider"
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value="1"
-              aria-label="Volumen"
-            >
-          </div>
-        </div>
-
-      </div>
-
-      <!-- AUDIO -->
-      <audio id="radioPlayer" preload="none" playsinline webkit-playsinline></audio>
-
-    </div>
-  </div>
-</section>
-    
-    
-    <!-- TOAST NUEVA CANCIÓN -->
+    <!-- =========================
+         TOAST NUEVA CANCIÓN
+    ========================== -->
     <div id="songToast" class="song-toast hidden">
       <div class="song-toast-inner">
         <i class="fa-solid fa-music"></i>
@@ -166,7 +161,9 @@
 
   </main>
 
-  <!-- MINI PLAYER MOBILE -->
+  <!-- =========================
+       MINI PLAYER MOBILE
+  ========================== -->
   <div id="miniPlayer" class="mini-player">
     <div class="mini-left">
       <span id="miniLiveDot" class="mini-live-dot"></span>
@@ -181,7 +178,9 @@
     </button>
   </div>
 
+  <!-- ========================= -->
   <!-- REDES SOCIALES -->
+  <!-- ========================= -->
   <section class="social-section">
     <div class="container">
       <h2 class="section-title">Redes Sociales</h2>
@@ -194,16 +193,16 @@
     </div>
   </section>
 
+  <!-- ========================= -->
   <!-- PLAYERS SECUNDARIOS -->
+  <!-- ========================= -->
   <section class="players-section">
 
     <!-- DISCO DE LA SEMANA -->
     <h3 class="player-title">Disco de la Semana</h3>
 
     <div class="custom-player disco-player" id="disco-player">
-      <div class="disco-cover-wrap">
-        <img id="cover" src="disco-semana/portada.jpg" alt="Portada Disco">
-      </div>
+      <img id="cover" src="disco-semana/portada.jpg" alt="Portada Disco">
 
       <div class="disco-player-info">
         <div id="track-title" class="disco-track-title"></div>
@@ -226,7 +225,9 @@
 
   </section>
 
+  <!-- ========================= -->
   <!-- STAFF -->
+  <!-- ========================= -->
   <section class="staff-section">
     <div class="container">
       <h2 class="section-title" style="margin-bottom:40px;">Staff</h2>
@@ -262,7 +263,9 @@
     </div>
   </section>
 
+  <!-- ========================= -->
   <!-- ¿QUIÉNES SOMOS? -->
+  <!-- ========================= -->
   <section class="about-section">
     <div class="container">
       <div class="about-content">
@@ -279,7 +282,9 @@
     </div>
   </section>
 
+  <!-- ========================= -->
   <!-- ¿QUÉ ES SONAR ROCK? -->
+  <!-- ========================= -->
   <section class="about-section">
     <div class="container">
       <div class="about-content">
@@ -297,8 +302,8 @@
   </section>
 
   <!-- JS -->
-  <script src="disco-semana.js?v=16" defer></script>
-  <script src="player.js?v=12" defer></script>
+  <script src="disco-semana.js?v=20" defer></script>
+  <script src="player.js?v=20" defer></script>
 
   <script>
     if ("serviceWorker" in navigator) {

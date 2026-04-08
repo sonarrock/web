@@ -271,7 +271,7 @@ h2::after {
   display: flex;
   align-items: center;
   gap: 25px;
-  max-width: 650px;
+  max-width: 200px;
   margin: 34px auto 18px;
   padding: 26px;
   position: relative;

@@ -281,16 +281,6 @@ h2::after {
   position: relative;
 }
 
-.disco-section-title::after {
-  content: "";
-  display: block;
-  width: 78px;
-  height: 3px;
-  margin-top: 8px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--primary), transparent);
-}
-
 /* CONTENEDOR */
 .disco-player {
   display: flex;

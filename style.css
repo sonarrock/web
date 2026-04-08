@@ -205,15 +205,18 @@ h2::after {
   justify-content: center;
   align-items: flex-start;
   width: auto;
+  gap: 2px;
 }
 
 .kicker {
   color: var(--primary);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 900;
-  letter-spacing: 2px;
+  letter-spacing: 2.6px;
   text-transform: uppercase;
   margin-bottom: 10px;
+  line-height: 1;
+  text-shadow: 0 0 12px rgba(255, 122, 26, 0.18);
 }
 
 .title-section h1 {
@@ -236,6 +239,7 @@ h2::after {
   text-transform: uppercase;
   line-height: 1.2;
 }
+
 
 /* ===============================
    SECCIONES CON TARJETA VISUAL

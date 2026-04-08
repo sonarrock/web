@@ -201,25 +201,30 @@
 <h3 class="disco-section-title">Disco de la Semana</h3>
 
 <div class="disco-player" id="discoPlayer">
-  <img id="discoCover" src="disco-semana/portada.jpg" alt="Portada Disco de la Semana">
+  <div class="disco-cover-wrap">
+    <img id="discoCover" src="disco-semana/portada.jpg" alt="Portada Disco de la Semana">
+    <div class="disco-eq" id="discoEQ">
+      <span></span><span></span><span></span><span></span>
+    </div>
+  </div>
 
   <div class="disco-player-info">
     <p class="disco-track-title" id="discoTitle">Cargando...</p>
 
     <div class="disco-controls">
-      <button id="discoPlayBtn" class="disco-btn" aria-label="Reproducir / Pausar">▶</button>
-      <button id="discoStopBtn" class="disco-btn" aria-label="Detener">■</button>
-      <button id="discoMuteBtn" class="disco-btn" aria-label="Silenciar">🔊</button>
+      <button id="discoPlayBtn" class="disco-btn" type="button" aria-label="Reproducir / Pausar">▶</button>
+      <button id="discoStopBtn" class="disco-btn" type="button" aria-label="Detener">■</button>
+      <button id="discoMuteBtn" class="disco-btn" type="button" aria-label="Silenciar">🔊</button>
     </div>
 
     <div class="disco-progress-wrap">
       <span id="discoCurrentTime" class="disco-time">0:00</span>
-      <input type="range" id="discoProgress" class="disco-progress" value="0" min="0" max="100">
+      <input type="range" id="discoProgress" class="disco-progress" value="0" min="0" max="100" step="1">
       <span id="discoDuration" class="disco-time">0:00</span>
     </div>
   </div>
 
-  <audio id="discoAudio"></audio>
+  <audio id="discoAudio" preload="metadata" playsinline webkit-playsinline></audio>
 </div>
     
     <!-- SPOTIFY -->

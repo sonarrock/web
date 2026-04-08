@@ -267,110 +267,69 @@ h2::after {
 /* ===============================
    DISCO DE LA SEMANA
 =============================== */
-.disco-player {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-  max-width: 152px;
-  margin: 34px auto 18px;
-  padding: 26px;
-  position: relative;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 28px;
-  border: 1px solid var(--glass-border);
-  box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 122, 26, 0.04);
-  transition: var(--transition);
-}
 
-.disco-player::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at center,
-    rgba(255, 122, 26, 0.18),
-    transparent 70%
-  );
-  opacity: 0.35;
-  pointer-events: none;
-  z-index: 0;
-}
+  .disco-player {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 14px;
+    min-height: 148px;
+    padding: 13px 14px;
+    border-radius: 20px;
+  }
 
-.disco-player:hover {
-  transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 122, 26, 0.28);
-  box-shadow:
-    0 28px 55px -12px rgba(0, 0, 0, 0.58),
-    0 0 0 1px rgba(255, 122, 26, 0.08);
-}
+  .disco-player img {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    min-height: 80px;
+    border-radius: 16px;
+  }
 
-.disco-cover-wrap {
-  width: 122px;
-  height: 122px;
-  border-radius: 50%;
-  padding: 8px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  position: relative;
-  z-index: 2;
-  flex-shrink: 0;
-}
+  .disco-player-info {
+    width: 100%;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 7px;
+  }
 
-.disco-player img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-  box-shadow:
-    0 0 0 8px rgba(0, 0, 0, 0.16),
-    0 0 0 1px rgba(255, 122, 26, 0.12),
-    0 14px 28px rgba(0, 0, 0, 0.38);
-}
+  .disco-track-title {
+    border-left: 3px solid var(--primary);
+    border-bottom: none;
+    padding-left: 10px;
+    padding-bottom: 0;
+    text-align: left;
+    font-size: 0.88rem;
+    line-height: 1.28;
+  }
 
-.disco-player.playing img {
-  animation: vinylSpin 6s linear infinite;
-}
+  .disco-subline {
+    padding-left: 12px;
+    font-size: 0.74rem;
+  }
 
-@keyframes vinylSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
+  .disco-controls {
+    gap: 10px;
+  }
 
-.disco-player-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  position: relative;
-  z-index: 2;
-  width: 100%;
-}
+  .disco-play-btn {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+  }
 
-.disco-track-title {
-  font-size: 1rem;
-  font-weight: 900;
-  color: var(--text-light);
-  text-transform: uppercase;
-  border-left: 4px solid var(--primary);
-  padding-left: 12px;
-  line-height: 1.45;
-  letter-spacing: 0.5px;
-}
+  .disco-progress {
+    height: 6px;
+  }
 
-.disco-player audio {
-  width: 100%;
-  height: 40px;
-  opacity: 0.9;
-  filter: invert(1) hue-rotate(160deg) brightness(1.15);
-  border-radius: 10px;
-}
+  .disco-time-row {
+    font-size: 0.68rem;
+  }
+
+
+
+
 
 /* ===============================
    SPOTIFY EMBED
@@ -537,36 +496,48 @@ h2::after {
     border-radius: 22px;
   }
 
+@media (max-width: 480px) {
   .disco-player {
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-    gap: 18px;
-    padding: 22px;
+    max-width: 100%;
+    min-height: 142px;
+    padding: 12px 13px;
+    gap: 12px;
   }
 
-  .disco-cover-wrap {
-    width: 102px;
-    height: 102px;
-  }
-
-  .disco-player-info {
-    width: 100%;
-    align-items: center;
+  .disco-player img {
+    width: 74px;
+    height: 74px;
+    min-width: 74px;
+    min-height: 74px;
+    border-radius: 14px;
   }
 
   .disco-track-title {
-    border-left: none;
-    border-bottom: 3px solid var(--primary);
-    padding-left: 0;
-    padding-bottom: 8px;
-    text-align: center;
+    font-size: 0.82rem;
+    line-height: 1.25;
+    padding-left: 8px;
   }
 
-  .disco-player audio,
-  .spotify-player-info iframe {
-    width: 100%;
+  .disco-subline {
+    font-size: 0.7rem;
+    padding-left: 10px;
   }
+
+  .disco-play-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  #disco-play-icon {
+    font-size: 1.05rem;
+  }
+
+  .disco-time-row {
+    font-size: 0.65rem;
+  }
+}
 
   .social-buttons {
     gap: 14px;

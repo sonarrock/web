@@ -707,6 +707,12 @@ h2::after {
     text-align: center;
   }
 
+  .kicker {
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
   .title-section h1 {
     letter-spacing: 2px;
   }
@@ -716,7 +722,7 @@ h2::after {
     font-size: 1rem;
     letter-spacing: 1px;
   }
-
+}
   .players-section,
   .social-section,
   .staff-section,

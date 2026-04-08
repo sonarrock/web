@@ -1,5 +1,9 @@
 {
+  "artista": "Radiohead",
+  "album": "The Bends",
   "titulo": "Radiohead - The Bends",
-  "portada": "https://cdn.jsdelivr.net/gh/sonarrock/web@main/disco-semana/portada.jpg",
-  "audio":   "https://cdn.jsdelivr.net/gh/sonarrock/web@main/disco-semana/Radiohead - The Bends.mp3"
+  "anio": "1995",
+  "portada": "disco-semana/portada.jpg",
+  "audio": "disco-semana/Radiohead - The Bends.mp3",
+  "descripcion": "Uno de los discos más importantes del rock alternativo de los 90."
 }

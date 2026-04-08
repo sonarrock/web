@@ -1,106 +1,85 @@
-/* ===============================
-   DISCO DE LA SEMANA — JSON AUTOLOAD
-=============================== */
-document.addEventListener("DOMContentLoaded", () => {
-  const audio = document.getElementById("disco-audio");
-  const playBtn = document.getElementById("disco-play-btn");
-  const progressFill = document.getElementById("disco-progress-fill");
-  const coverImg = document.getElementById("disco-cover-img");
-  const titleEl = document.getElementById("disco-title");
-  const artistEl = document.getElementById("disco-artist");
-  const metaEl = document.getElementById("disco-meta");
+document.addEventListener("DOMContentLoaded", async () => {
+  const player = document.getElementById("discoPlayer");
+  const audio = document.getElementById("discoAudio");
+  const cover = document.getElementById("discoCover");
+  const title = document.getElementById("discoTitle");
 
-  if (!audio || !playBtn || !progressFill || !coverImg || !titleEl) return;
+  const playBtn = document.getElementById("discoPlayBtn");
+  const stopBtn = document.getElementById("discoStopBtn");
+  const muteBtn = document.getElementById("discoMuteBtn");
+  const progress = document.getElementById("discoProgress");
+  const currentTimeEl = document.getElementById("discoCurrentTime");
+  const durationEl = document.getElementById("discoDuration");
 
-  let isPlaying = false;
+  function formatTime(seconds) {
+    if (isNaN(seconds)) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60).toString().padStart(2, "0");
+    return `${mins}:${secs}`;
+  }
 
-  // ========= CARGAR JSON =========
-  fetch("disco-semana/info.json")
-    .then(response => {
-      if (!response.ok) throw new Error("No se pudo cargar info.json");
-      return response.json();
-    })
-    .then(data => {
-      const tituloCompleto = data.titulo || "Disco de la Semana";
-      const audioSrc = data.audio || "";
-      const portadaSrc = data.portada || "disco-semana/portada.jpg";
+  try {
+    const res = await fetch("disco-semana/disco.json");
+    const data = await res.json();
 
-      // Separar artista y álbum automáticamente si viene "Artista - Álbum"
-      let artista = "Sonar Rock";
-      let album = tituloCompleto;
+    title.textContent = data.titulo || "Disco de la Semana";
+    cover.src = data.portada || "disco-semana/portada.jpg";
+    audio.src = data.audio || "";
+  } catch (err) {
+    console.error("Error cargando disco.json:", err);
+    title.textContent = "No se pudo cargar el disco de la semana";
+  }
 
-      if (tituloCompleto.includes(" - ")) {
-        const partes = tituloCompleto.split(" - ");
-        artista = partes[0].trim();
-        album = partes.slice(1).join(" - ").trim();
-      }
-
-      titleEl.textContent = album;
-      artistEl.textContent = artista;
-      metaEl.textContent = "Disco destacado";
-
-      coverImg.style.opacity = "0.4";
-
-      const nuevaImg = new Image();
-      nuevaImg.src = portadaSrc;
-      nuevaImg.onload = () => {
-        coverImg.src = portadaSrc;
-        setTimeout(() => {
-          coverImg.style.opacity = "1";
-        }, 120);
-      };
-
-      audio.src = audioSrc;
-    })
-    .catch(error => {
-      console.warn("Error cargando disco-semana/info.json:", error);
-      titleEl.textContent = "No se pudo cargar el disco";
-      artistEl.textContent = "Sonar Rock";
-      metaEl.textContent = "Revisa disco-semana/info.json";
-    });
-
-  // ========= PLAY / PAUSE =========
   playBtn.addEventListener("click", async () => {
-    try {
-      if (!audio.src) return;
-
-      if (!isPlaying) {
+    if (audio.paused) {
+      try {
         await audio.play();
-        isPlaying = true;
-        playBtn.textContent = "⏸ Pausar";
-      } else {
-        audio.pause();
-        isPlaying = false;
-        playBtn.textContent = "▶ Escuchar";
+      } catch (err) {
+        console.error("Error al reproducir:", err);
       }
-    } catch (err) {
-      console.warn("No se pudo reproducir el preview:", err);
+    } else {
+      audio.pause();
     }
   });
 
-  // ========= PROGRESO =========
-  audio.addEventListener("timeupdate", () => {
-    if (!audio.duration) return;
-    const percent = (audio.currentTime / audio.duration) * 100;
-    progressFill.style.width = `${percent}%`;
+  stopBtn.addEventListener("click", () => {
+    audio.pause();
+    audio.currentTime = 0;
+    progress.value = 0;
   });
 
-  audio.addEventListener("ended", () => {
-    isPlaying = false;
-    playBtn.textContent = "▶ Escuchar";
-    progressFill.style.width = "0%";
-  });
-
-  audio.addEventListener("pause", () => {
-    if (audio.currentTime < audio.duration && !audio.ended) {
-      isPlaying = false;
-      playBtn.textContent = "▶ Escuchar";
-    }
+  muteBtn.addEventListener("click", () => {
+    audio.muted = !audio.muted;
+    muteBtn.textContent = audio.muted ? "🔇" : "🔊";
   });
 
   audio.addEventListener("play", () => {
-    isPlaying = true;
-    playBtn.textContent = "⏸ Pausar";
+    player.classList.add("playing");
+    playBtn.textContent = "❚❚";
+  });
+
+  audio.addEventListener("pause", () => {
+    player.classList.remove("playing");
+    playBtn.textContent = "▶";
+  });
+
+  audio.addEventListener("loadedmetadata", () => {
+    durationEl.textContent = formatTime(audio.duration);
+    progress.max = Math.floor(audio.duration || 0);
+  });
+
+  audio.addEventListener("timeupdate", () => {
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+    progress.value = Math.floor(audio.currentTime || 0);
+  });
+
+  progress.addEventListener("input", () => {
+    audio.currentTime = progress.value;
+  });
+
+  audio.addEventListener("ended", () => {
+    player.classList.remove("playing");
+    playBtn.textContent = "▶";
+    progress.value = 0;
   });
 });
-

@@ -198,18 +198,48 @@
   <!-- ========================= -->
   <section class="players-section">
 
-    <!-- DISCO DE LA SEMANA -->
-    <h3 class="player-title">Disco de la Semana</h3>
+<!-- DISCO DE LA SEMANA -->
+<h3 class="player-title">Disco de la Semana</h3>
 
-    <div class="custom-player disco-player" id="disco-player">
-      <img id="cover" src="disco-semana/portada.jpg" alt="Portada Disco">
+<div class="custom-player disco-player" id="disco-player">
+  <img id="cover" src="disco-semana/portada.jpg" alt="Portada Disco">
 
-      <div class="disco-player-info">
-        <div id="track-title" class="disco-track-title"></div>
-        <audio id="disco-audio" controls preload="metadata" playsinline></audio>
+  <div class="disco-player-info">
+    <div id="track-title" class="disco-track-title">Disco de la Semana</div>
+
+    <div class="disco-subline">
+      <span id="disco-status">Listo para reproducir</span>
+    </div>
+
+    <div class="disco-controls">
+      <button id="disco-play-btn" class="disco-play-btn" type="button" aria-label="Reproducir Disco de la Semana">
+        <span id="disco-play-icon">▶</span>
+      </button>
+
+      <div class="disco-progress-wrap">
+        <input
+          id="disco-progress"
+          class="disco-progress"
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+          step="0.1"
+          aria-label="Progreso de reproducción"
+        >
+
+        <div class="disco-time-row">
+          <span id="disco-current-time">0:00</span>
+          <span id="disco-duration">0:00</span>
+        </div>
       </div>
     </div>
 
+    <audio id="disco-audio" preload="metadata" playsinline></audio>
+  </div>
+</div>
+
+    
     <!-- SPOTIFY -->
     <h3 class="player-title">Spotify</h3>
 

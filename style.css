@@ -264,9 +264,9 @@ h2::after {
   z-index: -1;
 }
 
-/* ===============================
-   DISCO DE LA SEMANA — FIX TOTAL
-=============================== */
+/* ==================
+   DISCO DE LA SEMANA
+==================== */
 .disco-player {
   display: flex;
   align-items: center;
@@ -308,7 +308,6 @@ h2::after {
     0 0 0 1px rgba(255, 122, 26, 0.08);
 }
 
-/* Cover */
 .disco-cover {
   width: 118px;
   height: 118px;
@@ -335,7 +334,6 @@ h2::after {
   transform: scale(1.03);
 }
 
-/* Info */
 .disco-info {
   flex: 1;
   min-width: 0;
@@ -392,7 +390,6 @@ h2::after {
   text-overflow: ellipsis;
 }
 
-/* Controls */
 .disco-controls {
   display: flex;
   align-items: center;
@@ -432,18 +429,6 @@ h2::after {
   transform: scale(0.97);
 }
 
-.disco-btn.secondary {
-  background: rgba(255,255,255,0.08);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: none;
-}
-
-.disco-btn.secondary:hover {
-  background: rgba(255,255,255,0.12);
-}
-
-/* Progress */
 .disco-progress {
   width: 100%;
   height: 4px;
@@ -497,27 +482,6 @@ h2::after {
   }
 }
 
-@media (max-width: 520px) {
-  .disco-player {
-    align-items: center;
-    gap: 10px;
-    padding: 12px;
-  }
-
-  .disco-cover {
-    width: 88px;
-    height: 88px;
-  }
-
-  .disco-controls {
-    gap: 7px;
-  }
-
-  .disco-btn {
-    font-size: 0.72rem;
-    padding: 7px 10px;
-  }
-}
 
 /* ===============================
    SPOTIFY EMBED

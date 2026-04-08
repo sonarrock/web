@@ -265,70 +265,289 @@ h2::after {
 }
 
 /* ===============================
-   DISCO DE LA SEMANA
+   DISCO DE LA SEMANA — V2 FINAL LIMPIO
+   Tamaño tipo Spotify embed (~152px)
 =============================== */
+.disco-player {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 420px;
+  min-height: 152px;
+  margin: 26px auto 14px;
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 24px;
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 18px 38px -12px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 122, 26, 0.04);
+  transition: var(--transition);
+}
 
+.disco-player::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 122, 26, 0.08), transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(255, 122, 26, 0.18), transparent 32%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.disco-player::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 122, 26, 0.16),
+    transparent 70%
+  );
+  opacity: 0.28;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.disco-player:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(255, 122, 26, 0.24);
+  box-shadow:
+    0 22px 42px -12px rgba(0, 0, 0, 0.52),
+    0 0 0 1px rgba(255, 122, 26, 0.08);
+}
+
+/* Cover */
+.disco-cover {
+  width: 120px;
+  height: 120px;
+  border-radius: 18px;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.04);
+}
+
+.disco-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition:
+    transform 0.45s ease,
+    opacity 0.45s ease,
+    filter 0.45s ease;
+}
+
+.disco-player:hover .disco-cover img {
+  transform: scale(1.03);
+  filter: saturate(1.05);
+}
+
+/* Info */
+.disco-info {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+}
+
+.disco-label {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffb06b;
+  background: rgba(255, 122, 26, 0.10);
+  border: 1px solid rgba(255, 122, 26, 0.18);
+  padding: 4px 8px;
+  border-radius: 999px;
+  margin-bottom: 2px;
+}
+
+.disco-title {
+  font-size: 1rem;
+  line-height: 1.24;
+  font-weight: 800;
+  margin: 0;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.disco-artist {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.80);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.disco-meta {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.58);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Controls */
+.disco-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.disco-btn {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 800;
+  font-size: 0.84rem;
+  transition: all 0.25s ease;
+  background: linear-gradient(135deg, #ff7a1a, #ff9f43);
+  color: #111;
+  box-shadow: 0 8px 20px rgba(255, 122, 26, 0.22);
+}
+
+.disco-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(255, 122, 26, 0.28);
+}
+
+.disco-btn:active {
+  transform: scale(0.97);
+}
+
+.disco-btn.secondary {
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: none;
+}
+
+.disco-btn.secondary:hover {
+  background: rgba(255,255,255,0.11);
+}
+
+/* Barra mini opcional */
+.disco-progress {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.disco-progress span {
+  display: block;
+  width: 36%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff7a1a, #ffb347);
+}
+
+/* ===============================
+   MOBILE
+=============================== */
+@media (max-width: 768px) {
   .disco-player {
-    flex-direction: row;
-    align-items: center;
-    text-align: left;
-    gap: 14px;
-    min-height: 148px;
-    padding: 13px 14px;
-    border-radius: 20px;
+    max-width: 100%;
+    min-height: 152px;
+    padding: 14px 14px;
+    gap: 12px;
+    border-radius: 22px;
   }
 
-  .disco-player img {
-    width: 80px;
-    height: 80px;
-    min-width: 80px;
-    min-height: 80px;
+  .disco-cover {
+    width: 104px;
+    height: 104px;
     border-radius: 16px;
   }
 
-  .disco-player-info {
-    width: 100%;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 7px;
+  .disco-title {
+    font-size: 0.95rem;
   }
 
-  .disco-track-title {
-    border-left: 3px solid var(--primary);
-    border-bottom: none;
-    padding-left: 10px;
-    padding-bottom: 0;
-    text-align: left;
-    font-size: 0.88rem;
-    line-height: 1.28;
+  .disco-artist {
+    font-size: 0.84rem;
   }
 
-  .disco-subline {
-    padding-left: 12px;
-    font-size: 0.74rem;
+  .disco-meta {
+    font-size: 0.75rem;
+  }
+
+  .disco-btn {
+    padding: 9px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .disco-player {
+    gap: 11px;
+    padding: 13px;
+    min-height: 148px;
+  }
+
+  .disco-cover {
+    width: 96px;
+    height: 96px;
+    border-radius: 15px;
+  }
+
+  .disco-label {
+    font-size: 0.62rem;
+    padding: 4px 7px;
+  }
+
+  .disco-title {
+    font-size: 0.9rem;
+  }
+
+  .disco-artist {
+    font-size: 0.8rem;
+  }
+
+  .disco-meta {
+    font-size: 0.72rem;
   }
 
   .disco-controls {
-    gap: 10px;
+    gap: 8px;
+    margin-top: 5px;
   }
 
-  .disco-play-btn {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    min-height: 42px;
+  .disco-btn {
+    padding: 8px 11px;
+    font-size: 0.76rem;
   }
-
-  .disco-progress {
-    height: 6px;
-  }
-
-  .disco-time-row {
-    font-size: 0.68rem;
-  }
-
-
-
+}
 
 
 /* ===============================

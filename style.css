@@ -265,28 +265,28 @@ h2::after {
 }
 
 /* ===============================
-   DISCO DE LA SEMANA — V2 FINAL LIMPIO
-   Tamaño tipo Spotify embed (~152px)
+   DISCO DE LA SEMANA — FIX TOTAL
 =============================== */
 .disco-player {
   display: flex;
   align-items: center;
   gap: 14px;
+  width: 100%;
   max-width: 420px;
   min-height: 152px;
-  margin: 26px auto 14px;
-  padding: 16px 18px;
+  margin: 24px auto 16px;
+  padding: 14px 16px;
   position: relative;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 24px;
-  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.08);
   box-shadow:
-    0 18px 38px -12px rgba(0, 0, 0, 0.45),
+    0 18px 38px -12px rgba(0, 0, 0, 0.42),
     0 0 0 1px rgba(255, 122, 26, 0.04);
-  transition: var(--transition);
+  transition: all 0.3s ease;
 }
 
 .disco-player::before {
@@ -295,47 +295,32 @@ h2::after {
   inset: 0;
   background:
     linear-gradient(135deg, rgba(255, 122, 26, 0.08), transparent 45%),
-    radial-gradient(circle at 85% 20%, rgba(255, 122, 26, 0.18), transparent 32%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.disco-player::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at center,
-    rgba(255, 122, 26, 0.16),
-    transparent 70%
-  );
-  opacity: 0.28;
+    radial-gradient(circle at 85% 20%, rgba(255, 122, 26, 0.14), transparent 32%);
   pointer-events: none;
   z-index: 0;
 }
 
 .disco-player:hover {
-  transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.055);
-  border-color: rgba(255, 122, 26, 0.24);
+  transform: translateY(-3px);
+  border-color: rgba(255, 122, 26, 0.20);
   box-shadow:
-    0 22px 42px -12px rgba(0, 0, 0, 0.52),
+    0 22px 42px -12px rgba(0, 0, 0, 0.50),
     0 0 0 1px rgba(255, 122, 26, 0.08);
 }
 
 /* Cover */
 .disco-cover {
-  width: 120px;
-  height: 120px;
-  border-radius: 18px;
+  width: 118px;
+  height: 118px;
+  border-radius: 16px;
   overflow: hidden;
   flex-shrink: 0;
   position: relative;
   z-index: 1;
-  box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.42),
-    0 0 0 1px rgba(255,255,255,0.06);
   background: rgba(255,255,255,0.04);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255,255,255,0.05);
 }
 
 .disco-cover img {
@@ -343,15 +328,11 @@ h2::after {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition:
-    transform 0.45s ease,
-    opacity 0.45s ease,
-    filter 0.45s ease;
+  transition: transform 0.45s ease, opacity 0.45s ease;
 }
 
 .disco-player:hover .disco-cover img {
   transform: scale(1.03);
-  filter: saturate(1.05);
 }
 
 /* Info */
@@ -363,14 +344,14 @@ h2::after {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 7px;
+  gap: 6px;
 }
 
 .disco-label {
   display: inline-flex;
   align-items: center;
   width: fit-content;
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -383,8 +364,8 @@ h2::after {
 }
 
 .disco-title {
-  font-size: 1rem;
-  line-height: 1.24;
+  font-size: 0.98rem;
+  line-height: 1.2;
   font-weight: 800;
   margin: 0;
   color: #fff;
@@ -394,8 +375,8 @@ h2::after {
 }
 
 .disco-artist {
-  font-size: 0.88rem;
-  color: rgba(255,255,255,0.80);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.82);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -403,7 +384,7 @@ h2::after {
 }
 
 .disco-meta {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: rgba(255,255,255,0.58);
   margin: 0;
   white-space: nowrap;
@@ -415,27 +396,35 @@ h2::after {
 .disco-controls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin-top: 6px;
   flex-wrap: wrap;
 }
 
 .disco-btn {
+  appearance: none;
+  -webkit-appearance: none;
   border: none;
   outline: none;
   cursor: pointer;
   border-radius: 999px;
-  padding: 10px 14px;
+  padding: 8px 12px;
   font-weight: 800;
-  font-size: 0.84rem;
-  transition: all 0.25s ease;
+  font-size: 0.76rem;
+  line-height: 1;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.22s ease;
   background: linear-gradient(135deg, #ff7a1a, #ff9f43);
   color: #111;
   box-shadow: 0 8px 20px rgba(255, 122, 26, 0.22);
+  min-height: 36px;
 }
 
 .disco-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 12px 24px rgba(255, 122, 26, 0.28);
 }
 
@@ -444,17 +433,17 @@ h2::after {
 }
 
 .disco-btn.secondary {
-  background: rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.08);
   color: #fff;
   border: 1px solid rgba(255,255,255,0.08);
   box-shadow: none;
 }
 
 .disco-btn.secondary:hover {
-  background: rgba(255,255,255,0.11);
+  background: rgba(255,255,255,0.12);
 }
 
-/* Barra mini opcional */
+/* Progress */
 .disco-progress {
   width: 100%;
   height: 4px;
@@ -466,64 +455,27 @@ h2::after {
 
 .disco-progress span {
   display: block;
-  width: 36%;
+  width: 0%;
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #ff7a1a, #ffb347);
+  transition: width 0.15s linear;
 }
 
-/* ===============================
-   MOBILE
-=============================== */
+/* Mobile */
 @media (max-width: 768px) {
   .disco-player {
     max-width: 100%;
-    min-height: 152px;
-    padding: 14px 14px;
-    gap: 12px;
-    border-radius: 22px;
-  }
-
-  .disco-cover {
-    width: 104px;
-    height: 104px;
-    border-radius: 16px;
-  }
-
-  .disco-title {
-    font-size: 0.95rem;
-  }
-
-  .disco-artist {
-    font-size: 0.84rem;
-  }
-
-  .disco-meta {
-    font-size: 0.75rem;
-  }
-
-  .disco-btn {
-    padding: 9px 12px;
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 520px) {
-  .disco-player {
-    gap: 11px;
-    padding: 13px;
     min-height: 148px;
+    padding: 13px;
+    gap: 12px;
+    border-radius: 20px;
   }
 
   .disco-cover {
     width: 96px;
     height: 96px;
-    border-radius: 15px;
-  }
-
-  .disco-label {
-    font-size: 0.62rem;
-    padding: 4px 7px;
+    border-radius: 14px;
   }
 
   .disco-title {
@@ -538,17 +490,34 @@ h2::after {
     font-size: 0.72rem;
   }
 
-  .disco-controls {
-    gap: 8px;
-    margin-top: 5px;
-  }
-
   .disco-btn {
     padding: 8px 11px;
-    font-size: 0.76rem;
+    font-size: 0.74rem;
+    min-height: 34px;
   }
 }
 
+@media (max-width: 520px) {
+  .disco-player {
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .disco-cover {
+    width: 88px;
+    height: 88px;
+  }
+
+  .disco-controls {
+    gap: 7px;
+  }
+
+  .disco-btn {
+    font-size: 0.72rem;
+    padding: 7px 10px;
+  }
+}
 
 /* ===============================
    SPOTIFY EMBED
@@ -715,67 +684,6 @@ h2::after {
     border-radius: 22px;
   }
 
-@media (max-width: 480px) {
-  .disco-player {
-    max-width: 100%;
-    min-height: 142px;
-    padding: 12px 13px;
-    gap: 12px;
-  }
-
-  .disco-player img {
-    width: 74px;
-    height: 74px;
-    min-width: 74px;
-    min-height: 74px;
-    border-radius: 14px;
-  }
-
-  .disco-track-title {
-    font-size: 0.82rem;
-    line-height: 1.25;
-    padding-left: 8px;
-  }
-
-  .disco-subline {
-    font-size: 0.7rem;
-    padding-left: 10px;
-  }
-
-  .disco-play-btn {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
-  }
-
-  #disco-play-icon {
-    font-size: 1.05rem;
-  }
-
-  .disco-time-row {
-    font-size: 0.65rem;
-  }
-}
-
-  .social-buttons {
-    gap: 14px;
-  }
-
-  .social-btn {
-    width: 60px;
-    height: 60px;
-    font-size: 1.18rem;
-  }
-
-  h2 {
-    font-size: 1.75rem;
-  }
-
-  .player-title {
-    font-size: 1.22rem;
-  }
-}
 
 @media (max-width: 600px) {
   .staff-grid {

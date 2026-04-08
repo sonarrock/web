@@ -727,7 +727,7 @@ h2::after {
   .about-section::before {
     border-radius: 22px;
   }
-
+}
 
 @media (max-width: 600px) {
   .staff-grid {

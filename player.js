@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const toastSong = document.getElementById("toastSong");
 
   const stationCover = document.getElementById("stationCover");
-  const vuCanvas = document.getElementById("vuMeter");
 
   if (!audio || !playBtn) return;
 
@@ -73,160 +72,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let playbackStartedAt = 0;
   let isRecovering = false;
 
-  // =========================
-  // VU METER REAL (Web Audio)
-  // =========================
-  let audioCtx = null;
+  // Audio Analysis
+  let audioContext = null;
   let analyser = null;
   let sourceNode = null;
-  let dataArray = null;
-  let animationFrame = null;
-  let audioGraphReady = false;
-
-  const canvasCtx = vuCanvas ? vuCanvas.getContext("2d") : null;
-
-  function resizeCanvasForDPR() {
-    if (!vuCanvas || !canvasCtx) return;
-    const dpr = window.devicePixelRatio || 1;
-    const rect = vuCanvas.getBoundingClientRect();
-
-    vuCanvas.width = Math.floor(rect.width * dpr);
-    vuCanvas.height = Math.floor(rect.height * dpr);
-
-    canvasCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-
-  function initAudioGraph() {
-    if (audioGraphReady || !audio) return;
-
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.82;
-
-      sourceNode = audioCtx.createMediaElementSource(audio);
-      sourceNode.connect(analyser);
-      analyser.connect(audioCtx.destination);
-
-      dataArray = new Uint8Array(analyser.frequencyBinCount);
-      audioGraphReady = true;
-
-      resizeCanvasForDPR();
-      drawVUMeter();
-    } catch (err) {
-      console.warn("No se pudo inicializar Web Audio API:", err);
-    }
-  }
-
-  async function resumeAudioGraph() {
-    if (!audioCtx) return;
-    if (audioCtx.state === "suspended") {
-      try {
-        await audioCtx.resume();
-      } catch (err) {
-        console.warn("No se pudo reanudar AudioContext:", err);
-      }
-    }
-  }
-
-  function stopVUMeter() {
-    if (animationFrame) {
-      cancelAnimationFrame(animationFrame);
-      animationFrame = null;
-    }
-    drawIdleMeter();
-  }
-
-  function drawIdleMeter() {
-    if (!vuCanvas || !canvasCtx) return;
-
-    const width = vuCanvas.clientWidth;
-    const height = vuCanvas.clientHeight;
-
-    canvasCtx.clearRect(0, 0, width, height);
-
-    const bars = 28;
-    const gap = 4;
-    const barWidth = (width - gap * (bars - 1)) / bars;
-    const baseY = height;
-
-    for (let i = 0; i < bars; i++) {
-      const h = 10 + Math.sin(i * 0.55) * 2;
-      const x = i * (barWidth + gap);
-      const y = baseY - h;
-
-      const grad = canvasCtx.createLinearGradient(0, y, 0, baseY);
-      grad.addColorStop(0, "rgba(255,255,255,0.22)");
-      grad.addColorStop(0.55, "rgba(255,209,102,0.14)");
-      grad.addColorStop(1, "rgba(255,122,26,0.08)");
-
-      canvasCtx.fillStyle = grad;
-      roundRect(canvasCtx, x, y, barWidth, h, 4);
-      canvasCtx.fill();
-    }
-  }
-
-  function drawVUMeter() {
-    if (!analyser || !vuCanvas || !canvasCtx || !dataArray) return;
-
-    const width = vuCanvas.clientWidth;
-    const height = vuCanvas.clientHeight;
-
-    analyser.getByteFrequencyData(dataArray);
-
-    canvasCtx.clearRect(0, 0, width, height);
-
-    const bars = 28;
-    const gap = 4;
-    const barWidth = (width - gap * (bars - 1)) / bars;
-    const step = Math.floor(dataArray.length / bars);
-    const baseY = height;
-
-    for (let i = 0; i < bars; i++) {
-      const sample = dataArray[i * step] || 0;
-      const normalized = sample / 255;
-
-      const minHeight = 6;
-      const maxHeight = height - 6;
-      const barHeight = Math.max(minHeight, normalized * maxHeight);
-
-      const x = i * (barWidth + gap);
-      const y = baseY - barHeight;
-
-      const grad = canvasCtx.createLinearGradient(0, y, 0, baseY);
-      grad.addColorStop(0, "#ffffff");
-      grad.addColorStop(0.18, "#f5f5f5");
-      grad.addColorStop(0.42, "#ffd166");
-      grad.addColorStop(0.68, "#ff9f43");
-      grad.addColorStop(1, "#ff7a1a");
-
-      canvasCtx.fillStyle = grad;
-      roundRect(canvasCtx, x, y, barWidth, barHeight, 4);
-      canvasCtx.fill();
-    }
-
-    animationFrame = requestAnimationFrame(drawVUMeter);
-  }
-
-  function roundRect(ctx, x, y, width, height, radius) {
-    ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.lineTo(x + width - radius, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-    ctx.lineTo(x + width, y + height - radius);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-    ctx.lineTo(x + radius, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-    ctx.lineTo(x, y + radius);
-    ctx.quadraticCurveTo(x, y, x + radius, y);
-    ctx.closePath();
-  }
-
-  window.addEventListener("resize", () => {
-    resizeCanvasForDPR();
-    if (!isPlaying) drawIdleMeter();
-  });
+  let vuAnimationFrame = null;
+  let vuBars = [];
 
   // =========================
   // AUDIO BASE
@@ -236,6 +87,110 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
   audio.crossOrigin = "anonymous";
+
+  // =========================
+  // INYECTAR ESTRUCTURA VU
+  // =========================
+  function injectPlayerEnhancements() {
+    const controls = document.querySelector(".player-controls");
+    if (!controls) return;
+
+    if (!document.querySelector(".controls-top")) {
+      const oldChildren = Array.from(controls.children);
+
+      const controlsTop = document.createElement("div");
+      controlsTop.className = "controls-top";
+
+      const volumeWrap = document.querySelector(".volume-wrap");
+
+      oldChildren.forEach((child) => {
+        if (
+          child.id === "playBtn" ||
+          child.id === "muteBtn"
+        ) {
+          controlsTop.appendChild(child);
+        }
+      });
+
+      controls.prepend(controlsTop);
+
+      if (!document.getElementById("vuWrap")) {
+        const vuWrap = document.createElement("div");
+        vuWrap.className = "vu-wrap";
+        vuWrap.id = "vuWrap";
+
+        for (let i = 0; i < 18; i++) {
+          const bar = document.createElement("span");
+          bar.className = "vu-bar";
+          vuWrap.appendChild(bar);
+        }
+
+        if (volumeWrap) {
+          controls.appendChild(volumeWrap);
+          controls.appendChild(vuWrap);
+        } else {
+          controls.appendChild(vuWrap);
+        }
+      }
+    }
+
+    vuBars = Array.from(document.querySelectorAll(".vu-bar"));
+  }
+
+  // =========================
+  // DECODIFICACIÓN SEGURA UTF-8
+  // =========================
+  function safeDecodeText(text = "") {
+    if (!text || typeof text !== "string") return "";
+
+    let cleaned = text.trim();
+
+    try {
+      cleaned = decodeURIComponent(escape(cleaned));
+    } catch (_) {}
+
+    const replacements = {
+      "Ã¡": "á",
+      "Ã©": "é",
+      "Ã­": "í",
+      "Ã³": "ó",
+      "Ãº": "ú",
+      "Ã": "Á",
+      "Ã‰": "É",
+      "Ã": "Í",
+      "Ã“": "Ó",
+      "Ãš": "Ú",
+      "Ã±": "ñ",
+      "Ã‘": "Ñ",
+      "Ã¼": "ü",
+      "Ãœ": "Ü",
+      "â€™": "’",
+      "â€œ": "“",
+      "â€": "”",
+      "â€“": "–",
+      "â€”": "—",
+      "â€¦": "…",
+      "Â": ""
+    };
+
+    Object.keys(replacements).forEach((bad) => {
+      cleaned = cleaned.split(bad).join(replacements[bad]);
+    });
+
+    return cleaned.normalize("NFC").trim();
+  }
+
+  // =========================
+  // NORMALIZAR PARA BÚSQUEDA DE PORTADA
+  // =========================
+  function normalizeForSearch(str = "") {
+    return safeDecodeText(str)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\w\s\-&]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
 
   // =========================
   // CARGAR CONFIG GUARDADA
@@ -278,7 +233,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!playing && isUserPaused) {
       setStatus("Listo para reproducir", false);
       stopMetadataPolling();
-      stopVUMeter();
+      stopVuMeter();
+    }
+
+    if (playing) {
+      startVuMeter();
     }
   }
 
@@ -315,30 +274,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const finalUrl = url || DEFAULT_COVER;
     if (finalUrl === currentCoverUrl) return;
 
-    stationCover.style.opacity = "0.35";
-    stationCover.style.filter = "blur(2px) saturate(0.95)";
+    stationCover.style.opacity = "0.45";
+    stationCover.style.filter = "blur(3px)";
 
     const img = new Image();
     img.onload = () => {
       stationCover.src = finalUrl;
       currentCoverUrl = finalUrl;
-
-      requestAnimationFrame(() => {
-        stationCover.style.opacity = "1";
-        stationCover.style.filter = "blur(0px) saturate(1.02)";
-      });
+      stationCover.style.opacity = "1";
+      stationCover.style.filter = "blur(0)";
     };
-
     img.onerror = () => {
       stationCover.src = DEFAULT_COVER;
       currentCoverUrl = DEFAULT_COVER;
-
-      requestAnimationFrame(() => {
-        stationCover.style.opacity = "1";
-        stationCover.style.filter = "blur(0px) saturate(1.02)";
-      });
+      stationCover.style.opacity = "1";
+      stationCover.style.filter = "blur(0)";
     };
-
     img.src = finalUrl;
   }
 
@@ -360,41 +311,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // TEXTO / ACENTOS / NORMALIZACIÓN
-  // =========================
-  function decodeHtmlEntities(str = "") {
-    const txt = document.createElement("textarea");
-    txt.innerHTML = str;
-    return txt.value;
-  }
-
-  function sanitizeText(str = "") {
-    if (!str || typeof str !== "string") return "";
-
-    return decodeHtmlEntities(str)
-      .normalize("NFC")
-      .replace(/\uFFFD/g, "") // caracter roto �
-      .replace(/&amp;/gi, "&")
-      .replace(/&quot;/gi, '"')
-      .replace(/&#39;/gi, "'")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
-
-  // =========================
   // PARSE TITLE
   // =========================
   function parseTitle(rawTitle = "") {
-    const cleanedRaw = sanitizeText(rawTitle);
+    const safe = safeDecodeText(rawTitle);
 
-    if (!cleanedRaw) {
+    if (!safe || typeof safe !== "string") {
       return {
         artist: "",
         title: DEFAULT_TRACK_TEXT
       };
     }
 
-    const cleaned = cleanedRaw
+    const cleaned = safe
+      .replace(/\s+/g, " ")
       .replace(/^NOW:\s*/i, "")
       .trim();
 
@@ -421,8 +351,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (parts && parts.length >= 2) {
-      const artist = sanitizeText(parts.shift().trim());
-      const title = sanitizeText(parts.join(" - ").trim());
+      const artist = safeDecodeText(parts.shift().trim());
+      const title = safeDecodeText(parts.join(" - ").trim());
 
       return {
         artist: artist || "",
@@ -440,17 +370,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // PORTADA (ITUNES)
   // =========================
   async function fetchAlbumArt(artist, title) {
-    const cleanArtist = sanitizeText(artist);
-    const cleanTitle = sanitizeText(title);
-
-    if (!cleanArtist && !cleanTitle) {
+    if (!artist && !title) {
       setCover(DEFAULT_COVER);
       return;
     }
 
     try {
-      const query = encodeURIComponent(`${cleanArtist} ${cleanTitle}`.trim());
-      const url = `https://itunes.apple.com/search?term=${query}&entity=song&limit=5`;
+      const searchArtist = normalizeForSearch(artist);
+      const searchTitle = normalizeForSearch(title);
+
+      const query = encodeURIComponent(`${searchArtist} ${searchTitle}`.trim());
+      const url = `https://itunes.apple.com/search?term=${query}&entity=song&limit=1`;
 
       const response = await fetch(url, { cache: "no-store" });
       if (!response.ok) {
@@ -459,22 +389,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const data = await response.json();
-      const results = data?.results || [];
+      const result = data?.results?.[0];
 
-      let best = results.find(item => {
-        const a = sanitizeText(item.artistName || "").toLowerCase();
-        const t = sanitizeText(item.trackName || "").toLowerCase();
-
-        return (
-          a.includes(cleanArtist.toLowerCase()) ||
-          t.includes(cleanTitle.toLowerCase())
-        );
-      });
-
-      if (!best) best = results[0];
-
-      if (best?.artworkUrl100) {
-        const hiResCover = best.artworkUrl100.replace("100x100bb", "600x600bb");
+      if (result?.artworkUrl100) {
+        const hiResCover = result.artworkUrl100.replace("100x100bb", "600x600bb");
         setCover(hiResCover);
       } else {
         setCover(DEFAULT_COVER);
@@ -517,7 +435,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!response.ok) return "";
 
       const text = await response.text();
-      return sanitizeText(text || "");
+      return safeDecodeText(text || "");
     } catch (error) {
       console.warn("Fallback now playing no disponible:", error);
       return "";
@@ -557,7 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
         source.server_description ||
         "";
 
-      rawTitle = sanitizeText(rawTitle);
+      rawTitle = safeDecodeText(rawTitle);
 
       if (!rawTitle || rawTitle.trim() === "-" || rawTitle.trim() === "- ,") {
         const fallbackTitle = await fetchNowPlayingFallback();
@@ -572,8 +490,8 @@ document.addEventListener("DOMContentLoaded", () => {
         lastMetadataTitle = rawTitle;
 
         const parsed = parseTitle(rawTitle);
-        const finalArtist = parsed.artist || "SONAR ROCK";
-        const finalTitle = parsed.title || DEFAULT_TRACK_TEXT;
+        const finalArtist = safeDecodeText(parsed.artist || "SONAR ROCK");
+        const finalTitle = safeDecodeText(parsed.title || DEFAULT_TRACK_TEXT);
 
         updateTrack(finalTitle, finalArtist);
         fetchAlbumArt(parsed.artist, parsed.title);
@@ -616,15 +534,97 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
+  // VU METER REAL
+  // =========================
+  async function setupAudioAnalysis() {
+    if (audioContext || !window.AudioContext && !window.webkitAudioContext) return;
+
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      audioContext = new AudioCtx();
+
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 64;
+      analyser.smoothingTimeConstant = 0.8;
+
+      sourceNode = audioContext.createMediaElementSource(audio);
+      sourceNode.connect(analyser);
+      analyser.connect(audioContext.destination);
+    } catch (error) {
+      console.warn("No se pudo activar análisis de audio:", error);
+    }
+  }
+
+  function animateVu() {
+    if (!analyser || !vuBars.length) {
+      vuAnimationFrame = requestAnimationFrame(animateVu);
+      return;
+    }
+
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(dataArray);
+
+    const barsCount = vuBars.length;
+    const chunkSize = Math.floor(dataArray.length / barsCount) || 1;
+
+    vuBars.forEach((bar, index) => {
+      let sum = 0;
+      const start = index * chunkSize;
+      const end = Math.min(start + chunkSize, dataArray.length);
+
+      for (let i = start; i < end; i++) {
+        sum += dataArray[i];
+      }
+
+      const avg = sum / (end - start || 1);
+      const normalized = Math.max(0.12, avg / 255);
+      const scale = 0.25 + normalized * 1.6;
+
+      bar.style.transform = `scaleY(${scale})`;
+      bar.style.opacity = `${0.18 + normalized * 0.95}`;
+      bar.classList.toggle("active", normalized > 0.22);
+    });
+
+    vuAnimationFrame = requestAnimationFrame(animateVu);
+  }
+
+  async function startVuMeter() {
+    await setupAudioAnalysis();
+
+    if (audioContext?.state === "suspended") {
+      try {
+        await audioContext.resume();
+      } catch (_) {}
+    }
+
+    if (!vuAnimationFrame) {
+      animateVu();
+    }
+  }
+
+  function stopVuMeter() {
+    if (vuAnimationFrame) {
+      cancelAnimationFrame(vuAnimationFrame);
+      vuAnimationFrame = null;
+    }
+
+    vuBars.forEach((bar, i) => {
+      const soft = 0.28 + ((i % 3) * 0.05);
+      bar.style.transform = `scaleY(${soft})`;
+      bar.style.opacity = "0.22";
+      bar.classList.remove("active");
+    });
+  }
+
+  // =========================
   // RECONEXIÓN INTELIGENTE
   // =========================
   async function recoverPlayback(forceReload = false) {
     if (!isPlaying || isUserPaused || isRecovering) return;
 
     if (reconnectAttempts >= maxReconnectAttempts) {
-      setStatus("No se pudo reconectar la señal", false);
+      setStatus("No se pudo reconectar", false);
       updatePlayUI(false);
-      stopVUMeter();
       return;
     }
 
@@ -642,7 +642,6 @@ document.addEventListener("DOMContentLoaded", () => {
           audio.load();
         }
 
-        await resumeAudioGraph();
         await audio.play();
         isRecovering = false;
       } catch (error) {
@@ -666,13 +665,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setStatus("Conectando con la señal...", false);
 
-      initAudioGraph();
-      await resumeAudioGraph();
-
       if (!audio.src || !audio.src.includes(STREAM_URL)) {
         audio.src = STREAM_URL;
       }
 
+      await setupAudioAnalysis();
       await audio.play();
 
       updatePlayUI(true);
@@ -681,7 +678,6 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error al reproducir stream:", error);
       updatePlayUI(false);
       setStatus("Toca reproducir nuevamente", false);
-      stopVUMeter();
     }
   }
 
@@ -692,7 +688,6 @@ document.addEventListener("DOMContentLoaded", () => {
     isRecovering = false;
     audio.pause();
     updatePlayUI(false);
-    stopVUMeter();
   }
 
   function togglePlay() {
@@ -734,25 +729,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   // EVENTOS AUDIO
   // =========================
-  audio.addEventListener("playing", async () => {
+  audio.addEventListener("playing", () => {
     clearReconnect();
     reconnectAttempts = 0;
     isRecovering = false;
-
-    initAudioGraph();
-    await resumeAudioGraph();
-
     updatePlayUI(true);
     setStatus("Transmitiendo en vivo", true);
     startMetadataPolling();
-
-    if (!animationFrame) drawVUMeter();
   });
 
   audio.addEventListener("pause", () => {
     if (isUserPaused) {
       updatePlayUI(false);
-      stopVUMeter();
     }
   });
 
@@ -789,7 +777,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!isPlaying || isUserPaused) {
       updatePlayUI(false);
       setStatus("Error al conectar con la señal", false);
-      stopVUMeter();
       return;
     }
 
@@ -807,12 +794,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isPlaying) {
       setStatus("Señal lista", true);
     }
-  });
-
-  audio.addEventListener("ended", () => {
-    stopVUMeter();
-    updatePlayUI(false);
-    setStatus("Fuera de línea", false);
   });
 
   audio.addEventListener("volumechange", updateMuteUI);
@@ -874,13 +855,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   // INIT
   // =========================
+  injectPlayerEnhancements();
   updateMuteUI();
   updatePlayUI(false);
   resetMetadataUI();
+  stopVuMeter();
   songToast?.classList.add("hidden");
-
-  resizeCanvasForDPR();
-  drawIdleMeter();
-
   startPassiveMetadataPolling();
 });

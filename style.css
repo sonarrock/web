@@ -277,7 +277,7 @@ h2::after {
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--text-light);
-  text-align: left;
+  text-align: center;
   position: relative;
 }
 

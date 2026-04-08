@@ -23,13 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackArtist = document.getElementById("trackArtist");
   const miniPlayer = document.getElementById("miniPlayer");
 
-  const installBtn = document.getElementById("installBtn");
-  const installBar = document.getElementById("installBar");
-
   const songToast = document.getElementById("songToast");
   const toastSong = document.getElementById("toastSong");
 
   const stationCover = document.getElementById("stationCover");
+  const vuCanvas = document.getElementById("vuCanvas");
 
   if (!audio || !playBtn) return;
 
@@ -62,7 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let reconnectAttempts = 0;
   let metadataTimer = null;
   let passiveMetadataTimer = null;
-  let deferredPrompt = null;
   let toastTimer = null;
 
   let currentCoverUrl = DEFAULT_COVER;
@@ -72,12 +69,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let playbackStartedAt = 0;
   let isRecovering = false;
 
-  // Audio Analysis
+  // =========================
+  // WEB AUDIO / REAL VU
+  // =========================
   let audioContext = null;
   let analyser = null;
   let sourceNode = null;
-  let vuAnimationFrame = null;
-  let vuBars = [];
+  let vuDataArray = null;
+  let vuAnimationId = null;
+  let audioGraphReady = false;
+  let canvasCtx = null;
 
   // =========================
   // AUDIO BASE
@@ -87,110 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
   audio.crossOrigin = "anonymous";
-
-  // =========================
-  // INYECTAR ESTRUCTURA VU
-  // =========================
-  function injectPlayerEnhancements() {
-    const controls = document.querySelector(".player-controls");
-    if (!controls) return;
-
-    if (!document.querySelector(".controls-top")) {
-      const oldChildren = Array.from(controls.children);
-
-      const controlsTop = document.createElement("div");
-      controlsTop.className = "controls-top";
-
-      const volumeWrap = document.querySelector(".volume-wrap");
-
-      oldChildren.forEach((child) => {
-        if (
-          child.id === "playBtn" ||
-          child.id === "muteBtn"
-        ) {
-          controlsTop.appendChild(child);
-        }
-      });
-
-      controls.prepend(controlsTop);
-
-      if (!document.getElementById("vuWrap")) {
-        const vuWrap = document.createElement("div");
-        vuWrap.className = "vu-wrap";
-        vuWrap.id = "vuWrap";
-
-        for (let i = 0; i < 18; i++) {
-          const bar = document.createElement("span");
-          bar.className = "vu-bar";
-          vuWrap.appendChild(bar);
-        }
-
-        if (volumeWrap) {
-          controls.appendChild(volumeWrap);
-          controls.appendChild(vuWrap);
-        } else {
-          controls.appendChild(vuWrap);
-        }
-      }
-    }
-
-    vuBars = Array.from(document.querySelectorAll(".vu-bar"));
-  }
-
-  // =========================
-  // DECODIFICACIÓN SEGURA UTF-8
-  // =========================
-  function safeDecodeText(text = "") {
-    if (!text || typeof text !== "string") return "";
-
-    let cleaned = text.trim();
-
-    try {
-      cleaned = decodeURIComponent(escape(cleaned));
-    } catch (_) {}
-
-    const replacements = {
-      "Ã¡": "á",
-      "Ã©": "é",
-      "Ã­": "í",
-      "Ã³": "ó",
-      "Ãº": "ú",
-      "Ã": "Á",
-      "Ã‰": "É",
-      "Ã": "Í",
-      "Ã“": "Ó",
-      "Ãš": "Ú",
-      "Ã±": "ñ",
-      "Ã‘": "Ñ",
-      "Ã¼": "ü",
-      "Ãœ": "Ü",
-      "â€™": "’",
-      "â€œ": "“",
-      "â€": "”",
-      "â€“": "–",
-      "â€”": "—",
-      "â€¦": "…",
-      "Â": ""
-    };
-
-    Object.keys(replacements).forEach((bad) => {
-      cleaned = cleaned.split(bad).join(replacements[bad]);
-    });
-
-    return cleaned.normalize("NFC").trim();
-  }
-
-  // =========================
-  // NORMALIZAR PARA BÚSQUEDA DE PORTADA
-  // =========================
-  function normalizeForSearch(str = "") {
-    return safeDecodeText(str)
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^\w\s\-&]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
 
   // =========================
   // CARGAR CONFIG GUARDADA
@@ -233,11 +130,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!playing && isUserPaused) {
       setStatus("Listo para reproducir", false);
       stopMetadataPolling();
-      stopVuMeter();
-    }
-
-    if (playing) {
-      startVuMeter();
     }
   }
 
@@ -274,21 +166,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const finalUrl = url || DEFAULT_COVER;
     if (finalUrl === currentCoverUrl) return;
 
-    stationCover.style.opacity = "0.45";
-    stationCover.style.filter = "blur(3px)";
+    stationCover.style.opacity = "0.4";
+    stationCover.style.transform = "scale(0.985)";
 
     const img = new Image();
     img.onload = () => {
       stationCover.src = finalUrl;
       currentCoverUrl = finalUrl;
-      stationCover.style.opacity = "1";
-      stationCover.style.filter = "blur(0)";
+      requestAnimationFrame(() => {
+        stationCover.style.opacity = "1";
+        stationCover.style.transform = "scale(1)";
+      });
     };
     img.onerror = () => {
       stationCover.src = DEFAULT_COVER;
       currentCoverUrl = DEFAULT_COVER;
-      stationCover.style.opacity = "1";
-      stationCover.style.filter = "blur(0)";
+      requestAnimationFrame(() => {
+        stationCover.style.opacity = "1";
+        stationCover.style.transform = "scale(1)";
+      });
     };
     img.src = finalUrl;
   }
@@ -311,20 +207,58 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
+  // NORMALIZAR TEXTO / ACENTOS
+  // =========================
+  function safeDecodeText(str = "") {
+    if (!str || typeof str !== "string") return "";
+
+    let output = str.trim();
+
+    try {
+      output = decodeURIComponent(output);
+    } catch (_) {}
+
+    const fixes = {
+      "Ã¡": "á", "Ã©": "é", "Ã­": "í", "Ã³": "ó", "Ãº": "ú",
+      "Ã": "Á", "Ã‰": "É", "Ã": "Í", "Ã“": "Ó", "Ãš": "Ú",
+      "Ã±": "ñ", "Ã‘": "Ñ", "Ã¼": "ü", "Ãœ": "Ü",
+      "â€™": "’", "â€œ": "“", "â€": "”", "â€“": "–", "â€”": "—",
+      "â€¦": "…", "Â": "", "Ã": "í"
+    };
+
+    Object.entries(fixes).forEach(([bad, good]) => {
+      output = output.split(bad).join(good);
+    });
+
+    return output
+      .replace(/\s+/g, " ")
+      .replace(/[^\S\r\n]+/g, " ")
+      .trim();
+  }
+
+  function normalizeForSearch(str = "") {
+    return safeDecodeText(str)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\w\s\-&]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  // =========================
   // PARSE TITLE
   // =========================
   function parseTitle(rawTitle = "") {
-    const safe = safeDecodeText(rawTitle);
+    const decoded = safeDecodeText(rawTitle);
 
-    if (!safe || typeof safe !== "string") {
+    if (!decoded || typeof decoded !== "string") {
       return {
         artist: "",
         title: DEFAULT_TRACK_TEXT
       };
     }
 
-    const cleaned = safe
-      .replace(/\s+/g, " ")
+    const cleaned = decoded
       .replace(/^NOW:\s*/i, "")
       .trim();
 
@@ -376,11 +310,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const searchArtist = normalizeForSearch(artist);
-      const searchTitle = normalizeForSearch(title);
-
-      const query = encodeURIComponent(`${searchArtist} ${searchTitle}`.trim());
-      const url = `https://itunes.apple.com/search?term=${query}&entity=song&limit=1`;
+      const cleanArtist = normalizeForSearch(artist);
+      const cleanTitle = normalizeForSearch(title);
+      const query = encodeURIComponent(`${cleanArtist} ${cleanTitle}`.trim());
+      const url = `https://itunes.apple.com/search?term=${query}&entity=song&limit=5`;
 
       const response = await fetch(url, { cache: "no-store" });
       if (!response.ok) {
@@ -389,10 +322,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const data = await response.json();
-      const result = data?.results?.[0];
+      const results = data?.results || [];
 
-      if (result?.artworkUrl100) {
-        const hiResCover = result.artworkUrl100.replace("100x100bb", "600x600bb");
+      const best = results.find(item => item?.artworkUrl100) || null;
+
+      if (best?.artworkUrl100) {
+        const hiResCover = best.artworkUrl100.replace("100x100bb", "600x600bb");
         setCover(hiResCover);
       } else {
         setCover(DEFAULT_COVER);
@@ -490,8 +425,8 @@ document.addEventListener("DOMContentLoaded", () => {
         lastMetadataTitle = rawTitle;
 
         const parsed = parseTitle(rawTitle);
-        const finalArtist = safeDecodeText(parsed.artist || "SONAR ROCK");
-        const finalTitle = safeDecodeText(parsed.title || DEFAULT_TRACK_TEXT);
+        const finalArtist = parsed.artist || "SONAR ROCK";
+        const finalTitle = parsed.title || DEFAULT_TRACK_TEXT;
 
         updateTrack(finalTitle, finalArtist);
         fetchAlbumArt(parsed.artist, parsed.title);
@@ -534,86 +469,147 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // VU METER REAL
+  // REAL VU SETUP
   // =========================
-  async function setupAudioAnalysis() {
-    if (audioContext || !window.AudioContext && !window.webkitAudioContext) return;
+  async function initAudioGraph() {
+    if (audioGraphReady) return true;
 
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return false;
+
       audioContext = new AudioCtx();
 
+      if (audioContext.state === "suspended") {
+        await audioContext.resume();
+      }
+
       analyser = audioContext.createAnalyser();
-      analyser.fftSize = 64;
-      analyser.smoothingTimeConstant = 0.8;
+      analyser.fftSize = 128;
+      analyser.smoothingTimeConstant = 0.82;
 
       sourceNode = audioContext.createMediaElementSource(audio);
       sourceNode.connect(analyser);
       analyser.connect(audioContext.destination);
-    } catch (error) {
-      console.warn("No se pudo activar análisis de audio:", error);
-    }
-  }
 
-  function animateVu() {
-    if (!analyser || !vuBars.length) {
-      vuAnimationFrame = requestAnimationFrame(animateVu);
-      return;
-    }
+      vuDataArray = new Uint8Array(analyser.frequencyBinCount);
 
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(dataArray);
-
-    const barsCount = vuBars.length;
-    const chunkSize = Math.floor(dataArray.length / barsCount) || 1;
-
-    vuBars.forEach((bar, index) => {
-      let sum = 0;
-      const start = index * chunkSize;
-      const end = Math.min(start + chunkSize, dataArray.length);
-
-      for (let i = start; i < end; i++) {
-        sum += dataArray[i];
+      if (vuCanvas) {
+        canvasCtx = vuCanvas.getContext("2d");
       }
 
-      const avg = sum / (end - start || 1);
-      const normalized = Math.max(0.12, avg / 255);
-      const scale = 0.25 + normalized * 1.6;
-
-      bar.style.transform = `scaleY(${scale})`;
-      bar.style.opacity = `${0.18 + normalized * 0.95}`;
-      bar.classList.toggle("active", normalized > 0.22);
-    });
-
-    vuAnimationFrame = requestAnimationFrame(animateVu);
+      audioGraphReady = true;
+      startVu();
+      return true;
+    } catch (error) {
+      console.warn("VU real no disponible en este navegador:", error);
+      audioGraphReady = false;
+      return false;
+    }
   }
 
-  async function startVuMeter() {
-    await setupAudioAnalysis();
-
-    if (audioContext?.state === "suspended") {
-      try {
+  async function resumeAudioGraph() {
+    if (!audioContext) return;
+    try {
+      if (audioContext.state === "suspended") {
         await audioContext.resume();
-      } catch (_) {}
-    }
-
-    if (!vuAnimationFrame) {
-      animateVu();
+      }
+    } catch (error) {
+      console.warn("No se pudo reanudar AudioContext:", error);
     }
   }
 
-  function stopVuMeter() {
-    if (vuAnimationFrame) {
-      cancelAnimationFrame(vuAnimationFrame);
-      vuAnimationFrame = null;
+  function drawVuIdle() {
+    if (!vuCanvas || !canvasCtx) return;
+
+    const w = vuCanvas.width;
+    const h = vuCanvas.height;
+
+    canvasCtx.clearRect(0, 0, w, h);
+
+    const bars = 26;
+    const gap = 4;
+    const barWidth = (w - gap * (bars - 1)) / bars;
+    const centerY = h / 2;
+
+    for (let i = 0; i < bars; i++) {
+      const x = i * (barWidth + gap);
+      const baseHeight = 8 + Math.sin((Date.now() / 500) + i * 0.35) * 2.2;
+
+      const grad = canvasCtx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, "rgba(53,215,255,0.18)");
+      grad.addColorStop(0.5, "rgba(255,122,26,0.14)");
+      grad.addColorStop(1, "rgba(255,255,255,0.08)");
+
+      canvasCtx.fillStyle = grad;
+      canvasCtx.fillRect(x, centerY - baseHeight / 2, barWidth, baseHeight);
+    }
+  }
+
+  function drawVuActive() {
+    if (!analyser || !vuDataArray || !vuCanvas || !canvasCtx) return;
+
+    analyser.getByteFrequencyData(vuDataArray);
+
+    const w = vuCanvas.width;
+    const h = vuCanvas.height;
+    canvasCtx.clearRect(0, 0, w, h);
+
+    const bars = 26;
+    const gap = 4;
+    const barWidth = (w - gap * (bars - 1)) / bars;
+    const centerY = h / 2;
+    const step = Math.floor(vuDataArray.length / bars) || 1;
+
+    for (let i = 0; i < bars; i++) {
+      const value = vuDataArray[i * step] || 0;
+      const scaled = Math.max(8, (value / 255) * (h - 8));
+      const x = i * (barWidth + gap);
+
+      const grad = canvasCtx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, "rgba(53,215,255,0.95)");
+      grad.addColorStop(0.55, "rgba(111,170,255,0.92)");
+      grad.addColorStop(1, "rgba(255,122,26,0.88)");
+
+      canvasCtx.fillStyle = grad;
+      canvasCtx.shadowBlur = 10;
+      canvasCtx.shadowColor = "rgba(53,215,255,0.22)";
+      canvasCtx.fillRect(x, centerY - scaled / 2, barWidth, scaled);
     }
 
-    vuBars.forEach((bar, i) => {
-      const soft = 0.28 + ((i % 3) * 0.05);
-      bar.style.transform = `scaleY(${soft})`;
-      bar.style.opacity = "0.22";
-      bar.classList.remove("active");
-    });
+    canvasCtx.shadowBlur = 0;
+  }
+
+  function renderVu() {
+    if (!vuCanvas || !canvasCtx) return;
+
+    if (audioGraphReady && isPlaying && !audio.paused) {
+      drawVuActive();
+    } else {
+      drawVuIdle();
+    }
+
+    vuAnimationId = requestAnimationFrame(renderVu);
+  }
+
+  function startVu() {
+    if (vuAnimationId) cancelAnimationFrame(vuAnimationId);
+    renderVu();
+  }
+
+  function resizeVuCanvas() {
+    if (!vuCanvas) return;
+
+    const rect = vuCanvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+
+    vuCanvas.width = Math.max(260, Math.floor(rect.width * dpr));
+    vuCanvas.height = Math.floor(60 * dpr);
+
+    if (canvasCtx) {
+      canvasCtx.setTransform(1, 0, 0, 1, 0, 0);
+      canvasCtx.scale(dpr, dpr);
+    }
   }
 
   // =========================
@@ -642,6 +638,7 @@ document.addEventListener("DOMContentLoaded", () => {
           audio.load();
         }
 
+        await resumeAudioGraph();
         await audio.play();
         isRecovering = false;
       } catch (error) {
@@ -665,11 +662,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setStatus("Conectando con la señal...", false);
 
+      await initAudioGraph();
+      await resumeAudioGraph();
+
       if (!audio.src || !audio.src.includes(STREAM_URL)) {
         audio.src = STREAM_URL;
       }
 
-      await setupAudioAnalysis();
       await audio.play();
 
       updatePlayUI(true);
@@ -729,10 +728,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   // EVENTOS AUDIO
   // =========================
-  audio.addEventListener("playing", () => {
+  audio.addEventListener("playing", async () => {
     clearReconnect();
     reconnectAttempts = 0;
     isRecovering = false;
+
+    await resumeAudioGraph();
+
     updatePlayUI(true);
     setStatus("Transmitiendo en vivo", true);
     startMetadataPolling();
@@ -801,9 +803,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   // VISIBILIDAD / iPHONE
   // =========================
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && isPlaying && audio.paused && !isUserPaused) {
-      recoverPlayback(false);
+  document.addEventListener("visibilitychange", async () => {
+    if (!document.hidden) {
+      await resumeAudioGraph();
+
+      if (isPlaying && audio.paused && !isUserPaused) {
+        recoverPlayback(false);
+      }
     }
   });
 
@@ -820,46 +826,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  window.addEventListener("resize", handleMiniPlayer);
-  handleMiniPlayer();
-
   // =========================
-  // PWA INSTALL
+  // RESIZE
   // =========================
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
+  function handleResize() {
+    handleMiniPlayer();
+    resizeVuCanvas();
+  }
 
-    if (installBar) installBar.classList.add("show");
-    if (installBtn) installBtn.style.display = "inline-flex";
-  });
-
-  installBtn?.addEventListener("click", async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-
-    if (choice.outcome === "accepted") {
-      if (installBar) installBar.classList.remove("show");
-    }
-
-    deferredPrompt = null;
-  });
-
-  window.addEventListener("appinstalled", () => {
-    if (installBar) installBar.classList.remove("show");
-    deferredPrompt = null;
-  });
+  window.addEventListener("resize", handleResize);
 
   // =========================
   // INIT
   // =========================
-  injectPlayerEnhancements();
   updateMuteUI();
   updatePlayUI(false);
   resetMetadataUI();
-  stopVuMeter();
   songToast?.classList.add("hidden");
+
+  if (vuCanvas) {
+    canvasCtx = vuCanvas.getContext("2d");
+    resizeVuCanvas();
+    startVu();
+  }
+
+  handleMiniPlayer();
   startPassiveMetadataPolling();
 });

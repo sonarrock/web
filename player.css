@@ -1,17 +1,17 @@
-/* ======================
-   SONAR ROCK PLAYER V12
-========================= */
+
+/* ========================
+   SONAR ROCK PLAYER — V13 
+========================== */
 
 :root {
   --sr-primary: #ff7a1a;
-  --sr-primary-2: #ffd166;
   --sr-primary-soft: rgba(255, 122, 26, 0.16);
   --sr-bg: rgba(255, 255, 255, 0.05);
   --sr-border: rgba(255, 255, 255, 0.12);
   --sr-text: #ffffff;
   --sr-subtext: #b8b8b8;
   --sr-live: #ff3b3b;
-  --sr-offline: #7a7a7a;
+  --sr-offline: #6f7683;
   --sr-shadow: 0 22px 55px rgba(0,0,0,0.42);
   --sr-radius: 28px;
   --sr-transition: all 0.35s ease;
@@ -21,7 +21,7 @@
    HERO SECTION
 ========================= */
 .hero-player-section {
-  padding: 20px 20px 8px;
+  padding: 20px 20px 10px;
 }
 
 /* =========================
@@ -30,8 +30,8 @@
 .sonar-player {
   width: 100%;
   max-width: 860px;
-  margin: 18px auto 34px;
-  padding: 24px 26px;
+  margin: 20px auto 40px;
+  padding: 22px 24px;
   border-radius: var(--sr-radius);
   background: linear-gradient(
     145deg,
@@ -43,11 +43,12 @@
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   display: grid;
-  grid-template-columns: 1.15fr 0.95fr;
-  gap: 24px;
+  grid-template-columns: 170px 1fr 210px;
+  gap: 22px;
   align-items: center;
   position: relative;
   overflow: hidden;
+  min-height: 250px;
 }
 
 .sonar-player::before {
@@ -55,8 +56,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at top left, rgba(255,122,26,0.12), transparent 35%),
-    radial-gradient(circle at bottom right, rgba(0,180,255,0.08), transparent 35%);
+    radial-gradient(circle at top left, rgba(255,122,26,0.16), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(0,180,255,0.10), transparent 35%);
   pointer-events: none;
 }
 
@@ -64,112 +65,106 @@
   box-shadow:
     0 25px 60px rgba(0,0,0,0.5),
     0 0 0 1px rgba(255,122,26,0.08),
-    0 0 36px rgba(255,122,26,0.08);
+    0 0 36px rgba(255,122,26,0.10);
 }
 
 /* =========================
-   LAYOUT INTERNO
+   COLUMNA IZQUIERDA
 ========================= */
 .player-left {
-  display: grid;
-  grid-template-columns: 148px 1fr;
-  gap: 18px;
-  align-items: center;
-  position: relative;
-  z-index: 2;
-  min-width: 0;
-}
-
-.player-right {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  justify-content: center;
-  align-items: stretch;
+  align-items: flex-start;
+  gap: 14px;
   position: relative;
   z-index: 2;
   min-width: 0;
 }
 
 /* =========================
-   COVER CUADRADA
+   COVER
 ========================= */
 .cover-wrap {
-  width: 148px;
-  height: 148px;
   position: relative;
+  z-index: 2;
+  width: 176px;
+  height: 176px;
+  margin: 0;
   flex-shrink: 0;
 }
 
 .station-cover {
-  width: 148px;
-  height: 148px;
-  border-radius: 22px;
+  width: 176px;
+  height: 176px;
+  border-radius: 22px; /* REGRESA A CUADRADA */
   object-fit: cover;
   box-shadow:
     0 0 0 10px rgba(0,0,0,0.18),
-    0 0 0 2px rgba(255,122,26,0.12),
+    0 0 0 2px rgba(255,122,26,0.14),
     0 18px 35px rgba(0,0,0,0.38);
   transition:
     transform 0.45s ease,
     opacity 0.45s ease,
     filter 0.45s ease;
   display: block;
-  filter: saturate(1.02) contrast(1.02);
+  background: rgba(255,255,255,0.04);
 }
 
 .sonar-player.playing .station-cover {
-  animation: coverPulse 4.2s ease-in-out infinite;
-}
-
-@keyframes coverPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.018); }
+  transform: scale(1.015);
 }
 
 /* =========================
-   INFO
+   INFO PRINCIPAL
 ========================= */
 .sonar-player-info {
+  position: relative;
+  z-index: 2;
   min-width: 0;
+  align-self: center;
 }
 
 .eyebrow {
   color: var(--sr-primary);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 1.8px;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .sonar-track-title {
-  font-size: clamp(1.14rem, 1.9vw, 1.72rem);
+  font-size: clamp(1.18rem, 2vw, 1.7rem);
   font-weight: 800;
   line-height: 1.18;
   color: var(--sr-text);
-  margin-bottom: 7px;
+  margin-bottom: 8px;
   word-break: break-word;
 }
 
 .sonar-track-artist {
-  font-size: 0.98rem;
+  font-size: 1rem;
   color: var(--sr-subtext);
-  font-weight: 650;
-  margin-bottom: 14px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  word-break: break-word;
 }
 
+/* =========================
+   STATUS
+========================= */
 .status-row {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 14px;
+  padding: 10px 15px;
   border-radius: 999px;
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.08);
   font-size: 0.92rem;
   color: #ddd;
   font-weight: 700;
+  flex-wrap: nowrap;
   white-space: nowrap;
   max-width: 100%;
 }
@@ -185,67 +180,45 @@
 
 .status-dot.live {
   background: var(--sr-live);
-  box-shadow: 0 0 12px var(--sr-live);
-  animation: pulseLive 1.6s infinite;
+  box-shadow: 0 0 10px var(--sr-live);
+  animation: srPulseLive 1.8s infinite;
 }
 
-@keyframes pulseLive {
-  0%   { transform: scale(1); opacity: 1; }
-  70%  { transform: scale(1.32); opacity: 0.42; }
+@keyframes srPulseLive {
+  0% { transform: scale(1); opacity: 1; }
+  70% { transform: scale(1.35); opacity: 0.45; }
   100% { transform: scale(1); opacity: 1; }
 }
 
 /* =========================
-   VU METER REAL
-========================= */
-.vu-wrap {
-  width: 100%;
-  min-height: 92px;
-  border-radius: 20px;
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.045),
-    rgba(255,255,255,0.018)
-  );
-  border: 1px solid rgba(255,255,255,0.07);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-  padding: 10px 12px;
-  overflow: hidden;
-}
-
-#vuMeter {
-  width: 100%;
-  height: 72px;
-  display: block;
-  border-radius: 12px;
-}
-
-/* =========================
-   CONTROLES
+   CONTROLES DERECHA
 ========================= */
 .player-controls {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-
-.buttons-row {
-  display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
+  position: relative;
+  z-index: 2;
+  min-width: 0;
   width: 100%;
 }
 
-/* PLAY */
+.controls-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+}
+
+/* BOTÓN PLAY */
 .play-btn {
-  width: 78px !important;
-  height: 78px !important;
-  min-width: 78px;
-  min-height: 78px;
+  width: 76px !important;
+  height: 76px !important;
+  min-width: 76px;
+  min-height: 76px;
   border: none;
   border-radius: 50% !important;
   background: radial-gradient(circle at 30% 30%, #35d7ff, #0078ff) !important;
@@ -256,40 +229,39 @@
   cursor: pointer;
   box-shadow:
     0 0 0 8px rgba(0, 170, 255, 0.10),
-    0 0 28px rgba(0, 170, 255, 0.34),
-    0 16px 28px rgba(0,0,0,0.35);
-  transition: transform 0.18s ease, box-shadow 0.28s ease, filter 0.28s ease;
+    0 0 32px rgba(0, 170, 255, 0.30),
+    0 18px 30px rgba(0,0,0,0.35);
+  transition: transform 0.18s ease, box-shadow 0.25s ease;
   padding: 0 !important;
   aspect-ratio: 1 / 1;
   flex-shrink: 0;
 }
 
 .play-btn:hover {
-  transform: scale(1.045);
-  box-shadow:
-    0 0 0 10px rgba(0, 170, 255, 0.11),
-    0 0 36px rgba(0, 170, 255, 0.44),
-    0 18px 30px rgba(0,0,0,0.42);
+  transform: scale(1.05);
 }
 
 .play-btn:active {
   transform: scale(0.95);
-  filter: brightness(0.95);
+  box-shadow:
+    0 0 0 5px rgba(0, 170, 255, 0.08),
+    0 0 22px rgba(0, 170, 255, 0.20),
+    0 10px 18px rgba(0,0,0,0.28);
 }
 
 #playIcon {
   font-size: 2rem !important;
   line-height: 1 !important;
   display: inline-block;
-  transform: translateX(2px);
+  transform: translateX(1px);
 }
 
-/* MUTE */
+/* BOTÓN MUTE */
 .mute-btn {
-  width: 56px !important;
-  height: 56px !important;
-  min-width: 56px;
-  min-height: 56px;
+  width: 54px !important;
+  height: 54px !important;
+  min-width: 54px;
+  min-height: 54px;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 50% !important;
   background: rgba(255,255,255,0.08) !important;
@@ -299,7 +271,7 @@
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 12px 24px rgba(0,0,0,0.25);
-  transition: transform 0.18s ease, background 0.28s ease, box-shadow 0.28s ease;
+  transition: transform 0.18s ease, background 0.25s ease;
   padding: 0 !important;
   aspect-ratio: 1 / 1;
   flex-shrink: 0;
@@ -315,7 +287,7 @@
 }
 
 #muteIcon {
-  font-size: 1.34rem !important;
+  font-size: 1.35rem !important;
   line-height: 1 !important;
 }
 
@@ -327,11 +299,11 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  max-width: 280px;
+  max-width: 200px;
 }
 
 .volume-emoji {
-  font-size: 1.06rem;
+  font-size: 1.05rem;
   opacity: 0.95;
   min-width: 20px;
 }
@@ -342,17 +314,9 @@
   width: 100%;
   height: 8px;
   border-radius: 999px;
+  background: linear-gradient(to right, #ff7a1a, #ffd166, #35d7ff);
   outline: none;
   box-shadow: inset 0 1px 4px rgba(0,0,0,0.35);
-  background: linear-gradient(
-    90deg,
-    #ffffff 0%,
-    #e7e7e7 18%,
-    #ffd166 38%,
-    #ffb347 58%,
-    #ff7a1a 78%,
-    #ff5c00 100%
-  );
 }
 
 .volume-slider::-webkit-slider-thumb {
@@ -365,11 +329,6 @@
   border: 3px solid var(--sr-primary);
   box-shadow: 0 4px 12px rgba(0,0,0,0.35);
   cursor: pointer;
-  transition: transform 0.16s ease;
-}
-
-.volume-slider::-webkit-slider-thumb:active {
-  transform: scale(1.08);
 }
 
 .volume-slider::-moz-range-thumb {
@@ -383,6 +342,41 @@
 }
 
 /* =========================
+   VU METER
+========================= */
+.vu-wrap {
+  width: 100%;
+  max-width: 200px;
+  height: 46px;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 4px;
+  padding: 0;
+  margin-top: 2px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.vu-bar {
+  width: 7px;
+  min-height: 8px;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(to top, #ff7a1a, #ffd166, #35d7ff);
+  opacity: 0.22;
+  transform-origin: bottom;
+  transform: scaleY(0.35);
+  transition: transform 0.08s linear, opacity 0.12s ease;
+  box-shadow: 0 0 10px rgba(53, 215, 255, 0.08);
+}
+
+.vu-bar.active {
+  opacity: 0.95;
+}
+
+/* =========================
    AUDIO HIDDEN
 ========================= */
 #radioPlayer {
@@ -390,7 +384,7 @@
 }
 
 /* =========================
-   TOAST
+   TOAST CANCIÓN
 ========================= */
 .song-toast {
   position: fixed;
@@ -511,38 +505,43 @@
 /* =========================
    RESPONSIVE
 ========================= */
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .sonar-player {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 22px 20px;
-  }
-
-  .player-left {
-    grid-template-columns: 136px 1fr;
+    grid-template-columns: 150px 1fr 190px;
+    gap: 18px;
+    padding: 20px;
+    min-height: auto;
   }
 
   .cover-wrap,
   .station-cover {
-    width: 136px;
-    height: 136px;
-  }
-
-  .player-right {
-    gap: 14px;
+    width: 150px;
+    height: 150px;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .hero-player-section {
     padding: 10px 16px 0;
   }
 
-  .player-left {
+  .sonar-player {
     grid-template-columns: 1fr;
+    gap: 18px;
     text-align: center;
-    justify-items: center;
-    gap: 14px;
+    padding: 20px 16px;
+    min-height: unset;
+  }
+
+  .player-left {
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cover-wrap,
+  .station-cover {
+    width: 132px;
+    height: 132px;
   }
 
   .sonar-player-info {
@@ -553,15 +552,33 @@
 
   .status-row {
     justify-content: center;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .player-controls {
     width: 100%;
-    gap: 12px;
+    gap: 14px;
   }
 
-  .volume-wrap {
-    max-width: 100%;
+  .controls-top {
+    justify-content: center;
+  }
+
+  .volume-wrap,
+  .vu-wrap {
+    max-width: 250px;
+    margin: 0 auto;
+  }
+
+  .sonar-track-title {
+    font-size: 1.16rem;
+  }
+
+  .sonar-track-artist {
+    font-size: 0.95rem;
   }
 
   .song-toast {
@@ -575,39 +592,42 @@
 
 @media (max-width: 480px) {
   .sonar-player {
-    padding: 18px 15px;
+    padding: 18px 14px;
     border-radius: 22px;
+    gap: 16px;
   }
 
   .cover-wrap,
   .station-cover {
-    width: 122px;
-    height: 122px;
+    width: 118px;
+    height: 118px;
   }
 
   .play-btn {
-    width: 72px !important;
-    height: 72px !important;
-    min-width: 72px;
-    min-height: 72px;
+    width: 70px !important;
+    height: 70px !important;
+    min-width: 70px;
+    min-height: 70px;
   }
 
   #playIcon {
-    font-size: 1.9rem !important;
+    font-size: 1.85rem !important;
   }
 
   .mute-btn {
-    width: 52px !important;
-    height: 52px !important;
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px;
+    min-height: 50px;
   }
 
   .status-row {
-    font-size: 0.88rem;
-    padding: 9px 13px;
+    font-size: 0.84rem;
+    padding: 8px 12px;
   }
 
   .eyebrow {
-    font-size: 0.75rem;
+    font-size: 0.74rem;
   }
 
   .mini-status {
@@ -615,11 +635,11 @@
   }
 
   .vu-wrap {
-    min-height: 82px;
-    padding: 8px 10px;
+    height: 40px;
+    gap: 3px;
   }
 
-  #vuMeter {
-    height: 64px;
+  .vu-bar {
+    width: 6px;
   }
 }

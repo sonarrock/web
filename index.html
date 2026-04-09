@@ -207,36 +207,35 @@
 <!-- ========================= -->
 <section class="players-section">
 
-  <h2 class="disco-section-title">Disco de la Semana</h2>
+<h3 class="disco-section-title">Disco de la Semana</h3>
 
-  <div class="disco-player" id="discoPlayer">
-    <div class="disco-cover-wrap">
-      <img id="discoCover" src="disco-semana/portada.jpg" alt="Portada Disco de la Semana">
-      <div class="disco-eq" id="discoEQ">
-        <span></span><span></span><span></span><span></span>
-      </div>
+<div class="disco-player" id="discoPlayer">
+  <div class="disco-cover-wrap">
+    <img id="discoCover" src="disco-semana/portada.jpg" alt="Portada Disco de la Semana">
+    <div class="disco-eq" id="discoEQ">
+      <span></span><span></span><span></span><span></span>
     </div>
-
-    <div class="disco-player-info">
-      <p class="disco-track-title" id="discoTitle">Disco de la Semana</p>
-
-      <div class="disco-controls">
-        <button id="discoPlayBtn" class="disco-btn" type="button" aria-label="Reproducir / Pausar">▶</button>
-        <button id="discoStopBtn" class="disco-btn" type="button" aria-label="Detener">■</button>
-        <button id="discoMuteBtn" class="disco-btn" type="button" aria-label="Silenciar">🔊</button>
-      </div>
-
-      <div class="disco-progress-wrap">
-        <span id="discoCurrentTime" class="disco-time">0:00</span>
-        <input type="range" id="discoProgress" class="disco-progress" value="0" min="0" max="100" step="1">
-        <span id="discoDuration" class="disco-time">0:00</span>
-      </div>
-    </div>
-
-    <audio id="discoAudio" preload="metadata" playsinline webkit-playsinline></audio>
   </div>
 
-</section>
+  <div class="disco-player-info">
+    <p class="disco-track-title" id="discoTitle">Disco de la Semana</p>
+
+    <div class="disco-controls">
+      <button id="discoPlayBtn" class="disco-btn" type="button" aria-label="Reproducir / Pausar">▶</button>
+      <button id="discoStopBtn" class="disco-btn" type="button" aria-label="Detener">■</button>
+      <button id="discoMuteBtn" class="disco-btn" type="button" aria-label="Silenciar">🔊</button>
+    </div>
+
+    <div class="disco-progress-wrap">
+      <span id="discoCurrentTime" class="disco-time">0:00</span>
+      <input type="range" id="discoProgress" class="disco-progress" value="0" min="0" max="100" step="1">
+      <span id="discoDuration" class="disco-time">0:00</span>
+    </div>
+  </div>
+
+  <audio id="discoAudio" preload="metadata" playsinline webkit-playsinline crossorigin="anonymous"></audio>
+</div>
+  
     
     <!-- SPOTIFY -->
     <h3 class="player-title">SPOTIFY</h3>

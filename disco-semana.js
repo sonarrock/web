@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
   const player = document.getElementById("discoPlayer");
   const audio = document.getElementById("discoAudio");
   const cover = document.getElementById("discoCover");
@@ -10,17 +10,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   const currentTimeEl = document.getElementById("discoCurrentTime");
   const durationEl = document.getElementById("discoDuration");
 
-  if (!player || !audio || !cover || !title || !playBtn || !stopBtn || !muteBtn || !progress || !currentTimeEl || !durationEl) {
+  // Seguridad: si no existe el bloque, salir sin romper la web
+  if (
+    !player ||
+    !audio ||
+    !cover ||
+    !title ||
+    !playBtn ||
+    !stopBtn ||
+    !muteBtn ||
+    !progress ||
+    !currentTimeEl ||
+    !durationEl
+  ) {
     console.warn("Disco de la Semana: faltan elementos en el DOM.");
     return;
   }
 
   let isSeeking = false;
   let discoData = null;
-  let hasLoadedJson = false;
 
   function formatTime(seconds) {
-    if (isNaN(seconds) || !isFinite(seconds) || seconds < 0) return "0:00";
+    if (!isFinite(seconds) || isNaN(seconds) || seconds < 0) return "0:00";
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60).toString().padStart(2, "0");
     return `${mins}:${secs}`;
@@ -33,14 +44,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function safeSetDuration() {
     const d = audio.duration;
-    if (d && isFinite(d) && !isNaN(d)) {
+    if (isFinite(d) && !isNaN(d) && d > 0) {
       progress.max = Math.floor(d);
       durationEl.textContent = formatTime(d);
     }
   }
 
-  function resetPlayerUI() {
+  function resetUI() {
     progress.value = 0;
+    progress.max = 100;
     currentTimeEl.textContent = "0:00";
     durationEl.textContent = "0:00";
     updatePlayUI(false);
@@ -48,8 +60,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function loadDiscoData() {
     try {
-      const jsonUrl = `disco-semana/disco.json?v=${Date.now()}`;
-      const res = await fetch(jsonUrl, {
+      resetUI();
+
+      const res = await fetch(`disco-semana/disco.json?v=${Date.now()}`, {
         cache: "no-store"
       });
 
@@ -57,63 +70,81 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const data = await res.json();
       discoData = data;
-      hasLoadedJson = true;
 
-      const discoTitle = data.titulo?.trim() || "Disco de la Semana";
-      const discoCover = data.portada?.trim() || "disco-semana/portada.jpg";
-      const discoAudio = data.audio?.trim() || "";
+      // Título SIEMPRE visible
+      title.textContent = data.titulo?.trim() || "Disco de la Semana";
 
-      title.textContent = discoTitle;
-      cover.src = discoCover;
-      cover.alt = discoTitle;
+      // Portada
+      cover.src = data.portada?.trim() || "disco-semana/portada.jpg";
+      cover.alt = data.titulo?.trim() || "Portada Disco de la Semana";
 
-      if (discoAudio) {
-        audio.src = discoAudio;
-        audio.load();
-      } else {
-        console.warn("Disco de la Semana: el JSON no contiene audio.");
+      // Audio
+      const audioUrl = data.audio?.trim() || "";
+      if (!audioUrl) {
+        console.warn("No hay URL de audio en disco.json");
+        title.textContent = "Falta audio en disco.json ⚠️";
+        return;
       }
+
+      audio.src = audioUrl;
+      audio.preload = "metadata";
+      audio.load();
+
+      console.log("Disco cargado:", data.titulo);
+      console.log("Audio URL:", audioUrl);
 
     } catch (err) {
       console.error("Error cargando disco.json:", err);
-      hasLoadedJson = false;
-      title.textContent = "Disco de la Semana";
+      title.textContent = "No se pudo cargar el disco de la semana";
       cover.src = "disco-semana/portada.jpg";
-      cover.alt = "Portada Disco de la Semana";
     }
   }
 
-  await loadDiscoData();
-
-  // Si por alguna razón tarda metadata, al menos nunca dejamos "Cargando..."
-  setTimeout(() => {
-    if (!hasLoadedJson && title.textContent.trim() === "Cargando...") {
-      title.textContent = "Disco de la Semana";
+  async function ensureAudioReady() {
+    if (!audio.src) {
+      throw new Error("No hay audio cargado.");
     }
-  }, 2500);
+
+    if (audio.readyState >= 2) return;
+
+    await new Promise((resolve, reject) => {
+      const onReady = () => {
+        cleanup();
+        resolve();
+      };
+
+      const onError = () => {
+        cleanup();
+        reject(new Error("No se pudo preparar el audio."));
+      };
+
+      const cleanup = () => {
+        audio.removeEventListener("canplay", onReady);
+        audio.removeEventListener("loadedmetadata", onReady);
+        audio.removeEventListener("error", onError);
+      };
+
+      audio.addEventListener("canplay", onReady, { once: true });
+      audio.addEventListener("loadedmetadata", onReady, { once: true });
+      audio.addEventListener("error", onError, { once: true });
+
+      audio.load();
+    });
+  }
 
   async function togglePlay() {
     try {
-      // Pausa el stream principal si está activo
-      const mainStream = document.getElementById("radioPlayer") || document.getElementById("audioPlayer");
+      // Pausar stream principal si está reproduciendo
+      const mainStream =
+        document.getElementById("radioPlayer") ||
+        document.getElementById("audioPlayer");
+
       if (mainStream && !mainStream.paused) {
         mainStream.pause();
       }
 
-      if (!audio.src) {
-        alert("No hay audio cargado en Disco de la Semana.");
-        return;
-      }
-
       if (audio.paused) {
-        // iPhone / Safari: forzar recarga si hubo error previo
-        if (audio.error) {
-          audio.load();
-          await new Promise((resolve) => {
-            audio.addEventListener("canplay", resolve, { once: true });
-          });
-        }
-
+        await ensureAudioReady();
         await audio.play();
         updatePlayUI(true);
       } else {
@@ -121,41 +152,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         updatePlayUI(false);
       }
     } catch (err) {
-      console.error("Error al reproducir el disco:", err);
-      alert("No se pudo reproducir el Disco de la Semana. Revisa el archivo MP3 o la ruta del JSON.");
+      console.error("Error al reproducir Disco de la Semana:", err);
+      alert("No se pudo reproducir el Disco de la Semana. Revisa la ruta del MP3 o intenta recargar la página.");
     }
   }
 
-  function bindTap(el, fn) {
-    if (!el) return;
+  // ====== BOTONES (SOLO CLICK, no touch duplicado) ======
+  playBtn.addEventListener("click", togglePlay);
 
-    el.addEventListener("click", fn);
-
-    el.addEventListener("touchend", (e) => {
-      e.preventDefault();
-      fn();
-    }, { passive: false });
-  }
-
-  bindTap(playBtn, togglePlay);
-
-  bindTap(stopBtn, () => {
+  stopBtn.addEventListener("click", () => {
     audio.pause();
     audio.currentTime = 0;
-    resetPlayerUI();
+    resetUI();
   });
 
-  bindTap(muteBtn, () => {
+  muteBtn.addEventListener("click", () => {
     audio.muted = !audio.muted;
     muteBtn.textContent = audio.muted ? "🔇" : "🔊";
   });
 
+  // ====== EVENTOS DE AUDIO ======
   audio.addEventListener("play", () => updatePlayUI(true));
   audio.addEventListener("pause", () => updatePlayUI(false));
 
   audio.addEventListener("loadedmetadata", safeSetDuration);
   audio.addEventListener("canplay", safeSetDuration);
-  audio.addEventListener("canplaythrough", safeSetDuration);
   audio.addEventListener("durationchange", safeSetDuration);
 
   audio.addEventListener("timeupdate", () => {
@@ -167,7 +188,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   audio.addEventListener("ended", () => {
     audio.currentTime = 0;
-    resetPlayerUI();
+    resetUI();
   });
 
   audio.addEventListener("error", (e) => {
@@ -175,6 +196,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     title.textContent = discoData?.titulo || "Error al cargar el audio ⚠️";
   });
 
+  // ====== SEEK ======
   progress.addEventListener("input", () => {
     isSeeking = true;
     currentTimeEl.textContent = formatTime(Number(progress.value));
@@ -187,14 +209,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     isSeeking = false;
   });
 
-  progress.addEventListener("touchstart", () => {
-    isSeeking = true;
-  }, { passive: true });
-
-  progress.addEventListener("touchend", () => {
-    if (isFinite(audio.duration)) {
-      audio.currentTime = Number(progress.value);
-    }
-    isSeeking = false;
-  }, { passive: true });
+  // ====== CARGA INICIAL ======
+  loadDiscoData();
 });

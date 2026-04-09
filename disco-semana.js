@@ -58,6 +58,28 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePlayUI(false);
   }
 
+  function setErrorState(msg = "Error al cargar el disco ⚠️") {
+    console.warn(msg);
+    title.textContent = msg;
+    cover.src = "disco-semana/portada.jpg";
+    resetUI();
+  }
+
+  function normalizeUrl(url) {
+    if (!url) return "";
+    return url.trim();
+  }
+
+  function pauseMainStream() {
+    const mainStream =
+      document.getElementById("radioPlayer") ||
+      document.getElementById("audioPlayer");
+
+    if (mainStream && !mainStream.paused) {
+      mainStream.pause();
+    }
+  }
+
   async function loadDiscoData() {
     try {
       resetUI();
@@ -71,18 +93,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       discoData = data;
 
+      const discoTitle = data.titulo?.trim() || "Disco de la Semana";
+      const coverUrl = normalizeUrl(data.portada) || "disco-semana/portada.jpg";
+      const audioUrl = normalizeUrl(data.audio);
+
       // Título SIEMPRE visible
-      title.textContent = data.titulo?.trim() || "Disco de la Semana";
+      title.textContent = discoTitle;
 
       // Portada
-      cover.src = data.portada?.trim() || "disco-semana/portada.jpg";
-      cover.alt = data.titulo?.trim() || "Portada Disco de la Semana";
+      cover.src = coverUrl;
+      cover.alt = discoTitle;
 
       // Audio
-      const audioUrl = data.audio?.trim() || "";
       if (!audioUrl) {
-        console.warn("No hay URL de audio en disco.json");
-        title.textContent = "Falta audio en disco.json ⚠️";
+        setErrorState("Falta audio en disco.json ⚠️");
         return;
       }
 
@@ -90,13 +114,12 @@ document.addEventListener("DOMContentLoaded", () => {
       audio.preload = "metadata";
       audio.load();
 
-      console.log("Disco cargado:", data.titulo);
+      console.log("Disco cargado:", discoTitle);
       console.log("Audio URL:", audioUrl);
 
     } catch (err) {
       console.error("Error cargando disco.json:", err);
-      title.textContent = "No se pudo cargar el disco de la semana";
-      cover.src = "disco-semana/portada.jpg";
+      setErrorState("No se pudo cargar el disco de la semana");
     }
   }
 
@@ -108,6 +131,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (audio.readyState >= 2) return;
 
     await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        cleanup();
+        reject(new Error("Tiempo agotado preparando el audio."));
+      }, 10000);
+
       const onReady = () => {
         cleanup();
         resolve();
@@ -119,6 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       const cleanup = () => {
+        clearTimeout(timeout);
         audio.removeEventListener("canplay", onReady);
         audio.removeEventListener("loadedmetadata", onReady);
         audio.removeEventListener("error", onError);
@@ -134,16 +163,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function togglePlay() {
     try {
-      // Pausar stream principal si está reproduciendo
-      const mainStream =
-        document.getElementById("radioPlayer") ||
-        document.getElementById("audioPlayer");
-
-      if (mainStream && !mainStream.paused) {
-        mainStream.pause();
-      }
-
       if (audio.paused) {
+        pauseMainStream();
         await ensureAudioReady();
         await audio.play();
         updatePlayUI(true);
@@ -153,11 +174,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (err) {
       console.error("Error al reproducir Disco de la Semana:", err);
-      alert("No se pudo reproducir el Disco de la Semana. Revisa la ruta del MP3 o intenta recargar la página.");
+      title.textContent = discoData?.titulo || "No se pudo reproducir ⚠️";
     }
   }
 
-  // ====== BOTONES (SOLO CLICK, no touch duplicado) ======
+  // ====== BOTONES ======
   playBtn.addEventListener("click", togglePlay);
 
   stopBtn.addEventListener("click", () => {
@@ -208,6 +229,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     isSeeking = false;
   });
+
+  // ====== SI EL PLAYER PRINCIPAL SUENA, PAUSAR ESTE ======
+  const mainStream =
+    document.getElementById("radioPlayer") ||
+    document.getElementById("audioPlayer");
+
+  if (mainStream) {
+    mainStream.addEventListener("play", () => {
+      if (!audio.paused) {
+        audio.pause();
+        updatePlayUI(false);
+      }
+    });
+  }
 
   // ====== CARGA INICIAL ======
   loadDiscoData();

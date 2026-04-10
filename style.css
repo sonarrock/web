@@ -182,12 +182,12 @@ h2::after {
 .logo-section img,
 .header .logo,
 .logo {
-  width: 170px !important;
-  height: 170px !important;
-  max-width: 170px !important;
-  max-height: 170px !important;
-  min-width: 170px;
-  min-height: 170px;
+  width: 190px !important;
+  height: 190px !important;
+  max-width: 190px !important;
+  max-height: 190px !important;
+  min-width: 190px;
+  min-height: 190px;
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid rgba(255,255,255,0.08);

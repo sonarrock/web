@@ -1,37 +1,19 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const player = document.getElementById("discoPlayer");
-  const audio = document.getElementById("discoAudio");
-  const cover = document.getElementById("discoCover");
-  const title = document.getElementById("discoTitle");
-  const playBtn = document.getElementById("discoPlayBtn");
-  const stopBtn = document.getElementById("discoStopBtn");
-  const muteBtn = document.getElementById("discoMuteBtn");
-  const progress = document.getElementById("discoProgress");
+document.addEventListener("DOMContentLoaded", async () => {
+  const player       = document.getElementById("discoPlayer");
+  const audio        = document.getElementById("discoAudio");
+  const cover        = document.getElementById("discoCover");
+  const title        = document.getElementById("discoTitle");
+  const playBtn      = document.getElementById("discoPlayBtn");
+  const stopBtn      = document.getElementById("discoStopBtn");
+  const muteBtn      = document.getElementById("discoMuteBtn");
+  const progress     = document.getElementById("discoProgress");
   const currentTimeEl = document.getElementById("discoCurrentTime");
-  const durationEl = document.getElementById("discoDuration");
-
-  // Seguridad: si no existe el bloque, salir sin romper la web
-  if (
-    !player ||
-    !audio ||
-    !cover ||
-    !title ||
-    !playBtn ||
-    !stopBtn ||
-    !muteBtn ||
-    !progress ||
-    !currentTimeEl ||
-    !durationEl
-  ) {
-    console.warn("Disco de la Semana: faltan elementos en el DOM.");
-    return;
-  }
+  const durationEl   = document.getElementById("discoDuration");
 
   let isSeeking = false;
-  let discoData = null;
 
   function formatTime(seconds) {
-    if (!isFinite(seconds) || isNaN(seconds) || seconds < 0) return "0:00";
+    if (isNaN(seconds) || !isFinite(seconds) || seconds < 0) return "0:00";
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60).toString().padStart(2, "0");
     return `${mins}:${secs}`;
@@ -44,128 +26,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function safeSetDuration() {
     const d = audio.duration;
-    if (isFinite(d) && !isNaN(d) && d > 0) {
+    if (d && isFinite(d) && !isNaN(d)) {
       progress.max = Math.floor(d);
       durationEl.textContent = formatTime(d);
     }
   }
 
-  function resetUI() {
-    progress.value = 0;
-    progress.max = 100;
-    currentTimeEl.textContent = "0:00";
-    durationEl.textContent = "0:00";
-    updatePlayUI(false);
-  }
-
-  function setErrorState(msg = "Error al cargar el disco ⚠️") {
-    console.warn(msg);
-    title.textContent = msg;
-    cover.src = "disco-semana/portada.jpg";
-    resetUI();
-  }
-
-  function normalizeUrl(url) {
-    if (!url) return "";
-    return url.trim();
-  }
-
-  function pauseMainStream() {
-    const mainStream =
-      document.getElementById("radioPlayer") ||
-      document.getElementById("audioPlayer");
-
-    if (mainStream && !mainStream.paused) {
-      mainStream.pause();
-    }
-  }
-
+  // ====== CARGA DEL JSON ======
   async function loadDiscoData() {
     try {
-      resetUI();
-
-      const res = await fetch(`disco-semana/disco.json?v=${Date.now()}`, {
-        cache: "no-store"
-      });
-
+      // Ruta relativa al JSON — debe estar en la misma carpeta que la página
+      const res = await fetch("disco-semana/disco.json", { cache: "no-store" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const data = await res.json();
-      discoData = data;
 
-      const discoTitle = data.titulo?.trim() || "Disco de la Semana";
-      const coverUrl = normalizeUrl(data.portada) || "disco-semana/portada.jpg";
-      const audioUrl = normalizeUrl(data.audio);
+      title.textContent = data.titulo || "Disco de la Semana";
+      cover.src         = data.portada || "disco-semana/portada.jpg";
 
-      // Título SIEMPRE visible
-      title.textContent = discoTitle;
-
-      // Portada
-      cover.src = coverUrl;
-      cover.alt = discoTitle;
-
-      // Audio
-      if (!audioUrl) {
-        setErrorState("Falta audio en disco.json ⚠️");
-        return;
-      }
-
-      audio.src = audioUrl;
-      audio.preload = "metadata";
+      // Usar la URL tal como viene del JSON (debe ser absoluta si viene de GitHub)
+      audio.src = data.audio;
       audio.load();
-
-      console.log("Disco cargado:", discoTitle);
-      console.log("Audio URL:", audioUrl);
 
     } catch (err) {
       console.error("Error cargando disco.json:", err);
-      setErrorState("No se pudo cargar el disco de la semana");
+      title.textContent = "No se pudo cargar el disco de la semana";
     }
   }
 
-  async function ensureAudioReady() {
-    if (!audio.src) {
-      throw new Error("No hay audio cargado.");
-    }
+  await loadDiscoData();
 
-    if (audio.readyState >= 2) return;
-
-    await new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        cleanup();
-        reject(new Error("Tiempo agotado preparando el audio."));
-      }, 10000);
-
-      const onReady = () => {
-        cleanup();
-        resolve();
-      };
-
-      const onError = () => {
-        cleanup();
-        reject(new Error("No se pudo preparar el audio."));
-      };
-
-      const cleanup = () => {
-        clearTimeout(timeout);
-        audio.removeEventListener("canplay", onReady);
-        audio.removeEventListener("loadedmetadata", onReady);
-        audio.removeEventListener("error", onError);
-      };
-
-      audio.addEventListener("canplay", onReady, { once: true });
-      audio.addEventListener("loadedmetadata", onReady, { once: true });
-      audio.addEventListener("error", onError, { once: true });
-
-      audio.load();
-    });
-  }
-
+  // ====== PLAY / PAUSE ======
   async function togglePlay() {
     try {
+      // Pausar el stream principal si está reproduciendo
+      const mainStream = document.getElementById("radioPlayer") || document.getElementById("audioPlayer");
+      if (mainStream && !mainStream.paused) {
+        mainStream.pause();
+      }
+
       if (audio.paused) {
-        pauseMainStream();
-        await ensureAudioReady();
+        // En iOS el audio.src a veces necesita recargarse si estaba en error
+        if (audio.error) {
+          audio.load();
+          await new Promise(r => audio.addEventListener("canplay", r, { once: true }));
+        }
         await audio.play();
         updatePlayUI(true);
       } else {
@@ -173,31 +78,42 @@ document.addEventListener("DOMContentLoaded", () => {
         updatePlayUI(false);
       }
     } catch (err) {
-      console.error("Error al reproducir Disco de la Semana:", err);
-      title.textContent = discoData?.titulo || "No se pudo reproducir ⚠️";
+      console.error("Error al reproducir:", err);
+      alert("No se pudo reproducir. Verifica que el archivo de audio esté disponible.");
     }
   }
 
   // ====== BOTONES ======
-  playBtn.addEventListener("click", togglePlay);
+  function addClickAndTouch(el, fn) {
+    el.addEventListener("click", fn);
+    el.addEventListener("touchend", (e) => {
+      e.preventDefault();
+      fn();
+    }, { passive: false });
+  }
 
-  stopBtn.addEventListener("click", () => {
+  addClickAndTouch(playBtn, togglePlay);
+
+  addClickAndTouch(stopBtn, () => {
     audio.pause();
     audio.currentTime = 0;
-    resetUI();
+    progress.value = 0;
+    currentTimeEl.textContent = "0:00";
+    updatePlayUI(false);
   });
 
-  muteBtn.addEventListener("click", () => {
+  addClickAndTouch(muteBtn, () => {
     audio.muted = !audio.muted;
     muteBtn.textContent = audio.muted ? "🔇" : "🔊";
   });
 
   // ====== EVENTOS DE AUDIO ======
-  audio.addEventListener("play", () => updatePlayUI(true));
+  audio.addEventListener("play",  () => updatePlayUI(true));
   audio.addEventListener("pause", () => updatePlayUI(false));
 
   audio.addEventListener("loadedmetadata", safeSetDuration);
-  audio.addEventListener("canplay", safeSetDuration);
+  audio.addEventListener("canplay",        safeSetDuration);
+  audio.addEventListener("canplaythrough", safeSetDuration);
   audio.addEventListener("durationchange", safeSetDuration);
 
   audio.addEventListener("timeupdate", () => {
@@ -208,16 +124,17 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   audio.addEventListener("ended", () => {
-    audio.currentTime = 0;
-    resetUI();
+    updatePlayUI(false);
+    progress.value = 0;
+    currentTimeEl.textContent = "0:00";
   });
 
   audio.addEventListener("error", (e) => {
     console.error("Error de audio:", audio.error, e);
-    title.textContent = discoData?.titulo || "Error al cargar el audio ⚠️";
+    title.textContent += " ⚠️ Error al cargar audio";
   });
 
-  // ====== SEEK ======
+  // ====== SEEK (barra de progreso) ======
   progress.addEventListener("input", () => {
     isSeeking = true;
     currentTimeEl.textContent = formatTime(Number(progress.value));
@@ -230,20 +147,14 @@ document.addEventListener("DOMContentLoaded", () => {
     isSeeking = false;
   });
 
-  // ====== SI EL PLAYER PRINCIPAL SUENA, PAUSAR ESTE ======
-  const mainStream =
-    document.getElementById("radioPlayer") ||
-    document.getElementById("audioPlayer");
+  progress.addEventListener("touchstart", () => {
+    isSeeking = true;
+  }, { passive: true });
 
-  if (mainStream) {
-    mainStream.addEventListener("play", () => {
-      if (!audio.paused) {
-        audio.pause();
-        updatePlayUI(false);
-      }
-    });
-  }
-
-  // ====== CARGA INICIAL ======
-  loadDiscoData();
+  progress.addEventListener("touchend", () => {
+    if (isFinite(audio.duration)) {
+      audio.currentTime = Number(progress.value);
+    }
+    isSeeking = false;
+  }, { passive: true });
 });

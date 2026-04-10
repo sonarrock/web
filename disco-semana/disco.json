@@ -1,5 +1,5 @@
 {
-  "titulo": "The Bends - Radiohead",
-  "portada": "https://www.sonarrock.com/disco-semana/portada.jpg",
-  "audio": "https://www.sonarrock.com/disco-semana/Radiohead%20-%20The%20Bends.mp3"
+  "titulo": "Nombre del disco - Artista",
+  "portada": "https://cdn.jsdelivr.net/gh/sonarrock/web@main/disco-semana/portada.jpg",
+  "audio":   "https://cdn.jsdelivr.net/gh/sonarrock/web@main/disco-semana/Radiohead - The Bends.mp3"
 }

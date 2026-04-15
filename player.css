@@ -213,24 +213,70 @@
 }
 
 /* =========================
-   VU METER
+   VU METER — V2
 ========================= */
 .vu-wrap {
   width: 100%;
-  min-height: 78px;
-  border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.025));
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 8px 10px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  min-height: 80px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 10px 12px;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  position: relative;
+  overflow: hidden;
 }
-
+ 
+/* Línea de reflejo superior */
+.vu-wrap::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.12) 40%,
+    rgba(255, 255, 255, 0.12) 60%,
+    transparent
+  );
+  pointer-events: none;
+}
+ 
 .vu-canvas {
   width: 100%;
   height: 60px;
   display: block;
-  border-radius: 12px;
+  border-radius: 8px;
+  /* El canvas dibuja sus propios colores, no necesita bg */
+  background: transparent;
+}
+ 
+/* Label "VU" opcional — pequeño indicador en esquina */
+.vu-label {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  pointer-events: none;
+  user-select: none;
+}
+ 
+/* Cuando está activo el VU brilla un poco más */
+.sonar-player.playing .vu-wrap {
+  border-color: rgba(53, 215, 255, 0.15);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(53, 215, 255, 0.04),
+    0 0 20px rgba(53, 215, 255, 0.06);
 }
 
 /* =========================

@@ -48,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const maxReconnectAttempts = 6;
   const reconnectDelay = 4000;
-  const startupGraceMs = 10000;
   const metadataIntervalMs = 12000;
   const passiveMetadataIntervalMs = 15000;
 
@@ -66,11 +65,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let lastMetadataTitle = "";
   let lastTrackShown = "";
   let isUserPaused = false;
-  let playbackStartedAt = 0;
   let isRecovering = false;
 
   // =========================
-  // WEB AUDIO / REAL VU
+  // WEB AUDIO / VU
   // =========================
   let audioContext = null;
   let analyser = null;
@@ -81,13 +79,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let canvasCtx = null;
 
   // =========================
-  // AUDIO BASE
+  // AUDIO SETUP — sin src al inicio
+  // El src se asigna sólo cuando el usuario da play
+  // para evitar que el browser pre-bufferice y dispare eventos
   // =========================
-  audio.src = STREAM_URL;
   audio.preload = "none";
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
-  audio.crossOrigin = "anonymous";
 
   // =========================
   // CARGAR CONFIG GUARDADA
@@ -108,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function setStatus(text, live = false) {
     if (statusText) statusText.textContent = text;
     if (miniStatus) miniStatus.textContent = text;
-
     if (statusDot) statusDot.classList.toggle("live", live);
     if (miniLiveDot) miniLiveDot.classList.toggle("live", live);
     if (player) player.classList.toggle("is-live", live);
@@ -121,12 +118,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updatePlayUI(playing) {
     isPlaying = playing;
-
     if (playIcon) playIcon.textContent = playing ? "❚❚" : "▶";
     if (miniPlayIcon) miniPlayIcon.textContent = playing ? "❚❚" : "▶";
-
     if (player) player.classList.toggle("playing", playing);
-
     if (!playing && isUserPaused) {
       setStatus("Listo para reproducir", false);
       stopMetadataPolling();
@@ -135,13 +129,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateMuteUI() {
     const muted = audio.muted || audio.volume === 0;
-
     if (muteIcon) muteIcon.textContent = muted ? "🔇" : "🔊";
     if (volumeEmoji) volumeEmoji.textContent = muted ? "🔇" : "🔊";
-
-    if (volumeControl) {
-      volumeControl.value = audio.muted ? 0 : audio.volume;
-    }
+    if (volumeControl) volumeControl.value = audio.muted ? 0 : audio.volume;
   }
 
   function saveAudioPrefs() {
@@ -156,13 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function withinStartupGrace() {
-    return Date.now() - playbackStartedAt < startupGraceMs;
-  }
-
   function setCover(url) {
     if (!stationCover) return;
-
     const finalUrl = url || DEFAULT_COVER;
     if (finalUrl === currentCoverUrl) return;
 
@@ -196,250 +181,126 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showSongToast(songText) {
     if (!songToast || !toastSong || !songText) return;
-
     toastSong.textContent = songText;
     songToast.classList.remove("hidden");
-
     if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => {
-      songToast.classList.add("hidden");
-    }, 3500);
+    toastTimer = setTimeout(() => songToast.classList.add("hidden"), 3500);
   }
 
   // =========================
-  // NORMALIZAR TEXTO / ACENTOS
+  // TEXTO / ACENTOS
   // =========================
   function safeDecodeText(str = "") {
     if (!str || typeof str !== "string") return "";
-
     let output = str.trim();
-
-    try {
-      output = decodeURIComponent(output);
-    } catch (_) {}
-
+    try { output = decodeURIComponent(output); } catch (_) {}
     const fixes = {
-      "Ã¡": "á", "Ã©": "é", "Ã­": "í", "Ã³": "ó", "Ãº": "ú",
-      "Ã": "Á", "Ã‰": "É", "Ã": "Í", "Ã“": "Ó", "Ãš": "Ú",
-      "Ã±": "ñ", "Ã‘": "Ñ", "Ã¼": "ü", "Ãœ": "Ü",
-      "â€™": "’", "â€œ": "“", "â€": "”", "â€“": "–", "â€”": "—",
-      "â€¦": "…", "Â": "", "Ã": "í"
+      "Ã¡":"á","Ã©":"é","Ã­":"í","Ã³":"ó","Ãº":"ú",
+      "Ã":"Á","Ã‰":"É","Ã":"Í","Ã"":"Ó","Ãš":"Ú",
+      "Ã±":"ñ","Ã'":"Ñ","Ã¼":"ü","Ãœ":"Ü",
+      "â€™":"'","â€œ":"\u201c","â€":"\u201d","â€"":"–","â€"":"—",
+      "â€¦":"…","Â":"","Ã":"í"
     };
-
-    Object.entries(fixes).forEach(([bad, good]) => {
-      output = output.split(bad).join(good);
-    });
-
-    return output
-      .replace(/\s+/g, " ")
-      .replace(/[^\S\r\n]+/g, " ")
-      .trim();
+    Object.entries(fixes).forEach(([bad, good]) => { output = output.split(bad).join(good); });
+    return output.replace(/\s+/g," ").trim();
   }
 
   function normalizeForSearch(str = "") {
     return safeDecodeText(str)
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^\w\s\-&]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
+      .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+      .replace(/[^\w\s\-&]/g," ").replace(/\s+/g," ").trim();
   }
 
-  // =========================
-  // PARSE TITLE
-  // =========================
   function parseTitle(rawTitle = "") {
     const decoded = safeDecodeText(rawTitle);
-
-    if (!decoded || typeof decoded !== "string") {
-      return {
-        artist: "",
-        title: DEFAULT_TRACK_TEXT
-      };
-    }
-
-    const cleaned = decoded
-      .replace(/^NOW:\s*/i, "")
-      .trim();
-
-    if (
-      cleaned === "-" ||
-      cleaned === "- ," ||
-      cleaned === ", -" ||
-      cleaned === " - "
-    ) {
-      return {
-        artist: "",
-        title: DEFAULT_TRACK_TEXT
-      };
-    }
-
-    const separators = [" - ", " – ", " — "];
-    let parts = null;
-
-    for (const sep of separators) {
+    if (!decoded) return { artist:"", title:DEFAULT_TRACK_TEXT };
+    const cleaned = decoded.replace(/^NOW:\s*/i,"").trim();
+    if (["-","- ,"," , -"," - "].includes(cleaned)) return { artist:"", title:DEFAULT_TRACK_TEXT };
+    for (const sep of [" - "," – "," — "]) {
       if (cleaned.includes(sep)) {
-        parts = cleaned.split(sep);
-        break;
+        const parts = cleaned.split(sep);
+        const artist = safeDecodeText(parts.shift().trim());
+        const title = safeDecodeText(parts.join(" - ").trim());
+        return { artist, title: title || cleaned };
       }
     }
-
-    if (parts && parts.length >= 2) {
-      const artist = safeDecodeText(parts.shift().trim());
-      const title = safeDecodeText(parts.join(" - ").trim());
-
-      return {
-        artist: artist || "",
-        title: title || cleaned
-      };
-    }
-
-    return {
-      artist: "",
-      title: cleaned
-    };
+    return { artist:"", title:cleaned };
   }
 
   // =========================
-  // PORTADA (ITUNES)
+  // PORTADA
   // =========================
   async function fetchAlbumArt(artist, title) {
-    if (!artist && !title) {
-      setCover(DEFAULT_COVER);
-      return;
-    }
-
+    if (!artist && !title) { setCover(DEFAULT_COVER); return; }
     try {
-      const cleanArtist = normalizeForSearch(artist);
-      const cleanTitle = normalizeForSearch(title);
-      const query = encodeURIComponent(`${cleanArtist} ${cleanTitle}`.trim());
-      const url = `https://itunes.apple.com/search?term=${query}&entity=song&limit=5`;
-
-      const response = await fetch(url, { cache: "no-store" });
-      if (!response.ok) {
-        setCover(DEFAULT_COVER);
-        return;
-      }
-
-      const data = await response.json();
-      const results = data?.results || [];
-
-      const best = results.find(item => item?.artworkUrl100) || null;
-
+      const q = encodeURIComponent(`${normalizeForSearch(artist)} ${normalizeForSearch(title)}`.trim());
+      const res = await fetch(`https://itunes.apple.com/search?term=${q}&entity=song&limit=5`,{ cache:"no-store" });
+      if (!res.ok) { setCover(DEFAULT_COVER); return; }
+      const data = await res.json();
+      const best = (data?.results || []).find(i => i?.artworkUrl100);
       if (best?.artworkUrl100) {
-        const hiResCover = best.artworkUrl100.replace("100x100bb", "600x600bb");
-        setCover(hiResCover);
+        setCover(best.artworkUrl100.replace("100x100bb","600x600bb"));
       } else {
         setCover(DEFAULT_COVER);
       }
-    } catch (error) {
-      console.warn("No se pudo cargar portada:", error);
-      setCover(DEFAULT_COVER);
-    }
+    } catch { setCover(DEFAULT_COVER); }
   }
 
   // =========================
-  // METADATA GISS / ICECAST
+  // METADATA
   // =========================
   function getMountSource(data) {
     const sources = data?.icestats?.source;
     if (!sources) return null;
-
     if (Array.isArray(sources)) {
-      return (
-        sources.find((src) => {
-          const listen = (src.listenurl || "").toLowerCase();
-          const name = (src.server_name || "").toLowerCase();
-          return (
-            listen.includes(MOUNTPOINT.toLowerCase()) ||
-            name.includes("sonarrock")
-          );
-        }) || null
-      );
+      return sources.find(s =>
+        (s.listenurl||"").toLowerCase().includes(MOUNTPOINT.toLowerCase()) ||
+        (s.server_name||"").toLowerCase().includes("sonarrock")
+      ) || null;
     }
-
     return sources;
   }
 
   async function fetchNowPlayingFallback() {
     try {
-      const response = await fetch(`${GISS_NOWPLAYING_URL}&t=${Date.now()}`, {
-        cache: "no-store"
-      });
-
-      if (!response.ok) return "";
-
-      const text = await response.text();
-      return safeDecodeText(text || "");
-    } catch (error) {
-      console.warn("Fallback now playing no disponible:", error);
-      return "";
-    }
+      const res = await fetch(`${GISS_NOWPLAYING_URL}&t=${Date.now()}`,{ cache:"no-store" });
+      if (!res.ok) return "";
+      return safeDecodeText(await res.text());
+    } catch { return ""; }
   }
 
   async function fetchMetadata() {
     try {
-      const response = await fetch(`${METADATA_URL}?t=${Date.now()}`, {
-        cache: "no-store"
-      });
-
-      if (!response.ok) return;
-
-      const data = await response.json();
+      const res = await fetch(`${METADATA_URL}?t=${Date.now()}`,{ cache:"no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
       const source = getMountSource(data);
-
-      if (!source) {
+      if (!source || !source.stream_start_iso8601) {
         setStatus("Fuera de línea", false);
         resetMetadataUI();
         return;
       }
-
-      const isReallyLive = !!source.stream_start_iso8601;
-
-      if (!isReallyLive) {
-        setStatus("Fuera de línea", false);
-        resetMetadataUI();
-        return;
-      }
-
       setStatus("Transmitiendo en vivo", true);
-
-      let rawTitle =
-        source.title ||
-        source.artist ||
-        source.server_description ||
-        "";
-
-      rawTitle = safeDecodeText(rawTitle);
-
-      if (!rawTitle || rawTitle.trim() === "-" || rawTitle.trim() === "- ,") {
-        const fallbackTitle = await fetchNowPlayingFallback();
-        if (fallbackTitle) rawTitle = fallbackTitle;
+      let rawTitle = safeDecodeText(source.title || source.artist || source.server_description || "");
+      if (!rawTitle || ["-","- ,"].includes(rawTitle.trim())) {
+        const fb = await fetchNowPlayingFallback();
+        if (fb) rawTitle = fb;
       }
-
-      if (!rawTitle) {
-        rawTitle = DEFAULT_TRACK_TEXT;
-      }
-
+      if (!rawTitle) rawTitle = DEFAULT_TRACK_TEXT;
       if (rawTitle !== lastMetadataTitle) {
         lastMetadataTitle = rawTitle;
-
         const parsed = parseTitle(rawTitle);
         const finalArtist = parsed.artist || "SONAR ROCK";
         const finalTitle = parsed.title || DEFAULT_TRACK_TEXT;
-
         updateTrack(finalTitle, finalArtist);
         fetchAlbumArt(parsed.artist, parsed.title);
-
-        const currentTrackKey = `${finalArtist} - ${finalTitle}`;
-        if (currentTrackKey !== lastTrackShown && finalTitle !== DEFAULT_TRACK_TEXT) {
-          lastTrackShown = currentTrackKey;
-          showSongToast(currentTrackKey);
+        const key = `${finalArtist} - ${finalTitle}`;
+        if (key !== lastTrackShown && finalTitle !== DEFAULT_TRACK_TEXT) {
+          lastTrackShown = key;
+          showSongToast(key);
         }
       }
-    } catch (error) {
-      console.warn("Metadata no disponible:", error);
-    }
+    } catch (e) { console.warn("Metadata no disponible:", e); }
   }
 
   function startMetadataPolling() {
@@ -449,10 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function stopMetadataPolling() {
-    if (metadataTimer) {
-      clearInterval(metadataTimer);
-      metadataTimer = null;
-    }
+    if (metadataTimer) { clearInterval(metadataTimer); metadataTimer = null; }
   }
 
   function startPassiveMetadataPolling() {
@@ -462,31 +320,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function stopPassiveMetadataPolling() {
-    if (passiveMetadataTimer) {
-      clearInterval(passiveMetadataTimer);
-      passiveMetadataTimer = null;
-    }
+    if (passiveMetadataTimer) { clearInterval(passiveMetadataTimer); passiveMetadataTimer = null; }
   }
 
   // =========================
-  // REAL VU SETUP
+  // WEB AUDIO GRAPH
+  // Se inicializa solo una vez y solo tras gesto del usuario
   // =========================
   async function initAudioGraph() {
-    if (audioGraphReady) return true;
-
+    if (audioGraphReady) {
+      if (audioContext?.state === "suspended") await audioContext.resume().catch(() => {});
+      return true;
+    }
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return false;
 
       audioContext = new AudioCtx();
-
-      if (audioContext.state === "suspended") {
-        await audioContext.resume();
-      }
+      if (audioContext.state === "suspended") await audioContext.resume();
 
       analyser = audioContext.createAnalyser();
-      analyser.fftSize = 128;
-      analyser.smoothingTimeConstant = 0.82;
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.80;
+
+      // crossOrigin debe estar seteado antes de conectar al graph
+      audio.crossOrigin = "anonymous";
 
       sourceNode = audioContext.createMediaElementSource(audio);
       sourceNode.connect(analyser);
@@ -494,141 +352,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
       vuDataArray = new Uint8Array(analyser.frequencyBinCount);
 
-      if (vuCanvas) {
-        canvasCtx = vuCanvas.getContext("2d");
-      }
+      if (vuCanvas) canvasCtx = vuCanvas.getContext("2d");
 
       audioGraphReady = true;
       startVu();
       return true;
-    } catch (error) {
-      console.warn("VU real no disponible en este navegador:", error);
+    } catch (e) {
+      console.warn("Web Audio no disponible:", e);
       audioGraphReady = false;
+      // Arrancar VU idle sin audio graph
+      if (vuCanvas && !canvasCtx) {
+        canvasCtx = vuCanvas.getContext("2d");
+        startVu();
+      }
       return false;
     }
   }
 
-  async function resumeAudioGraph() {
-    if (!audioContext) return;
-    try {
-      if (audioContext.state === "suspended") {
-        await audioContext.resume();
-      }
-    } catch (error) {
-      console.warn("No se pudo reanudar AudioContext:", error);
-    }
-  }
-
-  function drawVuIdle() {
-    if (!vuCanvas || !canvasCtx) return;
-
-    const w = vuCanvas.width;
-    const h = vuCanvas.height;
-
-    canvasCtx.clearRect(0, 0, w, h);
-
-    const bars = 26;
-    const gap = 4;
-    const barWidth = (w - gap * (bars - 1)) / bars;
-    const centerY = h / 2;
-
-    for (let i = 0; i < bars; i++) {
-      const x = i * (barWidth + gap);
-      const baseHeight = 8 + Math.sin((Date.now() / 500) + i * 0.35) * 2.2;
-
-      const grad = canvasCtx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, "rgba(53,215,255,0.18)");
-      grad.addColorStop(0.5, "rgba(255,122,26,0.14)");
-      grad.addColorStop(1, "rgba(255,255,255,0.08)");
-
-      canvasCtx.fillStyle = grad;
-      canvasCtx.fillRect(x, centerY - baseHeight / 2, barWidth, baseHeight);
-    }
-  }
-
-  function drawVuActive() {
-    if (!analyser || !vuDataArray || !vuCanvas || !canvasCtx) return;
-
-    analyser.getByteFrequencyData(vuDataArray);
-
-    const w = vuCanvas.width;
-    const h = vuCanvas.height;
-    canvasCtx.clearRect(0, 0, w, h);
-
-    const bars = 26;
-    const gap = 4;
-    const barWidth = (w - gap * (bars - 1)) / bars;
-    const centerY = h / 2;
-    const step = Math.floor(vuDataArray.length / bars) || 1;
-
-    for (let i = 0; i < bars; i++) {
-      const value = vuDataArray[i * step] || 0;
-      const scaled = Math.max(8, (value / 255) * (h - 8));
-      const x = i * (barWidth + gap);
-
-      const grad = canvasCtx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, "rgba(53,215,255,0.95)");
-      grad.addColorStop(0.55, "rgba(111,170,255,0.92)");
-      grad.addColorStop(1, "rgba(255,122,26,0.88)");
-
-      canvasCtx.fillStyle = grad;
-      canvasCtx.shadowBlur = 10;
-      canvasCtx.shadowColor = "rgba(53,215,255,0.22)";
-      canvasCtx.fillRect(x, centerY - scaled / 2, barWidth, scaled);
-    }
-
-    canvasCtx.shadowBlur = 0;
-  }
-
-  function renderVu() {
-    if (!vuCanvas || !canvasCtx) return;
-
-    if (audioGraphReady && isPlaying && !audio.paused) {
-      drawVuActive();
-    } else {
-      drawVuIdle();
-    }
-
-    vuAnimationId = requestAnimationFrame(renderVu);
-  }
-
-  function startVu() {
-    if (vuAnimationId) cancelAnimationFrame(vuAnimationId);
-    renderVu();
-  }
-
-  function resizeVuCanvas() {
-    if (!vuCanvas) return;
-
-    const rect = vuCanvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-
-    vuCanvas.width = Math.max(260, Math.floor(rect.width * dpr));
-    vuCanvas.height = Math.floor(60 * dpr);
-
-    if (canvasCtx) {
-      canvasCtx.setTransform(1, 0, 0, 1, 0, 0);
-      canvasCtx.scale(dpr, dpr);
-    }
-  }
-
   // =========================
-  // RECONEXIÓN INTELIGENTE
+  // RECONEXIÓN
   // =========================
   async function recoverPlayback(forceReload = false) {
     if (!isPlaying || isUserPaused || isRecovering) return;
-
     if (reconnectAttempts >= maxReconnectAttempts) {
       setStatus("No se pudo reconectar", false);
       updatePlayUI(false);
       return;
     }
-
     isRecovering = true;
     reconnectAttempts++;
     clearReconnect();
-
-    setStatus(`Reconectando señal... (${reconnectAttempts})`, false);
+    setStatus(`Reconectando... (${reconnectAttempts})`, false);
 
     reconnectTimer = setTimeout(async () => {
       try {
@@ -637,12 +391,11 @@ document.addEventListener("DOMContentLoaded", () => {
           audio.src = `${STREAM_URL}?t=${Date.now()}`;
           audio.load();
         }
-
-        await resumeAudioGraph();
+        if (audioContext?.state === "suspended") await audioContext.resume().catch(() => {});
         await audio.play();
         isRecovering = false;
-      } catch (error) {
-        console.error("Reconexión fallida:", error);
+      } catch (e) {
+        console.error("Reconexión fallida:", e);
         isRecovering = false;
         recoverPlayback(true);
       }
@@ -651,6 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // =========================
   // PLAY / PAUSE
+  // Flujo limpio: src → crossOrigin → audioGraph → play()
   // =========================
   async function playStream() {
     try {
@@ -658,23 +412,23 @@ document.addEventListener("DOMContentLoaded", () => {
       reconnectAttempts = 0;
       isUserPaused = false;
       isRecovering = false;
-      playbackStartedAt = Date.now();
 
-      setStatus("Conectando con la señal...", false);
+      setStatus("Conectando...", false);
+      updatePlayUI(true); // feedback visual inmediato
 
+      // 1. Asignar src fresco (evita caché de stream cortado)
+      audio.src = `${STREAM_URL}?t=${Date.now()}`;
+      audio.load();
+
+      // 2. Inicializar audio graph (solo crea el contexto una vez)
       await initAudioGraph();
-      await resumeAudioGraph();
 
-      if (!audio.src || !audio.src.includes(STREAM_URL)) {
-        audio.src = STREAM_URL;
-      }
-
+      // 3. Play
       await audio.play();
 
-      updatePlayUI(true);
       startMetadataPolling();
-    } catch (error) {
-      console.error("Error al reproducir stream:", error);
+    } catch (e) {
+      console.error("Error al reproducir:", e);
       updatePlayUI(false);
       setStatus("Toca reproducir nuevamente", false);
     }
@@ -690,10 +444,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function togglePlay() {
-    if (audio.paused) {
-      playStream();
-    } else {
+    if (isPlaying) {
       pauseStream();
+    } else {
+      playStream();
     }
   }
 
@@ -705,130 +459,199 @@ document.addEventListener("DOMContentLoaded", () => {
 
   muteBtn?.addEventListener("click", () => {
     audio.muted = !audio.muted;
-
     if (!audio.muted && audio.volume === 0) {
       audio.volume = 1;
       if (volumeControl) volumeControl.value = 1;
     }
-
     updateMuteUI();
     saveAudioPrefs();
   });
 
   volumeControl?.addEventListener("input", (e) => {
     const value = parseFloat(e.target.value);
-
     audio.volume = value;
     audio.muted = value === 0;
-
     updateMuteUI();
     saveAudioPrefs();
   });
 
   // =========================
-  // EVENTOS AUDIO
+  // EVENTOS AUDIO — solo reaccionan cuando corresponde
   // =========================
-  audio.addEventListener("playing", async () => {
+  audio.addEventListener("playing", () => {
     clearReconnect();
     reconnectAttempts = 0;
     isRecovering = false;
-
-    await resumeAudioGraph();
-
     updatePlayUI(true);
     setStatus("Transmitiendo en vivo", true);
-    startMetadataPolling();
+    if (audioContext?.state === "suspended") audioContext.resume().catch(() => {});
   });
 
   audio.addEventListener("pause", () => {
-    if (isUserPaused) {
-      updatePlayUI(false);
-    }
+    if (isUserPaused) updatePlayUI(false);
   });
 
   audio.addEventListener("waiting", () => {
+    // Solo actuar si llevamos más de 8s reproduciendo (no es buffering inicial)
     if (!isPlaying || isUserPaused) return;
-
     setStatus("Bufferizando señal...", false);
-
-    if (!withinStartupGrace()) {
-      recoverPlayback(false);
-    }
   });
 
   audio.addEventListener("stalled", () => {
     if (!isPlaying || isUserPaused) return;
-
-    if (withinStartupGrace()) {
-      setStatus("Estabilizando señal...", false);
-      return;
-    }
-
     setStatus("Señal detenida, recuperando...", false);
-    recoverPlayback(false);
-  });
-
-  audio.addEventListener("suspend", () => {
-    if (!isPlaying || isUserPaused) return;
-    setStatus("Transmitiendo en vivo", true);
+    // Dar 5s antes de forzar reconexión para no pisar el arranque
+    clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(() => recoverPlayback(true), 5000);
   });
 
   audio.addEventListener("error", () => {
-    console.error("Error en stream");
-
     if (!isPlaying || isUserPaused) {
       updatePlayUI(false);
       setStatus("Error al conectar con la señal", false);
       return;
     }
-
     setStatus("Error en la señal, recuperando...", false);
     recoverPlayback(true);
   });
 
-  audio.addEventListener("loadstart", () => {
-    if (isPlaying && !withinStartupGrace()) {
-      setStatus("Cargando stream...", false);
-    }
-  });
-
   audio.addEventListener("canplay", () => {
-    if (isPlaying) {
-      setStatus("Señal lista", true);
-    }
+    if (isPlaying) setStatus("Transmitiendo en vivo", true);
   });
 
   audio.addEventListener("volumechange", updateMuteUI);
 
   // =========================
-  // VISIBILIDAD / iPHONE
+  // VISIBILIDAD
   // =========================
   document.addEventListener("visibilitychange", async () => {
     if (!document.hidden) {
-      await resumeAudioGraph();
-
-      if (isPlaying && audio.paused && !isUserPaused) {
-        recoverPlayback(false);
-      }
+      if (audioContext?.state === "suspended") await audioContext.resume().catch(() => {});
+      if (isPlaying && audio.paused && !isUserPaused) recoverPlayback(false);
     }
   });
 
   // =========================
-  // MINI PLAYER MÓVIL
+  // MINI PLAYER
   // =========================
   function handleMiniPlayer() {
     if (!miniPlayer) return;
-
-    if (window.innerWidth <= 768) {
-      miniPlayer.classList.add("show");
-    } else {
-      miniPlayer.classList.remove("show");
-    }
+    miniPlayer.classList.toggle("show", window.innerWidth <= 768);
   }
 
   // =========================
-  // RESIZE
+  // VU METER — diseño mejorado
   // =========================
+  const VU_BARS = 32;
+  const VU_GAP = 3;
+  const VU_BORDER_RADIUS = 3;
+  // Picos por barra para el efecto "peak hold"
+  const peakValues = new Float32Array(VU_BARS).fill(0);
+  const peakDecay = 0.015;
+
+  function resizeVuCanvas() {
+    if (!vuCanvas) return;
+    const rect = vuCanvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    vuCanvas.width = Math.max(260, Math.floor(rect.width * dpr));
+    vuCanvas.height = Math.floor(64 * dpr);
+    if (canvasCtx) canvasCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function getBarColor(normalizedValue, index, total) {
+    // Gradiente por posición: izquierda azul/cyan → centro naranja → derecha rojo
+    const pos = index / total;
+    if (normalizedValue > 0.85) return "rgba(255,60,60,0.95)";
+    if (pos < 0.4) return `rgba(53,215,255,${0.7 + normalizedValue * 0.3})`;
+    if (pos < 0.7) return `rgba(255,160,40,${0.75 + normalizedValue * 0.25})`;
+    return `rgba(255,100,30,${0.75 + normalizedValue * 0.25})`;
+  }
+
+  function drawVu() {
+    if (!vuCanvas || !canvasCtx) return;
+    const dpr = window.devicePixelRatio || 1;
+    const W = vuCanvas.width / dpr;
+    const H = vuCanvas.height / dpr;
+
+    canvasCtx.clearRect(0, 0, W, H);
+
+    const barWidth = (W - VU_GAP * (VU_BARS - 1)) / VU_BARS;
+    const now = Date.now();
+    const active = audioGraphReady && isPlaying && !audio.paused;
+
+    if (active && analyser && vuDataArray) {
+      analyser.getByteFrequencyData(vuDataArray);
+    }
+
+    for (let i = 0; i < VU_BARS; i++) {
+      const x = i * (barWidth + VU_GAP);
+
+      let rawValue;
+      if (active && vuDataArray) {
+        const step = Math.floor(vuDataArray.length / VU_BARS);
+        rawValue = (vuDataArray[i * step] || 0) / 255;
+      } else {
+        // Idle: ondas suaves con fase diferente por barra
+        const t = now / 1000;
+        const wave1 = Math.sin(t * 1.1 + i * 0.28) * 0.5 + 0.5;
+        const wave2 = Math.sin(t * 0.7 + i * 0.45 + 1.2) * 0.5 + 0.5;
+        rawValue = (wave1 * 0.6 + wave2 * 0.4) * 0.18 + 0.04;
+      }
+
+      // Peak hold
+      if (rawValue >= peakValues[i]) {
+        peakValues[i] = rawValue;
+      } else {
+        peakValues[i] = Math.max(0, peakValues[i] - peakDecay);
+      }
+
+      const barH = Math.max(4, rawValue * (H - 4));
+      const peakH = Math.max(4, peakValues[i] * (H - 4));
+      const y = H - barH;
+
+      // Barra principal
+      const color = getBarColor(rawValue, i, VU_BARS);
+      canvasCtx.beginPath();
+      canvasCtx.roundRect
+        ? canvasCtx.roundRect(x, y, barWidth, barH, VU_BORDER_RADIUS)
+        : canvasCtx.rect(x, y, barWidth, barH);
+
+      // Glow en barras activas
+      if (active && rawValue > 0.3) {
+        canvasCtx.shadowBlur = 8;
+        canvasCtx.shadowColor = rawValue > 0.7
+          ? "rgba(255,80,40,0.6)"
+          : "rgba(53,215,255,0.4)";
+      } else {
+        canvasCtx.shadowBlur = 0;
+      }
+
+      canvasCtx.fillStyle = color;
+      canvasCtx.fill();
+
+      // Pixel de pico (peak hold)
+      if (active && peakValues[i] > 0.05) {
+        canvasCtx.shadowBlur = 0;
+        canvasCtx.fillStyle = peakValues[i] > 0.85
+          ? "rgba(255,80,60,0.95)"
+          : "rgba(255,255,255,0.75)";
+        canvasCtx.fillRect(x, H - peakH - 2, barWidth, 2);
+      }
+    }
+
+    canvasCtx.shadowBlur = 0;
+  }
+
+  function renderVu() {
+    drawVu();
+    vuAnimationId = requestAnimationFrame(renderVu);
+  }
+
+  function startVu() {
+    if (vuAnimationId) cancelAnimationFrame(vuAnimationId);
+    renderVu();
+  }
+
   function handleResize() {
     handleMiniPlayer();
     resizeVuCanvas();

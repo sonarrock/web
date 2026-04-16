@@ -224,3 +224,8 @@ document.addEventListener("DOMContentLoaded", () => {
   updatePlayUI(false);
 
 });
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js")
+    .then(() => console.log("SW activo"))
+    .catch(err => console.log("SW error", err));
+}

@@ -125,52 +125,56 @@ document.addEventListener("DOMContentLoaded", () => {
   // METADATA PRO
   // =========================
   async function fetchMetadata() {
+  try {
+    let title = "";
+
+    // 🔥 1. PRIORIDAD: endpoint simple (funciona en móvil)
     try {
-      const res = await fetch(`${METADATA_URL}?t=${Date.now()}`);
-      const data = await res.json();
+      const fb = await fetch(FALLBACK_URL + "&t=" + Date.now(), {
+        cache: "no-store"
+      });
+      title = (await fb.text()).trim();
+    } catch {}
 
-      let source = data.icestats.source;
+    // 🔥 2. SI FALLA, intentar JSON (PC principalmente)
+    if (!title || title === "-") {
+      try {
+        const res = await fetch(`${METADATA_URL}?t=${Date.now()}`);
+        const data = await res.json();
 
-      if (Array.isArray(source)) {
-        source = source.find(s => (s.listenurl || "").includes("sonarrock.mp3"));
-      }
+        let source = data.icestats.source;
 
-      let title = source?.title || "";
+        if (Array.isArray(source)) {
+          source = source.find(s =>
+            (s.listenurl || "").includes("sonarrock.mp3")
+          );
+        }
 
-      if (!title || title === "-") {
-        const fb = await fetch(FALLBACK_URL + "&t=" + Date.now());
-        title = await fb.text();
-      }
-
-      if (!title || title === lastTitle) return;
-
-      lastTitle = title;
-
-      const parsed = parseTitle(title);
-
-      updateTrack(parsed.title, parsed.artist);
-
-      const cover = await fetchCover(parsed.artist, parsed.title);
-      setCover(cover);
-
-      updateMediaSession(parsed.title, parsed.artist, cover);
-
-      showToast(`${parsed.artist} - ${parsed.title}`);
-
-    } catch (e) {
-      console.warn("Metadata error:", e);
+        title = source?.title || "";
+      } catch {}
     }
-  }
 
-  function startMetadata() {
-    fetchMetadata();
-    metadataTimer = setInterval(fetchMetadata, 10000);
-  }
+    if (!title || title === "-" || title === lastTitle) return;
 
-  function stopMetadata() {
-    if (metadataTimer) clearInterval(metadataTimer);
-  }
+    lastTitle = title;
 
+    const parsed = parseTitle(title);
+
+    updateTrack(parsed.title, parsed.artist);
+
+    const cover = await fetchCover(parsed.artist, parsed.title);
+    setCover(cover);
+
+    updateMediaSession(parsed.title, parsed.artist, cover);
+
+    showToast(`${parsed.artist} - ${parsed.title}`);
+
+  } catch (e) {
+    console.warn("Metadata error:", e);
+  }
+}
+
+  
   // =========================
   // PLAY
   // =========================

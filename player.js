@@ -6,37 +6,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const trackInfo = document.getElementById("trackInfo");
   const trackArtist = document.getElementById("trackArtist");
+  const stationCover = document.getElementById("stationCover");
 
   const statusText = document.getElementById("statusText");
 
   if (!audio || !playBtn) return;
 
-  // =========================
-  // DETECTAR MÓVIL
-  // =========================
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-  // =========================
-  // CONFIG
-  // =========================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
   const METADATA_URL = "https://giss.tv:667/status-json.xsl";
   const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
 
   const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
   const DEFAULT_ARTIST = "SONAR ROCK";
+  const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
 
   let isPlaying = false;
   let metadataTimer = null;
   let lastTitle = "";
 
-  // =========================
-  // AUDIO SETUP
-  // =========================
   audio.preload = "none";
   audio.playsInline = true;
-  audio.setAttribute("playsinline", "");
-  audio.setAttribute("webkit-playsinline", "");
 
   // =========================
   // UI
@@ -55,8 +44,61 @@ document.addEventListener("DOMContentLoaded", () => {
     if (trackArtist) trackArtist.textContent = artist;
   }
 
+  function setCover(url) {
+    if (!stationCover) return;
+    stationCover.src = url || DEFAULT_COVER;
+  }
+
   // =========================
-  // PARSE TITLE
+  // TOAST (cambio de canción)
+  // =========================
+  function showToast(text) {
+    let toast = document.getElementById("songToast");
+    if (!toast) return;
+
+    toast.textContent = text;
+    toast.classList.add("show");
+
+    setTimeout(() => toast.classList.remove("show"), 3000);
+  }
+
+  // =========================
+  // PORTADAS (iTunes)
+  // =========================
+  async function fetchCover(artist, title) {
+    try {
+      const q = encodeURIComponent(`${artist} ${title}`);
+      const res = await fetch(`https://itunes.apple.com/search?term=${q}&limit=1`);
+      const data = await res.json();
+
+      if (data.results && data.results[0]) {
+        return data.results[0].artworkUrl100.replace("100x100bb", "600x600bb");
+      }
+    } catch {}
+    return DEFAULT_COVER;
+  }
+
+  // =========================
+  // MEDIA SESSION (LOCKSCREEN)
+  // =========================
+  function updateMediaSession(title, artist, cover) {
+    if (!("mediaSession" in navigator)) return;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title,
+      artist: artist,
+      album: "Sonar Rock",
+      artwork: [
+        { src: cover, sizes: "512x512", type: "image/png" }
+      ]
+    });
+
+    navigator.mediaSession.setActionHandler("play", playStream);
+    navigator.mediaSession.setActionHandler("pause", pauseStream);
+  }
+
+  // =========================
+  // PARSE
   // =========================
   function parseTitle(text = "") {
     text = decodeURIComponent(text || "").trim();
@@ -80,11 +122,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // METADATA
+  // METADATA PRO
   // =========================
   async function fetchMetadata() {
     try {
-      const res = await fetch(`${METADATA_URL}?t=${Date.now()}`, { cache: "no-store" });
+      const res = await fetch(`${METADATA_URL}?t=${Date.now()}`);
       const data = await res.json();
 
       let source = data.icestats.source;
@@ -95,21 +137,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let title = source?.title || "";
 
-      // fallback si viene vacío
       if (!title || title === "-") {
         const fb = await fetch(FALLBACK_URL + "&t=" + Date.now());
         title = await fb.text();
       }
 
-      if (!title) return;
+      if (!title || title === lastTitle) return;
 
-      if (title !== lastTitle) {
-        lastTitle = title;
+      lastTitle = title;
 
-        const parsed = parseTitle(title);
+      const parsed = parseTitle(title);
 
-        updateTrack(parsed.title, parsed.artist);
-      }
+      updateTrack(parsed.title, parsed.artist);
+
+      const cover = await fetchCover(parsed.artist, parsed.title);
+      setCover(cover);
+
+      updateMediaSession(parsed.title, parsed.artist, cover);
+
+      showToast(`${parsed.artist} - ${parsed.title}`);
 
     } catch (e) {
       console.warn("Metadata error:", e);
@@ -122,14 +168,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function stopMetadata() {
-    if (metadataTimer) {
-      clearInterval(metadataTimer);
-      metadataTimer = null;
-    }
+    if (metadataTimer) clearInterval(metadataTimer);
   }
 
   // =========================
-  // PLAY (FIX iOS)
+  // PLAY
   // =========================
   async function playStream() {
     try {
@@ -139,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
       audio.src = `${STREAM_URL}?t=${Date.now()}`;
       audio.load();
 
-      await audio.play(); // 🔥 primero
+      await audio.play();
 
       updatePlayUI(true);
       setStatus("En vivo");
@@ -148,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (e) {
       console.error(e);
-      setStatus("Toca reproducir nuevamente");
+      setStatus("Toca reproducir");
       updatePlayUI(false);
     }
   }
@@ -169,22 +212,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   // EVENTOS
   // =========================
-  audio.addEventListener("waiting", () => {
-    if (isPlaying) setStatus("Bufferizando...");
-  });
-
-  audio.addEventListener("playing", () => {
-    setStatus("En vivo");
-  });
-
-  audio.addEventListener("error", () => {
-    setStatus("Error de señal");
-  });
+  audio.addEventListener("playing", () => setStatus("En vivo"));
+  audio.addEventListener("waiting", () => isPlaying && setStatus("Bufferizando..."));
+  audio.addEventListener("error", () => setStatus("Error de señal"));
 
   // =========================
   // INIT
   // =========================
   updateTrack(DEFAULT_TRACK, DEFAULT_ARTIST);
+  setCover(DEFAULT_COVER);
   updatePlayUI(false);
 
 });

@@ -1,38 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const audio = document.getElementById("radioPlayer");
-  const player = document.getElementById("sonarPlayer");
 
+  const audio = document.getElementById("radioPlayer");
   const playBtn = document.getElementById("playBtn");
   const playIcon = document.getElementById("playIcon");
 
-  const miniPlayBtn = document.getElementById("miniPlayBtn");
-  const miniPlayIcon = document.getElementById("miniPlayIcon");
-
-  const muteBtn = document.getElementById("muteBtn");
-  const muteIcon = document.getElementById("muteIcon");
-
-  const volumeControl = document.getElementById("volumeControl");
-  const volumeEmoji = document.getElementById("volumeEmoji");
-
-  const statusText = document.getElementById("statusText");
-  const statusDot = document.getElementById("statusDot");
-  const miniStatus = document.getElementById("miniStatus");
-  const miniLiveDot = document.getElementById("miniLiveDot");
-
   const trackInfo = document.getElementById("trackInfo");
   const trackArtist = document.getElementById("trackArtist");
-  const miniPlayer = document.getElementById("miniPlayer");
 
-  const songToast = document.getElementById("songToast");
-  const toastSong = document.getElementById("toastSong");
-
-  const stationCover = document.getElementById("stationCover");
-  const vuCanvas = document.getElementById("vuCanvas");
+  const statusText = document.getElementById("statusText");
 
   if (!audio || !playBtn) return;
 
   // =========================
-  // DETECCIÓN DE DISPOSITIVO
+  // DETECTAR MÓVIL
   // =========================
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -41,151 +21,170 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
   const METADATA_URL = "https://giss.tv:667/status-json.xsl";
+  const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
 
-  const DEFAULT_TRACK_TEXT = "Transmitiendo rock sin concesiones";
-  const DEFAULT_ARTIST_TEXT = "Señal lista";
-
-  const maxReconnectAttempts = 6;
-  const reconnectDelay = 4000;
+  const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
+  const DEFAULT_ARTIST = "SONAR ROCK";
 
   let isPlaying = false;
-  let reconnectTimer = null;
-  let reconnectAttempts = 0;
-  let isUserPaused = false;
+  let metadataTimer = null;
+  let lastTitle = "";
 
   // =========================
   // AUDIO SETUP
   // =========================
   audio.preload = "none";
+  audio.playsInline = true;
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
-  audio.playsInline = true;
 
   // =========================
   // UI
   // =========================
-  function setStatus(text, live = false) {
+  function setStatus(text) {
     if (statusText) statusText.textContent = text;
-    if (miniStatus) miniStatus.textContent = text;
-    if (statusDot) statusDot.classList.toggle("live", live);
-    if (miniLiveDot) miniLiveDot.classList.toggle("live", live);
   }
 
   function updatePlayUI(playing) {
     isPlaying = playing;
     if (playIcon) playIcon.textContent = playing ? "❚❚" : "▶";
-    if (miniPlayIcon) miniPlayIcon.textContent = playing ? "❚❚" : "▶";
   }
 
-  function clearReconnect() {
-    if (reconnectTimer) {
-      clearTimeout(reconnectTimer);
-      reconnectTimer = null;
+  function updateTrack(title, artist) {
+    if (trackInfo) trackInfo.textContent = title;
+    if (trackArtist) trackArtist.textContent = artist;
+  }
+
+  // =========================
+  // PARSE TITLE
+  // =========================
+  function parseTitle(text = "") {
+    text = decodeURIComponent(text || "").trim();
+
+    if (!text || text === "-") {
+      return { artist: DEFAULT_ARTIST, title: DEFAULT_TRACK };
+    }
+
+    if (text.includes(" - ")) {
+      const parts = text.split(" - ");
+      return {
+        artist: parts[0].trim(),
+        title: parts.slice(1).join(" - ").trim()
+      };
+    }
+
+    return {
+      artist: DEFAULT_ARTIST,
+      title: text
+    };
+  }
+
+  // =========================
+  // METADATA
+  // =========================
+  async function fetchMetadata() {
+    try {
+      const res = await fetch(`${METADATA_URL}?t=${Date.now()}`, { cache: "no-store" });
+      const data = await res.json();
+
+      let source = data.icestats.source;
+
+      if (Array.isArray(source)) {
+        source = source.find(s => (s.listenurl || "").includes("sonarrock.mp3"));
+      }
+
+      let title = source?.title || "";
+
+      // fallback si viene vacío
+      if (!title || title === "-") {
+        const fb = await fetch(FALLBACK_URL + "&t=" + Date.now());
+        title = await fb.text();
+      }
+
+      if (!title) return;
+
+      if (title !== lastTitle) {
+        lastTitle = title;
+
+        const parsed = parseTitle(title);
+
+        updateTrack(parsed.title, parsed.artist);
+      }
+
+    } catch (e) {
+      console.warn("Metadata error:", e);
+    }
+  }
+
+  function startMetadata() {
+    fetchMetadata();
+    metadataTimer = setInterval(fetchMetadata, 10000);
+  }
+
+  function stopMetadata() {
+    if (metadataTimer) {
+      clearInterval(metadataTimer);
+      metadataTimer = null;
     }
   }
 
   // =========================
-  // PLAY CORREGIDO (CLAVE)
+  // PLAY (FIX iOS)
   // =========================
   async function playStream() {
     try {
-      clearReconnect();
-      reconnectAttempts = 0;
-      isUserPaused = false;
-
-      setStatus("Conectando...", false);
+      setStatus("Conectando...");
 
       audio.crossOrigin = "anonymous";
       audio.src = `${STREAM_URL}?t=${Date.now()}`;
       audio.load();
 
-      // 🔥 PRIMERO reproducir (FIX iOS)
-      await audio.play();
+      await audio.play(); // 🔥 primero
 
       updatePlayUI(true);
-      setStatus("Transmitiendo en vivo", true);
+      setStatus("En vivo");
 
-      // 🔥 SOLO EN PC activar VU
-      if (!isMobile) {
-        initAudioGraph();
-      }
+      startMetadata();
 
     } catch (e) {
-      console.error("Error:", e);
+      console.error(e);
+      setStatus("Toca reproducir nuevamente");
       updatePlayUI(false);
-      setStatus("Toca reproducir nuevamente", false);
     }
   }
 
   function pauseStream() {
-    clearReconnect();
-    isUserPaused = true;
     audio.pause();
+    stopMetadata();
     updatePlayUI(false);
+    setStatus("Pausado");
   }
 
   function togglePlay() {
     isPlaying ? pauseStream() : playStream();
   }
 
-  // =========================
-  // BOTONES
-  // =========================
   playBtn.addEventListener("click", togglePlay);
-  miniPlayBtn?.addEventListener("click", togglePlay);
 
   // =========================
-  // EVENTOS AUDIO
+  // EVENTOS
   // =========================
-  audio.addEventListener("playing", () => {
-    updatePlayUI(true);
-    setStatus("Transmitiendo en vivo", true);
+  audio.addEventListener("waiting", () => {
+    if (isPlaying) setStatus("Bufferizando...");
   });
 
-  audio.addEventListener("waiting", () => {
-    if (!isPlaying) return;
-    setStatus("Bufferizando...", false);
+  audio.addEventListener("playing", () => {
+    setStatus("En vivo");
   });
 
   audio.addEventListener("error", () => {
-    setStatus("Error en la señal", false);
-    recoverPlayback();
+    setStatus("Error de señal");
   });
-
-  function recoverPlayback() {
-    if (reconnectAttempts >= maxReconnectAttempts) return;
-
-    reconnectAttempts++;
-    setStatus("Reconectando...", false);
-
-    reconnectTimer = setTimeout(() => {
-      playStream();
-    }, reconnectDelay);
-  }
-
-  // =========================
-  // VU METER SOLO PC
-  // =========================
-  let audioContext, analyser, source;
-
-  function initAudioGraph() {
-    if (isMobile) return;
-
-    try {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioContext.createAnalyser();
-
-      source = audioContext.createMediaElementSource(audio);
-      source.connect(analyser);
-      analyser.connect(audioContext.destination);
-
-    } catch (e) {
-      console.warn("WebAudio desactivado:", e);
-    }
-  }
 
   // =========================
   // INIT
   // =========================
+  updateTrack(DEFAULT_TRACK, DEFAULT_ARTIST);
   updatePlayUI(false);
+
 });

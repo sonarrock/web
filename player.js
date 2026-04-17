@@ -121,10 +121,11 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
+   // =========================
+  // METADATA
   // =========================
-  // METADATA PRO
-  // =========================
-  async function fetchMetadata() {
+  
+async function fetchMetadata() {
   try {
     let title = "";
 
@@ -173,7 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
     console.warn("Metadata error:", e);
   }
 }
-
   
   // =========================
   // PLAY

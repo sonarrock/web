@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // CONFIG
   // =========================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
-  const METADATA_URL = "/metadata.php";
+  const METADATA_URL = "/api/nowplaying.php";
   const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
 
   const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
@@ -172,68 +172,27 @@ document.addEventListener("DOMContentLoaded", () => {
   // METADATA PRO
   // =========================
   async function fetchMetadata() {
-    try {
-      let title = "";
+  try {
+    const res = await fetch("/api/nowplaying.php?t=" + Date.now());
+    const data = await res.json();
 
-      // 🔥 móvil primero
-      try {
-        const fb = await fetch(FALLBACK_URL + "&t=" + Date.now(), { cache: "no-store" });
-        title = (await fb.text()).trim();
-      } catch {}
+    if (!data || !data.title) return;
 
-      // fallback JSON
-      if (!title || title === "-") {
-        try {
-          const res = await fetch(`${METADATA_URL}?t=${Date.now()}`);
-          const data = await res.json();
+    if (data.title === lastTitle) return;
+    lastTitle = data.title;
 
-          let source = data.icestats.source;
+    updateTrack(data.title, data.artist);
+    setCover(data.cover);
+    updateMediaSession(data.title, data.artist, data.cover);
 
-          if (Array.isArray(source)) {
-            source = source.find(s =>
-              (s.listenurl || "").includes("sonarrock.mp3")
-            );
-          }
+    showToast(`${data.artist} - ${data.title}`);
 
-          title = source?.title || "";
-        } catch {}
-      }
+    addToHistory(data.artist, data.title, data.cover);
 
-      const now = Date.now();
-
-      if (!title || title === "-" || title === lastTitle) return;
-      if (now - lastUpdateTime < 4000) return;
-
-      lastTitle = title;
-      lastUpdateTime = now;
-
-      const parsed = parseTitle(title);
-
-      updateTrack(parsed.title, parsed.artist);
-
-      const cover = await fetchCover(parsed.artist, parsed.title);
-      setCover(cover);
-
-      updateMediaSession(parsed.title, parsed.artist, cover);
-
-      showToast(`${parsed.artist} - ${parsed.title}`);
-
-      addToHistory(parsed.artist, parsed.title, cover);
-
-    } catch (e) {
-      console.warn("Metadata error:", e);
-    }
+  } catch (e) {
+    console.warn("Metadata error:", e);
   }
-
-  function startMetadata() {
-    fetchMetadata();
-    metadataTimer = setInterval(fetchMetadata, 8000);
-  }
-
-  function stopMetadata() {
-    if (metadataTimer) clearInterval(metadataTimer);
-  }
-
+}
   // =========================
   // PLAY (iOS FIX)
   // =========================

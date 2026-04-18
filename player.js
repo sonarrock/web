@@ -12,14 +12,14 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!audio || !playBtn) return;
 
   // ================= CONFIG =================
-  const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
-  const API_URL = window.location.origin + "/api/nowplaying.php";
-  const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
+const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
+const API_URL = "/api/nowplaying.php";
+const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
 
-  const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
-  const DEFAULT_ARTIST = "SONAR ROCK";
-  const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
-
+const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
+const DEFAULT_ARTIST = "SONAR ROCK";
+const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
+  
   let isPlaying = false;
   let lastTitle = "";
   let metadataTimer = null;

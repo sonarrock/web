@@ -12,18 +12,17 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!audio || !playBtn) return;
 
   // ================= CONFIG =================
-const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
-const API_URL = "/api/nowplaying.php";
-const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
+  const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
+  const API_URL = window.location.origin + "/api/nowplaying.php";
+  const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
 
-const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
-const DEFAULT_ARTIST = "SONAR ROCK";
-const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
-  
+  const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
+  const DEFAULT_ARTIST = "SONAR ROCK";
+  const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
+
   let isPlaying = false;
   let lastTitle = "";
   let metadataTimer = null;
-  let retryCount = 0;
 
   // ================= AUDIO FIX iOS =================
   audio.preload = "none";
@@ -47,7 +46,11 @@ const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
   }
 
   function setCover(url) {
-    if (stationCover) stationCover.src = url || DEFAULT_COVER;
+    if (!stationCover) return;
+
+    // 🔥 FIX iOS: fuerza recarga de imagen (evita cache roto)
+    const cleanUrl = url ? url.split("?")[0] : DEFAULT_COVER;
+    stationCover.src = cleanUrl + "?t=" + Date.now();
   }
 
   function showToast(text) {
@@ -67,6 +70,9 @@ const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
     if (!text || text === "-") {
       return { artist: DEFAULT_ARTIST, title: DEFAULT_TRACK };
     }
+
+    // limpia caracteres raros
+    text = text.replace(/\+/g, " ");
 
     if (text.includes(" - ")) {
       const [artist, ...rest] = text.split(" - ");
@@ -91,6 +97,27 @@ const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
     });
   }
 
+  // ================= COVER (FIX iPhone) =================
+  async function fetchCover(artist, title) {
+    try {
+      const query = encodeURIComponent(`${artist} ${title}`);
+      const res = await fetch(`https://itunes.apple.com/search?term=${query}&limit=1`);
+
+      const data = await res.json();
+
+      if (data.results && data.results[0]) {
+        let img = data.results[0].artworkUrl100;
+
+        // calidad alta
+        img = img.replace("100x100bb", "600x600bb");
+
+        return img;
+      }
+    } catch {}
+
+    return DEFAULT_COVER;
+  }
+
   // ================= METADATA =================
   async function fetchMetadata() {
     try {
@@ -98,26 +125,25 @@ const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
         cache: "no-store"
       });
 
-      if (!res.ok) throw new Error("API fail");
-
       const data = await res.json();
 
-      if (!data?.title) throw new Error("No data");
-
-      if (data.title === lastTitle) return;
+      if (!data?.title || data.title === lastTitle) return;
 
       lastTitle = data.title;
-      retryCount = 0;
 
       const artist = data.artist || DEFAULT_ARTIST;
-      const cover = data.cover || DEFAULT_COVER;
+      const title = data.title;
 
-      updateTrack(data.title, artist);
+      updateTrack(title, artist);
+
+      // 🔥 portada dinámica (clave para iPhone)
+      const cover = await fetchCover(artist, title);
       setCover(cover);
-      updateMediaSession(data.title, artist, cover);
-      showToast(`${artist} - ${data.title}`);
 
-    } catch (e) {
+      updateMediaSession(title, artist, cover);
+      showToast(`${artist} - ${title}`);
+
+    } catch {
       fallbackMetadata();
     }
   }
@@ -142,19 +168,14 @@ const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
       updateMediaSession(parsed.title, parsed.artist, DEFAULT_COVER);
       showToast(`${parsed.artist} - ${parsed.title}`);
 
-    } catch {
-      retryCount++;
-      if (retryCount < 5) {
-        setTimeout(fetchMetadata, 2000);
-      }
-    }
+    } catch {}
   }
 
   function startMetadata() {
     if (metadataTimer) clearInterval(metadataTimer);
 
     fetchMetadata();
-    metadataTimer = setInterval(fetchMetadata, 5000);
+    metadataTimer = setInterval(fetchMetadata, 6000);
   }
 
   function stopMetadata() {
@@ -195,7 +216,7 @@ const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
 
   playBtn.addEventListener("click", togglePlay);
 
-  // ================= EVENTOS (CLAVE EN iOS) =================
+  // ================= EVENTOS =================
   audio.addEventListener("playing", () => setStatus("En vivo"));
   audio.addEventListener("waiting", () => isPlaying && setStatus("Bufferizando..."));
   audio.addEventListener("error", () => setStatus("Error de señal"));

@@ -592,3 +592,42 @@
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* =========================
+   MOBILE FIX PRO
+========================= */
+@media (max-width: 768px) {
+
+  .sonar-player {
+    grid-template-columns: 1fr !important;
+    padding: 16px !important;
+    gap: 14px !important;
+  }
+
+  .player-left {
+    grid-template-columns: 1fr !important;
+    text-align: left !important;
+  }
+
+  .cover-wrap {
+    margin: 0 auto;
+  }
+
+  .station-cover {
+    width: 110px !important;
+    height: 110px !important;
+  }
+
+  .player-right {
+    width: 100%;
+  }
+
+  .vu-wrap {
+    display: none !important; /* 🔥 lo quitamos en móvil */
+  }
+
+  .status-row {
+    justify-content: center;
+  }
+
+}

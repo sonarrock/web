@@ -7,15 +7,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const trackInfo = document.getElementById("trackInfo");
   const trackArtist = document.getElementById("trackArtist");
   const stationCover = document.getElementById("stationCover");
-
   const statusText = document.getElementById("statusText");
-  const historyContainer = document.getElementById("historyList");
 
   if (!audio || !playBtn) return;
 
-  // =========================
-  // CONFIG
-  // =========================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
   const API_URL = "/api/nowplaying.php";
   const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
@@ -24,26 +19,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const DEFAULT_ARTIST = "SONAR ROCK";
   const DEFAULT_COVER = "attached_assets/logo_1749601460841.jpeg";
 
-  const HISTORY_LIMIT = 8;
-
-  // =========================
-  // STATE
-  // =========================
   let isPlaying = false;
-  let metadataTimer = null;
   let lastTitle = "";
-  let trackHistory = [];
+  let metadataTimer = null;
+  let retryCount = 0;
 
-  // =========================
-  // AUDIO SETUP
-  // =========================
   audio.preload = "none";
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
 
-  // =========================
-  // UI
-  // =========================
+  // ================= UI =================
   function setStatus(text) {
     if (statusText) statusText.textContent = text;
   }
@@ -59,82 +44,37 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setCover(url) {
-    if (!stationCover) return;
-    stationCover.src = url || DEFAULT_COVER;
+    if (stationCover) stationCover.src = url || DEFAULT_COVER;
   }
 
-  // =========================
-  // TOAST
-  // =========================
   function showToast(text) {
     const toast = document.getElementById("songToast");
     if (!toast) return;
-
     toast.textContent = text;
     toast.classList.add("show");
-
     setTimeout(() => toast.classList.remove("show"), 3000);
   }
 
-  // =========================
-  // HISTORIAL
-  // =========================
-  function addToHistory(artist, title, cover) {
-    const key = `${artist} - ${title}`;
-
-    if (trackHistory[0]?.key === key) return;
-
-    trackHistory.unshift({ key, artist, title, cover });
-
-    if (trackHistory.length > HISTORY_LIMIT) {
-      trackHistory.pop();
-    }
-
-    renderHistory();
-  }
-
-  function renderHistory() {
-    if (!historyContainer) return;
-
-    historyContainer.innerHTML = trackHistory.map(track => `
-      <div class="history-item">
-        <img src="${track.cover}" />
-        <div>
-          <div class="h-title">${track.title}</div>
-          <div class="h-artist">${track.artist}</div>
-        </div>
-      </div>
-    `).join("");
-  }
-
-  // =========================
-  // PARSE
-  // =========================
+  // ================= PARSE =================
   function parseTitle(text = "") {
-    text = decodeURIComponent(text || "").trim();
+    text = decodeURIComponent(text).trim();
 
-    if (!text || text === "-" || text.length < 3) {
+    if (!text || text === "-") {
       return { artist: DEFAULT_ARTIST, title: DEFAULT_TRACK };
     }
 
-    const separators = [" - ", " – ", " — "];
-
-    for (const sep of separators) {
-      if (text.includes(sep)) {
-        const parts = text.split(sep);
-        return {
-          artist: parts[0].trim(),
-          title: parts.slice(1).join(" - ").trim()
-        };
-      }
+    if (text.includes(" - ")) {
+      const [artist, ...rest] = text.split(" - ");
+      return {
+        artist: artist.trim(),
+        title: rest.join(" - ").trim()
+      };
     }
 
     return { artist: DEFAULT_ARTIST, title: text };
   }
 
-  // =========================
-  // MEDIA SESSION (LOCKSCREEN)
-  // =========================
+  // ================= MEDIA SESSION =================
   function updateMediaSession(title, artist, cover) {
     if (!("mediaSession" in navigator)) return;
 
@@ -144,28 +84,25 @@ document.addEventListener("DOMContentLoaded", () => {
       album: "Sonar Rock",
       artwork: [{ src: cover, sizes: "512x512", type: "image/png" }]
     });
-
-    navigator.mediaSession.setActionHandler("play", playStream);
-    navigator.mediaSession.setActionHandler("pause", pauseStream);
   }
 
-  // =========================
-  // METADATA (API + FALLBACK)
-  // =========================
+  // ================= METADATA CORE =================
   async function fetchMetadata() {
     try {
       const res = await fetch(API_URL + "?t=" + Date.now(), {
         cache: "no-store"
       });
 
-      if (!res.ok) throw new Error("API error");
+      if (!res.ok) throw new Error("API fail");
 
       const data = await res.json();
 
-      if (!data || !data.title) throw new Error("No data");
+      if (!data?.title) throw new Error("No data");
 
       if (data.title === lastTitle) return;
+
       lastTitle = data.title;
+      retryCount = 0;
 
       const artist = data.artist || DEFAULT_ARTIST;
       const cover = data.cover || DEFAULT_COVER;
@@ -173,20 +110,15 @@ document.addEventListener("DOMContentLoaded", () => {
       updateTrack(data.title, artist);
       setCover(cover);
       updateMediaSession(data.title, artist, cover);
-
       showToast(`${artist} - ${data.title}`);
-      addToHistory(artist, data.title, cover);
 
     } catch (e) {
-      console.warn("API falló, usando fallback");
-
+      console.warn("API error, fallback", e);
       fallbackMetadata();
     }
   }
 
-  // =========================
-  // FALLBACK (iOS FIX)
-  // =========================
+  // ================= FALLBACK =================
   async function fallbackMetadata() {
     try {
       const res = await fetch(FALLBACK_URL + "&t=" + Date.now(), {
@@ -196,35 +128,45 @@ document.addEventListener("DOMContentLoaded", () => {
       const text = await res.text();
 
       if (!text || text === "-" || text === lastTitle) return;
+
       lastTitle = text;
 
       const parsed = parseTitle(text);
 
       updateTrack(parsed.title, parsed.artist);
       setCover(DEFAULT_COVER);
-
+      updateMediaSession(parsed.title, parsed.artist, DEFAULT_COVER);
       showToast(`${parsed.artist} - ${parsed.title}`);
 
-    } catch {}
+    } catch (e) {
+      retryCount++;
+
+      if (retryCount < 5) {
+        setTimeout(fetchMetadata, 2000);
+      }
+    }
   }
 
+  // ================= LOOP =================
   function startMetadata() {
+    if (metadataTimer) clearInterval(metadataTimer);
+
     fetchMetadata();
-    metadataTimer = setInterval(fetchMetadata, 6000);
+
+    metadataTimer = setInterval(() => {
+      fetchMetadata();
+    }, 5000);
   }
 
   function stopMetadata() {
     if (metadataTimer) clearInterval(metadataTimer);
   }
 
-  // =========================
-  // PLAY
-  // =========================
+  // ================= PLAY =================
   async function playStream() {
     try {
       setStatus("Conectando...");
 
-      audio.crossOrigin = "anonymous";
       audio.src = STREAM_URL + "?t=" + Date.now();
       audio.load();
 
@@ -236,7 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
       startMetadata();
 
     } catch (e) {
-      console.error(e);
       setStatus("Toca reproducir");
       updatePlayUI(false);
     }
@@ -255,27 +196,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   playBtn.addEventListener("click", togglePlay);
 
-  // =========================
-  // EVENTOS AUDIO
-  // =========================
-  audio.addEventListener("playing", () => setStatus("En vivo"));
-  audio.addEventListener("waiting", () => isPlaying && setStatus("Bufferizando..."));
-  audio.addEventListener("error", () => setStatus("Error de señal"));
-
-  // =========================
-  // INIT
-  // =========================
+  // ================= INIT =================
   updateTrack(DEFAULT_TRACK, DEFAULT_ARTIST);
   setCover(DEFAULT_COVER);
   updatePlayUI(false);
 
 });
-
-// =========================
-// SERVICE WORKER
-// =========================
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/sw.js")
-    .then(() => console.log("SW activo"))
-    .catch(err => console.log("SW error", err));
-}

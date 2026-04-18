@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // CONFIG
   // =========================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
-  const METADATA_URL = "/api/nowplaying.php";
+  const API_URL = "/api/nowplaying.php";
   const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
 
   const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
@@ -32,14 +32,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let isPlaying = false;
   let metadataTimer = null;
   let lastTitle = "";
-  let lastUpdateTime = 0;
   let trackHistory = [];
 
   // =========================
   // AUDIO SETUP
   // =========================
   audio.preload = "none";
-  audio.playsInline = true;
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
 
@@ -110,40 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // PORTADAS
-  // =========================
-  async function fetchCover(artist, title) {
-    try {
-      const q = encodeURIComponent(`${artist} ${title}`);
-      const res = await fetch(`https://itunes.apple.com/search?term=${q}&limit=1`);
-      const data = await res.json();
-
-      if (data.results && data.results[0]) {
-        return data.results[0].artworkUrl100.replace("100x100bb", "600x600bb");
-      }
-    } catch {}
-
-    return DEFAULT_COVER;
-  }
-
-  // =========================
-  // MEDIA SESSION
-  // =========================
-  function updateMediaSession(title, artist, cover) {
-    if (!("mediaSession" in navigator)) return;
-
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title,
-      artist,
-      album: "Sonar Rock",
-      artwork: [{ src: cover, sizes: "512x512", type: "image/png" }]
-    });
-
-    navigator.mediaSession.setActionHandler("play", playStream);
-    navigator.mediaSession.setActionHandler("pause", pauseStream);
-  }
-
-  // =========================
   // PARSE
   // =========================
   function parseTitle(text = "") {
@@ -169,39 +133,99 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // METADATA PRO
+  // MEDIA SESSION (LOCKSCREEN)
+  // =========================
+  function updateMediaSession(title, artist, cover) {
+    if (!("mediaSession" in navigator)) return;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title,
+      artist,
+      album: "Sonar Rock",
+      artwork: [{ src: cover, sizes: "512x512", type: "image/png" }]
+    });
+
+    navigator.mediaSession.setActionHandler("play", playStream);
+    navigator.mediaSession.setActionHandler("pause", pauseStream);
+  }
+
+  // =========================
+  // METADATA (API + FALLBACK)
   // =========================
   async function fetchMetadata() {
-  try {
-    const res = await fetch("/api/nowplaying.php?t=" + Date.now());
-    const data = await res.json();
+    try {
+      const res = await fetch(API_URL + "?t=" + Date.now(), {
+        cache: "no-store"
+      });
 
-    if (!data || !data.title) return;
+      if (!res.ok) throw new Error("API error");
 
-    if (data.title === lastTitle) return;
-    lastTitle = data.title;
+      const data = await res.json();
 
-    updateTrack(data.title, data.artist);
-    setCover(data.cover);
-    updateMediaSession(data.title, data.artist, data.cover);
+      if (!data || !data.title) throw new Error("No data");
 
-    showToast(`${data.artist} - ${data.title}`);
+      if (data.title === lastTitle) return;
+      lastTitle = data.title;
 
-    addToHistory(data.artist, data.title, data.cover);
+      const artist = data.artist || DEFAULT_ARTIST;
+      const cover = data.cover || DEFAULT_COVER;
 
-  } catch (e) {
-    console.warn("Metadata error:", e);
+      updateTrack(data.title, artist);
+      setCover(cover);
+      updateMediaSession(data.title, artist, cover);
+
+      showToast(`${artist} - ${data.title}`);
+      addToHistory(artist, data.title, cover);
+
+    } catch (e) {
+      console.warn("API falló, usando fallback");
+
+      fallbackMetadata();
+    }
   }
-}
+
   // =========================
-  // PLAY (iOS FIX)
+  // FALLBACK (iOS FIX)
+  // =========================
+  async function fallbackMetadata() {
+    try {
+      const res = await fetch(FALLBACK_URL + "&t=" + Date.now(), {
+        cache: "no-store"
+      });
+
+      const text = await res.text();
+
+      if (!text || text === "-" || text === lastTitle) return;
+      lastTitle = text;
+
+      const parsed = parseTitle(text);
+
+      updateTrack(parsed.title, parsed.artist);
+      setCover(DEFAULT_COVER);
+
+      showToast(`${parsed.artist} - ${parsed.title}`);
+
+    } catch {}
+  }
+
+  function startMetadata() {
+    fetchMetadata();
+    metadataTimer = setInterval(fetchMetadata, 6000);
+  }
+
+  function stopMetadata() {
+    if (metadataTimer) clearInterval(metadataTimer);
+  }
+
+  // =========================
+  // PLAY
   // =========================
   async function playStream() {
     try {
       setStatus("Conectando...");
 
       audio.crossOrigin = "anonymous";
-      audio.src = `${STREAM_URL}?t=${Date.now()}`;
+      audio.src = STREAM_URL + "?t=" + Date.now();
       audio.load();
 
       await audio.play();
@@ -232,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
   playBtn.addEventListener("click", togglePlay);
 
   // =========================
-  // EVENTOS
+  // EVENTOS AUDIO
   // =========================
   audio.addEventListener("playing", () => setStatus("En vivo"));
   audio.addEventListener("waiting", () => isPlaying && setStatus("Bufferizando..."));

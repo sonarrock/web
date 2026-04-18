@@ -11,8 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!audio || !playBtn) return;
 
+  // ================= CONFIG =================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
-  const API_URL = "/api/nowplaying.php";
+  const API_URL = window.location.origin + "/api/nowplaying.php";
   const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
 
   const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
@@ -24,9 +25,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let metadataTimer = null;
   let retryCount = 0;
 
+  // ================= AUDIO FIX iOS =================
   audio.preload = "none";
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
+  audio.crossOrigin = "anonymous";
 
   // ================= UI =================
   function setStatus(text) {
@@ -57,7 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ================= PARSE =================
   function parseTitle(text = "") {
-    text = decodeURIComponent(text).trim();
+    try {
+      text = decodeURIComponent(text).trim();
+    } catch {}
 
     if (!text || text === "-") {
       return { artist: DEFAULT_ARTIST, title: DEFAULT_TRACK };
@@ -86,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ================= METADATA CORE =================
+  // ================= METADATA =================
   async function fetchMetadata() {
     try {
       const res = await fetch(API_URL + "?t=" + Date.now(), {
@@ -113,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast(`${artist} - ${data.title}`);
 
     } catch (e) {
-      console.warn("API error, fallback", e);
       fallbackMetadata();
     }
   }
@@ -138,24 +142,19 @@ document.addEventListener("DOMContentLoaded", () => {
       updateMediaSession(parsed.title, parsed.artist, DEFAULT_COVER);
       showToast(`${parsed.artist} - ${parsed.title}`);
 
-    } catch (e) {
+    } catch {
       retryCount++;
-
       if (retryCount < 5) {
         setTimeout(fetchMetadata, 2000);
       }
     }
   }
 
-  // ================= LOOP =================
   function startMetadata() {
     if (metadataTimer) clearInterval(metadataTimer);
 
     fetchMetadata();
-
-    metadataTimer = setInterval(() => {
-      fetchMetadata();
-    }, 5000);
+    metadataTimer = setInterval(fetchMetadata, 5000);
   }
 
   function stopMetadata() {
@@ -177,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       startMetadata();
 
-    } catch (e) {
+    } catch {
       setStatus("Toca reproducir");
       updatePlayUI(false);
     }
@@ -195,6 +194,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   playBtn.addEventListener("click", togglePlay);
+
+  // ================= EVENTOS (CLAVE EN iOS) =================
+  audio.addEventListener("playing", () => setStatus("En vivo"));
+  audio.addEventListener("waiting", () => isPlaying && setStatus("Bufferizando..."));
+  audio.addEventListener("error", () => setStatus("Error de señal"));
 
   // ================= INIT =================
   updateTrack(DEFAULT_TRACK, DEFAULT_ARTIST);

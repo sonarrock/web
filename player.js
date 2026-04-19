@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ================= CONFIG =================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
   const API_URL = "https://sonarrock-api.cmrm1982.workers.dev/";
+  const SPOTIFY_API = "https://sonarrock-spotify.cmrm1982.workers.dev/";
   const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
 
   const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
@@ -68,14 +69,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const fallback = DEFAULT_COVER;
 
-    if (!url || url === "null" || url === "undefined") {
+    if (!url) {
       stationCover.src = fallback;
       return;
     }
 
-    const clean = url
-      .replace("http://", "https://")
-      .split("?")[0];
+    const clean = url.replace("http://", "https://").split("?")[0];
 
     const img = new Image();
 
@@ -84,7 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     img.onerror = () => {
-      console.warn("Cover falló:", clean);
       stationCover.src = fallback;
     };
 
@@ -118,24 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .trim();
   }
 
-  function parseTitle(text = "") {
-    text = cleanText(text);
-
-    if (!text || text === "-") {
-      return { artist: DEFAULT_ARTIST, title: DEFAULT_TRACK };
-    }
-
-    if (text.includes(" - ")) {
-      const [artist, ...rest] = text.split(" - ");
-      return {
-        artist: cleanText(artist),
-        title: cleanText(rest.join(" - "))
-      };
-    }
-
-    return { artist: DEFAULT_ARTIST, title: text };
-  }
-
   // ================= MEDIA SESSION =================
   function updateMediaSession(title, artist, cover) {
     if (!("mediaSession" in navigator)) return;
@@ -146,29 +126,6 @@ document.addEventListener("DOMContentLoaded", () => {
       album: "Sonar Rock",
       artwork: [{ src: cover, sizes: "512x512", type: "image/png" }]
     });
-  }
-
-  // ================= FETCH COVER (iTunes) =================
-  async function fetchCover(artist, title) {
-    try {
-      const query = encodeURIComponent(`${artist} ${title}`);
-
-      const res = await fetch(
-        `https://itunes.apple.com/search?term=${query}&limit=1`,
-        { cache: "no-store" }
-      );
-
-      const data = await res.json();
-
-      if (data.results?.[0]?.artworkUrl100) {
-        return data.results[0].artworkUrl100.replace("100x100bb", "600x600bb");
-      }
-
-    } catch (e) {
-      console.warn("iTunes cover error", e);
-    }
-
-    return DEFAULT_COVER;
   }
 
   // ================= METADATA =================
@@ -189,39 +146,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
       updateTrack(title, artist);
 
-      // 🔥 FIX REAL
-      // 🔥 SOLO iTunes (consistente en todos los dispositivos)
-      const cover = await fetchCover(artist, title);
-    }
+      // 🔥 SPOTIFY COVER (FUENTE ÚNICA)
+      let cover = DEFAULT_COVER;
+
+      try {
+        const spotifyRes = await fetch(
+          `${SPOTIFY_API}?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`
+        );
+
+        const spotifyData = await spotifyRes.json();
+
+        if (spotifyData.cover) {
+          cover = spotifyData.cover;
+        }
+
+      } catch (e) {
+        console.warn("Spotify error", e);
+      }
 
       setCover(cover);
       updateMediaSession(title, artist, cover);
       showToast(`${artist} - ${title}`);
 
     } catch (e) {
-      console.warn("Worker error", e);
+      console.warn("Metadata error", e);
     }
   }
 
-  // ================= FALLBACK =================
-  async function fallbackMetadata() {
-    try {
-      const res = await fetch(FALLBACK_URL + "&t=" + Date.now(), { cache: "no-store" });
-      const text = await res.text();
-
-      if (!text || text === "-" || text === lastTitle) return;
-
-      const parsed = parseTitle(text);
-
-      lastTitle = parsed.title;
-
-      updateTrack(parsed.title, parsed.artist);
-      setCover(DEFAULT_COVER);
-      updateMediaSession(parsed.title, parsed.artist, DEFAULT_COVER);
-
-    } catch {}
-  }
-
+  // ================= METADATA LOOP =================
   function startMetadata() {
     stopMetadata();
     fetchMetadata();

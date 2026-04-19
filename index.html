@@ -161,8 +161,10 @@
 <div id="historyList" class="history-list"></div>
           
           <!-- AUDIO -->
-          <audio id="radioPlayer" playsinline webkit-playsinline></audio>
-
+<audio id="radioPlayer" playsinline webkit-playsinline preload="none">
+  <source src="https://giss.tv:667/sonarrock.mp3" type="audio/mpeg">
+</audio>
+        
         </div>
       </div>
     </section>
@@ -334,8 +336,8 @@
     <div class="mini-left">
       <span id="miniLiveDot" class="mini-live-dot"></span>
       <div class="mini-meta">
-        <span class="mini-title">Sonar Rock</span>
-        <span id="miniStatus" class="mini-status">Listo para reproducir</span>
+       <span id="miniLiveDot" class="mini-live-dot"></span>
+<span id="miniStatus" class="mini-status">Listo para reproducir</span>
       </div>
     </div>
 

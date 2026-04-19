@@ -190,11 +190,9 @@ document.addEventListener("DOMContentLoaded", () => {
       updateTrack(title, artist);
 
       // 🔥 FIX REAL
-      let cover = data.cover;
-
-      if (!cover || cover.includes("default") || cover.includes("noimage")) {
-        cover = await fetchCover(artist, title);
-      }
+      // 🔥 SOLO iTunes (consistente en todos los dispositivos)
+      const cover = await fetchCover(artist, title);
+    }
 
       setCover(cover);
       updateMediaSession(title, artist, cover);

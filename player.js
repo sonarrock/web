@@ -28,7 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let lastTitle = "";
   let metadataTimer = null;
 
-  // ================= AUDIO FIX iOS =================
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // ================= AUDIO CONFIG =================
   audio.preload = "none";
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
@@ -60,36 +62,35 @@ document.addEventListener("DOMContentLoaded", () => {
     if (trackArtist) trackArtist.textContent = artist;
   }
 
-  // ================= PORTADA FIX iPHONE =================
+  // ================= PORTADAS =================
   function setCover(url) {
-  if (!stationCover) return;
+    if (!stationCover) return;
 
-  const fallback = DEFAULT_COVER;
+    const fallback = DEFAULT_COVER;
 
-  if (!url || url === "null" || url === "undefined") {
-    stationCover.src = fallback;
-    return;
+    if (!url || url === "null" || url === "undefined") {
+      stationCover.src = fallback;
+      return;
+    }
+
+    const clean = url
+      .replace("http://", "https://")
+      .split("?")[0];
+
+    const img = new Image();
+
+    img.onload = () => {
+      stationCover.src = clean + "?v=" + Date.now();
+    };
+
+    img.onerror = () => {
+      console.warn("Cover falló:", clean);
+      stationCover.src = fallback;
+    };
+
+    img.src = clean;
   }
 
-  const clean = url
-    .replace("http://", "https://")
-    .split("?")[0];
-
-  const img = new Image();
-
-  img.onload = () => {
-    stationCover.src = clean + "?t=" + Date.now();
-  };
-
-  img.onerror = () => {
-    console.warn("Cover falló:", clean);
-    stationCover.src = fallback;
-  };
-
-  img.src = clean;
-}
-  
-  
   // ================= TOAST =================
   function showToast(text) {
     const toast = document.getElementById("songToast");
@@ -103,19 +104,20 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => toast.classList.remove("show"), 3000);
   }
 
-  // ================= LIMPIEZA TEXTO =================
+  // ================= TEXTO =================
   function cleanText(text = "") {
-  try { text = decodeURIComponent(text); } catch {}
+    try { text = decodeURIComponent(text); } catch {}
 
-  return text
-    .replace(/\+/g, " ")
-    .replace(/%20/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&#39;/g, "'")
-    .replace(/&quot;/g, '"')
-    .replace(/\s+/g, " ")
-    .trim();
-}
+    return text
+      .replace(/\+/g, " ")
+      .replace(/%20/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&#39;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   function parseTitle(text = "") {
     text = cleanText(text);
 
@@ -146,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ================= COVER FETCH =================
+  // ================= FETCH COVER (iTunes) =================
   async function fetchCover(artist, title) {
     try {
       const query = encodeURIComponent(`${artist} ${title}`);
@@ -162,41 +164,47 @@ document.addEventListener("DOMContentLoaded", () => {
         return data.results[0].artworkUrl100.replace("100x100bb", "600x600bb");
       }
 
-    } catch {}
+    } catch (e) {
+      console.warn("iTunes cover error", e);
+    }
 
     return DEFAULT_COVER;
   }
 
   // ================= METADATA =================
   async function fetchMetadata() {
-  try {
-    const res = await fetch(API_URL + "?t=" + Date.now(), {
-      cache: "no-store"
-    });
+    try {
+      const res = await fetch(API_URL + "?t=" + Date.now(), {
+        cache: "no-store"
+      });
 
-    const data = await res.json();
+      const data = await res.json();
+      if (!data?.title) return;
 
-    if (!data?.title) return;
+      const title = cleanText(data.title);
+      const artist = cleanText(data.artist || DEFAULT_ARTIST);
 
-    const title = cleanText(data.title);
-    const artist = cleanText(data.artist || DEFAULT_ARTIST);
+      if (title === lastTitle) return;
+      lastTitle = title;
 
-    if (title === lastTitle) return;
-    lastTitle = title;
+      updateTrack(title, artist);
 
-    updateTrack(title, artist);
+      // 🔥 FIX REAL
+      let cover = data.cover;
 
-    // 🔥 CLAVE: usa directamente cover del worker
-    setCover(data.cover);
+      if (!cover || cover.includes("default") || cover.includes("noimage")) {
+        cover = await fetchCover(artist, title);
+      }
 
-    updateMediaSession(title, artist, data.cover);
-    showToast(`${artist} - ${title}`);
+      setCover(cover);
+      updateMediaSession(title, artist, cover);
+      showToast(`${artist} - ${title}`);
 
-  } catch (e) {
-    console.warn("Worker error", e);
+    } catch (e) {
+      console.warn("Worker error", e);
+    }
   }
-}
-  
+
   // ================= FALLBACK =================
   async function fallbackMetadata() {
     try {
@@ -234,17 +242,19 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       setStatus("loading");
 
-      audio.src = STREAM_URL + "?t=" + Date.now(); // 🔥 clave iPhone
-      audio.load();
+      audio.src = isIOS
+        ? STREAM_URL + "?t=" + Date.now()
+        : STREAM_URL;
 
+      audio.load();
       await audio.play();
 
       updatePlayUI(true);
       setStatus("live");
-
       startMetadata();
 
-    } catch {
+    } catch (e) {
+      console.warn("Play error", e);
       setStatus("ready");
       updatePlayUI(false);
     }

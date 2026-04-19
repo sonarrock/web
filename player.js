@@ -1,5 +1,7 @@
+
 document.addEventListener("DOMContentLoaded", () => {
 
+  // ================= ELEMENTOS =================
   const audio = document.getElementById("radioPlayer");
   const playBtn = document.getElementById("playBtn");
   const playIcon = document.getElementById("playIcon");
@@ -24,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let lastTitle = "";
   let metadataTimer = null;
 
-  // ================= AUDIO FIX iOS =================
+  // ================= AUDIO (iOS FIX) =================
   audio.preload = "none";
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
@@ -48,16 +50,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function setCover(url) {
     if (!stationCover) return;
 
-    // 🔥 FIX iOS: fuerza recarga de imagen (evita cache roto)
     const cleanUrl = url ? url.split("?")[0] : DEFAULT_COVER;
     stationCover.src = cleanUrl + "?t=" + Date.now();
   }
 
   function showToast(text) {
     const toast = document.getElementById("songToast");
-    if (!toast) return;
-    toast.textContent = text;
+    const span = document.getElementById("toastSong");
+
+    if (!toast || !span) return;
+
+    span.textContent = text;
     toast.classList.add("show");
+
     setTimeout(() => toast.classList.remove("show"), 3000);
   }
 
@@ -71,7 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return { artist: DEFAULT_ARTIST, title: DEFAULT_TRACK };
     }
 
-    // limpia caracteres raros
     text = text.replace(/\+/g, " ");
 
     if (text.includes(" - ")) {
@@ -97,21 +101,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ================= COVER (FIX iPhone) =================
+  // ================= COVER =================
   async function fetchCover(artist, title) {
     try {
+      const controller = new AbortController();
+      setTimeout(() => controller.abort(), 3000);
+
       const query = encodeURIComponent(`${artist} ${title}`);
-      const res = await fetch(`https://itunes.apple.com/search?term=${query}&limit=1`);
+      const res = await fetch(`https://itunes.apple.com/search?term=${query}&limit=1`, {
+        signal: controller.signal
+      });
 
       const data = await res.json();
 
-      if (data.results && data.results[0]) {
-        let img = data.results[0].artworkUrl100;
-
-        // calidad alta
-        img = img.replace("100x100bb", "600x600bb");
-
-        return img;
+      if (data.results?.[0]) {
+        return data.results[0].artworkUrl100.replace("100x100bb", "600x600bb");
       }
     } catch {}
 
@@ -121,29 +125,29 @@ document.addEventListener("DOMContentLoaded", () => {
   // ================= METADATA =================
   async function fetchMetadata() {
     try {
-      const res = await fetch(API_URL + "?t=" + Date.now(), {
-        cache: "no-store"
-      });
-
+      const res = await fetch(API_URL + "?t=" + Date.now(), { cache: "no-store" });
       const data = await res.json();
 
-      if (!data?.title || data.title === lastTitle) return;
+      if (!data?.title) return;
 
-      lastTitle = data.title;
+      const parsed = parseTitle(data.title);
 
-      const artist = data.artist || DEFAULT_ARTIST;
-      const title = data.title;
+      const artist = data.artist || parsed.artist;
+      const title = parsed.title;
+
+      if (title === lastTitle) return;
+      lastTitle = title;
 
       updateTrack(title, artist);
 
-      // 🔥 portada dinámica (clave para iPhone)
       const cover = await fetchCover(artist, title);
       setCover(cover);
 
       updateMediaSession(title, artist, cover);
       showToast(`${artist} - ${title}`);
 
-    } catch {
+    } catch (err) {
+      console.warn("Metadata error, usando fallback");
       fallbackMetadata();
     }
   }
@@ -151,35 +155,36 @@ document.addEventListener("DOMContentLoaded", () => {
   // ================= FALLBACK =================
   async function fallbackMetadata() {
     try {
-      const res = await fetch(FALLBACK_URL + "&t=" + Date.now(), {
-        cache: "no-store"
-      });
-
+      const res = await fetch(FALLBACK_URL + "&t=" + Date.now(), { cache: "no-store" });
       const text = await res.text();
 
       if (!text || text === "-" || text === lastTitle) return;
 
-      lastTitle = text;
-
       const parsed = parseTitle(text);
+
+      lastTitle = parsed.title;
 
       updateTrack(parsed.title, parsed.artist);
       setCover(DEFAULT_COVER);
       updateMediaSession(parsed.title, parsed.artist, DEFAULT_COVER);
       showToast(`${parsed.artist} - ${parsed.title}`);
 
-    } catch {}
+    } catch (err) {
+      console.warn("Fallback metadata falló");
+    }
   }
 
   function startMetadata() {
-    if (metadataTimer) clearInterval(metadataTimer);
-
+    stopMetadata();
     fetchMetadata();
     metadataTimer = setInterval(fetchMetadata, 6000);
   }
 
   function stopMetadata() {
-    if (metadataTimer) clearInterval(metadataTimer);
+    if (metadataTimer) {
+      clearInterval(metadataTimer);
+      metadataTimer = null;
+    }
   }
 
   // ================= PLAY =================
@@ -187,8 +192,9 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       setStatus("Conectando...");
 
-      audio.src = STREAM_URL + "?t=" + Date.now();
-      audio.load();
+      if (!audio.src) {
+        audio.src = STREAM_URL;
+      }
 
       await audio.play();
 
@@ -197,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       startMetadata();
 
-    } catch {
+    } catch (err) {
       setStatus("Toca reproducir");
       updatePlayUI(false);
     }
@@ -227,3 +233,4 @@ document.addEventListener("DOMContentLoaded", () => {
   updatePlayUI(false);
 
 });
+

@@ -64,16 +64,31 @@ document.addEventListener("DOMContentLoaded", () => {
   function setCover(url) {
   if (!stationCover) return;
 
+  const fallback = DEFAULT_COVER;
+
+  if (!url || url === "null" || url === "undefined") {
+    stationCover.src = fallback;
+    return;
+  }
+
   const clean = url
     .replace("http://", "https://")
     .split("?")[0];
 
-  stationCover.src = clean + "?t=" + Date.now();
+  const img = new Image();
 
-  stationCover.onerror = () => {
-    stationCover.src = DEFAULT_COVER;
+  img.onload = () => {
+    stationCover.src = clean + "?t=" + Date.now();
   };
+
+  img.onerror = () => {
+    console.warn("Cover falló:", clean);
+    stationCover.src = fallback;
+  };
+
+  img.src = clean;
 }
+  
   
   // ================= TOAST =================
   function showToast(text) {
@@ -90,14 +105,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ================= LIMPIEZA TEXTO =================
   function cleanText(text = "") {
-    try { text = decodeURIComponent(text); } catch {}
-    return text
-      .replace(/\+/g, " ")
-      .replace(/%20/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
+  try { text = decodeURIComponent(text); } catch {}
 
+  return text
+    .replace(/\+/g, " ")
+    .replace(/%20/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+}
   function parseTitle(text = "") {
     text = cleanText(text);
 
@@ -160,8 +178,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!data?.title) return;
 
-    const title = data.title;
-    const artist = data.artist;
+    const title = cleanText(data.title);
+    const artist = cleanText(data.artist || DEFAULT_ARTIST);
 
     if (title === lastTitle) return;
     lastTitle = title;

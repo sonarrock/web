@@ -1,10 +1,13 @@
-
+```javascript
 document.addEventListener("DOMContentLoaded", () => {
 
   // ================= ELEMENTOS =================
   const audio = document.getElementById("radioPlayer");
   const playBtn = document.getElementById("playBtn");
   const playIcon = document.getElementById("playIcon");
+
+  const miniPlayBtn = document.getElementById("miniPlayBtn");
+  const miniPlayIcon = document.getElementById("miniPlayIcon");
 
   const trackInfo = document.getElementById("trackInfo");
   const trackArtist = document.getElementById("trackArtist");
@@ -32,14 +35,46 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.setAttribute("webkit-playsinline", "");
   audio.crossOrigin = "anonymous";
 
-  // ================= UI =================
-  function setStatus(text) {
+  // ================= STATUS LIVE =================
+  function setStatus(state) {
+    const map = {
+      loading: "Conectando...",
+      live: "En vivo",
+      buffering: "Bufferizando...",
+      paused: "Pausado",
+      error: "Sin señal",
+      ready: "Listo para reproducir"
+    };
+
+    const text = map[state] || state;
+
+    // textos
     if (statusText) statusText.textContent = text;
+
+    const miniStatus = document.getElementById("miniStatus");
+    if (miniStatus) miniStatus.textContent = text;
+
+    // dots
+    const dot = document.getElementById("statusDot");
+    const miniDot = document.getElementById("miniLiveDot");
+
+    [dot, miniDot].forEach(el => {
+      if (!el) return;
+
+      el.classList.remove("live", "connecting", "offline");
+
+      if (state === "live") el.classList.add("live");
+      else if (state === "loading" || state === "buffering") el.classList.add("connecting");
+      else el.classList.add("offline");
+    });
   }
 
+  // ================= UI =================
   function updatePlayUI(playing) {
     isPlaying = playing;
+
     if (playIcon) playIcon.textContent = playing ? "❚❚" : "▶";
+    if (miniPlayIcon) miniPlayIcon.textContent = playing ? "❚❚" : "▶";
   }
 
   function updateTrack(title, artist) {
@@ -49,9 +84,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setCover(url) {
     if (!stationCover) return;
-
-    const cleanUrl = url ? url.split("?")[0] : DEFAULT_COVER;
-    stationCover.src = cleanUrl + "?t=" + Date.now();
+    const clean = url ? url.split("?")[0] : DEFAULT_COVER;
+    stationCover.src = clean + "?t=" + Date.now();
   }
 
   function showToast(text) {
@@ -68,9 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ================= PARSE =================
   function parseTitle(text = "") {
-    try {
-      text = decodeURIComponent(text).trim();
-    } catch {}
+    try { text = decodeURIComponent(text).trim(); } catch {}
 
     if (!text || text === "-") {
       return { artist: DEFAULT_ARTIST, title: DEFAULT_TRACK };
@@ -146,13 +178,11 @@ document.addEventListener("DOMContentLoaded", () => {
       updateMediaSession(title, artist, cover);
       showToast(`${artist} - ${title}`);
 
-    } catch (err) {
-      console.warn("Metadata error, usando fallback");
+    } catch {
       fallbackMetadata();
     }
   }
 
-  // ================= FALLBACK =================
   async function fallbackMetadata() {
     try {
       const res = await fetch(FALLBACK_URL + "&t=" + Date.now(), { cache: "no-store" });
@@ -169,9 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
       updateMediaSession(parsed.title, parsed.artist, DEFAULT_COVER);
       showToast(`${parsed.artist} - ${parsed.title}`);
 
-    } catch (err) {
-      console.warn("Fallback metadata falló");
-    }
+    } catch {}
   }
 
   function startMetadata() {
@@ -190,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ================= PLAY =================
   async function playStream() {
     try {
-      setStatus("Conectando...");
+      setStatus("loading");
 
       if (!audio.src) {
         audio.src = STREAM_URL;
@@ -199,12 +227,12 @@ document.addEventListener("DOMContentLoaded", () => {
       await audio.play();
 
       updatePlayUI(true);
-      setStatus("En vivo");
+      setStatus("live");
 
       startMetadata();
 
-    } catch (err) {
-      setStatus("Toca reproducir");
+    } catch {
+      setStatus("ready");
       updatePlayUI(false);
     }
   }
@@ -213,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.pause();
     stopMetadata();
     updatePlayUI(false);
-    setStatus("Pausado");
+    setStatus("paused");
   }
 
   function togglePlay() {
@@ -221,16 +249,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   playBtn.addEventListener("click", togglePlay);
+  if (miniPlayBtn) miniPlayBtn.addEventListener("click", togglePlay);
 
   // ================= EVENTOS =================
-  audio.addEventListener("playing", () => setStatus("En vivo"));
-  audio.addEventListener("waiting", () => isPlaying && setStatus("Bufferizando..."));
-  audio.addEventListener("error", () => setStatus("Error de señal"));
+  audio.addEventListener("playing", () => setStatus("live"));
+
+  audio.addEventListener("waiting", () => {
+    if (isPlaying) setStatus("buffering");
+  });
+
+  audio.addEventListener("error", () => setStatus("error"));
 
   // ================= INIT =================
   updateTrack(DEFAULT_TRACK, DEFAULT_ARTIST);
   setCover(DEFAULT_COVER);
   updatePlayUI(false);
+  setStatus("ready");
 
 });
-
+```

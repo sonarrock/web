@@ -62,21 +62,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ================= PORTADA FIX iPHONE =================
   function setCover(url) {
-    if (!stationCover) return;
+  if (!stationCover) return;
 
-    const cleanUrl = (url || DEFAULT_COVER)
-      .replace("http://", "https://") // 🔥 iPhone bloquea http
-      .split("?")[0];
+  const clean = url
+    .replace("http://", "https://")
+    .split("?")[0];
 
-    // 🔥 forzar recarga real (cache killer)
-    stationCover.src = cleanUrl + "?t=" + Date.now();
+  stationCover.src = clean + "?t=" + Date.now();
 
-    // 🔥 fallback si falla
-    stationCover.onerror = () => {
-      stationCover.src = DEFAULT_COVER;
-    };
-  }
-
+  stationCover.onerror = () => {
+    stationCover.src = DEFAULT_COVER;
+  };
+}
+  
   // ================= TOAST =================
   function showToast(text) {
     const toast = document.getElementById("songToast");

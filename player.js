@@ -1,4 +1,3 @@
-```javascript
 document.addEventListener("DOMContentLoaded", () => {
 
   // ================= ELEMENTOS =================
@@ -33,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.preload = "none";
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
-  audio.crossOrigin = "anonymous";
+  audio.muted = true; // 🔥 necesario para iPhone
 
   // ================= STATUS LIVE =================
   function setStatus(state) {
@@ -48,13 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const text = map[state] || state;
 
-    // textos
     if (statusText) statusText.textContent = text;
 
     const miniStatus = document.getElementById("miniStatus");
     if (miniStatus) miniStatus.textContent = text;
 
-    // dots
     const dot = document.getElementById("statusDot");
     const miniDot = document.getElementById("miniLiveDot");
 
@@ -215,23 +212,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ================= PLAY =================
+  // ================= PLAY (FIX iPHONE) =================
   async function playStream() {
     try {
       setStatus("loading");
 
-      if (!audio.src) {
-        audio.src = STREAM_URL;
-      }
+      // 🔥 fuerza recarga del stream (clave)
+      audio.src = STREAM_URL + "?t=" + Date.now();
+
+      // 🔥 hack iOS autoplay
+      audio.muted = true;
 
       await audio.play();
+
+      audio.muted = false;
 
       updatePlayUI(true);
       setStatus("live");
 
       startMetadata();
 
-    } catch {
+    } catch (e) {
+      console.error(e);
       setStatus("ready");
       updatePlayUI(false);
     }
@@ -267,4 +269,3 @@ document.addEventListener("DOMContentLoaded", () => {
   setStatus("ready");
 
 });
-```

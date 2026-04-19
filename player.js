@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ================= CONFIG =================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
-  const API_URL = window.location.origin + "/api/nowplaying.php";
+  const API_URL = "https://sonarrock-api.cmrm1982.workers.dev/";
   const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
 
   const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
@@ -153,33 +153,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ================= METADATA =================
   async function fetchMetadata() {
-    try {
-      const res = await fetch(API_URL + "?t=" + Date.now(), { cache: "no-store" });
-      const data = await res.json();
+  try {
+    const res = await fetch(API_URL + "?t=" + Date.now(), {
+      cache: "no-store"
+    });
 
-      if (!data?.title) throw "no data";
+    const data = await res.json();
 
-      const parsed = parseTitle(data.title);
+    if (!data?.title) return;
 
-      const artist = data.artist || parsed.artist;
-      const title = parsed.title;
+    const title = data.title;
+    const artist = data.artist;
 
-      if (title === lastTitle) return;
-      lastTitle = title;
+    if (title === lastTitle) return;
+    lastTitle = title;
 
-      updateTrack(title, artist);
+    updateTrack(title, artist);
 
-      const cover = await fetchCover(artist, title);
-      setCover(cover);
+    // 🔥 CLAVE: usa directamente cover del worker
+    setCover(data.cover);
 
-      updateMediaSession(title, artist, cover);
-      showToast(`${artist} - ${title}`);
+    updateMediaSession(title, artist, data.cover);
+    showToast(`${artist} - ${title}`);
 
-    } catch {
-      fallbackMetadata();
-    }
+  } catch (e) {
+    console.warn("Worker error", e);
   }
-
+}
+  
   // ================= FALLBACK =================
   async function fallbackMetadata() {
     try {

@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
   const API_URL = "https://sonarrock-api.cmrm1982.workers.dev/";
   const SPOTIFY_API = "https://sonarrock-spotify.cmrm1982.workers.dev/";
-  const FALLBACK_URL = "https://giss.tv/player/playing.php?mp=sonarrock.mp3";
 
   const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
   const DEFAULT_ARTIST = "SONAR ROCK";
@@ -29,37 +28,35 @@ document.addEventListener("DOMContentLoaded", () => {
   let lastTitle = "";
   let metadataTimer = null;
 
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
   // ================= AUDIO CONFIG =================
+  // crossOrigin removido: puede bloquear el stream si el servidor
+  // no envía headers CORS. No es necesario para radio en línea.
   audio.preload = "none";
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
-  audio.crossOrigin = "anonymous";
 
   // ================= STATUS =================
   function setStatus(state) {
     const map = {
-      loading: "Conectando...",
-      live: "En vivo",
+      loading:   "Conectando...",
+      live:      "En vivo",
       buffering: "Bufferizando...",
-      paused: "Pausado",
-      error: "Sin señal",
-      ready: "Listo"
+      paused:    "Pausado",
+      error:     "Sin señal",
+      ready:     "Listo"
     };
-
     if (statusText) statusText.textContent = map[state] || state;
   }
 
   // ================= UI =================
   function updatePlayUI(playing) {
     isPlaying = playing;
-    if (playIcon) playIcon.textContent = playing ? "❚❚" : "▶";
+    if (playIcon)     playIcon.textContent     = playing ? "❚❚" : "▶";
     if (miniPlayIcon) miniPlayIcon.textContent = playing ? "❚❚" : "▶";
   }
 
   function updateTrack(title, artist) {
-    if (trackInfo) trackInfo.textContent = title;
+    if (trackInfo)   trackInfo.textContent   = title;
     if (trackArtist) trackArtist.textContent = artist;
   }
 
@@ -92,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ================= TOAST =================
   function showToast(text) {
     const toast = document.getElementById("songToast");
-    const span = document.getElementById("toastSong");
+    const span  = document.getElementById("toastSong");
 
     if (!toast || !span) return;
 
@@ -107,12 +104,12 @@ document.addEventListener("DOMContentLoaded", () => {
     try { text = decodeURIComponent(text); } catch {}
 
     return text
-      .replace(/\+/g, " ")
-      .replace(/%20/g, " ")
+      .replace(/\+/g,    " ")
+      .replace(/%20/g,   " ")
       .replace(/&amp;/g, "&")
       .replace(/&#39;/g, "'")
       .replace(/&quot;/g, '"')
-      .replace(/\s+/g, " ")
+      .replace(/\s+/g,   " ")
       .trim();
   }
 
@@ -123,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
     navigator.mediaSession.metadata = new MediaMetadata({
       title,
       artist,
-      album: "Sonar Rock",
+      album:   "Sonar Rock",
       artwork: [{ src: cover, sizes: "512x512", type: "image/png" }]
     });
   }
@@ -131,14 +128,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // ================= METADATA =================
   async function fetchMetadata() {
     try {
-      const res = await fetch(API_URL + "?t=" + Date.now(), {
-        cache: "no-store"
-      });
-
+      const res  = await fetch(API_URL + "?t=" + Date.now(), { cache: "no-store" });
       const data = await res.json();
+
       if (!data?.title) return;
 
-      const title = cleanText(data.title);
+      const title  = cleanText(data.title);
       const artist = cleanText(data.artist || DEFAULT_ARTIST);
 
       if (title === lastTitle) return;
@@ -146,22 +141,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
       updateTrack(title, artist);
 
-      // 🔥 SPOTIFY COVER (FUENTE ÚNICA)
+      // Portada via Spotify Worker (fuente única)
       let cover = DEFAULT_COVER;
 
       try {
-        const spotifyRes = await fetch(
+        const spotifyRes  = await fetch(
           `${SPOTIFY_API}?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`
         );
-
         const spotifyData = await spotifyRes.json();
 
         if (spotifyData.cover) {
           cover = spotifyData.cover;
         }
-
       } catch (e) {
-        console.warn("Spotify error", e);
+        console.warn("Spotify cover error:", e);
       }
 
       setCover(cover);
@@ -169,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast(`${artist} - ${title}`);
 
     } catch (e) {
-      console.warn("Metadata error", e);
+      console.warn("Metadata fetch error:", e);
     }
   }
 
@@ -192,10 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       setStatus("loading");
 
-      audio.src = isIOS
-        ? STREAM_URL + "?t=" + Date.now()
-        : STREAM_URL;
-
+      // Cache-buster universal: evita que el navegador sirva
+      // una conexión cacheada o cortada, en todos los dispositivos.
+      audio.src = STREAM_URL + "?t=" + Date.now();
       audio.load();
       await audio.play();
 
@@ -204,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
       startMetadata();
 
     } catch (e) {
-      console.warn("Play error", e);
+      console.warn("Play error:", e);
       setStatus("ready");
       updatePlayUI(false);
     }
@@ -212,6 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function pauseStream() {
     audio.pause();
+    audio.src = "";   // libera la conexión al servidor
     stopMetadata();
     updatePlayUI(false);
     setStatus("paused");
@@ -221,13 +214,19 @@ document.addEventListener("DOMContentLoaded", () => {
     isPlaying ? pauseStream() : playStream();
   }
 
+  // ================= EVENTOS BOTONES =================
   playBtn.addEventListener("click", togglePlay);
   if (miniPlayBtn) miniPlayBtn.addEventListener("click", togglePlay);
 
-  // ================= EVENTOS =================
+  // ================= EVENTOS AUDIO =================
   audio.addEventListener("playing", () => setStatus("live"));
   audio.addEventListener("waiting", () => isPlaying && setStatus("buffering"));
-  audio.addEventListener("error", () => setStatus("error"));
+  audio.addEventListener("error",   () => {
+    console.warn("Audio error — stream no disponible");
+    setStatus("error");
+    updatePlayUI(false);
+    stopMetadata();
+  });
 
   // ================= INIT =================
   updateTrack(DEFAULT_TRACK, DEFAULT_ARTIST);

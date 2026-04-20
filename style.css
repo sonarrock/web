@@ -35,6 +35,8 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   position: relative;
+  /* Espacio inferior para que el mini player no tape contenido */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Fondo global */
@@ -242,11 +244,15 @@ h2::after {
 
 /* ===============================
    SECCIONES CON TARJETA VISUAL
+   position: relative es obligatorio
+   para que ::before se posicione
+   correctamente en todos los navegadores
 =============================== */
 .players-section,
 .social-section,
 .staff-section,
 .about-section {
+  position: relative;
   padding: 28px 20px;
   max-width: 1120px;
   margin: 22px auto;
@@ -435,8 +441,8 @@ h2::after {
 }
 
 .disco-btn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.08);
@@ -450,6 +456,9 @@ h2::after {
   transition: all 0.22s ease;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.24);
   -webkit-tap-highlight-color: transparent;
+  /* Área táctil mínima recomendada para mobile */
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .disco-btn:hover {
@@ -496,9 +505,9 @@ h2::after {
 .disco-progress::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
-  margin-top: -5px;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
   border-radius: 50%;
   border: none;
   background: var(--primary);
@@ -512,8 +521,8 @@ h2::after {
 }
 
 .disco-progress::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border: none;
   border-radius: 50%;
   background: var(--primary);
@@ -562,6 +571,9 @@ h2::after {
   color: #ffffff;
   transition: all 0.3s ease;
   box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+  /* Área táctil cómoda en mobile */
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .social-btn:hover {
@@ -631,7 +643,7 @@ h2::after {
 }
 
 /* ===============================
-   RESPONSIVE
+   RESPONSIVE — TABLET
 =============================== */
 @media (max-width: 768px) {
   .header {
@@ -692,8 +704,16 @@ h2::after {
   }
 }
 
-/* ========= MOBILE ========= */
+/* ===============================
+   RESPONSIVE — MOBILE
+=============================== */
 @media (max-width: 640px) {
+  /* Espacio extra al fondo para que el mini player
+     no tape el último bloque de contenido */
+  body {
+    padding-bottom: calc(90px + env(safe-area-inset-bottom, 16px));
+  }
+
   .disco-player {
     gap: 12px;
     padding: 14px;
@@ -719,8 +739,8 @@ h2::after {
   }
 
   .disco-btn {
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
     font-size: 0.95rem;
   }
@@ -739,6 +759,7 @@ h2::after {
   .staff-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 30px;
+    justify-items: center;
   }
 
   .staff-image {
@@ -747,6 +768,7 @@ h2::after {
 
   .staff-name {
     font-size: 14px;
+    text-align: center;
   }
 
   .about-text {

@@ -1,4 +1,3 @@
-
 /* =========================================
    SONAR ROCK PLAYER — OPTIMIZED PRO VERSION
 ========================================= */
@@ -32,6 +31,7 @@
   border: 1px solid var(--sr-border);
   box-shadow: var(--sr-shadow);
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: grid;
   grid-template-columns: 1fr 260px;
   gap: 20px;
@@ -95,12 +95,20 @@
   font-size: 1.3rem;
   font-weight: 800;
   margin-bottom: 6px;
+  /* Evita desborde con títulos muy largos */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .sonar-track-artist {
   font-size: .95rem;
   color: var(--sr-subtext);
   margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* =========================
@@ -121,34 +129,25 @@
 .mini-live-dot {
   width: 10px;
   height: 10px;
+  flex-shrink: 0;
   border-radius: 50%;
   background: #555;
   transition: var(--sr-transition);
 }
 
-/* estados */
-.live {
-  background: var(--sr-live);
-  box-shadow: 0 0 8px var(--sr-live);
-  animation: pulse 1.5s infinite;
-}
-
-.connecting {
-  background: orange;
-}
-
-.offline {
-  background: #555;
-}
+/* estados del dot — aplicados desde JS */
+.live    { background: var(--sr-live); box-shadow: 0 0 8px var(--sr-live); animation: pulse 1.5s infinite; }
+.connecting { background: orange; }
+.offline    { background: #555; }
 
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.25); opacity: .6; }
-  100% { transform: scale(1); opacity: 1; }
+  0%   { transform: scale(1);    opacity: 1; }
+  50%  { transform: scale(1.25); opacity: .6; }
+  100% { transform: scale(1);    opacity: 1; }
 }
 
 /* =========================
-   VU
+   VU METER
 ========================= */
 
 .vu-wrap {
@@ -156,11 +155,17 @@
   border-radius: 12px;
   background: rgba(0,0,0,0.5);
   overflow: hidden;
+  /* Sin width fijo: se adapta al contenedor */
+  width: 100%;
 }
 
 .vu-canvas {
+  /* El canvas ocupa todo el contenedor — las dimensiones
+     reales (para el contexto 2D) las asigna player.js
+     con canvas.width / canvas.height al inicializar */
   width: 100%;
   height: 100%;
+  display: block;
 }
 
 /* =========================
@@ -170,6 +175,7 @@
 .top-buttons {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 14px;
 }
 
@@ -177,6 +183,9 @@
 .play-btn {
   width: 70px;
   height: 70px;
+  /* Área táctil mínima garantizada */
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
   border: none;
   background: radial-gradient(circle, #35d7ff, #0078ff);
@@ -187,23 +196,35 @@
   cursor: pointer;
   box-shadow: 0 0 25px rgba(0,170,255,0.4);
   transition: var(--sr-transition);
+  -webkit-tap-highlight-color: transparent;
 }
 
-.play-btn:hover { transform: scale(1.05); }
+.play-btn:hover  { transform: scale(1.05); }
 .play-btn:active { transform: scale(.95); }
 
-#playIcon { font-size: 1.9rem; }
+#playIcon { font-size: 1.9rem; line-height: 1; }
 
 /* MUTE */
 .mute-btn {
   width: 50px;
   height: 50px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
   border: 1px solid rgba(255,255,255,0.15);
   background: rgba(255,255,255,0.08);
   color: #fff;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: var(--sr-transition);
+  -webkit-tap-highlight-color: transparent;
 }
+
+.mute-btn:hover  { background: rgba(255,255,255,0.14); }
+.mute-btn:active { transform: scale(.95); }
 
 /* =========================
    VOLUMEN
@@ -215,11 +236,41 @@
   gap: 10px;
 }
 
+.volume-emoji {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
 .volume-slider {
-  width: 100%;
+  flex: 1;
+  appearance: none;
+  -webkit-appearance: none;
   height: 6px;
   border-radius: 999px;
   background: linear-gradient(90deg, #ff7a1a, #ffd7b5);
+  outline: none;
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255,122,26,0.4);
+  cursor: pointer;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255,122,26,0.4);
+  cursor: pointer;
 }
 
 /* =========================
@@ -232,7 +283,10 @@
   left: 50%;
   transform: translateX(-50%) translateY(10px);
   opacity: 0;
-  transition: .3s;
+  pointer-events: none;
+  transition: opacity .3s, transform .3s;
+  z-index: 200;
+  white-space: nowrap;
 }
 
 .song-toast.show {
@@ -245,7 +299,10 @@
   padding: 10px 16px;
   border-radius: 999px;
   font-weight: 700;
+  font-size: .9rem;
+  color: #fff;
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 
@@ -258,60 +315,128 @@
   bottom: 15px;
   left: 15px;
   right: 15px;
+  /* Respeta el notch / home indicator en iPhones */
+  bottom: calc(15px + env(safe-area-inset-bottom, 0px));
   display: none;
   align-items: center;
   justify-content: space-between;
-  padding: 10px;
+  padding: 12px 16px;
   border-radius: 18px;
-  background: rgba(15,15,15,0.9);
-  box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+  background: rgba(15,15,15,0.92);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+  /* Por encima del contenido y del toast */
+  z-index: 100;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .mini-left {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
-.mini-title { font-weight: 700; }
-.mini-status { font-size: .8rem; color: #aaa; }
+.mini-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mini-status {
+  font-size: .8rem;
+  color: #aaa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .mini-play-btn {
   width: 48px;
   height: 48px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
   border: none;
   background: radial-gradient(circle, #35d7ff, #0078ff);
   color: #fff;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(0,170,255,0.35);
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: var(--sr-transition);
 }
 
+.mini-play-btn:active { transform: scale(.93); }
+
 /* =========================
-   MOBILE
+   MOBILE — PLAYER
 ========================= */
 
 @media (max-width: 768px) {
 
   .sonar-player {
+    /* Apila columnas en mobile */
     grid-template-columns: 1fr;
     padding: 16px;
+    gap: 16px;
   }
 
   .player-left {
+    /* Cover arriba, info abajo, centrado */
     grid-template-columns: 1fr;
     text-align: center;
+    justify-items: center;
+    gap: 12px;
   }
 
   .cover-wrap {
-    margin: auto;
+    width: 110px;
+    height: 110px;
+    margin: 0 auto;
+  }
+
+  .sonar-player-info {
+    width: 100%;
+  }
+
+  .sonar-track-title {
+    font-size: 1.1rem;
+  }
+
+  .sonar-track-artist {
+    font-size: .88rem;
+  }
+
+  .status-row {
+    /* Centrar el badge de estado */
+    display: inline-flex;
+    margin: 0 auto;
   }
 
   .vu-wrap {
+    /* Oculto en mobile: el mini player cumple esa función */
     display: none;
   }
+
+  .player-right {
+    gap: 12px;
+  }
+
+  .play-btn {
+    width: 64px;
+    height: 64px;
+  }
+
+  #playIcon { font-size: 1.7rem; }
 
   .mini-player {
     display: flex;
   }
 
 }
-

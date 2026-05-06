@@ -45,12 +45,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       cover.src         = data.portada || "disco-semana/portada.jpg";
 
       // Usar la URL tal como viene del JSON (debe ser absoluta si viene de GitHub)
+     
       audio.src = data.audio;
+      audio.volume = 1.0; // Asegura el 100% del volumen nativo
       audio.load();
 
-    } catch (err) {
+          } catch (err) {
       console.error("Error cargando disco.json:", err);
       title.textContent = "No se pudo cargar el disco de la semana";
+      
+      
     }
   }
 

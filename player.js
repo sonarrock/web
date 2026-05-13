@@ -124,8 +124,10 @@ document.addEventListener("DOMContentLoaded", () => {
       // 🔥 FIX IMPORTANTE: usar updated del worker
       const updated = data.updated || 0;
 
-      if (updated === lastUpdated) return;
-      lastUpdated = updated;
+    const current = artist + " - " + title;
+
+if (current === lastTrack && cover) return;
+lastTrack = current;
 
       updateTrack(title, artist);
 

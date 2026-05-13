@@ -1,4 +1,3 @@
-console.log("🔥 SONAR PLAYER JS ACTIVO");
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -26,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const DEFAULT_COVER = window.location.origin + "/attached_assets/logo_1749601460841.jpeg";
 
   let isPlaying = false;
-  let lastTrack = "";
+  let lastUpdated = 0;
   let metadataTimer = null;
 
   // ================= AUDIO =================
@@ -97,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ================= CLEAN TEXT =================
+  // ================= CLEAN =================
   function cleanText(text = "") {
     try { text = decodeURIComponent(text); } catch {}
 
@@ -107,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .trim();
   }
 
-  // ================= METADATA (ÚNICO SISTEMA) =================
+  // ================= METADATA (FIX REAL) =================
   async function fetchNowPlaying() {
     try {
       const res = await fetch(API_URL + "?t=" + Date.now(), {
@@ -122,10 +121,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const artist = cleanText(data.artist || DEFAULT_ARTIST);
       const title = cleanText(data.title);
 
-      const current = artist + " - " + title;
-      if (current === lastTrack) return;
+      // 🔥 FIX IMPORTANTE: usar updated del worker
+      const updated = data.updated || 0;
 
-      lastTrack = current;
+      if (updated === lastUpdated) return;
+      lastUpdated = updated;
 
       updateTrack(title, artist);
 
@@ -139,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const span = document.getElementById("toastSong");
 
       if (toast && span) {
-        span.textContent = current;
+        span.textContent = artist + " - " + title;
         toast.classList.add("show");
         setTimeout(() => toast.classList.remove("show"), 3000);
       }

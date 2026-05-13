@@ -30,11 +30,22 @@ document.addEventListener("DOMContentLoaded", () => {
   let metadataTimer = null;
   let userInteracted = false;
 
+  // 🔥 NUEVO
+  let history = [];
+  let lastAudioTime = Date.now();
+
   // ================= AUDIO CONFIG =================
   audio.preload = "none";
-  audio.volume = 0; // para fade-in
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
+
+  // 🔊 VOLUMEN PERSISTENTE
+  const savedVolume = localStorage.getItem("volume");
+  audio.volume = savedVolume !== null ? parseFloat(savedVolume) : 1;
+
+  audio.addEventListener("volumechange", () => {
+    localStorage.setItem("volume", audio.volume);
+  });
 
   // ================= STATUS =================
   function setStatus(state) {
@@ -61,20 +72,34 @@ document.addEventListener("DOMContentLoaded", () => {
     if (trackArtist) trackArtist.textContent = artist;
   }
 
+  // ================= HISTORIAL =================
+  function updateHistory(title, artist) {
+    history.unshift({ title, artist });
+    if (history.length > 10) history.pop();
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const container = document.getElementById("historyList");
+    if (!container) return;
+
+    container.innerHTML = history
+      .map(t => `<div class="history-item">${t.artist} - ${t.title}</div>`)
+      .join("");
+  }
+
   // ================= FADE IN =================
   function fadeInAudio(duration = 1200) {
     const steps = 20;
     const stepTime = duration / steps;
     let currentStep = 0;
 
+    audio.volume = 0;
+
     const interval = setInterval(() => {
       currentStep++;
       audio.volume = Math.min(1, currentStep / steps);
-
-      if (currentStep >= steps) {
-        clearInterval(interval);
-        audio.volume = 1;
-      }
+      if (currentStep >= steps) clearInterval(interval);
     }, stepTime);
   }
 
@@ -83,14 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!stationCover) return;
 
     const fallback = DEFAULT_COVER;
-
-    if (!url) {
-      stationCover.src = fallback;
-      return;
-    }
+    if (!url) return stationCover.src = fallback;
 
     const clean = url.replace("http://", "https://").split("?")[0];
-
     const img = new Image();
 
     img.onload = () => {
@@ -122,12 +142,12 @@ document.addEventListener("DOMContentLoaded", () => {
     try { text = decodeURIComponent(text); } catch {}
 
     return text
-      .replace(/\+/g,    " ")
-      .replace(/%20/g,   " ")
+      .replace(/\+/g, " ")
+      .replace(/%20/g, " ")
       .replace(/&amp;/g, "&")
       .replace(/&#39;/g, "'")
       .replace(/&quot;/g, '"')
-      .replace(/\s+/g,   " ")
+      .replace(/\s+/g, " ")
       .trim();
   }
 
@@ -138,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
     navigator.mediaSession.metadata = new MediaMetadata({
       title,
       artist,
-      album:   "Sonar Rock",
+      album: "Sonar Rock",
       artwork: [{ src: cover, sizes: "512x512", type: "image/png" }]
     });
   }
@@ -158,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
       lastTitle = title;
 
       updateTrack(title, artist);
+      updateHistory(title, artist); // 🔥 NUEVO
 
       let cover = DEFAULT_COVER;
 
@@ -166,20 +187,15 @@ document.addEventListener("DOMContentLoaded", () => {
           `${SPOTIFY_API}?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`
         );
         const spotifyData = await spotifyRes.json();
-
-        if (spotifyData.cover) {
-          cover = spotifyData.cover;
-        }
-      } catch (e) {
-        console.warn("Spotify cover error:", e);
-      }
+        if (spotifyData.cover) cover = spotifyData.cover;
+      } catch {}
 
       setCover(cover);
       updateMediaSession(title, artist, cover);
       showToast(`${artist} - ${title}`);
 
     } catch (e) {
-      console.warn("Metadata fetch error:", e);
+      console.warn("Metadata error:", e);
     }
   }
 
@@ -190,19 +206,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function stopMetadata() {
-    if (metadataTimer) {
-      clearInterval(metadataTimer);
-      metadataTimer = null;
-    }
+    if (metadataTimer) clearInterval(metadataTimer);
   }
 
-  // ================= UNLOCK AUDIO =================
+  // ================= UNLOCK =================
   function unlockAudio() {
     if (userInteracted) return;
-
     audio.src = STREAM_URL;
     audio.load();
-
     userInteracted = true;
   }
 
@@ -216,21 +227,14 @@ document.addEventListener("DOMContentLoaded", () => {
         audio.load();
       }
 
-      audio.volume = 0;
-
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        await playPromise;
-      }
-
+      await audio.play();
       fadeInAudio();
 
       updatePlayUI(true);
       setStatus("live");
       startMetadata();
 
-    } catch (e) {
-      console.warn("Play error:", e);
+    } catch {
       setStatus("ready");
       updatePlayUI(false);
     }
@@ -247,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
     isPlaying ? pauseStream() : playStream();
   }
 
-  // ================= EVENTOS BOTONES =================
+  // ================= EVENTOS =================
   playBtn.addEventListener("click", () => {
     unlockAudio();
     togglePlay();
@@ -260,14 +264,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ================= EVENTOS AUDIO =================
   audio.addEventListener("playing", () => setStatus("live"));
   audio.addEventListener("waiting", () => isPlaying && setStatus("buffering"));
 
-  audio.addEventListener("error", () => {
-    console.warn("Reconectando stream...");
-    setStatus("loading");
+  audio.addEventListener("timeupdate", () => {
+    lastAudioTime = Date.now();
+  });
 
+  // 🔥 DETECCIÓN DE SILENCIO
+  setInterval(() => {
+    if (isPlaying && Date.now() - lastAudioTime > 10000) {
+      console.warn("Silencio detectado, reconectando...");
+      audio.load();
+      audio.play().catch(() => {});
+    }
+  }, 5000);
+
+  audio.addEventListener("error", () => {
+    setStatus("loading");
     setTimeout(() => {
       audio.load();
       audio.play().catch(() => {});
@@ -281,3 +295,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setStatus("ready");
 
 });
+

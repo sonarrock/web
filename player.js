@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
 
   // ================= ELEMENTOS =================
@@ -77,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (history.length === 0 || history[0].title !== title) {
       history.unshift({ title, artist });
     }
-    if (history.length > 04) history.pop();
+    if (history.length > 4) history.pop();
     renderHistory();
   }
 
@@ -107,13 +106,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }, stepTime);
   }
 
-  // ================= 🎙️ SHOW DETECTION =================
+  // ================= 🎙️ SHOW =================
   function getCurrentShow() {
     const now = new Date();
     const day = now.getDay();
     const hour = now.getHours();
 
-    // miércoles 21:00 a jueves 00:00
     if ((day === 3 && hour >= 21) || (day === 4 && hour < 1)) {
       return {
         name: "Sonar Rock Sessions",
@@ -121,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     }
 
-    // jueves 21:00 a viernes 00:00
     if ((day === 4 && hour >= 21) || (day === 5 && hour < 1)) {
       return {
         name: "Lado B",
@@ -134,13 +131,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ================= 🎨 BACKGROUND =================
   function updateDynamicBackground(imageUrl) {
+    if (!imageUrl) imageUrl = DEFAULT_COVER;
+
     player.style.setProperty("--dynamic-bg", `url('${imageUrl}')`);
   }
 
   // ================= COVER =================
   function setCover(url) {
-    if (!stationCover) return;
-
     const fallback = DEFAULT_COVER;
     const clean = url ? url.replace("http://", "https://").split("?")[0] : fallback;
 
@@ -198,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setCover(cover);
 
-      // 🔥 SHOW MODE REAL
+      // 🔥 LÓGICA FINAL CORRECTA
       const show = getCurrentShow();
 
       if (show) {
@@ -206,13 +203,14 @@ document.addEventListener("DOMContentLoaded", () => {
         updateDynamicBackground(show.cover);
       } else {
         player.classList.remove("show-live");
-        updateDynamicBackground(cover);
+        updateDynamicBackground(cover || DEFAULT_COVER);
       }
 
       showToast(`${artist} - ${title}`);
 
     } catch (e) {
       console.warn("Metadata error:", e);
+      updateDynamicBackground(DEFAULT_COVER); // 🔥 fallback crítico
     }
   }
 
@@ -271,6 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
     isPlaying ? pauseStream() : playStream();
   }
 
+  // ================= EVENTOS =================
   playBtn.addEventListener("click", () => {
     unlockAudio();
     togglePlay();
@@ -305,8 +304,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 2000);
   });
 
+  // ================= INIT =================
   updateTrack(DEFAULT_TRACK, DEFAULT_ARTIST);
   setCover(DEFAULT_COVER);
+  updateDynamicBackground(DEFAULT_COVER); // 🔥 ESTA LÍNEA ERA LA CLAVE
   updatePlayUI(false);
   setStatus("ready");
 

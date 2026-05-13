@@ -58,14 +58,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (trackArtist) trackArtist.textContent = artist;
   }
 
-  // ================= FONDO DINÁMICO =================
-  function updateBackground(imageUrl) {
-    document.body.style.backgroundImage = `url('${imageUrl}')`;
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundPosition = "center";
-    document.body.style.backgroundRepeat = "no-repeat";
-    document.body.style.transition = "background-image 0.6s ease-in-out";
-  }
+ // ================= FONDO DINÁMICO =================
+function updateBackground(imageUrl) {
+  const player = document.querySelector(".sonar-player");
+  if (!player) return;
+
+  player.style.setProperty("--dynamic-bg", `url('${imageUrl}')`);
+}
 
   // ================= PORTADAS =================
   function setCover(url) {

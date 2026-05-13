@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
 
   // ================= ELEMENTOS =================
@@ -27,11 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let isPlaying = false;
   let lastTitle = "";
   let metadataTimer = null;
+  let userInteracted = false;
 
   // ================= AUDIO CONFIG =================
-  // crossOrigin removido: puede bloquear el stream si el servidor
-  // no envía headers CORS. No es necesario para radio en línea.
-  audio.preload = "auto";
+  audio.preload = "none";
+  audio.volume = 0; // para fade-in
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
 
@@ -58,6 +59,23 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateTrack(title, artist) {
     if (trackInfo)   trackInfo.textContent   = title;
     if (trackArtist) trackArtist.textContent = artist;
+  }
+
+  // ================= FADE IN =================
+  function fadeInAudio(duration = 1200) {
+    const steps = 20;
+    const stepTime = duration / steps;
+    let currentStep = 0;
+
+    const interval = setInterval(() => {
+      currentStep++;
+      audio.volume = Math.min(1, currentStep / steps);
+
+      if (currentStep >= steps) {
+        clearInterval(interval);
+        audio.volume = 1;
+      }
+    }, stepTime);
   }
 
   // ================= PORTADAS =================
@@ -141,7 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       updateTrack(title, artist);
 
-      // Portada via Spotify Worker (fuente única)
       let cover = DEFAULT_COVER;
 
       try {
@@ -166,7 +183,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ================= METADATA LOOP =================
   function startMetadata() {
     stopMetadata();
     fetchMetadata();
@@ -180,39 +196,48 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ================= PLAY =================
-async function playStream() {
-  try {
+  // ================= UNLOCK AUDIO =================
+  function unlockAudio() {
+    if (userInteracted) return;
 
-    setStatus("loading");
+    audio.src = STREAM_URL;
+    audio.load();
 
-    // NO recrear conexión cada play
-    if (!audio.src) {
-      audio.src = STREAM_URL;
-    }
-
-    // Intentar reproducir inmediatamente
-    const playPromise = audio.play();
-
-    if (playPromise !== undefined) {
-      await playPromise;
-    }
-
-    updatePlayUI(true);
-    setStatus("live");
-    startMetadata();
-
-  } catch (e) {
-
-    console.warn("Play error:", e);
-
-    setStatus("ready");
-    updatePlayUI(false);
+    userInteracted = true;
   }
-}
+
+  // ================= PLAY =================
+  async function playStream() {
+    try {
+      setStatus("loading");
+
+      if (!audio.src) {
+        audio.src = STREAM_URL;
+        audio.load();
+      }
+
+      audio.volume = 0;
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        await playPromise;
+      }
+
+      fadeInAudio();
+
+      updatePlayUI(true);
+      setStatus("live");
+      startMetadata();
+
+    } catch (e) {
+      console.warn("Play error:", e);
+      setStatus("ready");
+      updatePlayUI(false);
+    }
+  }
+
   function pauseStream() {
     audio.pause();
-    audio.src = "";   // libera la conexión al servidor
     stopMetadata();
     updatePlayUI(false);
     setStatus("paused");
@@ -223,17 +248,30 @@ async function playStream() {
   }
 
   // ================= EVENTOS BOTONES =================
-  playBtn.addEventListener("click", togglePlay);
-  if (miniPlayBtn) miniPlayBtn.addEventListener("click", togglePlay);
+  playBtn.addEventListener("click", () => {
+    unlockAudio();
+    togglePlay();
+  });
+
+  if (miniPlayBtn) {
+    miniPlayBtn.addEventListener("click", () => {
+      unlockAudio();
+      togglePlay();
+    });
+  }
 
   // ================= EVENTOS AUDIO =================
   audio.addEventListener("playing", () => setStatus("live"));
   audio.addEventListener("waiting", () => isPlaying && setStatus("buffering"));
-  audio.addEventListener("error",   () => {
-    console.warn("Audio error — stream no disponible");
-    setStatus("error");
-    updatePlayUI(false);
-    stopMetadata();
+
+  audio.addEventListener("error", () => {
+    console.warn("Reconectando stream...");
+    setStatus("loading");
+
+    setTimeout(() => {
+      audio.load();
+      audio.play().catch(() => {});
+    }, 1500);
   });
 
   // ================= INIT =================

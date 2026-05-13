@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (history.length === 0 || history[0].title !== title) {
       history.unshift({ title, artist });
     }
-    if (history.length > 10) history.pop();
+    if (history.length > 04) history.pop();
     renderHistory();
   }
 
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if ((day === 3 && hour >= 21) || (day === 4 && hour < 1)) {
       return {
         name: "Sonar Rock Sessions",
-        cover: "/icons/sessions.jpg"
+        cover: "/icons/sessions.jpeg"
       };
     }
 
@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if ((day === 4 && hour >= 21) || (day === 5 && hour < 1)) {
       return {
         name: "Lado B",
-        cover: "/icons/ladob.jpg"
+        cover: "/icons/ladob.jpeg"
       };
     }
 

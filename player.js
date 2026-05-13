@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!data?.title) return;
 
       const artist = data.artist || "SONAR ROCK";
-      const title = data.title || "Transmitiendo rock";
+      const title = data.title || "Transmitiendo rock sin payola";
 
       const key = artist + title;
       if (key === lastKey) return;

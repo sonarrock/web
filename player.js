@@ -114,6 +114,25 @@ document.addEventListener("DOMContentLoaded", () => {
     timer = null;
   }
 
+function getShowBackground() {
+  const d = new Date();
+  const day = d.getDay(); // 0 domingo
+  const hour = d.getHours();
+
+  // Miércoles 21–24
+  if (day === 3 && hour >= 21) {
+    return "/attached_assets/session.jpg";
+  }
+
+  // Jueves 21–24
+  if (day === 4 && hour >= 21) {
+    return "/attached_assets/ladoB.jpg";
+  }
+
+  return DEFAULT_COVER;
+}
+
+  
   // ================= PLAYER =================
   async function play() {
     try {

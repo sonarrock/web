@@ -1,5 +1,6 @@
+```css
 /* =========================================
-   SONAR ROCK PLAYER — OPTIMIZED PRO VERSION
+   SONAR ROCK PLAYER — PRO UPGRADE VERSION
 ========================================= */
 
 :root {
@@ -23,6 +24,7 @@
 }
 
 .sonar-player {
+  position: relative;
   max-width: 860px;
   margin: 20px auto 40px;
   padding: 20px;
@@ -30,13 +32,30 @@
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--sr-border);
   box-shadow: var(--sr-shadow);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   display: grid;
   grid-template-columns: 1fr 260px;
   gap: 20px;
   align-items: center;
   overflow: hidden;
+}
+
+/* 🔥 blur dinámico tipo app */
+.sonar-player::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 30%, rgba(255,122,26,0.15), transparent 60%);
+  opacity: 0.6;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* contenido arriba del blur */
+.sonar-player > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* =========================
@@ -73,10 +92,11 @@
   background: rgba(255,255,255,0.05);
   box-shadow: 0 12px 25px rgba(0,0,0,0.4);
   transition: var(--sr-transition);
+  will-change: transform;
 }
 
 .sonar-player.playing .station-cover {
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
 
 /* =========================
@@ -95,7 +115,6 @@
   font-size: 1.3rem;
   font-weight: 800;
   margin-bottom: 6px;
-  /* Evita desborde con títulos muy largos */
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -119,53 +138,77 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 6px 12px;
   border-radius: 999px;
   background: rgba(255,255,255,0.06);
-  font-size: .85rem;
+  font-size: .8rem;
+  backdrop-filter: blur(6px);
 }
 
 .status-dot,
 .mini-live-dot {
   width: 10px;
   height: 10px;
-  flex-shrink: 0;
   border-radius: 50%;
   background: #555;
-  transition: var(--sr-transition);
 }
 
-/* estados del dot — aplicados desde JS */
 .live    { background: var(--sr-live); box-shadow: 0 0 8px var(--sr-live); animation: pulse 1.5s infinite; }
 .connecting { background: orange; }
 .offline    { background: #555; }
 
 @keyframes pulse {
-  0%   { transform: scale(1);    opacity: 1; }
+  0%   { transform: scale(1); opacity: 1; }
   50%  { transform: scale(1.25); opacity: .6; }
-  100% { transform: scale(1);    opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 /* =========================
-   VU METER
+   HISTORY
 ========================= */
 
-.vu-wrap {
-  height: 60px;
-  border-radius: 12px;
-  background: rgba(0,0,0,0.5);
-  overflow: hidden;
-  /* Sin width fijo: se adapta al contenedor */
-  width: 100%;
+#historyList {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 12px;
+  color: var(--sr-subtext);
+  max-height: 110px;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
-.vu-canvas {
-  /* El canvas ocupa todo el contenedor — las dimensiones
-     reales (para el contexto 2D) las asigna player.js
-     con canvas.width / canvas.height al inicializar */
-  width: 100%;
-  height: 100%;
-  display: block;
+#historyList::-webkit-scrollbar {
+  width: 4px;
+}
+
+#historyList::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+}
+
+.history-item {
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.7;
+  transform: translateY(4px);
+  animation: historyFade .3s ease forwards;
+}
+
+.history-item:first-child {
+  font-weight: 700;
+  color: var(--sr-text);
+  opacity: 1;
+}
+
+@keyframes historyFade {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* =========================
@@ -175,17 +218,12 @@
 .top-buttons {
   display: flex;
   justify-content: center;
-  align-items: center;
   gap: 14px;
 }
 
-/* PLAY */
 .play-btn {
   width: 70px;
   height: 70px;
-  /* Área táctil mínima garantizada */
-  min-width: 44px;
-  min-height: 44px;
   border-radius: 50%;
   border: none;
   background: radial-gradient(circle, #35d7ff, #0078ff);
@@ -196,115 +234,12 @@
   cursor: pointer;
   box-shadow: 0 0 25px rgba(0,170,255,0.4);
   transition: var(--sr-transition);
-  -webkit-tap-highlight-color: transparent;
 }
 
 .play-btn:hover  { transform: scale(1.05); }
 .play-btn:active { transform: scale(.95); }
 
-#playIcon { font-size: 1.9rem; line-height: 1; }
-
-/* MUTE */
-.mute-btn {
-  width: 50px;
-  height: 50px;
-  min-width: 44px;
-  min-height: 44px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.08);
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  transition: var(--sr-transition);
-  -webkit-tap-highlight-color: transparent;
-}
-
-.mute-btn:hover  { background: rgba(255,255,255,0.14); }
-.mute-btn:active { transform: scale(.95); }
-
-/* =========================
-   VOLUMEN
-========================= */
-
-.volume-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.volume-emoji {
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-.volume-slider {
-  flex: 1;
-  appearance: none;
-  -webkit-appearance: none;
-  height: 6px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #ff7a1a, #ffd7b5);
-  outline: none;
-  cursor: pointer;
-}
-
-.volume-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(255,122,26,0.4);
-  cursor: pointer;
-}
-
-.volume-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border: none;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(255,122,26,0.4);
-  cursor: pointer;
-}
-
-/* =========================
-   TOAST
-========================= */
-
-.song-toast {
-  position: fixed;
-  bottom: 90px;
-  left: 50%;
-  transform: translateX(-50%) translateY(10px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .3s, transform .3s;
-  z-index: 200;
-  white-space: nowrap;
-}
-
-.song-toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-.song-toast-inner {
-  background: rgba(0,0,0,0.9);
-  padding: 10px 16px;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: .9rem;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+#playIcon { font-size: 1.9rem; }
 
 /* =========================
    MINI PLAYER
@@ -312,11 +247,9 @@
 
 .mini-player {
   position: fixed;
-  bottom: 15px;
+  bottom: calc(15px + env(safe-area-inset-bottom, 0px));
   left: 15px;
   right: 15px;
-  /* Respeta el notch / home indicator en iPhones */
-  bottom: calc(15px + env(safe-area-inset-bottom, 0px));
   display: none;
   align-items: center;
   justify-content: space-between;
@@ -325,118 +258,48 @@
   background: rgba(15,15,15,0.92);
   border: 1px solid rgba(255,255,255,0.08);
   box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-  /* Por encima del contenido y del toast */
   z-index: 100;
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
 }
-
-.mini-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.mini-meta {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.mini-status {
-  font-size: .8rem;
-  color: #aaa;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mini-play-btn {
-  width: 48px;
-  height: 48px;
-  min-width: 44px;
-  min-height: 44px;
-  border-radius: 50%;
-  border: none;
-  background: radial-gradient(circle, #35d7ff, #0078ff);
-  color: #fff;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 0 18px rgba(0,170,255,0.35);
-  flex-shrink: 0;
-  -webkit-tap-highlight-color: transparent;
-  transition: var(--sr-transition);
-}
-
-.mini-play-btn:active { transform: scale(.93); }
 
 /* =========================
-   MOBILE — PLAYER
+   MOBILE
 ========================= */
 
 @media (max-width: 768px) {
 
   .sonar-player {
-    /* Apila columnas en mobile */
     grid-template-columns: 1fr;
     padding: 16px;
     gap: 16px;
   }
 
   .player-left {
-    /* Cover arriba, info abajo, centrado */
     grid-template-columns: 1fr;
     text-align: center;
     justify-items: center;
-    gap: 12px;
   }
 
   .cover-wrap {
     width: 110px;
     height: 110px;
-    margin: 0 auto;
   }
 
-  .sonar-player-info {
-    width: 100%;
-  }
-
-  .sonar-track-title {
-    font-size: 1.1rem;
-  }
-
-  .sonar-track-artist {
-    font-size: .88rem;
-  }
+  .sonar-track-title { font-size: 1.1rem; }
+  .sonar-track-artist { font-size: .88rem; }
 
   .status-row {
-    /* Centrar el badge de estado */
-    display: inline-flex;
     margin: 0 auto;
   }
 
-  .vu-wrap {
-    /* Oculto en mobile: el mini player cumple esa función */
-    display: none;
+  #historyList {
+    max-height: 90px;
+    font-size: 11px;
   }
-
-  .player-right {
-    gap: 12px;
-  }
-
-  .play-btn {
-    width: 64px;
-    height: 64px;
-  }
-
-  #playIcon { font-size: 1.7rem; }
 
   .mini-player {
     display: flex;
   }
 
 }
+```

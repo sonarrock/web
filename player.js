@@ -1,4 +1,3 @@
-console.log("🔥 SONAR PLAYER JS ACTIVO");
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -43,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (statusText) statusText.textContent = map[s] || s;
   }
 
-  // ================= UI BUTTONS =================
+  // ================= UI =================
   function updatePlayUI(p) {
     isPlaying = p;
     playIcon.textContent = p ? "❚❚" : "▶";
@@ -51,6 +50,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateMuteUI(m) {
     muteIcon.textContent = m ? "🔇" : "🔊";
+  }
+
+  // ================= LIMPIEZA TEXTO =================
+  function cleanText(text = "") {
+    try { text = decodeURIComponent(text); } catch {}
+    return text.replace(/\+/g, " ").replace(/\s+/g, " ").trim();
   }
 
   // ================= COVER + BACKGROUND =================
@@ -61,8 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const url = cover + "?v=" + Date.now();
 
       stationCover.src = url;
-
-      // 🔥 fondo del player
       player.style.setProperty("--dynamic-bg", `url('${url}')`);
     };
 
@@ -74,6 +77,25 @@ document.addEventListener("DOMContentLoaded", () => {
     img.src = cover;
   }
 
+  // ================= SHOW BACKGROUNDS =================
+  function getShowBackground() {
+    const d = new Date();
+    const day = d.getDay();
+    const hour = d.getHours();
+
+    // Miércoles 9pm–12am
+    if (day === 3 && hour >= 21) {
+      return "/attached_assets/session.jpg";
+    }
+
+    // Jueves 9pm–12am
+    if (day === 4 && hour >= 21) {
+      return "/attached_assets/ladoB.jpg";
+    }
+
+    return DEFAULT_COVER;
+  }
+
   // ================= METADATA =================
   async function fetchMeta() {
     try {
@@ -81,22 +103,26 @@ document.addEventListener("DOMContentLoaded", () => {
         cache: "no-store"
       });
 
+      if (!res.ok) return;
+
       const data = await res.json();
       if (!data?.title) return;
 
-      const artist = data.artist || "SONAR ROCK";
-      const title = data.title || "Transmitiendo rock sin payola";
+      const artist = cleanText(data.artist || "SONAR ROCK");
+      const title = cleanText(data.title || "Transmitiendo rock sin concesiones");
 
-      const key = artist + title;
+      const key = artist + " - " + title;
       if (key === lastKey) return;
       lastKey = key;
 
       trackInfo.textContent = title;
       trackArtist.textContent = artist;
 
-      if (data.cover) {
-        setVisual(data.cover);
-      }
+      // 🔥 USAR FONDO LOCAL SIEMPRE (ESTABLE)
+      const bg = getShowBackground();
+      setVisual(bg);
+
+      console.log("🎵 NOW:", key);
 
     } catch (e) {
       console.warn("metadata error", e);
@@ -114,25 +140,6 @@ document.addEventListener("DOMContentLoaded", () => {
     timer = null;
   }
 
-function getShowBackground() {
-  const d = new Date();
-  const day = d.getDay(); // 0 domingo
-  const hour = d.getHours();
-
-  // Miércoles 21–24
-  if (day === 3 && hour >= 21) {
-    return "/attached_assets/session.jpg";
-  }
-
-  // Jueves 21–24
-  if (day === 4 && hour >= 21) {
-    return "/attached_assets/ladoB.jpg";
-  }
-
-  return DEFAULT_COVER;
-}
-
-  
   // ================= PLAYER =================
   async function play() {
     try {
@@ -174,6 +181,7 @@ function getShowBackground() {
     audio.volume = v;
   }
 
+  // ================= EVENTS =================
   playBtn.addEventListener("click", toggle);
   muteBtn.addEventListener("click", toggleMute);
 

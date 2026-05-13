@@ -261,3 +261,36 @@ async function fetchMetadata() {
   setStatus("ready");
 
 });
+
+const API = "https://sonarrock-api.cmrm1982.workers.dev/";
+
+let last = "";
+
+async function sync() {
+  try {
+    const res = await fetch(API, { cache: "no-store" });
+    const data = await res.json();
+
+    const current = data.artist + " - " + data.title;
+
+    if (current !== last) {
+      last = current;
+
+      console.log("🎵 Now Playing:", current);
+
+      // 👇 AJUSTA ESTO A TU PLAYER
+      document.getElementById("artist").innerText = data.artist;
+      document.getElementById("title").innerText = data.title;
+
+      if (data.cover) {
+        document.getElementById("cover").src = data.cover;
+      }
+    }
+
+  } catch (e) {
+    console.log("sync error", e);
+  }
+}
+
+setInterval(sync, 2000);
+sync();

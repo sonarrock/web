@@ -1,17 +1,15 @@
+```css
 /* =========================================
-   SONAR ROCK PLAYER — PRO UPGRADE VERSION
+   SONAR ROCK PLAYER — FINAL CLEAN VERSION
 ========================================= */
-
-.sonar-player {
-  font-family: 'Inter', sans-serif;
-}
 
 :root {
   --sr-primary: #ff7a1a;
   --sr-bg: rgba(255,255,255,0.05);
   --sr-border: rgba(255,255,255,0.12);
   --sr-text: #ffffff;
-  --sr-subtext: #b8b8b8;
+  --sr-subtext: #cfcfcf;
+  --sr-muted: #9a9a9a;
   --sr-live: #ff3b3b;
   --sr-radius: 24px;
   --sr-shadow: 0 18px 45px rgba(0,0,0,0.4);
@@ -27,24 +25,32 @@
 }
 
 .sonar-player {
+  font-family: 'Inter', sans-serif;
   position: relative;
   max-width: 860px;
   margin: 20px auto 40px;
   padding: 20px;
   border-radius: var(--sr-radius);
-  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.05),
+    rgba(0,0,0,0.65)
+  );
+
   border: 1px solid var(--sr-border);
   box-shadow: var(--sr-shadow);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+
   display: grid;
   grid-template-columns: 1fr 260px;
-  gap: 20px;
+  gap: 24px;
   align-items: center;
-  overflow: hidden;
 }
 
-/* 🔥 blur dinámico tipo app */
+/* glow sutil */
 .sonar-player::before {
   content: "";
   position: absolute;
@@ -52,10 +58,8 @@
   background: radial-gradient(circle at 20% 30%, rgba(255,122,26,0.15), transparent 60%);
   opacity: 0.6;
   z-index: 0;
-  pointer-events: none;
 }
 
-/* contenido arriba del blur */
 .sonar-player > * {
   position: relative;
   z-index: 1;
@@ -75,7 +79,8 @@
 .player-right {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px; /* 🔥 espacio corregido */
+  justify-content: center;
 }
 
 /* =========================
@@ -117,6 +122,7 @@
 .sonar-track-title {
   font-size: 1.3rem;
   font-weight: 800;
+  letter-spacing: 0.3px;
   margin-bottom: 6px;
   overflow: hidden;
   display: -webkit-box;
@@ -127,6 +133,7 @@
 .sonar-track-artist {
   font-size: .95rem;
   color: var(--sr-subtext);
+  font-weight: 500;
   margin-bottom: 10px;
   white-space: nowrap;
   overflow: hidden;
@@ -148,21 +155,22 @@
   backdrop-filter: blur(6px);
 }
 
-.status-dot,
-.mini-live-dot {
+.status-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: #555;
 }
 
-.live    { background: var(--sr-live); box-shadow: 0 0 8px var(--sr-live); animation: pulse 1.5s infinite; }
-.connecting { background: orange; }
-.offline    { background: #555; }
+.live {
+  background: var(--sr-live);
+  box-shadow: 0 0 8px var(--sr-live);
+  animation: pulse 1.5s infinite;
+}
 
 @keyframes pulse {
-  0%   { transform: scale(1); opacity: 1; }
-  50%  { transform: scale(1.25); opacity: .6; }
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: .6; }
   100% { transform: scale(1); opacity: 1; }
 }
 
@@ -178,16 +186,15 @@
   color: var(--sr-subtext);
   max-height: 110px;
   overflow-y: auto;
-  scrollbar-width: thin;
 }
 
-#historyList::-webkit-scrollbar {
-  width: 4px;
-}
-
-#historyList::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
-  border-radius: 10px;
+.history-title {
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  font-size: 11px;
+  color: var(--sr-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
 }
 
 .history-item {
@@ -221,34 +228,45 @@
 .top-buttons {
   display: flex;
   justify-content: center;
-  gap: 14px;
+  align-items: center;
+  gap: 18px;
 }
 
 .play-btn {
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  border: none;
-  background: radial-gradient(circle, #35d7ff, #0078ff);
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
   color: #fff;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 0 25px rgba(0,170,255,0.4);
   transition: var(--sr-transition);
 }
 
-.play-btn:hover  { transform: scale(1.05); }
-.play-btn:active { transform: scale(.95); }
+.play-btn:hover {
+  background: rgba(255,255,255,0.18);
+  transform: scale(1.05);
+}
 
-#playIcon { font-size: 1.9rem; }
+.play-btn:active {
+  transform: scale(.95);
+}
+
+#playIcon {
+  font-size: 1.9rem;
+}
 
 /* =========================
    MINI PLAYER
 ========================= */
 
 .mini-player {
+  font-family: 'Inter', sans-serif;
   position: fixed;
   bottom: calc(15px + env(safe-area-inset-bottom, 0px));
   left: 15px;
@@ -288,8 +306,13 @@
     height: 110px;
   }
 
-  .sonar-track-title { font-size: 1.1rem; }
-  .sonar-track-artist { font-size: .88rem; }
+  .sonar-track-title {
+    font-size: 1.1rem;
+  }
+
+  .sonar-track-artist {
+    font-size: .88rem;
+  }
 
   .status-row {
     margin: 0 auto;
@@ -305,3 +328,4 @@
   }
 
 }
+```

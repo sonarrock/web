@@ -14,7 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const stationCover = document.getElementById("stationCover");
   const statusText = document.getElementById("statusText");
 
-  if (!audio || !playBtn) return;
+  const player = document.querySelector(".sonar-player");
+
+  if (!audio || !playBtn || !player) return;
 
   // ================= CONFIG =================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
@@ -105,23 +107,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }, stepTime);
   }
 
-  // ================= DETECCIÓN SHOW =================
+  // ================= 🎙️ SHOW DETECTION =================
   function getCurrentShow() {
     const now = new Date();
     const day = now.getDay();
     const hour = now.getHours();
 
-    // rango 21:00 - 23:59
-    const isNight = hour >= 21;
-
-    if (day === 3 && isNight) {
+    // miércoles 21:00 a jueves 00:00
+    if ((day === 3 && hour >= 21) || (day === 4 && hour < 1)) {
       return {
         name: "Sonar Rock Sessions",
         cover: "/icons/sessions.jpg"
       };
     }
 
-    if (day === 4 && isNight) {
+    // jueves 21:00 a viernes 00:00
+    if ((day === 4 && hour >= 21) || (day === 5 && hour < 1)) {
       return {
         name: "Lado B",
         cover: "/icons/ladob.jpg"
@@ -131,17 +132,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return null;
   }
 
-  // ================= FONDO =================
+  // ================= 🎨 BACKGROUND =================
   function updateDynamicBackground(imageUrl) {
-    const player = document.querySelector(".sonar-player");
-    if (!player) return;
-
-    player.style.background = `
-      linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.95)),
-      url('${imageUrl}')
-    `;
-    player.style.backgroundSize = "cover";
-    player.style.backgroundPosition = "center";
+    player.style.setProperty("--dynamic-bg", `url('${imageUrl}')`);
   }
 
   // ================= COVER =================
@@ -149,10 +142,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!stationCover) return;
 
     const fallback = DEFAULT_COVER;
-
     const clean = url ? url.replace("http://", "https://").split("?")[0] : fallback;
+
     const img = new Image();
-    img.crossOrigin = "anonymous";
 
     img.onload = () => {
       stationCover.src = clean + "?v=" + Date.now();
@@ -175,20 +167,6 @@ document.addEventListener("DOMContentLoaded", () => {
     toast.classList.add("show");
 
     setTimeout(() => toast.classList.remove("show"), 3000);
-  }
-
-  // ================= TEXTO =================
-  function cleanText(text = "") {
-    try { text = decodeURIComponent(text); } catch {}
-
-    return text
-      .replace(/\+/g, " ")
-      .replace(/%20/g, " ")
-      .replace(/&amp;/g, "&")
-      .replace(/&#39;/g, "'")
-      .replace(/&quot;/g, '"')
-      .replace(/\s+/g, " ")
-      .trim();
   }
 
   // ================= METADATA =================
@@ -220,15 +198,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setCover(cover);
 
-      // 🔥 MODO HÍBRIDO
+      // 🔥 SHOW MODE REAL
       const show = getCurrentShow();
 
       if (show) {
+        player.classList.add("show-live");
         updateDynamicBackground(show.cover);
-        document.querySelector(".sonar-player")?.classList.add("show-mode");
       } else {
+        player.classList.remove("show-live");
         updateDynamicBackground(cover);
-        document.querySelector(".sonar-player")?.classList.remove("show-mode");
       }
 
       showToast(`${artist} - ${title}`);
@@ -236,6 +214,11 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (e) {
       console.warn("Metadata error:", e);
     }
+  }
+
+  function cleanText(text = "") {
+    try { text = decodeURIComponent(text); } catch {}
+    return text.replace(/\+/g, " ").replace(/\s+/g, " ").trim();
   }
 
   function startMetadata() {
@@ -248,7 +231,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (metadataTimer) clearInterval(metadataTimer);
   }
 
-  // ================= UNLOCK =================
   function unlockAudio() {
     if (userInteracted) return;
     audio.src = STREAM_URL;
@@ -256,7 +238,6 @@ document.addEventListener("DOMContentLoaded", () => {
     userInteracted = true;
   }
 
-  // ================= PLAY =================
   async function playStream() {
     try {
       setStatus("loading");
@@ -290,7 +271,6 @@ document.addEventListener("DOMContentLoaded", () => {
     isPlaying ? pauseStream() : playStream();
   }
 
-  // ================= EVENTOS =================
   playBtn.addEventListener("click", () => {
     unlockAudio();
     togglePlay();
@@ -325,16 +305,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 2000);
   });
 
-  audio.addEventListener("stalled", () => {
-    audio.load();
-    audio.play().catch(() => {});
-  });
-
-  // ================= INIT =================
   updateTrack(DEFAULT_TRACK, DEFAULT_ARTIST);
   setCover(DEFAULT_COVER);
   updatePlayUI(false);
   setStatus("ready");
 
 });
-

@@ -5,8 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const audio = document.getElementById("radioPlayer");
   const playBtn = document.getElementById("playBtn");
   const playIcon = document.getElementById("playIcon");
-  const miniPlayBtn = document.getElementById("miniPlayBtn");
-  const miniPlayIcon = document.getElementById("miniPlayIcon");
+
+  const muteBtn = document.getElementById("muteBtn");
+  const muteIcon = document.getElementById("muteIcon");
+
+  const volume = document.getElementById("volumeControl");
 
   const trackInfo = document.getElementById("trackInfo");
   const trackArtist = document.getElementById("trackArtist");
@@ -17,41 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!audio || !playBtn) return;
 
-  // ================= CONFIG =================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
   const API_URL = "https://sonarrock-api.cmrm1982.workers.dev/";
 
-  const DEFAULT_ARTIST = "SONAR ROCK";
-  const DEFAULT_TITLE = "Transmitiendo rock sin payola";
   const DEFAULT_COVER = "/attached_assets/logo_1749601460841.jpeg";
 
   let isPlaying = false;
+  let isMuted = false;
   let lastKey = "";
   let timer = null;
-
-  // ================= HORARIOS ESPECIALES =================
-  function getSpecialBackground() {
-    const now = new Date();
-    const day = now.getDay(); // 0 dom, 3 mié, 4 jue
-    const hour = now.getHours();
-
-    // 🎙 SONAR ROCK SESSION - Miércoles 9pm - 12am
-    if (day === 3 && hour >= 21 && hour < 24) {
-      return "url('/icons/sessions.png')";
-    }
-
-    // 🎸 LADO B - Jueves 9pm - 12am
-    if (day === 4 && hour >= 21 && hour < 24) {
-      return "url('/icons/ladob.jpeg')";
-    }
-
-    return null;
-  }
-
-  function applyBackground(image) {
-    if (!player || !image) return;
-    player.style.setProperty("--dynamic-bg", image);
-  }
 
   // ================= STATUS =================
   function setStatus(s) {
@@ -66,34 +43,35 @@ document.addEventListener("DOMContentLoaded", () => {
     if (statusText) statusText.textContent = map[s] || s;
   }
 
-  // ================= UI =================
-  function updateUI(playing) {
-    isPlaying = playing;
-    if (playIcon) playIcon.textContent = playing ? "❚❚" : "▶";
-    if (miniPlayIcon) miniPlayIcon.textContent = playing ? "❚❚" : "▶";
+  // ================= UI BUTTONS =================
+  function updatePlayUI(p) {
+    isPlaying = p;
+    playIcon.textContent = p ? "❚❚" : "▶";
   }
 
-  function updateText(title, artist) {
-    if (trackInfo) trackInfo.textContent = title;
-    if (trackArtist) trackArtist.textContent = artist;
+  function updateMuteUI(m) {
+    muteIcon.textContent = m ? "🔇" : "🔊";
   }
 
-  function setCover(url) {
+  // ================= COVER + BACKGROUND =================
+  function setVisual(cover) {
     const img = new Image();
 
     img.onload = () => {
-      const final = url + "?v=" + Date.now();
-      if (stationCover) stationCover.src = final;
+      const url = cover + "?v=" + Date.now();
 
-      // 🔥 fondo dinámico normal (portada)
-      applyBackground(`url('${final}')`);
+      stationCover.src = url;
+
+      // 🔥 fondo del player
+      player.style.setProperty("--dynamic-bg", `url('${url}')`);
     };
 
     img.onerror = () => {
-      if (stationCover) stationCover.src = DEFAULT_COVER;
+      stationCover.src = DEFAULT_COVER;
+      player.style.setProperty("--dynamic-bg", `url('${DEFAULT_COVER}')`);
     };
 
-    img.src = url;
+    img.src = cover;
   }
 
   // ================= METADATA =================
@@ -106,18 +84,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       if (!data?.title) return;
 
-      const artist = data.artist || DEFAULT_ARTIST;
-      const title = data.title || DEFAULT_TITLE;
+      const artist = data.artist || "SONAR ROCK";
+      const title = data.title || "Transmitiendo rock";
 
-      const key = artist + "-" + title;
+      const key = artist + title;
       if (key === lastKey) return;
       lastKey = key;
 
-      updateText(title, artist);
+      trackInfo.textContent = title;
+      trackArtist.textContent = artist;
 
-      const cover = data.cover || DEFAULT_COVER;
-
-      setCover(cover);
+      if (data.cover) {
+        setVisual(data.cover);
+      }
 
     } catch (e) {
       console.warn("metadata error", e);
@@ -143,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
       audio.src = STREAM_URL + "?t=" + Date.now();
       await audio.play();
 
-      updateUI(true);
+      updatePlayUI(true);
       setStatus("live");
       startLoop();
 
@@ -157,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
     audio.pause();
     audio.src = "";
     stopLoop();
-    updateUI(false);
+    updatePlayUI(false);
     setStatus("paused");
   }
 
@@ -165,28 +144,37 @@ document.addEventListener("DOMContentLoaded", () => {
     isPlaying ? pause() : play();
   }
 
+  // ================= MUTE =================
+  function toggleMute() {
+    isMuted = !isMuted;
+    audio.muted = isMuted;
+    updateMuteUI(isMuted);
+  }
+
+  function setVolume(v) {
+    audio.volume = v;
+  }
+
   playBtn.addEventListener("click", toggle);
-  if (miniPlayBtn) miniPlayBtn.addEventListener("click", toggle);
+  muteBtn.addEventListener("click", toggleMute);
+
+  if (volume) {
+    volume.addEventListener("input", (e) => {
+      setVolume(e.target.value);
+    });
+  }
 
   audio.addEventListener("playing", () => setStatus("live"));
   audio.addEventListener("error", () => {
     setStatus("error");
-    updateUI(false);
     stopLoop();
   });
 
   // ================= INIT =================
+  trackInfo.textContent = "Transmitiendo rock sin concesiones";
+  trackArtist.textContent = "SONAR ROCK";
 
-  updateText(DEFAULT_TITLE, DEFAULT_ARTIST);
-
-  // 🔥 fondo especial horario (prioridad)
-  const special = getSpecialBackground();
-  if (special) {
-    applyBackground(special);
-  } else {
-    applyBackground(`url('${DEFAULT_COVER}')`);
-  }
-
+  setVisual(DEFAULT_COVER);
   setStatus("ready");
 
 });

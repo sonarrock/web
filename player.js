@@ -1,3 +1,5 @@
+console.log("🔥 SONAR PLAYER JS ACTIVO");
+
 document.addEventListener("DOMContentLoaded", () => {
 
   const audio = document.getElementById("radioPlayer");
@@ -25,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let isPlaying = false;
   let isMuted = false;
-  let lastUpdated = 0; // 🔥 CAMBIO CLAVE
+  let lastMeta = "";
   let timer = null;
 
   // ================= STATUS =================
@@ -38,4 +40,177 @@ document.addEventListener("DOMContentLoaded", () => {
       error: "Sin señal",
       ready: "Listo"
     };
-    if (statusText) statusText.textContent =
+    if (statusText) statusText.textContent = map[s] || s;
+  }
+
+  // ================= UI =================
+  function updatePlayUI(p) {
+    isPlaying = p;
+    playIcon.textContent = p ? "❚❚" : "▶";
+  }
+
+  function updateMuteUI(m) {
+    muteIcon.textContent = m ? "🔇" : "🔊";
+  }
+
+  // ================= PROGRAMAS EN VIVO =================
+  function getShowBackground() {
+    const d = new Date();
+    const day = d.getDay();
+    const hour = d.getHours();
+
+    if (day === 3 && hour >= 21) {
+      return "/attached_assets/session.jpg";
+    }
+
+    if (day === 4 && hour >= 21) {
+      return "/attached_assets/ladoB.jpg";
+    }
+
+    return null;
+  }
+
+  // ================= VISUAL =================
+  function setVisual(cover) {
+
+    const showBg = getShowBackground();
+
+    // 🔥 prioridad:
+    // 1. programa en vivo
+    // 2. cover real
+    // 3. default
+    const final = showBg || cover || DEFAULT_COVER;
+
+    if (!final) return;
+
+    const img = new Image();
+
+    img.onload = () => {
+      const url = final + "?v=" + Date.now();
+
+      stationCover.src = url;
+
+      // 🔥 FONDO REAL DINÁMICO
+      player.style.setProperty("--dynamic-bg", `url('${url}')`);
+    };
+
+    img.onerror = () => {
+      stationCover.src = DEFAULT_COVER;
+      player.style.setProperty("--dynamic-bg", `url('${DEFAULT_COVER}')`);
+    };
+
+    img.src = final;
+  }
+
+  // ================= METADATA =================
+  async function fetchMeta() {
+    try {
+      const res = await fetch(API_URL + "?t=" + Date.now(), {
+        cache: "no-store"
+      });
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+      if (!data || !data.title) return;
+
+      const artist = data.artist || "SONAR ROCK";
+      const title = data.title || "Transmitiendo rock";
+
+      const currentMeta = artist + " - " + title;
+
+      // 🔥 SOLO evita duplicado EXACTO
+      if (currentMeta === lastMeta) return;
+      lastMeta = currentMeta;
+
+      // 🔥 actualizar UI SIEMPRE
+      trackInfo.textContent = title;
+      trackArtist.textContent = artist;
+
+      // 🔥 actualizar fondo SIEMPRE
+      setVisual(data.cover);
+
+      console.log("🎵 META OK:", currentMeta);
+
+    } catch (e) {
+      console.warn("metadata error", e);
+    }
+  }
+
+  function startLoop() {
+    stopLoop();
+    fetchMeta();
+    timer = setInterval(fetchMeta, 5000);
+  }
+
+  function stopLoop() {
+    if (timer) clearInterval(timer);
+    timer = null;
+  }
+
+  // ================= PLAYER =================
+  async function play() {
+    try {
+      setStatus("loading");
+
+      audio.src = STREAM_URL + "?t=" + Date.now();
+      await audio.play();
+
+      updatePlayUI(true);
+      setStatus("live");
+      startLoop();
+
+    } catch (e) {
+      console.warn(e);
+      setStatus("error");
+    }
+  }
+
+  function pause() {
+    audio.pause();
+    audio.src = "";
+    stopLoop();
+    updatePlayUI(false);
+    setStatus("paused");
+  }
+
+  function toggle() {
+    isPlaying ? pause() : play();
+  }
+
+  // ================= MUTE =================
+  function toggleMute() {
+    isMuted = !isMuted;
+    audio.muted = isMuted;
+    updateMuteUI(isMuted);
+  }
+
+  function setVolume(v) {
+    audio.volume = v;
+  }
+
+  // ================= EVENTS =================
+  playBtn.addEventListener("click", toggle);
+  muteBtn.addEventListener("click", toggleMute);
+
+  if (volume) {
+    volume.addEventListener("input", (e) => {
+      setVolume(e.target.value);
+    });
+  }
+
+  audio.addEventListener("playing", () => setStatus("live"));
+  audio.addEventListener("waiting", () => isPlaying && setStatus("buffering"));
+  audio.addEventListener("error", () => {
+    setStatus("error");
+    stopLoop();
+  });
+
+  // ================= INIT =================
+  trackInfo.textContent = "Transmitiendo rock sin concesiones";
+  trackArtist.textContent = "SONAR ROCK";
+
+  setVisual(DEFAULT_COVER);
+  setStatus("ready");
+
+});

@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if ((day === 3 && hour >= 21) || (day === 4 && hour < 1)) {
       return {
         name: "Sonar Rock Sessions",
-        cover: "/icons/sessions.jpeg"
+        cover: "/icons/sessions.png"
       };
     }
 

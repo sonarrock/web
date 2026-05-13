@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
   const API_URL = "https://sonarrock-api.cmrm1982.workers.dev/";
 
-  const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
+  const DEFAULT_TRACK = "Transmitiendo rock sin payola";
   const DEFAULT_ARTIST = "SONAR ROCK";
   const DEFAULT_COVER = window.location.origin + "/attached_assets/logo_1749601460841.jpeg";
 

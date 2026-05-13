@@ -105,13 +105,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }, stepTime);
   }
 
-  // ================= FONDO DINÁMICO =================
+  // ================= DETECCIÓN SHOW =================
+  function getCurrentShow() {
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+
+    // rango 21:00 - 23:59
+    const isNight = hour >= 21;
+
+    if (day === 3 && isNight) {
+      return {
+        name: "Sonar Rock Sessions",
+        cover: "/icons/sessions.jpg"
+      };
+    }
+
+    if (day === 4 && isNight) {
+      return {
+        name: "Lado B",
+        cover: "/icons/ladob.jpg"
+      };
+    }
+
+    return null;
+  }
+
+  // ================= FONDO =================
   function updateDynamicBackground(imageUrl) {
     const player = document.querySelector(".sonar-player");
     if (!player) return;
 
     player.style.background = `
-      linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+      linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.95)),
       url('${imageUrl}')
     `;
     player.style.backgroundSize = "cover";
@@ -124,24 +150,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const fallback = DEFAULT_COVER;
 
-    if (!url) {
-      stationCover.src = fallback;
-      updateDynamicBackground(fallback);
-      return;
-    }
-
-    const clean = url.replace("http://", "https://").split("?")[0];
+    const clean = url ? url.replace("http://", "https://").split("?")[0] : fallback;
     const img = new Image();
     img.crossOrigin = "anonymous";
 
     img.onload = () => {
       stationCover.src = clean + "?v=" + Date.now();
-      updateDynamicBackground(clean);
     };
 
     img.onerror = () => {
       stationCover.src = fallback;
-      updateDynamicBackground(fallback);
     };
 
     img.src = clean;
@@ -201,6 +219,18 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch {}
 
       setCover(cover);
+
+      // 🔥 MODO HÍBRIDO
+      const show = getCurrentShow();
+
+      if (show) {
+        updateDynamicBackground(show.cover);
+        document.querySelector(".sonar-player")?.classList.add("show-mode");
+      } else {
+        updateDynamicBackground(cover);
+        document.querySelector(".sonar-player")?.classList.remove("show-mode");
+      }
+
       showToast(`${artist} - ${title}`);
 
     } catch (e) {
@@ -280,19 +310,15 @@ document.addEventListener("DOMContentLoaded", () => {
     lastAudioTime = Date.now();
   });
 
-  // 🔥 AUTO-RECOVERY
   setInterval(() => {
     if (isPlaying && Date.now() - lastAudioTime > 10000) {
-      console.warn("Reconectando por silencio...");
       audio.load();
       audio.play().catch(() => {});
     }
   }, 5000);
 
   audio.addEventListener("error", () => {
-    console.warn("Error de stream — reconectando...");
     setStatus("loading");
-
     setTimeout(() => {
       audio.load();
       audio.play().catch(() => {});
@@ -300,7 +326,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   audio.addEventListener("stalled", () => {
-    console.warn("Stream detenido — reintentando...");
     audio.load();
     audio.play().catch(() => {});
   });

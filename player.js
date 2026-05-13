@@ -1,3 +1,5 @@
+console.log("🔥 SONAR PLAYER JS ACTIVO");
+
 document.addEventListener("DOMContentLoaded", () => {
 
   const audio = document.getElementById("radioPlayer");
@@ -11,18 +13,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const stationCover = document.getElementById("stationCover");
   const statusText = document.getElementById("statusText");
 
+  const player = document.querySelector(".sonar-player");
+
   if (!audio || !playBtn) return;
 
+  // ================= CONFIG =================
   const STREAM_URL = "https://giss.tv:667/sonarrock.mp3";
   const API_URL = "https://sonarrock-api.cmrm1982.workers.dev/";
 
   const DEFAULT_ARTIST = "SONAR ROCK";
-  const DEFAULT_TITLE = "Transmitiendo rock sin concesiones";
+  const DEFAULT_TITLE = "Transmitiendo rock sin payola";
   const DEFAULT_COVER = "/attached_assets/logo_1749601460841.jpeg";
 
   let isPlaying = false;
   let lastKey = "";
   let timer = null;
+
+  // ================= HORARIOS ESPECIALES =================
+  function getSpecialBackground() {
+    const now = new Date();
+    const day = now.getDay(); // 0 dom, 3 mié, 4 jue
+    const hour = now.getHours();
+
+    // 🎙 SONAR ROCK SESSION - Miércoles 9pm - 12am
+    if (day === 3 && hour >= 21 && hour < 24) {
+      return "url('/icons/sessions.png')";
+    }
+
+    // 🎸 LADO B - Jueves 9pm - 12am
+    if (day === 4 && hour >= 21 && hour < 24) {
+      return "url('/icons/ladob.jpeg')";
+    }
+
+    return null;
+  }
+
+  function applyBackground(image) {
+    if (!player || !image) return;
+    player.style.setProperty("--dynamic-bg", image);
+  }
 
   // ================= STATUS =================
   function setStatus(s) {
@@ -50,15 +79,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setCover(url) {
-    if (!stationCover) return;
-
     const img = new Image();
+
     img.onload = () => {
-      stationCover.src = url;
+      const final = url + "?v=" + Date.now();
+      if (stationCover) stationCover.src = final;
+
+      // 🔥 fondo dinámico normal (portada)
+      applyBackground(`url('${final}')`);
     };
+
     img.onerror = () => {
-      stationCover.src = DEFAULT_COVER;
+      if (stationCover) stationCover.src = DEFAULT_COVER;
     };
+
     img.src = url;
   }
 
@@ -82,6 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
       updateText(title, artist);
 
       const cover = data.cover || DEFAULT_COVER;
+
       setCover(cover);
 
     } catch (e) {
@@ -140,8 +175,18 @@ document.addEventListener("DOMContentLoaded", () => {
     stopLoop();
   });
 
+  // ================= INIT =================
+
   updateText(DEFAULT_TITLE, DEFAULT_ARTIST);
-  setCover(DEFAULT_COVER);
+
+  // 🔥 fondo especial horario (prioridad)
+  const special = getSpecialBackground();
+  if (special) {
+    applyBackground(special);
+  } else {
+    applyBackground(`url('${DEFAULT_COVER}')`);
+  }
+
   setStatus("ready");
 
 });

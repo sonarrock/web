@@ -51,6 +51,28 @@
   transition: var(--sr-transition);
 }
 
+#playBtn, #muteBtn {
+  background: linear-gradient(145deg, #e0e0e0, #9a9a9a);
+  border: none;
+  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+  color: #111;
+  font-size: 18px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  cursor: pointer;
+}
+
+#playBtn:hover, #muteBtn:hover {
+  transform: scale(1.05);
+}
+
+.volume-slider {
+  width: 100%;
+  accent-color: silver;
+  height: 4px;
+}
+
 /* 🔥 CAPA BLUR (LA MAGIA) */
 .sonar-player::before {
   content: "";

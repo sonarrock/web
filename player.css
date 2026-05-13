@@ -2,6 +2,10 @@
    SONAR ROCK PLAYER — PRO UPGRADE VERSION
 ========================================= */
 
+.sonar-player {
+  font-family: 'Inter', sans-serif;
+}
+
 :root {
   --sr-primary: #ff7a1a;
   --sr-bg: rgba(255,255,255,0.05);

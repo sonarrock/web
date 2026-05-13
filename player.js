@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "https://sonarrock-api.cmrm1982.workers.dev/";
   const SPOTIFY_API = "https://sonarrock-spotify.cmrm1982.workers.dev/";
 
-  const DEFAULT_TRACK = "Transmitiendo rock sin concesiones";
+  const DEFAULT_TRACK = "Transmitiendo rock sin payola";
   const DEFAULT_ARTIST = "SONAR ROCK";
   const DEFAULT_COVER = window.location.origin + "/attached_assets/logo_1749601460841.jpeg";
 
@@ -34,14 +34,63 @@ document.addEventListener("DOMContentLoaded", () => {
   let history = [];
   let lastAudioTime = Date.now();
 
+// ================= VOLUMEN Y MUTE =================
+const volumeControl = document.getElementById("volumeControl");
+const muteBtn = document.getElementById("muteBtn");
+const muteIcon = document.getElementById("muteIcon");
+const volumeEmoji = document.getElementById("volumeEmoji");
+
+// cargar volumen guardado
+const savedVolume = localStorage.getItem("volume");
+if (savedVolume !== null) {
+  audio.volume = parseFloat(savedVolume);
+  volumeControl.value = audio.volume;
+}
+
+// actualizar UI volumen
+function updateVolumeUI(vol) {
+  if (vol === 0) {
+    muteIcon.textContent = "🔇";
+    volumeEmoji.textContent = "🔇";
+  } else if (vol < 0.5) {
+    muteIcon.textContent = "🔉";
+    volumeEmoji.textContent = "🔉";
+  } else {
+    muteIcon.textContent = "🔊";
+    volumeEmoji.textContent = "🔊";
+  }
+}
+
+// mover slider
+volumeControl.addEventListener("input", () => {
+  audio.volume = parseFloat(volumeControl.value);
+  localStorage.setItem("volume", audio.volume);
+
+  // si sube volumen, quitar mute
+  if (audio.muted) audio.muted = false;
+
+  updateVolumeUI(audio.volume);
+});
+
+// botón mute
+muteBtn.addEventListener("click", () => {
+  audio.muted = !audio.muted;
+
+  if (audio.muted) {
+    muteIcon.textContent = "🔇";
+    volumeEmoji.textContent = "🔇";
+  } else {
+    updateVolumeUI(audio.volume);
+  }
+});
+
+// init UI
+updateVolumeUI(audio.volume);
+  
   // ================= AUDIO =================
   audio.preload = "none";
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
-
-  const savedVolume = localStorage.getItem("volume");
-  audio.volume = savedVolume !== null ? parseFloat(savedVolume) : 1;
-
   audio.addEventListener("volumechange", () => {
     localStorage.setItem("volume", audio.volume);
   });

@@ -1,4 +1,3 @@
-console.log("🔥 SONAR PLAYER JS ACTIVO");
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -28,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let isPlaying = false;
   let isMuted = false;
   let lastMeta = "";
+  let lastCover = "";
   let timer = null;
 
   // ================= STATUS =================
@@ -74,24 +74,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function setVisual(cover) {
 
     const showBg = getShowBackground();
-
-    // 🔥 prioridad:
-    // 1. programa en vivo
-    // 2. cover real
-    // 3. default
     const final = showBg || cover || DEFAULT_COVER;
 
     if (!final) return;
 
+    // 🔥 evita recargar misma imagen
+    if (final === lastCover) return;
+    lastCover = final;
+
     const img = new Image();
 
     img.onload = () => {
-      const url = final + "?v=" + Date.now();
-
-      stationCover.src = url;
-
-      // 🔥 FONDO REAL DINÁMICO
-      player.style.setProperty("--dynamic-bg", `url('${url}')`);
+      stationCover.src = final;
+      player.style.setProperty("--dynamic-bg", `url('${final}')`);
     };
 
     img.onerror = () => {
@@ -119,15 +114,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const currentMeta = artist + " - " + title;
 
-      // 🔥 SOLO evita duplicado EXACTO
+      // 🔥 evita duplicado REAL
       if (currentMeta === lastMeta) return;
       lastMeta = currentMeta;
 
-      // 🔥 actualizar UI SIEMPRE
       trackInfo.textContent = title;
       trackArtist.textContent = artist;
 
-      // 🔥 actualizar fondo SIEMPRE
       setVisual(data.cover);
 
       console.log("🎵 META OK:", currentMeta);

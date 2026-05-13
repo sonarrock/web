@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let isPlaying = false;
   let isMuted = false;
-  let lastKey = "";
+  let lastTitle = "";
   let timer = null;
 
   // ================= STATUS =================
@@ -52,20 +52,39 @@ document.addEventListener("DOMContentLoaded", () => {
     muteIcon.textContent = m ? "🔇" : "🔊";
   }
 
-  // ================= LIMPIEZA TEXTO =================
-  function cleanText(text = "") {
-    try { text = decodeURIComponent(text); } catch {}
-    return text.replace(/\+/g, " ").replace(/\s+/g, " ").trim();
+  // ================= PROGRAMAS EN VIVO =================
+  function getShowBackground() {
+    const d = new Date();
+    const day = d.getDay();
+    const hour = d.getHours();
+
+    // Miércoles 9pm+
+    if (day === 3 && hour >= 21) {
+      return "/attached_assets/session.jpg";
+    }
+
+    // Jueves 9pm+
+    if (day === 4 && hour >= 21) {
+      return "/attached_assets/ladoB.jpg";
+    }
+
+    return null;
   }
 
-  // ================= COVER + BACKGROUND =================
+  // ================= VISUAL =================
   function setVisual(cover) {
+    const showBg = getShowBackground();
+
+    const final = showBg || cover || DEFAULT_COVER;
+
     const img = new Image();
 
     img.onload = () => {
-      const url = cover + "?v=" + Date.now();
+      const url = final + "?v=" + Date.now();
 
       stationCover.src = url;
+
+      // 🔥 FONDO DINÁMICO REAL
       player.style.setProperty("--dynamic-bg", `url('${url}')`);
     };
 
@@ -74,26 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
       player.style.setProperty("--dynamic-bg", `url('${DEFAULT_COVER}')`);
     };
 
-    img.src = cover;
-  }
-
-  // ================= SHOW BACKGROUNDS =================
-  function getShowBackground() {
-    const d = new Date();
-    const day = d.getDay();
-    const hour = d.getHours();
-
-    // Miércoles 9pm–12am
-    if (day === 3 && hour >= 21) {
-      return "/attached_assets/session.jpg";
-    }
-
-    // Jueves 9pm–12am
-    if (day === 4 && hour >= 21) {
-      return "/attached_assets/ladoB.jpg";
-    }
-
-    return DEFAULT_COVER;
+    img.src = final;
   }
 
   // ================= METADATA =================
@@ -106,23 +106,20 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!res.ok) return;
 
       const data = await res.json();
-      if (!data?.title) return;
+      if (!data || !data.title) return;
 
-      const artist = cleanText(data.artist || "SONAR ROCK");
-      const title = cleanText(data.title || "Transmitiendo rock sin concesiones");
+      const artist = data.artist || "SONAR ROCK";
+      const title = data.title || "Transmitiendo rock";
 
-      const key = artist + " - " + title;
-      if (key === lastKey) return;
-      lastKey = key;
+      // 🔥 SOLO BLOQUEA SI ES EXACTAMENTE IGUAL
+      if (title === lastTitle) return;
+      lastTitle = title;
 
       trackInfo.textContent = title;
       trackArtist.textContent = artist;
 
-      // 🔥 USAR FONDO LOCAL SIEMPRE (ESTABLE)
-      const bg = getShowBackground();
-      setVisual(bg);
-
-      console.log("🎵 NOW:", key);
+      // 🔥 SI NO HAY COVER, USA PROGRAMA
+      setVisual(data.cover);
 
     } catch (e) {
       console.warn("metadata error", e);
@@ -192,6 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   audio.addEventListener("playing", () => setStatus("live"));
+  audio.addEventListener("waiting", () => isPlaying && setStatus("buffering"));
   audio.addEventListener("error", () => {
     setStatus("error");
     stopLoop();

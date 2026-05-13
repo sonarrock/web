@@ -180,11 +180,21 @@ updateVolumeUI(audio.volume);
 
   // ================= 🎨 BACKGROUND =================
   function updateDynamicBackground(imageUrl) {
-    if (!imageUrl) imageUrl = DEFAULT_COVER;
+  if (!imageUrl) imageUrl = DEFAULT_COVER;
 
-    player.style.setProperty("--dynamic-bg", `url('${imageUrl}')`);
+  // 🔥 asegurar URL absoluta SIEMPRE
+  let finalUrl = imageUrl;
+
+  if (!imageUrl.startsWith("http")) {
+    finalUrl = window.location.origin + imageUrl;
   }
 
+  // limpiar y evitar cache roto
+  finalUrl = finalUrl.replace("http://", "https://").split("?")[0] + "?v=" + Date.now();
+
+  // aplicar al CSS
+  player.style.setProperty("--dynamic-bg", `url("${finalUrl}")`);
+}
   // ================= COVER =================
   function setCover(url) {
     const fallback = DEFAULT_COVER;

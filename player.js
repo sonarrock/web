@@ -133,46 +133,67 @@ function updateBackground(imageUrl) {
     });
   }
 
-  // ================= METADATA =================
-  async function fetchMetadata() {
+// ================= METADATA =================
+async function fetchMetadata() {
+  try {
+    const res = await fetch(API_URL + "?t=" + Date.now(), { cache: "no-store" });
+
+    if (!res.ok) {
+      console.warn("API no respondió bien");
+      return;
+    }
+
+    const data = await res.json();
+
+    if (!data || !data.title) {
+      console.warn("Sin metadata válida");
+      return;
+    }
+
+    const title  = cleanText(data.title);
+    const artist = cleanText(data.artist || DEFAULT_ARTIST);
+
+    if (!title || title === lastTitle) return;
+    lastTitle = title;
+
+    // 🔥 ACTUALIZA TEXTO SIEMPRE
+    updateTrack(title, artist);
+
+    // ================= SPOTIFY =================
+    let cover = DEFAULT_COVER;
+
     try {
-      const res  = await fetch(API_URL + "?t=" + Date.now(), { cache: "no-store" });
-      const data = await res.json();
+      const spotifyRes = await fetch(
+        `${SPOTIFY_API}?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`
+      );
 
-      if (!data?.title) return;
-
-      const title  = cleanText(data.title);
-      const artist = cleanText(data.artist || DEFAULT_ARTIST);
-
-      if (title === lastTitle) return;
-      lastTitle = title;
-
-      updateTrack(title, artist);
-
-      let cover = DEFAULT_COVER;
-
-      try {
-        const spotifyRes  = await fetch(
-          `${SPOTIFY_API}?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`
-        );
+      if (spotifyRes.ok) {
         const spotifyData = await spotifyRes.json();
 
-        if (spotifyData?.cover) {
+        if (spotifyData && spotifyData.cover) {
           cover = spotifyData.cover;
         }
-      } catch (e) {
-        console.warn("Spotify cover error:", e);
       }
 
-      setCover(cover);
-      updateMediaSession(title, artist, cover);
-      showToast(`${artist} - ${title}`);
-
     } catch (e) {
-      console.warn("Metadata fetch error:", e);
+      console.warn("Spotify cover error:", e);
     }
-  }
 
+    // 🔥 ASEGURAR QUE SIEMPRE SE EJECUTA
+    setCover(cover);
+    updateMediaSession(title, artist, cover);
+    showToast(`${artist} - ${title}`);
+
+    // 🔥 FONDO DINÁMICO CORRECTO (EL BUENO)
+    const player = document.querySelector(".sonar-player");
+    if (player && cover) {
+      player.style.setProperty("--dynamic-bg", `url('${cover}')`);
+    }
+
+  } catch (e) {
+    console.warn("Metadata fetch error:", e);
+  }
+}
   // ================= METADATA LOOP =================
   function startMetadata() {
     stopMetadata();

@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ================= AUDIO CONFIG =================
   // crossOrigin removido: puede bloquear el stream si el servidor
   // no envía headers CORS. No es necesario para radio en línea.
-  audio.preload = "none";
+  audio.preload = "auto";
   audio.setAttribute("playsinline", "");
   audio.setAttribute("webkit-playsinline", "");
 
@@ -181,27 +181,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ================= PLAY =================
-  async function playStream() {
-    try {
-      setStatus("loading");
+async function playStream() {
+  try {
 
-      // Cache-buster universal: evita que el navegador sirva
-      // una conexión cacheada o cortada, en todos los dispositivos.
-      audio.src = STREAM_URL + "?t=" + Date.now();
-      audio.load();
-      await audio.play();
+    setStatus("loading");
 
-      updatePlayUI(true);
-      setStatus("live");
-      startMetadata();
-
-    } catch (e) {
-      console.warn("Play error:", e);
-      setStatus("ready");
-      updatePlayUI(false);
+    // NO recrear conexión cada play
+    if (!audio.src) {
+      audio.src = STREAM_URL;
     }
-  }
 
+    // Intentar reproducir inmediatamente
+    const playPromise = audio.play();
+
+    if (playPromise !== undefined) {
+      await playPromise;
+    }
+
+    updatePlayUI(true);
+    setStatus("live");
+    startMetadata();
+
+  } catch (e) {
+
+    console.warn("Play error:", e);
+
+    setStatus("ready");
+    updatePlayUI(false);
+  }
+}
   function pauseStream() {
     audio.pause();
     audio.src = "";   // libera la conexión al servidor

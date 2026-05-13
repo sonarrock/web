@@ -1,3 +1,5 @@
+console.log("🔥 SONAR PLAYER JS ACTIVO");
+
 document.addEventListener("DOMContentLoaded", () => {
 
   // ================= ELEMENTOS =================

@@ -1,5 +1,5 @@
 /* =========================================
-   SONAR ROCK PLAYER — SPOTIFY PRO
+   SONAR ROCK PLAYER — SPOTIFY PRO (CLEAN)
 ========================================= */
 
 :root {
@@ -19,7 +19,7 @@
 }
 
 /* =========================
-   PLAYER BASE (🔥 LIMPIO)
+   PLAYER BASE (🔥 NÍTIDO)
 ========================= */
 
 .sonar-player {
@@ -32,7 +32,7 @@
 
   min-height: 320px;
 
-  /* 🔥 SOLO IMAGEN (SIN DOBLE NEGRO) */
+  /* 🔥 IMAGEN LIMPIA */
   background: var(--dynamic-bg);
   background-size: cover;
   background-position: center;
@@ -40,8 +40,9 @@
   border: 1px solid rgba(255,255,255,0.12);
   box-shadow: var(--sr-shadow);
 
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* ❌ eliminado efecto vidrio */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 
   display: grid;
   grid-template-columns: 1fr 260px;
@@ -50,6 +51,10 @@
 
   transition: var(--sr-transition);
 }
+
+/* =========================
+   BOTONES
+========================= */
 
 #playBtn, #muteBtn {
   background: linear-gradient(145deg, #e0e0e0, #9a9a9a);
@@ -73,7 +78,10 @@
   height: 4px;
 }
 
-/* 🔥 CAPA BLUR (LA MAGIA) */
+/* =========================
+   FONDO (SIN BLUR)
+========================= */
+
 .sonar-player::before {
   content: "";
   position: absolute;
@@ -83,23 +91,24 @@
   background-size: cover;
   background-position: center;
 
-  transform: scale(1.15);
-  filter: blur(22px);
+  /* ❌ eliminado blur */
+  filter: none;
+  transform: none;
 
-  opacity: 0.75; /* 🔥 MÁS VIVO */
+  opacity: 1;
 
   z-index: 0;
 }
 
-/* 🔥 OVERLAY SUAVE (NO MATA LA IMAGEN) */
+/* 🔥 OVERLAY SUAVE (solo contraste) */
 .sonar-player::after {
   content: "";
   position: absolute;
   inset: 0;
 
   background: linear-gradient(
-    rgba(0,0,0,0.15),
-    rgba(0,0,0,0.35)
+    rgba(0,0,0,0.25),
+    rgba(0,0,0,0.45)
   );
 
   z-index: 0;
@@ -124,9 +133,9 @@
 }
 
 @keyframes liveGlow {
-  0%   { opacity: 0.6; }
-  50%  { opacity: 0.85; }
-  100% { opacity: 0.6; }
+  0%   { opacity: 0.7; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.7; }
 }
 
 /* =========================
@@ -213,7 +222,7 @@
 }
 
 /* =========================
-   MOBILE FIX REAL 🔥
+   MOBILE FIX 🔥
 ========================= */
 
 @media (max-width: 768px) {
@@ -223,7 +232,6 @@
     padding: 18px;
     gap: 20px;
 
-    /* 🔥 SI FALLA BG DINÁMICO, NO NEGRO */
     background-color: #111;
   }
 
@@ -237,17 +245,16 @@
     height: 110px;
   }
 
-  /* 🔥 MENOS BLUR PARA QUE NO MUERA */
+  /* 🔥 sin blur en móvil */
   .sonar-player::before {
-    filter: blur(14px);
-    opacity: 0.85;
+    filter: none;
+    opacity: 1;
   }
 
-  /* 🔥 CASI SIN NEGRO */
   .sonar-player::after {
     background: linear-gradient(
-      rgba(0,0,0,0.1),
-      rgba(0,0,0,0.25)
+      rgba(0,0,0,0.2),
+      rgba(0,0,0,0.35)
     );
   }
 }

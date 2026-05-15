@@ -247,7 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.addEventListener("error",   () => { setStatus("error"); stopMetaLoop(); updatePlayUI(false); });
 
   // ── INIT ──────────────────────────────────────────────────
-  trackInfo.textContent   = "Transmitiendo rock sin concesiones";
+  trackInfo.textContent   = "Transmitiendo rock sin payola!";
   trackArtist.textContent = "SONAR ROCK";
 
   setStatus("ready");

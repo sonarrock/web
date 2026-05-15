@@ -125,34 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     toastTimer = setTimeout(() => songToast.classList.remove("toast-visible"), 4000);
   }
 
-  // ── MINI PLAYER ───────────────────────────────────────────
-  function updateMiniUI(p) {
-    if (!miniPlayIcon) return;
-    miniPlayIcon.textContent = p ? "❚❚" : "▶";
-    if (miniLiveDot) miniLiveDot.classList.toggle("mini-live-dot--active", p);
-  }
-
-  function updateMiniStatus(s) {
-    if (!miniStatus) return;
-    miniStatus.textContent = STATUS_MAP[s] ?? s;
-  }
-
-
-  const STATUS_MAP = {
-    loading:  "Conectando…",
-    live:     "En vivo",
-    buffering:"Buffering…",
-    paused:   "Pausado",
-    error:    "Sin señal",
-    ready:    "Listo para reproducir"
-  };
-
-  function setStatus(s) {
-    if (statusText) statusText.textContent = STATUS_MAP[s] ?? s;
-    if (statusDot)  statusDot.className    = `status-dot status-${s}`;
-    updateMiniStatus(s);
-  }
-
+  
   // ── UI ────────────────────────────────────────────────────
   function updatePlayUI(p) {
     isPlaying            = p;

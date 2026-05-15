@@ -1,26 +1,20 @@
 /* =========================================
-   SONAR ROCK PLAYER — SPOTIFY PRO (CLEAN)
+   SONAR ROCK PLAYER — OPTIMIZADO
 ========================================= */
 
 :root {
-  --sr-primary: #ff7a1a;
-  --sr-text: #ffffff;
-  --sr-subtext: #cfcfcf;
-  --sr-muted: #9a9a9a;
-  --sr-live: #ff3b3b;
-
-  --sr-silver: linear-gradient(145deg, #dcdcdc, #8a8a8a);
-
-  --sr-radius: 24px;
-  --sr-shadow: 0 18px 45px rgba(0,0,0,0.4);
+  --sr-primary:    #ff7a1a;
+  --sr-text:       #ffffff;
+  --sr-subtext:    #cfcfcf;
+  --sr-muted:      #9a9a9a;
+  --sr-live:       #ff3b3b;
+  --sr-radius:     24px;
+  --sr-shadow:     0 18px 45px rgba(0,0,0,0.4);
   --sr-transition: all .4s ease;
-
-  --dynamic-bg: none;
+  --dynamic-bg:    none;
 }
 
-/* =========================
-   PLAYER BASE (🔥 NÍTIDO)
-========================= */
+/* ── PLAYER BASE ─────────────────────────── */
 
 .sonar-player {
   position: relative;
@@ -29,20 +23,12 @@
   padding: 28px;
   border-radius: var(--sr-radius);
   overflow: hidden;
-
   min-height: 320px;
 
-  /* 🔥 IMAGEN LIMPIA */
-  background: var(--dynamic-bg);
-  background-size: cover;
-  background-position: center;
+  background: var(--dynamic-bg, #111) center/cover no-repeat;
 
   border: 1px solid rgba(255,255,255,0.12);
   box-shadow: var(--sr-shadow);
-
-  /* ❌ eliminado efecto vidrio */
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
 
   display: grid;
   grid-template-columns: 1fr 260px;
@@ -52,11 +38,32 @@
   transition: var(--sr-transition);
 }
 
-/* =========================
-   BOTONES
-========================= */
+/* Overlay de contraste (sin ::before para evitar duplicar fondo) */
+.sonar-player::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.50));
+  z-index: 0;
+  pointer-events: none;
+}
 
-#playBtn, #muteBtn {
+.sonar-player > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── SHOW LIVE ───────────────────────────── */
+
+.sonar-player.show-live {
+  border-color: rgba(255,59,59,0.45);
+  box-shadow: 0 0 40px rgba(255,59,59,0.25), var(--sr-shadow);
+}
+
+/* ── BOTONES ─────────────────────────────── */
+
+#playBtn,
+#muteBtn {
   background: linear-gradient(145deg, #e0e0e0, #9a9a9a);
   border: none;
   border-radius: 50%;
@@ -66,81 +73,34 @@
   font-size: 18px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+  /* 🔥 Sin delay visual en mobile */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
-#playBtn:hover, #muteBtn:hover {
-  transform: scale(1.05);
+#playBtn:hover,
+#muteBtn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.4);
 }
+
+#playBtn:active,
+#muteBtn:active {
+  transform: scale(0.95);
+}
+
+/* ── VOLUMEN ─────────────────────────────── */
 
 .volume-slider {
   width: 100%;
   accent-color: silver;
   height: 4px;
+  cursor: pointer;
 }
 
-/* =========================
-   FONDO (SIN BLUR)
-========================= */
-
-.sonar-player::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-
-  background: var(--dynamic-bg);
-  background-size: cover;
-  background-position: center;
-
-  /* ❌ eliminado blur */
-  filter: none;
-  transform: none;
-
-  opacity: 1;
-
-  z-index: 0;
-}
-
-/* 🔥 OVERLAY SUAVE (solo contraste) */
-.sonar-player::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-
-  background: linear-gradient(
-    rgba(0,0,0,0.25),
-    rgba(0,0,0,0.45)
-  );
-
-  z-index: 0;
-}
-
-.sonar-player > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* =========================
-   🎙️ SHOW MODE
-========================= */
-
-.sonar-player.show-live {
-  border: 1px solid rgba(255,59,59,0.4);
-  box-shadow: 0 0 40px rgba(255,59,59,0.25);
-}
-
-.sonar-player.show-live::before {
-  animation: liveGlow 6s ease-in-out infinite;
-}
-
-@keyframes liveGlow {
-  0%   { opacity: 0.7; }
-  50%  { opacity: 1; }
-  100% { opacity: 0.7; }
-}
-
-/* =========================
-   LAYOUT
-========================= */
+/* ── LAYOUT ──────────────────────────────── */
 
 .player-left {
   display: grid;
@@ -155,9 +115,7 @@
   gap: 26px;
 }
 
-/* =========================
-   COVER
-========================= */
+/* ── COVER ───────────────────────────────── */
 
 .cover-wrap {
   width: 120px;
@@ -169,9 +127,7 @@
   height: 100%;
   border-radius: 18px;
   object-fit: cover;
-
   box-shadow: 0 12px 25px rgba(0,0,0,0.4);
-
   transition: transform .4s ease, box-shadow .4s ease;
 }
 
@@ -180,9 +136,7 @@
   box-shadow: 0 18px 40px rgba(0,0,0,0.6);
 }
 
-/* =========================
-   TEXTO
-========================= */
+/* ── TEXTO ───────────────────────────────── */
 
 .eyebrow {
   font-size: .75rem;
@@ -205,9 +159,8 @@
 }
 
 @keyframes pulseLive {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-  100% { transform: scale(1); }
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.08); }
 }
 
 .sonar-track-title {
@@ -221,9 +174,54 @@
   color: var(--sr-subtext);
 }
 
-/* =========================
-   MOBILE FIX 🔥
-========================= */
+/* ── STATUS DOT ──────────────────────────── */
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  background: var(--sr-muted);
+  transition: background .3s;
+}
+
+.status-dot.status-live     { background: var(--sr-live); animation: pulseLive 1.5s infinite; }
+.status-dot.status-loading  { background: #ffcc00; }
+.status-dot.status-buffering{ background: #ffcc00; }
+.status-dot.status-error    { background: #ff3b3b; }
+.status-dot.status-paused,
+.status-dot.status-ready    { background: var(--sr-muted); }
+
+/* ── HISTORIAL ───────────────────────────── */
+
+.history-title {
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--sr-muted);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+.history-item {
+  font-size: .78rem;
+  color: var(--sr-subtext);
+  padding: 2px 0;
+  opacity: .75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-item.history-now {
+  color: var(--sr-primary);
+  opacity: 1;
+  font-weight: 600;
+}
+
+/* ── MOBILE ──────────────────────────────── */
 
 @media (max-width: 768px) {
 
@@ -231,8 +229,7 @@
     grid-template-columns: 1fr;
     padding: 18px;
     gap: 20px;
-
-    background-color: #111;
+    background-color: #111; /* fallback si la imagen no carga */
   }
 
   .player-left {
@@ -243,18 +240,6 @@
   .cover-wrap {
     width: 110px;
     height: 110px;
-  }
-
-  /* 🔥 sin blur en móvil */
-  .sonar-player::before {
-    filter: none;
-    opacity: 1;
-  }
-
-  .sonar-player::after {
-    background: linear-gradient(
-      rgba(0,0,0,0.2),
-      rgba(0,0,0,0.35)
-    );
+    margin: 0 auto;
   }
 }

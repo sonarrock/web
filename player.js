@@ -16,6 +16,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const player       = document.querySelector(".sonar-player");
   const historyList  = document.getElementById("historyList");
 
+  // Mini player (mobile)
+  const miniPlayer   = document.getElementById("miniPlayer");
+  const miniPlayBtn  = document.getElementById("miniPlayBtn");
+  const miniPlayIcon = document.getElementById("miniPlayIcon");
+  const miniStatus   = document.getElementById("miniStatus");
+  const miniLiveDot  = document.getElementById("miniLiveDot");
+
+  // Toast
+  const songToast    = document.getElementById("songToast");
+  const toastSong    = document.getElementById("toastSong");
+
   if (!audio || !playBtn) return;
 
   // ── CONSTANTES ─────────────────────────────────────────────
@@ -104,7 +115,29 @@ document.addEventListener("DOMContentLoaded", () => {
         .join("");
   }
 
-  // ── STATUS ────────────────────────────────────────────────
+  // ── TOAST ────────────────────────────────────────────────
+  let toastTimer = null;
+  function showToast(artist, title) {
+    if (!songToast || !toastSong) return;
+    toastSong.textContent = `${artist} — ${title}`;
+    songToast.classList.add("toast-visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => songToast.classList.remove("toast-visible"), 4000);
+  }
+
+  // ── MINI PLAYER ───────────────────────────────────────────
+  function updateMiniUI(p) {
+    if (!miniPlayIcon) return;
+    miniPlayIcon.textContent = p ? "❚❚" : "▶";
+    if (miniLiveDot) miniLiveDot.classList.toggle("mini-live-dot--active", p);
+  }
+
+  function updateMiniStatus(s) {
+    if (!miniStatus) return;
+    miniStatus.textContent = STATUS_MAP[s] ?? s;
+  }
+
+
   const STATUS_MAP = {
     loading:  "Conectando…",
     live:     "En vivo",
@@ -117,14 +150,16 @@ document.addEventListener("DOMContentLoaded", () => {
   function setStatus(s) {
     if (statusText) statusText.textContent = STATUS_MAP[s] ?? s;
     if (statusDot)  statusDot.className    = `status-dot status-${s}`;
+    updateMiniStatus(s);
   }
 
   // ── UI ────────────────────────────────────────────────────
   function updatePlayUI(p) {
-    isPlaying           = p;
+    isPlaying            = p;
     playIcon.textContent = p ? "❚❚" : "▶";
     player.classList.toggle("playing", p);
     playBtn.setAttribute("aria-label", p ? "Pausar" : "Reproducir");
+    updateMiniUI(p);
   }
 
   function updateMuteUI(m) {
@@ -156,6 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
         lastMeta = meta;
         trackInfo.textContent   = title;
         trackArtist.textContent = artist;
+        showToast(artist, title);   // 🔥 notificación visual de canción nueva
       }
 
       // Siempre intenta actualizar el fondo (show puede haber cambiado)
@@ -236,6 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ── EVENTOS ───────────────────────────────────────────────
   playBtn.addEventListener("click", toggle);
   muteBtn.addEventListener("click", toggleMute);
+  if (miniPlayBtn) miniPlayBtn.addEventListener("click", toggle);  // 🔥 mini player mobile
 
   if (volumeCtrl) {
     volumeCtrl.addEventListener("input", e => setVolume(parseFloat(e.target.value)));
@@ -247,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
   audio.addEventListener("error",   () => { setStatus("error"); stopMetaLoop(); updatePlayUI(false); });
 
   // ── INIT ──────────────────────────────────────────────────
-  trackInfo.textContent   = "Transmitiendo rock sin payola!";
+  trackInfo.textContent   = "Transmitiendo rock sin concesiones";
   trackArtist.textContent = "SONAR ROCK";
 
   setStatus("ready");

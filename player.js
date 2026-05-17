@@ -398,8 +398,22 @@ document.addEventListener("DOMContentLoaded", () => {
       lastTitle = title;
  
       if (trackInfo) {
-        trackInfo.textContent = title;
-      }
+
+  trackInfo.textContent = title;
+
+  requestAnimationFrame(() => {
+
+    trackInfo.classList.remove("marquee-active");
+
+    if (
+      trackInfo.scrollWidth >
+      trackInfo.clientWidth
+    ) {
+
+      trackInfo.classList.add("marquee-active");
+    }
+  });
+}
 
       if (trackArtist) {
         trackArtist.textContent = artist;

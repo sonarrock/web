@@ -23,19 +23,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // ── CONSTANTES ─────────────────────────────────────────────
   const STREAM_URL      = "https://giss.tv:667/sonarrock.mp3";
   const API_URL         = "https://sonarrock-api.cmrm1982.workers.dev/";
-  const DEFAULT_COVER   = "/attached_assets/logo_1749601460841.jpeg";
-  const META_INTERVAL   = 5_000;
+  const SPOTIFY_API     = "https://sonarrock-spotify.cmrm1982.workers.dev/";
+  const DEFAULT_COVER   = window.location.origin + "/attached_assets/logo_1749601460841.jpeg";
+  const DEFAULT_TRACK   = "Transmitiendo rock sin concesiones";
+  const DEFAULT_ARTIST  = "SONAR ROCK";
+  const META_INTERVAL   = 6_000;
   const SHOW_INTERVAL   = 30_000;
-  const STALL_TIMEOUT   = 8_000;   // ms de silencio antes de reconectar
-  const RECONNECT_DELAY = 3_000;   // ms entre intentos
+  const STALL_TIMEOUT   = 8_000;
+  const RECONNECT_DELAY = 3_000;
   const MAX_RECONNECTS  = 10;
  
   // ── ESTADO ─────────────────────────────────────────────────
   let isPlaying      = false;
   let isMuted        = false;
-  let lastMeta       = "";
-  let lastBg         = "";
-  let lastCover      = "";
+  let lastTitle      = "";
+  let lastCover      = DEFAULT_COVER;
   let metaTimer      = null;
   let showTimer      = null;
   let toastTimer     = null;
@@ -61,6 +63,50 @@ document.addEventListener("DOMContentLoaded", () => {
     if (statusDot)  statusDot.className    = `status-dot ${s.dot}`.trim();
   }
  
+  // ── LIMPIEZA DE TEXTO ──────────────────────────────────────
+  function cleanText(text = "") {
+    try { text = decodeURIComponent(text); } catch {}
+    return text
+      .replace(/\+/g,     " ")
+      .replace(/%20/g,    " ")
+      .replace(/&amp;/g,  "&")
+      .replace(/&#39;/g,  "'")
+      .replace(/&quot;/g, '"')
+      .replace(/\s+/g,    " ")
+      .trim();
+  }
+ 
+  // ── FONDO DINÁMICO ─────────────────────────────────────────
+  function updateBackground(imageUrl) {
+    document.body.style.backgroundImage    = `url('${imageUrl}')`;
+    document.body.style.backgroundSize     = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundRepeat   = "no-repeat";
+    document.body.style.transition         = "background-image 0.6s ease-in-out";
+  }
+ 
+  // ── PORTADA ────────────────────────────────────────────────
+  function setCover(url) {
+    if (!stationCover) return;
+    const finalUrl = url
+      ? url.replace("http://", "https://").split("?")[0]
+      : DEFAULT_COVER;
+ 
+    const img     = new Image();
+    img.onload    = () => {
+      const withCache = finalUrl + "?v=" + Date.now();
+      stationCover.src = withCache;
+      updateBackground(withCache);
+      lastCover = withCache;
+    };
+    img.onerror   = () => {
+      stationCover.src = DEFAULT_COVER;
+      updateBackground(DEFAULT_COVER);
+      lastCover = DEFAULT_COVER;
+    };
+    img.src = finalUrl;
+  }
+ 
   // ── PROGRAMAS EN VIVO ──────────────────────────────────────
   function getLiveShowImage() {
     const d    = new Date();
@@ -71,33 +117,16 @@ document.addEventListener("DOMContentLoaded", () => {
     return null;
   }
  
-  // ── FONDO DINÁMICO ─────────────────────────────────────────
-  function applyBackground(url) {
-    if (!url || url === lastBg) return;
-    lastBg = url;
-    const img   = new Image();
-    img.onload  = () => {
-      player.style.setProperty("--dynamic-bg", `url('${url}')`);
-      if (stationCover) stationCover.src = url;
-    };
-    img.onerror = () => {
-      player.style.setProperty("--dynamic-bg", `url('${DEFAULT_COVER}')`);
-      if (stationCover) stationCover.src = DEFAULT_COVER;
-    };
-    img.src = url;
-  }
- 
-  function refreshBackground(coverFromApi) {
+  function checkLiveShow() {
     const showImg = getLiveShowImage();
-    if (coverFromApi) lastCover = coverFromApi;
-    applyBackground(showImg || lastCover || DEFAULT_COVER);
     player.classList.toggle("show-live", !!showImg);
+    if (showImg) setCover(showImg);
   }
  
   function startShowLoop() {
     stopShowLoop();
-    refreshBackground(null);
-    showTimer = setInterval(() => refreshBackground(null), SHOW_INTERVAL);
+    checkLiveShow();
+    showTimer = setInterval(checkLiveShow, SHOW_INTERVAL);
   }
  
   function stopShowLoop() {
@@ -120,12 +149,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
  
   // ── TOAST ──────────────────────────────────────────────────
-  function showToast(artist, title) {
+  function showToast(text) {
     if (!songToast || !toastSong) return;
-    toastSong.textContent = `${artist} — ${title}`;
-    songToast.classList.add("toast-visible");
+    toastSong.textContent = text;
+    songToast.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => songToast.classList.remove("toast-visible"), 4000);
+    toastTimer = setTimeout(() => songToast.classList.remove("show"), 3000);
   }
  
   // ── UI ─────────────────────────────────────────────────────
@@ -143,29 +172,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (volumeEmoji) volumeEmoji.textContent = m ? "🔇" : "🔊";
   }
  
-  // ══════════════════════════════════════════════════════════
-  // 🆕 MEJORA 1 — MEDIA SESSION API
-  // Controles en pantalla de bloqueo y auriculares bluetooth
-  // ══════════════════════════════════════════════════════════
-  function updateMediaSession(artist, title, coverUrl) {
+  // ── MEDIA SESSION API ──────────────────────────────────────
+  function updateMediaSession(title, artist, cover) {
     if (!("mediaSession" in navigator)) return;
     navigator.mediaSession.metadata = new MediaMetadata({
-      title:   title  || "Sonar Rock",
-      artist:  artist || "SONAR ROCK",
-      album:   "En vivo",
-      artwork: [
-        { src: coverUrl || DEFAULT_COVER, sizes: "512x512", type: "image/jpeg" },
-      ],
+      title,
+      artist,
+      album:   "Sonar Rock",
+      artwork: [{ src: cover, sizes: "512x512", type: "image/png" }]
     });
-    navigator.mediaSession.setActionHandler("play",  () => play());
-    navigator.mediaSession.setActionHandler("pause", () => pause());
-    navigator.mediaSession.setActionHandler("stop",  () => pause());
+    navigator.mediaSession.setActionHandler("play",  () => playStream());
+    navigator.mediaSession.setActionHandler("pause", () => pauseStream());
+    navigator.mediaSession.setActionHandler("stop",  () => pauseStream());
   }
  
-  // ══════════════════════════════════════════════════════════
-  // 🆕 MEJORA 2 — NOTIFICACIONES DE CANCIÓN NUEVA
-  // Avisa cuando cambia la rola si el usuario está en otra pestaña
-  // ══════════════════════════════════════════════════════════
+  // ── NOTIFICACIONES ─────────────────────────────────────────
   async function requestNotifPermission() {
     if (!("Notification" in window)) return;
     if (Notification.permission === "default") {
@@ -173,16 +194,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
  
-  function sendSongNotification(artist, title, coverUrl) {
+  function sendSongNotification(artist, title, cover) {
     if (!("Notification" in window)) return;
     if (Notification.permission !== "granted") return;
-    if (document.visibilityState === "visible") return; // solo si está en otra pestaña
+    if (document.visibilityState === "visible") return;
     try {
       new Notification("🎸 Sonar Rock — Nueva canción", {
         body:   `${artist} — ${title}`,
-        icon:   coverUrl || DEFAULT_COVER,
+        icon:   cover || DEFAULT_COVER,
         silent: true,
-        tag:    "sonarrock-song",  // reemplaza la anterior, no apila
+        tag:    "sonarrock-song",
       });
     } catch (e) {
       console.warn("notificación fallida:", e);
@@ -190,43 +211,59 @@ document.addEventListener("DOMContentLoaded", () => {
   }
  
   // ── METADATA ───────────────────────────────────────────────
-  async function fetchMeta() {
+  async function fetchMetadata() {
     try {
-      const res = await fetch(`${API_URL}?t=${Date.now()}`, { cache: "no-store" });
-      if (!res.ok) return;
- 
+      const res  = await fetch(API_URL + "?t=" + Date.now(), { cache: "no-store" });
       const data = await res.json();
+ 
       if (!data?.title) return;
  
-      const artist = data.artist || "SONAR ROCK";
-      const title  = data.title  || "Transmitiendo rock";
-      const cover  = data.cover  || lastCover || DEFAULT_COVER;
-      const meta   = `${artist}|||${title}`;
+      const title  = cleanText(data.title);
+      const artist = cleanText(data.artist || DEFAULT_ARTIST);
  
-      if (meta !== lastMeta) {
-        if (lastMeta) {
-          const [pa, pt] = lastMeta.split("|||");
-          pushHistory(pa, pt);
+      if (title === lastTitle) return;
+ 
+      // Guarda la canción anterior en historial
+      if (lastTitle) pushHistory(
+        trackArtist?.textContent || DEFAULT_ARTIST,
+        lastTitle
+      );
+      lastTitle = title;
+ 
+      if (trackInfo)   trackInfo.textContent   = title;
+      if (trackArtist) trackArtist.textContent = artist;
+ 
+      // Solo actualiza portada si no hay show en vivo
+      if (!getLiveShowImage()) {
+        let cover = DEFAULT_COVER;
+        try {
+          const spotifyRes  = await fetch(
+            `${SPOTIFY_API}?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`
+          );
+          const spotifyData = await spotifyRes.json();
+          if (spotifyData?.cover) cover = spotifyData.cover;
+        } catch (e) {
+          console.warn("Spotify cover error:", e);
         }
-        lastMeta = meta;
-        if (trackInfo)   trackInfo.textContent   = title;
-        if (trackArtist) trackArtist.textContent = artist;
-        showToast(artist, title);
-        sendSongNotification(artist, title, cover);  // 🆕
-        updateMediaSession(artist, title, cover);     // 🆕
+        setCover(cover);
+        updateMediaSession(title, artist, cover);
+        sendSongNotification(artist, title, cover);
+      } else {
+        updateMediaSession(title, artist, lastCover);
+        sendSongNotification(artist, title, lastCover);
       }
  
-      refreshBackground(data.cover || null);
+      showToast(`${artist} - ${title}`);
  
     } catch (e) {
-      console.warn("metadata error", e);
+      console.warn("Metadata fetch error:", e);
     }
   }
  
   function startMetaLoop() {
     stopMetaLoop();
-    fetchMeta();
-    metaTimer = setInterval(fetchMeta, META_INTERVAL);
+    fetchMetadata();
+    metaTimer = setInterval(fetchMetadata, META_INTERVAL);
   }
  
   function stopMetaLoop() {
@@ -234,10 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
     metaTimer = null;
   }
  
-  // ══════════════════════════════════════════════════════════
-  // 🆕 MEJORA 3 — RECONEXIÓN AUTOMÁTICA
-  // Si el stream se cae, reintenta hasta MAX_RECONNECTS veces
-  // ══════════════════════════════════════════════════════════
+  // ── RECONEXIÓN AUTOMÁTICA ──────────────────────────────────
   function clearStallTimer() {
     if (stallTimer) clearTimeout(stallTimer);
     stallTimer = null;
@@ -262,7 +296,8 @@ document.addEventListener("DOMContentLoaded", () => {
     reconnectTimer = setTimeout(async () => {
       if (!isPlaying) return;
       try {
-        audio.src = STREAM_URL;
+        audio.src = STREAM_URL + "?t=" + Date.now();
+        audio.load();
         await audio.play();
         reconnectCount = 0;
         setStatus("live");
@@ -284,34 +319,33 @@ document.addEventListener("DOMContentLoaded", () => {
   }
  
   // ── PLAYER ─────────────────────────────────────────────────
-  async function play() {
+  async function playStream() {
     try {
       setStatus("loading");
       reconnectCount = 0;
  
-      if (!audio.src || !audio.src.includes("sonarrock")) {
-        audio.src = STREAM_URL;
-      }
- 
+      audio.src = STREAM_URL + "?t=" + Date.now();
+      audio.load();
       await audio.play();
+ 
       updatePlayUI(true);
       setStatus("live");
       startMetaLoop();
       await requestNotifPermission();
       updateMediaSession(
-        trackArtist?.textContent || "SONAR ROCK",
-        trackInfo?.textContent   || "Transmitiendo rock sin concesiones",
-        lastCover || DEFAULT_COVER
+        trackArtist?.textContent || DEFAULT_ARTIST,
+        trackInfo?.textContent   || DEFAULT_TRACK,
+        lastCover
       );
  
     } catch (e) {
-      console.warn("play error:", e);
-      setStatus("error");
+      console.warn("Play error:", e);
+      setStatus("ready");
       updatePlayUI(false);
     }
   }
  
-  function pause() {
+  function pauseStream() {
     clearStallTimer();
     clearReconnectTimer();
     reconnectCount = 0;
@@ -325,14 +359,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
  
-  function toggle() {
-    isPlaying ? pause() : play();
+  function togglePlay() {
+    isPlaying ? pauseStream() : playStream();
   }
  
   // ── VOLUMEN ────────────────────────────────────────────────
-  function toggleMute() {
-    updateMuteUI(!isMuted);
-  }
+  function toggleMute() { updateMuteUI(!isMuted); }
  
   function setVolume(v) {
     audio.volume = v;
@@ -372,16 +404,18 @@ document.addEventListener("DOMContentLoaded", () => {
   });
  
   // ── EVENTOS DE CONTROLES ───────────────────────────────────
-  playBtn.addEventListener("click", toggle);
+  playBtn.addEventListener("click", togglePlay);
   if (muteBtn)    muteBtn.addEventListener("click", toggleMute);
   if (volumeCtrl) volumeCtrl.addEventListener("input", e => setVolume(parseFloat(e.target.value)));
  
   // ── INIT ───────────────────────────────────────────────────
-  if (trackInfo)   trackInfo.textContent   = "Transmitiendo rock sin concesiones";
-  if (trackArtist) trackArtist.textContent = "SONAR ROCK";
+  if (trackInfo)   trackInfo.textContent   = DEFAULT_TRACK;
+  if (trackArtist) trackArtist.textContent = DEFAULT_ARTIST;
  
+  setCover(DEFAULT_COVER);
   setStatus("ready");
   startShowLoop();
  
 });
+ 
  

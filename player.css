@@ -243,3 +243,86 @@
     margin: 0 auto;
   }
 }
+
+/* =========================================
+   SONAR ROCK — CINEMATIC COVER TRANSITIONS
+========================================= */
+
+/* portada principal */
+#stationCover {
+
+  transition:
+    opacity .45s ease,
+    transform .45s ease,
+    filter .45s ease;
+
+  will-change:
+    opacity,
+    transform,
+    filter;
+
+  transform: scale(1);
+
+  backface-visibility: hidden;
+}
+
+/* animación cuando cambia canción */
+#stationCover.cover-changing {
+
+  opacity: .82;
+
+  transform: scale(1.035);
+
+  filter: blur(1px);
+}
+
+/* fondo dinámico más suave */
+#sonarPlayer::before {
+
+  transition:
+    opacity 1s ease,
+    filter 1s ease,
+    transform 1.2s ease !important;
+
+  filter:
+    blur(38px)
+    saturate(1.25)
+    brightness(.72);
+
+  transform: scale(1.08);
+}
+
+/* glow premium */
+#sonarPlayer::after {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255,122,26,.18),
+      transparent 70%
+    );
+
+  mix-blend-mode: screen;
+
+  opacity: .9;
+
+  z-index: 0;
+}
+
+/* asegura capas */
+.player-content,
+.player-controls,
+.player-meta {
+
+  position: relative;
+
+  z-index: 2;
+}

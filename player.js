@@ -13,21 +13,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const stationCover = document.getElementById("stationCover");
   const statusText   = document.getElementById("statusText");
   const statusDot    = document.getElementById("statusDot");
-  const player       = document.querySelector(".sonar-player");
+  const player       = document.getElementById("sonarPlayer");
   const historyList  = document.getElementById("historyList");
-
-  // Mini player (mobile)
-  const miniPlayer   = document.getElementById("miniPlayer");
-  const miniPlayBtn  = document.getElementById("miniPlayBtn");
-  const miniPlayIcon = document.getElementById("miniPlayIcon");
-  const miniStatus   = document.getElementById("miniStatus");
-  const miniLiveDot  = document.getElementById("miniLiveDot");
-
-  // Toast
   const songToast    = document.getElementById("songToast");
   const toastSong    = document.getElementById("toastSong");
 
-  if (!audio || !playBtn) return;
+  // Guardia principal: si faltan elementos críticos, no arranca nada
+  if (!audio || !playBtn || !player) return;
 
   // ── CONSTANTES ─────────────────────────────────────────────
   const STREAM_URL    = "https://giss.tv:667/sonarrock.mp3";
@@ -36,62 +28,69 @@ document.addEventListener("DOMContentLoaded", () => {
   const META_INTERVAL = 5_000;   // ms entre fetch de metadata
   const SHOW_INTERVAL = 30_000;  // ms entre revisiones de horario en vivo
 
-  // ── ESTADO ────────────────────────────────────────────────
-  let isPlaying  = false;
-  let isMuted    = false;
-  let lastMeta   = "";
-  let lastBg     = "";           // última URL aplicada al fondo
-  let metaTimer  = null;
-  let showTimer  = null;
-  const history  = [];           // máx 5 canciones anteriores
+  // ── ESTADO ─────────────────────────────────────────────────
+  let isPlaying = false;
+  let isMuted   = false;
+  let lastMeta  = "";
+  let lastBg    = "";
+  let metaTimer = null;
+  let showTimer = null;
+  let toastTimer = null;
+  const history = [];  // máx 5 canciones anteriores
 
-  // ── PROGRAMAS EN VIVO ─────────────────────────────────────
-  // Retorna la imagen de show si hay programa en vivo, o null.
+  // ── STATUS ─────────────────────────────────────────────────
+  const STATUS_MAP = {
+    ready:      { text: "Listo para reproducir", dot: ""          },
+    loading:    { text: "Conectando…",            dot: "loading"   },
+    live:       { text: "En vivo",                dot: "live"      },
+    buffering:  { text: "Cargando señal…",        dot: "buffering" },
+    paused:     { text: "Pausado",                dot: ""          },
+    error:      { text: "Error de conexión",      dot: "error"     },
+  };
+
+  function setStatus(key) {
+    const s = STATUS_MAP[key] || STATUS_MAP.ready;
+    if (statusText) statusText.textContent = s.text;
+    if (statusDot)  statusDot.className    = `status-dot ${s.dot}`.trim();
+  }
+
+  // ── PROGRAMAS EN VIVO ──────────────────────────────────────
   function getLiveShowImage() {
     const d    = new Date();
-    const day  = d.getDay();   // 0=dom … 6=sáb
+    const day  = d.getDay();    // 0=dom … 6=sáb
     const hour = d.getHours();
 
-    if (day === 3 && hour >= 21) return "/attached_assets/session.jpg";  // miércoles 21 h+
-    if (day === 4 && hour >= 21) return "/attached_assets/ladoB.jpg";    // jueves 21 h+
+    if (day === 3 && hour >= 21) return "/attached_assets/session.jpg"; // miércoles 21 h+
+    if (day === 4 && hour >= 21) return "/attached_assets/ladoB.jpg";   // jueves 21 h+
     return null;
   }
 
-  // ── FONDO DINÁMICO ────────────────────────────────────────
-  // Aplica un fondo solo si cambió realmente.
+  // ── FONDO DINÁMICO ─────────────────────────────────────────
   function applyBackground(url) {
     if (!url || url === lastBg) return;
     lastBg = url;
 
-    const img    = new Image();
-    img.onload   = () => {
+    const img   = new Image();
+    img.onload  = () => {
       player.style.setProperty("--dynamic-bg", `url('${url}')`);
-      stationCover.src = url;
+      if (stationCover) stationCover.src = url;
     };
-    img.onerror  = () => {
+    img.onerror = () => {
       player.style.setProperty("--dynamic-bg", `url('${DEFAULT_COVER}')`);
-      stationCover.src = DEFAULT_COVER;
+      if (stationCover) stationCover.src = DEFAULT_COVER;
     };
     img.src = url;
   }
 
-  // Revisa si hay programa en vivo y actualiza el fondo.
-  // Se puede llamar desde el loop de show O desde fetchMeta.
   function refreshBackground(coverFromApi) {
     const showImg = getLiveShowImage();
-
-    // El show tiene prioridad; si no hay show, usa la portada de la API.
     applyBackground(showImg || coverFromApi || DEFAULT_COVER);
-
-    // Clase visual para el borde rojo pulsante
     player.classList.toggle("show-live", !!showImg);
   }
 
-  // Loop independiente para actualizar el fondo por horario
-  // (funciona aunque el usuario no esté reproduciendo).
   function startShowLoop() {
     stopShowLoop();
-    refreshBackground(null);                        // revisión inmediata
+    refreshBackground(null);
     showTimer = setInterval(() => refreshBackground(null), SHOW_INTERVAL);
   }
 
@@ -100,11 +99,11 @@ document.addEventListener("DOMContentLoaded", () => {
     showTimer = null;
   }
 
-  // ── HISTORIAL ─────────────────────────────────────────────
+  // ── HISTORIAL ──────────────────────────────────────────────
   function pushHistory(artist, title) {
     if (!historyList) return;
     const entry = `${artist} — ${title}`;
-    if (history[0] === entry) return;          // evita duplicado al inicio
+    if (history[0] === entry) return;
     history.unshift(entry);
     if (history.length > 5) history.pop();
 
@@ -115,8 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .join("");
   }
 
-  // ── TOAST ────────────────────────────────────────────────
-  let toastTimer = null;
+  // ── TOAST ──────────────────────────────────────────────────
   function showToast(artist, title) {
     if (!songToast || !toastSong) return;
     toastSong.textContent = `${artist} — ${title}`;
@@ -125,27 +123,25 @@ document.addEventListener("DOMContentLoaded", () => {
     toastTimer = setTimeout(() => songToast.classList.remove("toast-visible"), 4000);
   }
 
-  
-  // ── UI ────────────────────────────────────────────────────
+  // ── UI ─────────────────────────────────────────────────────
   function updatePlayUI(p) {
-    isPlaying            = p;
-    playIcon.textContent = p ? "❚❚" : "▶";
+    isPlaying = p;
+    if (playIcon) playIcon.textContent = p ? "❚❚" : "▶";
     player.classList.toggle("playing", p);
-    playBtn.setAttribute("aria-label", p ? "Pausar" : "Reproducir");
-    updateMiniUI(p);
+    if (playBtn) playBtn.setAttribute("aria-label", p ? "Pausar" : "Reproducir");
   }
 
   function updateMuteUI(m) {
-    isMuted              = m;
-    audio.muted          = m;
-    muteIcon.textContent = m ? "🔇" : "🔊";
+    isMuted      = m;
+    audio.muted  = m;
+    if (muteIcon)   muteIcon.textContent   = m ? "🔇" : "🔊";
     if (volumeEmoji) volumeEmoji.textContent = m ? "🔇" : "🔊";
   }
 
-  // ── METADATA ──────────────────────────────────────────────
+  // ── METADATA ───────────────────────────────────────────────
   async function fetchMeta() {
     try {
-      const res  = await fetch(`${API_URL}?t=${Date.now()}`, { cache: "no-store" });
+      const res = await fetch(`${API_URL}?t=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) return;
 
       const data = await res.json();
@@ -153,21 +149,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const artist = data.artist || "SONAR ROCK";
       const title  = data.title  || "Transmitiendo rock";
-      const meta   = `${artist}|||${title}`;   // separador seguro
+      const meta   = `${artist}|||${title}`;
 
       if (meta !== lastMeta) {
-        // Hay canción nueva: mueve la anterior al historial
         if (lastMeta) {
           const [pa, pt] = lastMeta.split("|||");
           pushHistory(pa, pt);
         }
         lastMeta = meta;
-        trackInfo.textContent   = title;
-        trackArtist.textContent = artist;
-        showToast(artist, title);   // 🔥 notificación visual de canción nueva
+        if (trackInfo)   trackInfo.textContent   = title;
+        if (trackArtist) trackArtist.textContent = artist;
+        showToast(artist, title);
       }
 
-      // Siempre intenta actualizar el fondo (show puede haber cambiado)
       refreshBackground(data.cover || null);
 
     } catch (e) {
@@ -186,20 +180,11 @@ document.addEventListener("DOMContentLoaded", () => {
     metaTimer = null;
   }
 
-  // ── PLAYER ────────────────────────────────────────────────
-  // 🔥 PRE-CONEXIÓN: cargamos el stream en pausa para que el buffer
-  //    arranque sin delay cuando el usuario presione play.
-  function preconnect() {
-    audio.src     = STREAM_URL;
-    audio.preload = "none";   // no descarga datos aún, solo reserva conexión
-    audio.load();
-  }
-
+  // ── PLAYER ─────────────────────────────────────────────────
   async function play() {
     try {
       setStatus("loading");
 
-      // Si el src ya es el correcto, no lo reasignamos (evita reconexión)
       if (!audio.src || !audio.src.includes("sonarrock")) {
         audio.src = STREAM_URL;
       }
@@ -218,8 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function pause() {
     audio.pause();
-    // Liberar buffer pero mantener src para reconexión rápida
-    audio.src = "";
+    audio.src = "";   // libera buffer para reconexión limpia
     stopMetaLoop();
     updatePlayUI(false);
     setStatus("paused");
@@ -229,39 +213,40 @@ document.addEventListener("DOMContentLoaded", () => {
     isPlaying ? pause() : play();
   }
 
-  // ── VOLUMEN ───────────────────────────────────────────────
+  // ── VOLUMEN ────────────────────────────────────────────────
   function toggleMute() {
     updateMuteUI(!isMuted);
   }
 
   function setVolume(v) {
     audio.volume = v;
-    // Si el usuario sube el volumen estando muteado, desmutear
     if (v > 0 && isMuted) updateMuteUI(false);
     if (v === 0)           updateMuteUI(true);
     if (volumeEmoji) volumeEmoji.textContent = v === 0 ? "🔇" : v < 0.5 ? "🔉" : "🔊";
   }
 
-  // ── EVENTOS ───────────────────────────────────────────────
+  // ── EVENTOS ────────────────────────────────────────────────
   playBtn.addEventListener("click", toggle);
-  muteBtn.addEventListener("click", toggleMute);
-  if (miniPlayBtn) miniPlayBtn.addEventListener("click", toggle);  // 🔥 mini player mobile
+  if (muteBtn) muteBtn.addEventListener("click", toggleMute);
 
   if (volumeCtrl) {
     volumeCtrl.addEventListener("input", e => setVolume(parseFloat(e.target.value)));
   }
 
-  audio.addEventListener("playing", () => { if (isPlaying) setStatus("live"); });
+  audio.addEventListener("playing", () => { if (isPlaying) setStatus("live");      });
   audio.addEventListener("waiting", () => { if (isPlaying) setStatus("buffering"); });
   audio.addEventListener("stalled", () => { if (isPlaying) setStatus("buffering"); });
-  audio.addEventListener("error",   () => { setStatus("error"); stopMetaLoop(); updatePlayUI(false); });
+  audio.addEventListener("error",   () => {
+    setStatus("error");
+    stopMetaLoop();
+    updatePlayUI(false);
+  });
 
-  // ── INIT ──────────────────────────────────────────────────
-  trackInfo.textContent   = "Transmitiendo rock sin concesiones";
-  trackArtist.textContent = "SONAR ROCK";
+  // ── INIT ───────────────────────────────────────────────────
+  if (trackInfo)   trackInfo.textContent   = "Transmitiendo rock sin concesiones";
+  if (trackArtist) trackArtist.textContent = "SONAR ROCK";
 
   setStatus("ready");
-  startShowLoop();   // revisa horario de shows desde el inicio (sin necesidad de reproducir)
-  preconnect();      // pre-conecta el stream para play instantáneo
+  startShowLoop();  // revisa horario de shows sin necesidad de reproducir
 
 });

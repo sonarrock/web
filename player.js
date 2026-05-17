@@ -24,9 +24,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const STREAM_URL      = "https://giss.tv:667/sonarrock.mp3";
   const API_URL         = "https://sonarrock-api.cmrm1982.workers.dev/";
   const DEFAULT_COVER   = "https://www.sonarrock.com/attached_assets/logo_1749601460841.jpeg";
-  const DEFAULT_TRACK   = "Transmitiendo rock sin concesiones";
+  const DEFAULT_TRACK   = "Transmitiendo rock sin payola!";
   const DEFAULT_ARTIST  = "SONAR ROCK";
-  const META_INTERVAL   = 15_000;
+  const META_INTERVAL   = 10_000;
   const SHOW_INTERVAL   = 30_000;
   const STALL_TIMEOUT   = 8_000;
   const RECONNECT_DELAY = 3_000;
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
  
-  // ── PORTADA CINEMATOGRÁFICA ──────────────
+// ── PORTADA ────────────────────────────────
 function setCover(url) {
 
   if (!stationCover) return;
@@ -91,77 +91,21 @@ function setCover(url) {
       .replace("http://", "https://")
       .split("?")[0];
 
-  // evita recargar misma portada
-  if (
-    stationCover.dataset.currentCover === finalUrl
-  ) {
-    return;
-  }
-
   const img = new Image();
 
   img.onload = () => {
 
-    const overlay = document.createElement("img");
+    stationCover.classList.add("cover-changing");
 
-    overlay.src = finalUrl;
+    stationCover.src = finalUrl;
 
-    overlay.className =
-      "station-cover station-cover-overlay";
-
-    overlay.alt = "Nueva portada";
-
-    // posición encima
-    overlay.style.position = "absolute";
-    overlay.style.inset = "0";
-
-    overlay.style.opacity = "0";
-
-    overlay.style.transform = "scale(1.08)";
-
-    overlay.style.transition =
-      "opacity .7s ease, transform .7s ease";
-
-    const wrap =
-      stationCover.parentElement;
-
-    wrap.appendChild(overlay);
-
-    // fuerza repaint
-    overlay.offsetHeight;
-
-    // anima entrada
-    requestAnimationFrame(() => {
-
-      overlay.style.opacity = "1";
-
-      overlay.style.transform = "scale(1)";
-    });
-
-    // anima portada vieja
-    stationCover.style.opacity = ".35";
-
-    stationCover.style.transform =
-      "scale(.96)";
-
-    // actualiza fondo dinámico
     updateBackground(finalUrl);
 
     setTimeout(() => {
 
-      stationCover.src = finalUrl;
+      stationCover.classList.remove("cover-changing");
 
-      stationCover.dataset.currentCover =
-        finalUrl;
-
-      stationCover.style.opacity = "1";
-
-      stationCover.style.transform =
-        "scale(1)";
-
-      overlay.remove();
-
-    }, 700);
+    }, 450);
   };
 
   img.onerror = () => {
@@ -173,6 +117,7 @@ function setCover(url) {
 
   img.src = finalUrl;
 }
+
  
   // ── PROGRAMAS EN VIVO ──────────────────────────────────────
   function getLiveShowImage() {
@@ -225,8 +170,8 @@ function setCover(url) {
 
     history.unshift(entry);
 
-    // máximo 5 canciones
-    if (history.length > 5) {
+    // máximo 3 canciones
+    if (history.length > 3) {
       history.pop();
     }
 

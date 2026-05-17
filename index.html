@@ -66,63 +66,145 @@
 
   <main class="main-content">
 
-    <!-- PLAYER -->
-    <section class="hero-player-section">
-      <div class="container">
-        <div id="sonarPlayer" class="sonar-player">
+  <!-- PLAYER -->
+<section class="hero-player-section">
+  <div class="container">
 
-          <div class="player-left">
-            <div class="cover-wrap">
-              <img
-                id="stationCover"
-                src="attached_assets/logo_1749601460841.jpeg"
-                alt="Portada Sonar Rock"
-                class="station-cover"
-              >
-            </div>
-            <div class="sonar-player-info">
-              <p class="eyebrow">Ahora Escuchas</p>
-              <h3 id="trackInfo"   class="sonar-track-title">Transmitiendo rock sin payola</h3>
-              <p  id="trackArtist" class="sonar-track-artist">Señal lista</p>
-              <div class="status-row">
-                <span id="statusDot"  class="status-dot"></span>
-                <span id="statusText" class="status-text">Listo para reproducir</span>
-              </div>
-              <div id="historyList"></div>
-            </div>
+    <div id="sonarPlayer" class="sonar-player">
+
+      <div class="player-left">
+
+        <div class="cover-wrap">
+
+          <img
+            id="stationCover"
+            src="attached_assets/logo_1749601460841.jpeg"
+            alt="Portada Sonar Rock"
+            class="station-cover"
+          >
+
+          <!-- MINI VISUALIZER -->
+          <div class="sonar-visualizer" aria-hidden="true">
+
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+
           </div>
 
-          <div class="player-right">
-            <div class="vu-wrap" aria-hidden="true"></div>
-            <div class="player-controls">
-              <div class="top-buttons">
-                <button id="playBtn" class="play-btn" type="button" aria-label="Reproducir">
-                  <span id="playIcon">▶</span>
-                </button>
-                <button id="muteBtn" class="mute-btn" type="button" aria-label="Silenciar">
-                  <span id="muteIcon">🔊</span>
-                </button>
-              </div>
-              <div class="volume-wrap">
-                <span id="volumeEmoji" class="volume-emoji">🔊</span>
-                <input
-                  id="volumeControl"
-                  class="volume-slider"
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value="1"
-                  aria-label="Volumen"
-                >
-              </div>
-            </div>
-          </div>
-
-          <audio id="radioPlayer" playsinline webkit-playsinline preload="none"></audio>
         </div>
+
+        <div class="sonar-player-info">
+
+          <p class="eyebrow">
+            Ahora Escuchas
+          </p>
+
+          <h3
+            id="trackInfo"
+            class="sonar-track-title"
+          >
+            Transmitiendo rock sin payola
+          </h3>
+
+          <p
+            id="trackArtist"
+            class="sonar-track-artist"
+          >
+            Señal lista
+          </p>
+
+          <div class="status-row">
+
+            <span
+              id="statusDot"
+              class="status-dot"
+            ></span>
+
+            <span
+              id="statusText"
+              class="status-text"
+            >
+              Listo para reproducir
+            </span>
+
+          </div>
+
+          <div id="historyList"></div>
+
+        </div>
+
       </div>
-    </section>
+
+      <div class="player-right">
+
+        <div
+          class="vu-wrap"
+          aria-hidden="true"
+        ></div>
+
+        <div class="player-controls">
+
+          <div class="top-buttons">
+
+            <button
+              id="playBtn"
+              class="play-btn"
+              type="button"
+              aria-label="Reproducir"
+            >
+              <span id="playIcon">▶</span>
+            </button>
+
+            <button
+              id="muteBtn"
+              class="mute-btn"
+              type="button"
+              aria-label="Silenciar"
+            >
+              <span id="muteIcon">🔊</span>
+            </button>
+
+          </div>
+
+          <div class="volume-wrap">
+
+            <span
+              id="volumeEmoji"
+              class="volume-emoji"
+            >
+              🔊
+            </span>
+
+            <input
+              id="volumeControl"
+              class="volume-slider"
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value="1"
+              aria-label="Volumen"
+            >
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <audio
+        id="radioPlayer"
+        playsinline
+        webkit-playsinline
+        preload="none"
+      ></audio>
+
+    </div>
+  </div>
+</section>
 
     <!-- TOAST -->
     <div id="songToast" class="song-toast" role="status" aria-live="polite">

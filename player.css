@@ -628,3 +628,96 @@
 
   opacity: .35;
 }
+
+/* =========================================
+   SONAR ROCK — SMART MARQUEE
+========================================= */
+
+.track-marquee-wrap {
+
+  position: relative;
+
+  overflow: hidden;
+
+  width: 100%;
+}
+
+.marquee-text {
+
+  display: inline-block;
+
+  white-space: nowrap;
+
+  min-width: 100%;
+
+  will-change: transform;
+}
+
+/* activa animación solo cuando hace falta */
+
+.marquee-text.marquee-active {
+
+  animation:
+    sonarMarquee 12s linear infinite;
+}
+
+@keyframes sonarMarquee {
+
+  0% {
+
+    transform: translateX(0);
+  }
+
+  10% {
+
+    transform: translateX(0);
+  }
+
+  45% {
+
+    transform: translateX(calc(-100% + 280px));
+  }
+
+  55% {
+
+    transform: translateX(calc(-100% + 280px));
+  }
+
+  100% {
+
+    transform: translateX(0);
+  }
+}
+
+/* móvil */
+
+@media (max-width: 768px) {
+
+  @keyframes sonarMarquee {
+
+    0% {
+
+      transform: translateX(0);
+    }
+
+    10% {
+
+      transform: translateX(0);
+    }
+
+    45% {
+
+      transform: translateX(calc(-100% + 180px));
+    }
+
+    55% {
+
+      transform: translateX(calc(-100% + 180px));
+    }
+
+    100% {
+
+      transform: translateX(0);
+    }
+  }
+}

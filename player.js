@@ -118,6 +118,36 @@ function setCover(url) {
   img.src = finalUrl;
 }
 
+// ── LÓGICA CENTRAL DE PORTADA ──────────────────────────────
+function resolveAndSetCover() {
+
+  const showImg = getLiveShowImage();
+
+  // prioridad:
+  // 1. portada del álbum
+  // 2. imagen del show en vivo
+  // 3. logo default
+
+  if (lastSpotifyCover) {
+
+    setCover(lastSpotifyCover);
+
+    player.classList.remove("show-live");
+
+  } else if (showImg) {
+
+    setCover(showImg);
+
+    player.classList.add("show-live");
+
+  } else {
+
+    setCover(DEFAULT_COVER);
+
+    player.classList.remove("show-live");
+  }
+}
+ 
  
   // ── PROGRAMAS EN VIVO ──────────────────────────────────────
   function getLiveShowImage() {

@@ -174,24 +174,136 @@
   color: var(--sr-subtext);
 }
 
-/* ── STATUS DOT ──────────────────────────── */
+/* ── STATUS DOT PREMIUM ─────────────────── */
 
 .status-dot {
+
   display: inline-block;
-  width: 8px;
-  height: 8px;
+
+  width: 10px;
+
+  height: 10px;
+
   border-radius: 50%;
-  margin-right: 6px;
+
+  margin-right: 8px;
+
   background: var(--sr-muted);
-  transition: background .3s;
+
+  position: relative;
+
+  transition:
+    background .35s ease,
+    box-shadow .35s ease,
+    transform .35s ease;
+
+  will-change:
+    transform,
+    box-shadow;
 }
 
-.status-dot.status-live     { background: var(--sr-live); animation: pulseLive 1.5s infinite; }
-.status-dot.status-loading  { background: #ffcc00; }
-.status-dot.status-buffering{ background: #ffcc00; }
-.status-dot.status-error    { background: #ff3b3b; }
-.status-dot.status-paused,
-.status-dot.status-ready    { background: var(--sr-muted); }
+/* LIVE */
+
+.status-dot.live {
+
+  background: #ff5a36;
+
+  box-shadow:
+    0 0 10px rgba(255,90,54,.95),
+    0 0 22px rgba(255,90,54,.55);
+
+  animation:
+    sonarLivePulse 1.8s infinite;
+}
+
+/* LOADING + BUFFERING */
+
+.status-dot.loading,
+.status-dot.buffering {
+
+  background: #ffb347;
+
+  box-shadow:
+    0 0 10px rgba(255,179,71,.85);
+
+  animation:
+    sonarBufferPulse 1s infinite alternate;
+}
+
+/* ERROR */
+
+.status-dot.error {
+
+  background: #ff3b30;
+
+  box-shadow:
+    0 0 12px rgba(255,59,48,.85);
+}
+
+/* READY / PAUSED */
+
+.status-dot.ready,
+.status-dot.paused {
+
+  background: rgba(255,255,255,.25);
+
+  box-shadow: none;
+}
+
+/* LIVE PULSE */
+
+@keyframes sonarLivePulse {
+
+  0% {
+
+    transform: scale(1);
+
+    box-shadow:
+      0 0 0 0 rgba(255,90,54,.55),
+      0 0 10px rgba(255,90,54,.95),
+      0 0 22px rgba(255,90,54,.55);
+  }
+
+  70% {
+
+    transform: scale(1.14);
+
+    box-shadow:
+      0 0 0 10px rgba(255,90,54,0),
+      0 0 18px rgba(255,90,54,.95),
+      0 0 36px rgba(255,90,54,.55);
+  }
+
+  100% {
+
+    transform: scale(1);
+
+    box-shadow:
+      0 0 0 0 rgba(255,90,54,0),
+      0 0 10px rgba(255,90,54,.95),
+      0 0 22px rgba(255,90,54,.55);
+  }
+}
+
+/* BUFFER */
+
+@keyframes sonarBufferPulse {
+
+  from {
+
+    opacity: .45;
+
+    transform: scale(.92);
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform: scale(1.08);
+  }
+}
+
 
 /* ── HISTORIAL ───────────────────────────── */
 

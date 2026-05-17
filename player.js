@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const DEFAULT_COVER   = "https://www.sonarrock.com/attached_assets/logo_1749601460841.jpeg";
   const DEFAULT_TRACK   = "Transmitiendo rock sin concesiones";
   const DEFAULT_ARTIST  = "SONAR ROCK";
-  const META_INTERVAL   = 6_000;
+  const META_INTERVAL   = 15_000;
   const SHOW_INTERVAL   = 30_000;
   const STALL_TIMEOUT   = 8_000;
   const RECONNECT_DELAY = 3_000;
@@ -70,22 +70,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
  
   // ── PORTADA ────────────────────────────────────────────────
-  function setCover(url) {
-    if (!stationCover) return;
-    const finalUrl = (url || DEFAULT_COVER).replace("http://", "https://").split("?")[0];
- 
-    const img   = new Image();
-    img.onload  = () => {
-      const withCache = finalUrl + "?v=" + Date.now();
-      stationCover.src = withCache;
-      updateBackground(withCache);
-    };
-    img.onerror = () => {
-      stationCover.src = DEFAULT_COVER;
-      updateBackground(DEFAULT_COVER);
-    };
-    img.src = finalUrl;
-  }
+function setCover(url) {
+
+  if (!stationCover) return;
+
+  const finalUrl =
+    (url || DEFAULT_COVER)
+      .replace("http://", "https://")
+      .split("?")[0];
+
+  const img = new Image();
+
+  img.onload = () => {
+
+    const withCache = finalUrl;
+
+    stationCover.src = withCache;
+
+    updateBackground(withCache);
+  };
+
+  img.onerror = () => {
+
+    stationCover.src = DEFAULT_COVER;
+
+    updateBackground(DEFAULT_COVER);
+  };
+
+  img.src = finalUrl;
+} 
  
   // ── LÓGICA CENTRAL DE PORTADA ──────────────────────────────
   // Prioridad: portada de álbum (Spotify/iTunes) > imagen de show > logo

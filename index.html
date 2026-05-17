@@ -11,7 +11,7 @@
   <link rel="canonical" href="https://www.sonarrock.com/">
 
   <!-- ============
-       OPEN GRAPH 
+       OPEN GRAPH
   ============== -->
   <meta property="og:locale"            content="es_MX">
   <meta property="og:type"              content="website">
@@ -26,7 +26,6 @@
   <meta property="og:image:height"      content="630">
   <meta property="og:image:alt"         content="Sonar Rock - La Radio Independiente">
 
-
   <!-- PWA / ICONOS -->
   <link rel="manifest"           href="/manifest.json">
   <link rel="apple-touch-icon"   sizes="180x180" href="/icons/apple-touch-icon.png">
@@ -35,17 +34,17 @@
   <link rel="shortcut icon"      href="/icons/sonarrock-og.jpg">
 
   <!-- PRECONNECT -->
-  <link rel="preconnect"  href="https://giss.tv" crossorigin>
+  <link rel="preconnect"   href="https://giss.tv" crossorigin>
   <link rel="dns-prefetch" href="https://giss.tv">
-  <link rel="preconnect"  href="https://fonts.googleapis.com">
-  <link rel="preconnect"  href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect"   href="https://fonts.googleapis.com">
+  <link rel="preconnect"   href="https://fonts.gstatic.com" crossorigin>
 
   <!-- FUENTES -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link href="style.css?v=25"  rel="stylesheet">
-  <link href="player.css?v=25" rel="stylesheet">
+  <link href="style.css?v=26"  rel="stylesheet">
+  <link href="player.css?v=26" rel="stylesheet">
 
   <!-- ICONOS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -56,7 +55,7 @@
   <!-- HEADER -->
   <header class="header">
     <div class="logo-section">
-         <img src="icons/sonarrock-og.jpg" alt="Sonar Rock Logo" class="logo">
+      <img src="icons/sonarrock-og.jpg" alt="Sonar Rock Logo" class="logo">
       <div class="title-section">
         <p class="kicker">COMUNIDAD · ROCK · RESISTENCIA</p>
         <h1>SONAR ROCK</h1>
@@ -73,7 +72,6 @@
         <div id="sonarPlayer" class="sonar-player">
 
           <div class="player-left">
-            <!-- margin:0 auto eliminado del inline; está en player.css (mobile) -->
             <div class="cover-wrap">
               <img
                 id="stationCover"
@@ -84,13 +82,12 @@
             </div>
             <div class="sonar-player-info">
               <p class="eyebrow">Ahora Escuchas</p>
-              <h3 id="trackInfo" class="sonar-track-title">Transmitiendo rock sin payola</h3>
-              <p id="trackArtist" class="sonar-track-artist">Señal lista</p>
+              <h3 id="trackInfo"   class="sonar-track-title">Transmitiendo rock sin payola</h3>
+              <p  id="trackArtist" class="sonar-track-artist">Señal lista</p>
               <div class="status-row">
                 <span id="statusDot"  class="status-dot"></span>
                 <span id="statusText" class="status-text">Listo para reproducir</span>
               </div>
-              <!-- historyList vacío: el JS lo construye completo -->
               <div id="historyList"></div>
             </div>
           </div>
@@ -122,7 +119,7 @@
             </div>
           </div>
 
-          <audio id="radioPlayer" playsinline webkit-playsinline preload="metadata"></audio>
+          <audio id="radioPlayer" playsinline webkit-playsinline preload="none"></audio>
         </div>
       </div>
     </section>
@@ -198,7 +195,6 @@
 
         <div class="custom-player spotify-player">
           <div class="spotify-player-info">
-            <!-- width/height añadidos: sin ellos el iframe colapsa en algunos navegadores -->
             <iframe
               src="https://open.spotify.com/embed/show/6mPcjQLeDdCwxzJe3PLlyU?theme=0"
               width="100%"
@@ -219,23 +215,23 @@
         <h2 class="section-title" style="margin-bottom:40px;">Staff</h2>
         <div class="staff-grid">
           <div class="staff-member">
-            <img src="attached_assets/Wendy_1749601460841.jpeg"   alt="Wendy"           class="staff-image">
+            <img src="attached_assets/Wendy_1749601460841.jpeg"    alt="Wendy"             class="staff-image">
             <h3 class="staff-name">Wendy</h3>
           </div>
           <div class="staff-member">
-            <img src="attached_assets/Oz_1749601460841.jpeg"      alt='Oscar "Oz" Ibarra' class="staff-image">
+            <img src="attached_assets/Oz_1749601460841.jpeg"       alt='Oscar "Oz" Ibarra' class="staff-image">
             <h3 class="staff-name">Oscar "Oz" Ibarra</h3>
           </div>
           <div class="staff-member">
-            <img src="attached_assets/Alvaro_1749601460841.jpeg"  alt="El Contralor"    class="staff-image">
+            <img src="attached_assets/Alvaro_1749601460841.jpeg"   alt="El Contralor"      class="staff-image">
             <h3 class="staff-name">El Contralor</h3>
           </div>
           <div class="staff-member">
-            <img src="attached_assets/Hans_1749601460841.jpeg"    alt="Hans"            class="staff-image">
+            <img src="attached_assets/Hans_1749601460841.jpeg"     alt="Hans"              class="staff-image">
             <h3 class="staff-name">Hans</h3>
           </div>
           <div class="staff-member">
-            <img src="attached_assets/El Chris_1749601460841.jpeg" alt="El Chris"       class="staff-image">
+            <img src="attached_assets/El Chris_1749601460841.jpeg" alt="El Chris"          class="staff-image">
             <h3 class="staff-name">El Chris</h3>
           </div>
         </div>
@@ -279,8 +275,8 @@
   </main>
 
   <!-- JS -->
-  <script src="disco-semana.js?v=25" defer></script>
-  <script src="player.js?v=25" defer></script>
+  <script src="disco-semana.js?v=26" defer></script>
+  <script src="player.js?v=26"       defer></script>
 
   <script>
     if ("serviceWorker" in navigator) {

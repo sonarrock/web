@@ -81,62 +81,98 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
  
-  // ── PORTADA ────────────────────────────────────────────────
-  function setCover(url) {
+  // ── PORTADA CINEMATOGRÁFICA ──────────────
+function setCover(url) {
 
-    if (!stationCover) return;
+  if (!stationCover) return;
 
-    const finalUrl =
-      (url || DEFAULT_COVER)
-        .replace("http://", "https://")
-        .split("?")[0];
+  const finalUrl =
+    (url || DEFAULT_COVER)
+      .replace("http://", "https://")
+      .split("?")[0];
 
-    const img = new Image();
-
-    img.onload = () => {
-
-      const withCache = finalUrl;
-
-      // transición suave
-      stationCover.classList.add("cover-changing");
-
-      stationCover.src = withCache;
-
-      updateBackground(withCache);
-
-      setTimeout(() => {
-        stationCover.classList.remove("cover-changing");
-      }, 450);
-    };
-
-    img.onerror = () => {
-
-      stationCover.src = DEFAULT_COVER;
-
-      updateBackground(DEFAULT_COVER);
-    };
-
-    img.src = finalUrl;
+  // evita recargar misma portada
+  if (
+    stationCover.dataset.currentCover === finalUrl
+  ) {
+    return;
   }
- 
-  // ── LÓGICA CENTRAL DE PORTADA ──────────────────────────────
-  function resolveAndSetCover() {
 
-    const showImg = getLiveShowImage();
+  const img = new Image();
 
-    if (lastSpotifyCover) {
+  img.onload = () => {
 
-      setCover(lastSpotifyCover);
+    const overlay = document.createElement("img");
 
-    } else if (showImg) {
+    overlay.src = finalUrl;
 
-      setCover(showImg);
+    overlay.className =
+      "station-cover station-cover-overlay";
 
-    } else {
+    overlay.alt = "Nueva portada";
 
-      setCover(DEFAULT_COVER);
-    }
-  }
+    // posición encima
+    overlay.style.position = "absolute";
+    overlay.style.inset = "0";
+
+    overlay.style.opacity = "0";
+
+    overlay.style.transform = "scale(1.08)";
+
+    overlay.style.transition =
+      "opacity .7s ease, transform .7s ease";
+
+    const wrap =
+      stationCover.parentElement;
+
+    wrap.appendChild(overlay);
+
+    // fuerza repaint
+    overlay.offsetHeight;
+
+    // anima entrada
+    requestAnimationFrame(() => {
+
+      overlay.style.opacity = "1";
+
+      overlay.style.transform = "scale(1)";
+    });
+
+    // anima portada vieja
+    stationCover.style.opacity = ".35";
+
+    stationCover.style.transform =
+      "scale(.96)";
+
+    // actualiza fondo dinámico
+    updateBackground(finalUrl);
+
+    setTimeout(() => {
+
+      stationCover.src = finalUrl;
+
+      stationCover.dataset.currentCover =
+        finalUrl;
+
+      stationCover.style.opacity = "1";
+
+      stationCover.style.transform =
+        "scale(1)";
+
+      overlay.remove();
+
+    }, 700);
+  };
+
+  img.onerror = () => {
+
+    stationCover.src = DEFAULT_COVER;
+
+    updateBackground(DEFAULT_COVER);
+  };
+
+  img.src = finalUrl;
+}
  
   // ── PROGRAMAS EN VIVO ──────────────────────────────────────
   function getLiveShowImage() {

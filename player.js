@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!audio || !playBtn || !player) return;
  
   // ── CONSTANTES ─────────────────────────────────────────────
-  // Un solo Worker hace todo: metadata + Spotify + iTunes + cover
   const STREAM_URL      = "https://giss.tv:667/sonarrock.mp3";
   const API_URL         = "https://sonarrock-api.cmrm1982.workers.dev/";
   const DEFAULT_COVER   = "https://www.sonarrock.com/attached_assets/logo_1749601460841.jpeg";
@@ -32,19 +31,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const STALL_TIMEOUT   = 8_000;
   const RECONNECT_DELAY = 3_000;
   const MAX_RECONNECTS  = 10;
+
+  const HISTORY_STORAGE_KEY = "sonarrock-history";
  
   // ── ESTADO ─────────────────────────────────────────────────
   let isPlaying        = false;
   let isMuted          = false;
   let lastTitle        = "";
-  let lastSpotifyCover = null;  // null = sin canción identificada (micrófono abierto)
+  let lastSpotifyCover = null;
   let metaTimer        = null;
   let showTimer        = null;
   let toastTimer       = null;
   let stallTimer       = null;
   let reconnectTimer   = null;
   let reconnectCount   = 0;
-  const history        = [];
+
+  const history = [];
  
   // ── STATUS ─────────────────────────────────────────────────
   const STATUS_MAP = {
@@ -58,367 +60,696 @@ document.addEventListener("DOMContentLoaded", () => {
   };
  
   function setStatus(key) {
+
     const s = STATUS_MAP[key] || STATUS_MAP.ready;
-    if (statusText) statusText.textContent = s.text;
-    if (statusDot)  statusDot.className    = `status-dot ${s.dot}`.trim();
+
+    if (statusText) {
+      statusText.textContent = s.text;
+    }
+
+    if (statusDot) {
+      statusDot.className = `status-dot ${s.dot}`.trim();
+    }
   }
  
   // ── FONDO DINÁMICO ─────────────────────────────────────────
   function updateBackground(imageUrl) {
-    // Actualiza la variable CSS del player, NO el body
-    player.style.setProperty("--dynamic-bg", `url('${imageUrl}')`);
+
+    player.style.setProperty(
+      "--dynamic-bg",
+      `url('${imageUrl}')`
+    );
   }
  
- // ── PORTADA ────────────────────────────────────────────────
-function setCover(url) {
+  // ── PORTADA ────────────────────────────────────────────────
+  function setCover(url) {
 
-  if (!stationCover) return;
+    if (!stationCover) return;
 
-  const finalUrl =
-    (url || DEFAULT_COVER)
-      .replace("http://", "https://")
-      .split("?")[0];
+    const finalUrl =
+      (url || DEFAULT_COVER)
+        .replace("http://", "https://")
+        .split("?")[0];
 
-  const img = new Image();
+    const img = new Image();
 
-  img.onload = () => {
+    img.onload = () => {
 
-    const withCache = finalUrl;
+      const withCache = finalUrl;
 
-    // animación suave de transición
-    stationCover.classList.add("cover-changing");
+      // transición suave
+      stationCover.classList.add("cover-changing");
 
-    stationCover.src = withCache;
+      stationCover.src = withCache;
 
-    updateBackground(withCache);
+      updateBackground(withCache);
 
-    // limpia clase después de animar
-    setTimeout(() => {
-      stationCover.classList.remove("cover-changing");
-    }, 450);
-  };
+      setTimeout(() => {
+        stationCover.classList.remove("cover-changing");
+      }, 450);
+    };
 
-  img.onerror = () => {
+    img.onerror = () => {
 
-    stationCover.src = DEFAULT_COVER;
+      stationCover.src = DEFAULT_COVER;
 
-    updateBackground(DEFAULT_COVER);
-  };
+      updateBackground(DEFAULT_COVER);
+    };
 
-  img.src = finalUrl;
-} 
+    img.src = finalUrl;
+  }
  
   // ── LÓGICA CENTRAL DE PORTADA ──────────────────────────────
-  // Prioridad: portada de álbum (Spotify/iTunes) > imagen de show > logo
   function resolveAndSetCover() {
+
     const showImg = getLiveShowImage();
+
     if (lastSpotifyCover) {
-      setCover(lastSpotifyCover);       // música sonando → portada del álbum
+
+      setCover(lastSpotifyCover);
+
     } else if (showImg) {
-      setCover(showImg);                // show en vivo + micrófono abierto
+
+      setCover(showImg);
+
     } else {
-      setCover(DEFAULT_COVER);          // fuera de show y sin canción
+
+      setCover(DEFAULT_COVER);
     }
   }
  
   // ── PROGRAMAS EN VIVO ──────────────────────────────────────
   function getLiveShowImage() {
+
     const d    = new Date();
     const day  = d.getDay();
     const hour = d.getHours();
-    if (day === 3 && hour >= 21) return "/attached_assets/session.jpg";
-    if (day === 4 && hour >= 21) return "/attached_assets/ladoB.jpg";
+
+    if (day === 3 && hour >= 21) {
+      return "/attached_assets/session.jpg";
+    }
+
+    if (day === 4 && hour >= 21) {
+      return "/attached_assets/ladoB.jpg";
+    }
+
     return null;
   }
  
   function startShowLoop() {
+
     stopShowLoop();
+
     resolveAndSetCover();
-    showTimer = setInterval(resolveAndSetCover, SHOW_INTERVAL);
+
+    showTimer = setInterval(
+      resolveAndSetCover,
+      SHOW_INTERVAL
+    );
   }
  
   function stopShowLoop() {
-    if (showTimer) clearInterval(showTimer);
+
+    if (showTimer) {
+      clearInterval(showTimer);
+    }
+
     showTimer = null;
   }
  
   // ── HISTORIAL ──────────────────────────────────────────────
   function pushHistory(artist, title) {
+
     if (!historyList) return;
+
     const entry = `${artist} — ${title}`;
+
+    // evita duplicados consecutivos
     if (history[0] === entry) return;
+
     history.unshift(entry);
-    if (history.length > 5) history.pop();
+
+    // máximo 5 canciones
+    if (history.length > 5) {
+      history.pop();
+    }
+
+    // guardar historial
+    try {
+
+      localStorage.setItem(
+        HISTORY_STORAGE_KEY,
+        JSON.stringify(history)
+      );
+
+    } catch (e) {
+
+      console.warn("history storage error:", e);
+    }
+
+    renderHistory();
+  }
+
+  function renderHistory() {
+
+    if (!historyList) return;
+
     historyList.innerHTML =
-      `<div class="history-title">Historial musical</div>` +
+
+      `<div class="history-title">
+        Historial musical
+      </div>` +
+
       history
-        .map((t, i) => `<div class="history-item${i === 0 ? " history-now" : ""}">${t}</div>`)
+        .map((t, i) => `
+          <div class="history-item${i === 0 ? " history-now" : ""}">
+            ${t}
+          </div>
+        `)
         .join("");
   }
  
   // ── TOAST ──────────────────────────────────────────────────
   function showToast(text) {
+
     if (!songToast || !toastSong) return;
+
     toastSong.textContent = text;
+
     songToast.classList.add("show");
+
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => songToast.classList.remove("show"), 3000);
+
+    toastTimer = setTimeout(() => {
+      songToast.classList.remove("show");
+    }, 3000);
   }
  
   // ── UI ─────────────────────────────────────────────────────
   function updatePlayUI(p) {
+
     isPlaying = p;
-    if (playIcon) playIcon.textContent = p ? "❚❚" : "▶";
+
+    if (playIcon) {
+      playIcon.textContent = p ? "❚❚" : "▶";
+    }
+
     player.classList.toggle("playing", p);
-    if (playBtn) playBtn.setAttribute("aria-label", p ? "Pausar" : "Reproducir");
+
+    if (playBtn) {
+      playBtn.setAttribute(
+        "aria-label",
+        p ? "Pausar" : "Reproducir"
+      );
+    }
   }
  
   function updateMuteUI(m) {
+
     isMuted     = m;
     audio.muted = m;
-    if (muteIcon)    muteIcon.textContent    = m ? "🔇" : "🔊";
-    if (volumeEmoji) volumeEmoji.textContent = m ? "🔇" : "🔊";
+
+    if (muteIcon) {
+      muteIcon.textContent = m ? "🔇" : "🔊";
+    }
+
+    if (volumeEmoji) {
+      volumeEmoji.textContent = m ? "🔇" : "🔊";
+    }
   }
  
   // ── MEDIA SESSION API ──────────────────────────────────────
   function updateMediaSession(title, artist, cover) {
+
     if (!("mediaSession" in navigator)) return;
+
     navigator.mediaSession.metadata = new MediaMetadata({
       title,
       artist,
-      album:   "Sonar Rock",
-      artwork: [{ src: cover, sizes: "512x512", type: "image/png" }]
+      album: "Sonar Rock",
+      artwork: [{
+        src: cover,
+        sizes: "512x512",
+        type: "image/png"
+      }]
     });
-    navigator.mediaSession.setActionHandler("play",  () => playStream());
-    navigator.mediaSession.setActionHandler("pause", () => pauseStream());
-    navigator.mediaSession.setActionHandler("stop",  () => pauseStream());
+
+    navigator.mediaSession.setActionHandler(
+      "play",
+      () => playStream()
+    );
+
+    navigator.mediaSession.setActionHandler(
+      "pause",
+      () => pauseStream()
+    );
+
+    navigator.mediaSession.setActionHandler(
+      "stop",
+      () => pauseStream()
+    );
   }
  
   // ── NOTIFICACIONES ─────────────────────────────────────────
   async function requestNotifPermission() {
+
     if (!("Notification" in window)) return;
+
     if (Notification.permission === "default") {
       await Notification.requestPermission();
     }
   }
  
   function sendSongNotification(artist, title, cover) {
+
     if (!("Notification" in window)) return;
+
     if (Notification.permission !== "granted") return;
+
     if (document.visibilityState === "visible") return;
+
     try {
-      new Notification("🎸 Sonar Rock — Nueva canción", {
-        body:   `${artist} — ${title}`,
-        icon:   cover || DEFAULT_COVER,
-        silent: true,
-        tag:    "sonarrock-song",
-      });
+
+      new Notification(
+        "🎸 Sonar Rock — Nueva canción",
+        {
+          body: `${artist} — ${title}`,
+          icon: cover || DEFAULT_COVER,
+          silent: true,
+          tag: "sonarrock-song",
+        }
+      );
+
     } catch (e) {
+
       console.warn("notificación fallida:", e);
     }
   }
  
   // ── METADATA ───────────────────────────────────────────────
-  // El Worker ya regresa artist, title y cover listos.
-  // No se necesita llamar a ningún otro endpoint.
   async function fetchMetadata() {
+
     try {
-      const res  = await fetch(API_URL + "?t=" + Date.now(), { cache: "no-store" });
+
+      const res = await fetch(
+        API_URL + "?t=" + Date.now(),
+        {
+          cache: "no-store"
+        }
+      );
+
       const data = await res.json();
  
-      // El Worker regresa DEFAULT cuando no hay señal; validamos que sea real
-      if (!data?.title || data.title === DEFAULT_TRACK) return;
+      if (!data?.title || data.title === DEFAULT_TRACK) {
+        return;
+      }
  
       const title  = data.title;
       const artist = data.artist || DEFAULT_ARTIST;
  
-      // La portada viene del Worker (Spotify → iTunes → logo)
-      // Si el Worker devuelve el logo es porque no encontró nada → micrófono abierto
-      const coverFromApi = data.cover && data.cover !== DEFAULT_COVER
-        ? data.cover
-        : null;
+      const coverFromApi =
+        data.cover &&
+        data.cover !== DEFAULT_COVER
+          ? data.cover
+          : null;
  
+      // misma canción
       if (title === lastTitle) {
-        // Misma canción: solo actualiza portada si cambió
+
         if (coverFromApi !== lastSpotifyCover) {
+
           lastSpotifyCover = coverFromApi;
+
           resolveAndSetCover();
         }
+
         return;
       }
  
-      // Canción nueva
-      if (lastTitle) pushHistory(
-        trackArtist?.textContent || DEFAULT_ARTIST,
-        lastTitle
-      );
+      // nueva canción
+      if (lastTitle) {
+
+        pushHistory(
+          trackArtist?.textContent || DEFAULT_ARTIST,
+          lastTitle
+        );
+      }
+
       lastTitle = title;
  
-      if (trackInfo)   trackInfo.textContent   = title;
-      if (trackArtist) trackArtist.textContent = artist;
+      if (trackInfo) {
+        trackInfo.textContent = title;
+      }
+
+      if (trackArtist) {
+        trackArtist.textContent = artist;
+      }
  
       lastSpotifyCover = coverFromApi;
+
       resolveAndSetCover();
  
-      const coverForSession = coverFromApi || getLiveShowImage() || DEFAULT_COVER;
-      updateMediaSession(title, artist, coverForSession);
-      sendSongNotification(artist, title, coverForSession);
+      const coverForSession =
+        coverFromApi ||
+        getLiveShowImage() ||
+        DEFAULT_COVER;
+
+      updateMediaSession(
+        title,
+        artist,
+        coverForSession
+      );
+
+      sendSongNotification(
+        artist,
+        title,
+        coverForSession
+      );
+
       showToast(`${artist} - ${title}`);
  
     } catch (e) {
+
       console.warn("Metadata fetch error:", e);
     }
   }
  
   function startMetaLoop() {
+
     stopMetaLoop();
+
     fetchMetadata();
-    metaTimer = setInterval(fetchMetadata, META_INTERVAL);
+
+    metaTimer = setInterval(
+      fetchMetadata,
+      META_INTERVAL
+    );
   }
  
   function stopMetaLoop() {
-    if (metaTimer) clearInterval(metaTimer);
+
+    if (metaTimer) {
+      clearInterval(metaTimer);
+    }
+
     metaTimer = null;
   }
  
   // ── RECONEXIÓN AUTOMÁTICA ──────────────────────────────────
   function clearStallTimer() {
-    if (stallTimer) clearTimeout(stallTimer);
+
+    if (stallTimer) {
+      clearTimeout(stallTimer);
+    }
+
     stallTimer = null;
   }
  
   function clearReconnectTimer() {
-    if (reconnectTimer) clearTimeout(reconnectTimer);
+
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer);
+    }
+
     reconnectTimer = null;
   }
  
   function scheduleReconnect() {
+
     if (!isPlaying) return;
+
     if (reconnectCount >= MAX_RECONNECTS) {
+
       setStatus("error");
+
       updatePlayUI(false);
+
       stopMetaLoop();
+
       return;
     }
+
     reconnectCount++;
+
     setStatus("reconnecting");
+
     clearReconnectTimer();
+
     reconnectTimer = setTimeout(async () => {
+
       if (!isPlaying) return;
+
       try {
-        audio.src = STREAM_URL + "?t=" + Date.now();
+
+        audio.src =
+          STREAM_URL + "?t=" + Date.now();
+
         audio.load();
+
         await audio.play();
+
         reconnectCount = 0;
+
         setStatus("live");
+
         startMetaLoop();
+
       } catch (e) {
-        console.warn(`reconexión ${reconnectCount} fallida:`, e);
+
+        console.warn(
+          `reconexión ${reconnectCount} fallida:`,
+          e
+        );
+
         scheduleReconnect();
       }
+
     }, RECONNECT_DELAY);
   }
  
   function armStallDetector() {
+
     clearStallTimer();
+
     if (!isPlaying) return;
+
     stallTimer = setTimeout(() => {
-      console.warn("stream caído, iniciando reconexión…");
+
+      console.warn(
+        "stream caído, iniciando reconexión…"
+      );
+
       scheduleReconnect();
+
     }, STALL_TIMEOUT);
   }
  
   // ── PLAYER ─────────────────────────────────────────────────
   async function playStream() {
+
     try {
+
       setStatus("loading");
+
       reconnectCount = 0;
  
-      audio.src = STREAM_URL + "?t=" + Date.now();
+      audio.src =
+        STREAM_URL + "?t=" + Date.now();
+
       audio.load();
+
       await audio.play();
  
       updatePlayUI(true);
+
       setStatus("live");
+
       startMetaLoop();
+
       await requestNotifPermission();
  
     } catch (e) {
+
       console.warn("Play error:", e);
+
       setStatus("ready");
+
       updatePlayUI(false);
     }
   }
  
   function pauseStream() {
+
     clearStallTimer();
+
     clearReconnectTimer();
+
     reconnectCount = 0;
+
     audio.pause();
+
     audio.src = "";
+
     stopMetaLoop();
+
     updatePlayUI(false);
+
     setStatus("paused");
+
     if ("mediaSession" in navigator) {
-      navigator.mediaSession.playbackState = "paused";
+
+      navigator.mediaSession.playbackState =
+        "paused";
     }
   }
  
   function togglePlay() {
-    isPlaying ? pauseStream() : playStream();
+
+    isPlaying
+      ? pauseStream()
+      : playStream();
   }
  
   // ── VOLUMEN ────────────────────────────────────────────────
-  function toggleMute() { updateMuteUI(!isMuted); }
+  function toggleMute() {
+
+    updateMuteUI(!isMuted);
+  }
  
   function setVolume(v) {
+
     audio.volume = v;
-    if (v > 0 && isMuted) updateMuteUI(false);
-    if (v === 0)           updateMuteUI(true);
-    if (volumeEmoji) volumeEmoji.textContent = v === 0 ? "🔇" : v < 0.5 ? "🔉" : "🔊";
+
+    if (v > 0 && isMuted) {
+      updateMuteUI(false);
+    }
+
+    if (v === 0) {
+      updateMuteUI(true);
+    }
+
+    if (volumeEmoji) {
+
+      volumeEmoji.textContent =
+        v === 0
+          ? "🔇"
+          : v < 0.5
+            ? "🔉"
+            : "🔊";
+    }
   }
  
   // ── EVENTOS DE AUDIO ───────────────────────────────────────
   audio.addEventListener("playing", () => {
+
     clearStallTimer();
+
     clearReconnectTimer();
+
     if (isPlaying) {
+
       setStatus("live");
-      if ("mediaSession" in navigator) {
-        navigator.mediaSession.playbackState = "playing";
+
+      if ("mediaSession" in navigator") {
+
+        navigator.mediaSession.playbackState =
+          "playing";
       }
     }
   });
  
   audio.addEventListener("waiting", () => {
-    if (isPlaying) { setStatus("buffering"); armStallDetector(); }
+
+    if (isPlaying) {
+
+      setStatus("buffering");
+
+      armStallDetector();
+    }
   });
  
   audio.addEventListener("stalled", () => {
-    if (isPlaying) { setStatus("buffering"); armStallDetector(); }
+
+    if (isPlaying) {
+
+      setStatus("buffering");
+
+      armStallDetector();
+    }
   });
  
   audio.addEventListener("error", () => {
+
     if (isPlaying) {
+
       scheduleReconnect();
+
     } else {
+
       setStatus("error");
+
       stopMetaLoop();
+
       updatePlayUI(false);
     }
   });
  
   // ── EVENTOS DE CONTROLES ───────────────────────────────────
-  playBtn.addEventListener("click", togglePlay);
-  if (muteBtn)    muteBtn.addEventListener("click", toggleMute);
-  if (volumeCtrl) volumeCtrl.addEventListener("input", e => setVolume(parseFloat(e.target.value)));
+  playBtn.addEventListener(
+    "click",
+    togglePlay
+  );
+
+  if (muteBtn) {
+    muteBtn.addEventListener(
+      "click",
+      toggleMute
+    );
+  }
+
+  if (volumeCtrl) {
+
+    volumeCtrl.addEventListener(
+      "input",
+      e => setVolume(parseFloat(e.target.value))
+    );
+  }
  
   // ── INIT ───────────────────────────────────────────────────
-  if (trackInfo)   trackInfo.textContent   = DEFAULT_TRACK;
-  if (trackArtist) trackArtist.textContent = DEFAULT_ARTIST;
+  if (trackInfo) {
+    trackInfo.textContent = DEFAULT_TRACK;
+  }
+
+  if (trackArtist) {
+    trackArtist.textContent = DEFAULT_ARTIST;
+  }
+
+  // cargar historial guardado
+  try {
+
+    const savedHistory =
+      localStorage.getItem(HISTORY_STORAGE_KEY);
+
+    if (savedHistory) {
+
+      const parsedHistory =
+        JSON.parse(savedHistory);
+
+      if (Array.isArray(parsedHistory)) {
+
+        history.push(...parsedHistory);
+
+        renderHistory();
+      }
+    }
+
+  } catch (e) {
+
+    console.warn("history load error:", e);
+  }
  
   setStatus("ready");
+
   startShowLoop();
  
 });
- 

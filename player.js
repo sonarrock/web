@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     live:         { text: "En vivo",                dot: "live"      },
     buffering:    { text: "Cargando señal…",        dot: "buffering" },
     reconnecting: { text: "Reconectando…",          dot: "buffering" },
-    paused:       { text: "Pausado",                dot: "pausado"          },
+    paused:       { text: "Pausado",                dot: ""          },
     error:        { text: "Error de conexión",      dot: "error"     },
   };
  
@@ -619,6 +619,15 @@ function resolveAndSetCover() {
 
     updatePlayUI(false);
 
+lastSpotifyCover = null;
+
+setCover(DEFAULT_COVER);
+
+player.style.setProperty(
+  "--dynamic-bg",
+  "none"
+);
+   
     setStatus("paused");
 
     if ("mediaSession" in navigator) {

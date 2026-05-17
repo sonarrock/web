@@ -378,16 +378,6 @@
   backface-visibility: hidden;
 }
 
-/* animación cuando cambia canción */
-#stationCover.cover-changing {
-
-  opacity: .82;
-
-  transform: scale(1.035);
-
-  filter: blur(1px);
-}
-
 /* fondo dinámico más suave */
 #sonarPlayer::before {
 
@@ -720,4 +710,40 @@
       transform: translateX(0);
     }
   }
+}
+
+/* =========================================
+   SONAR ROCK — CINEMATIC COVER FADE
+========================================= */
+
+.cover-wrap {
+
+  position: relative;
+
+  overflow: visible;
+}
+
+.station-cover {
+
+  position: relative;
+
+  z-index: 1;
+}
+
+.station-cover-overlay {
+
+  border-radius: 18px;
+
+  object-fit: cover;
+
+  z-index: 2;
+
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.45);
+
+  pointer-events: none;
+
+  will-change:
+    opacity,
+    transform;
 }

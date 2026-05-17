@@ -650,7 +650,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setStatus("live");
 
-      if ("mediaSession" in navigator") {
+      if ("mediaSession" in navigator) {
 
         navigator.mediaSession.playbackState =
           "playing";

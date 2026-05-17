@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     live:         { text: "En vivo",                dot: "live"      },
     buffering:    { text: "Cargando señal…",        dot: "buffering" },
     reconnecting: { text: "Reconectando…",          dot: "buffering" },
-    paused:       { text: "Pausado",                dot: ""          },
+    paused:       { text: "Pausado",                dot: "pausado"          },
     error:        { text: "Error de conexión",      dot: "error"     },
   };
  

@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     player.style.setProperty("--dynamic-bg", `url('${imageUrl}')`);
   }
  
-  // ── PORTADA ────────────────────────────────────────────────
+ // ── PORTADA ────────────────────────────────────────────────
 function setCover(url) {
 
   if (!stationCover) return;
@@ -85,9 +85,17 @@ function setCover(url) {
 
     const withCache = finalUrl;
 
+    // animación suave de transición
+    stationCover.classList.add("cover-changing");
+
     stationCover.src = withCache;
 
     updateBackground(withCache);
+
+    // limpia clase después de animar
+    setTimeout(() => {
+      stationCover.classList.remove("cover-changing");
+    }, 450);
   };
 
   img.onerror = () => {

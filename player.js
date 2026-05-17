@@ -21,10 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!audio || !playBtn || !player) return;
  
   // ── CONSTANTES ─────────────────────────────────────────────
+  // Un solo Worker hace todo: metadata + Spotify + iTunes + cover
   const STREAM_URL      = "https://giss.tv:667/sonarrock.mp3";
   const API_URL         = "https://sonarrock-api.cmrm1982.workers.dev/";
-  const SPOTIFY_API     = "https://sonarrock-spotify.cmrm1982.workers.dev/";
-  const DEFAULT_COVER   = window.location.origin + "/attached_assets/logo_1749601460841.jpeg";
+  const DEFAULT_COVER   = "https://www.sonarrock.com/attached_assets/logo_1749601460841.jpeg";
   const DEFAULT_TRACK   = "Transmitiendo rock sin concesiones";
   const DEFAULT_ARTIST  = "SONAR ROCK";
   const META_INTERVAL   = 6_000;
@@ -34,17 +34,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const MAX_RECONNECTS  = 10;
  
   // ── ESTADO ─────────────────────────────────────────────────
-  let isPlaying      = false;
-  let isMuted        = false;
-  let lastTitle      = "";
-  let lastSpotifyCover = null;   // última portada real de Spotify (null = no hay canción)
-  let metaTimer      = null;
-  let showTimer      = null;
-  let toastTimer     = null;
-  let stallTimer     = null;
-  let reconnectTimer = null;
-  let reconnectCount = 0;
-  const history      = [];
+  let isPlaying        = false;
+  let isMuted          = false;
+  let lastTitle        = "";
+  let lastSpotifyCover = null;  // null = sin canción identificada (micrófono abierto)
+  let metaTimer        = null;
+  let showTimer        = null;
+  let toastTimer       = null;
+  let stallTimer       = null;
+  let reconnectTimer   = null;
+  let reconnectCount   = 0;
+  const history        = [];
  
   // ── STATUS ─────────────────────────────────────────────────
   const STATUS_MAP = {
@@ -63,19 +63,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (statusDot)  statusDot.className    = `status-dot ${s.dot}`.trim();
   }
  
-  // ── LIMPIEZA DE TEXTO ──────────────────────────────────────
-  function cleanText(text = "") {
-    try { text = decodeURIComponent(text); } catch {}
-    return text
-      .replace(/\+/g,     " ")
-      .replace(/%20/g,    " ")
-      .replace(/&amp;/g,  "&")
-      .replace(/&#39;/g,  "'")
-      .replace(/&quot;/g, '"')
-      .replace(/\s+/g,    " ")
-      .trim();
-  }
- 
   // ── FONDO DINÁMICO ─────────────────────────────────────────
   function updateBackground(imageUrl) {
     document.body.style.backgroundImage    = `url('${imageUrl}')`;
@@ -86,12 +73,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
  
   // ── PORTADA ────────────────────────────────────────────────
-  // Aplica una URL a la portada visible y al fondo.
   function setCover(url) {
     if (!stationCover) return;
-    const finalUrl = url
-      ? url.replace("http://", "https://").split("?")[0]
-      : DEFAULT_COVER;
+    const finalUrl = (url || DEFAULT_COVER).replace("http://", "https://").split("?")[0];
  
     const img   = new Image();
     img.onload  = () => {
@@ -107,22 +91,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
  
   // ── LÓGICA CENTRAL DE PORTADA ──────────────────────────────
-  // Decide qué imagen mostrar según el estado actual:
-  //   - Show en vivo Y sin portada de Spotify → imagen del programa
-  //   - Hay portada de Spotify (música sonando) → portada del álbum
-  //   - Sin show y sin Spotify → logo por defecto
+  // Prioridad: portada de álbum (Spotify/iTunes) > imagen de show > logo
   function resolveAndSetCover() {
     const showImg = getLiveShowImage();
- 
     if (lastSpotifyCover) {
-      // Hay música identificada → siempre muestra el álbum
-      setCover(lastSpotifyCover);
+      setCover(lastSpotifyCover);       // música sonando → portada del álbum
     } else if (showImg) {
-      // Show en vivo con micrófono abierto (sin canción de Spotify)
-      setCover(showImg);
+      setCover(showImg);                // show en vivo + micrófono abierto
     } else {
-      // Fuera de show y sin música identificada
-      setCover(DEFAULT_COVER);
+      setCover(DEFAULT_COVER);          // fuera de show y sin canción
     }
   }
  
@@ -179,8 +156,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
  
   function updateMuteUI(m) {
-    isMuted      = m;
-    audio.muted  = m;
+    isMuted     = m;
+    audio.muted = m;
     if (muteIcon)    muteIcon.textContent    = m ? "🔇" : "🔊";
     if (volumeEmoji) volumeEmoji.textContent = m ? "🔇" : "🔊";
   }
@@ -224,19 +201,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
  
   // ── METADATA ───────────────────────────────────────────────
+  // El Worker ya regresa artist, title y cover listos.
+  // No se necesita llamar a ningún otro endpoint.
   async function fetchMetadata() {
     try {
       const res  = await fetch(API_URL + "?t=" + Date.now(), { cache: "no-store" });
       const data = await res.json();
  
-      if (!data?.title) return;
+      // El Worker regresa DEFAULT cuando no hay señal; validamos que sea real
+      if (!data?.title || data.title === DEFAULT_TRACK) return;
  
-      const title  = cleanText(data.title);
-      const artist = cleanText(data.artist || DEFAULT_ARTIST);
+      const title  = data.title;
+      const artist = data.artist || DEFAULT_ARTIST;
  
-      if (title === lastTitle) return;
+      // La portada viene del Worker (Spotify → iTunes → logo)
+      // Si el Worker devuelve el logo es porque no encontró nada → micrófono abierto
+      const coverFromApi = data.cover && data.cover !== DEFAULT_COVER
+        ? data.cover
+        : null;
  
-      // Mueve la canción anterior al historial
+      if (title === lastTitle) {
+        // Misma canción: solo actualiza portada si cambió
+        if (coverFromApi !== lastSpotifyCover) {
+          lastSpotifyCover = coverFromApi;
+          resolveAndSetCover();
+        }
+        return;
+      }
+ 
+      // Canción nueva
       if (lastTitle) pushHistory(
         trackArtist?.textContent || DEFAULT_ARTIST,
         lastTitle
@@ -246,24 +239,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (trackInfo)   trackInfo.textContent   = title;
       if (trackArtist) trackArtist.textContent = artist;
  
-      // Busca portada en Spotify
-      let spotifyCover = null;
-      try {
-        const spotifyRes  = await fetch(
-          `${SPOTIFY_API}?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`
-        );
-        const spotifyData = await spotifyRes.json();
-        if (spotifyData?.cover) spotifyCover = spotifyData.cover;
-      } catch (e) {
-        console.warn("Spotify cover error:", e);
-      }
- 
-      // Actualiza el estado de portada de Spotify y resuelve qué mostrar
-      lastSpotifyCover = spotifyCover;  // null si no encontró → mostrará show o default
+      lastSpotifyCover = coverFromApi;
       resolveAndSetCover();
  
-      // Usa la portada correcta también en Media Session y notificación
-      const coverForSession = spotifyCover || getLiveShowImage() || DEFAULT_COVER;
+      const coverForSession = coverFromApi || getLiveShowImage() || DEFAULT_COVER;
       updateMediaSession(title, artist, coverForSession);
       sendSongNotification(artist, title, coverForSession);
       showToast(`${artist} - ${title}`);
@@ -421,6 +400,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (trackArtist) trackArtist.textContent = DEFAULT_ARTIST;
  
   setStatus("ready");
-  startShowLoop();  // arranca el loop que decide qué portada mostrar
+  startShowLoop();
  
 });
+ 

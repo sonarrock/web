@@ -497,3 +497,134 @@
       translate3d(8px,4px,0);
   }
 }
+
+/* =========================================
+   SONAR ROCK — MINI VISUALIZER
+========================================= */
+
+.cover-wrap {
+
+  position: relative;
+}
+
+.sonar-visualizer {
+
+  position: absolute;
+
+  left: 50%;
+
+  bottom: -14px;
+
+  transform: translateX(-50%);
+
+  display: flex;
+
+  align-items: flex-end;
+
+  gap: 4px;
+
+  height: 18px;
+
+  opacity: .9;
+
+  pointer-events: none;
+}
+
+.sonar-visualizer span {
+
+  width: 4px;
+
+  border-radius: 999px;
+
+  background:
+
+    linear-gradient(
+      to top,
+      rgba(255,122,26,.35),
+      rgba(255,122,26,.95)
+    );
+
+  box-shadow:
+    0 0 8px rgba(255,122,26,.45);
+
+  animation:
+    sonarVisualizerBounce 1s ease-in-out infinite;
+
+  transform-origin: bottom;
+
+  will-change:
+    transform,
+    height,
+    opacity;
+}
+
+/* tamaños diferentes */
+
+.sonar-visualizer span:nth-child(1) {
+
+  height: 8px;
+
+  animation-delay: .1s;
+}
+
+.sonar-visualizer span:nth-child(2) {
+
+  height: 16px;
+
+  animation-delay: .3s;
+}
+
+.sonar-visualizer span:nth-child(3) {
+
+  height: 12px;
+
+  animation-delay: .5s;
+}
+
+.sonar-visualizer span:nth-child(4) {
+
+  height: 18px;
+
+  animation-delay: .2s;
+}
+
+.sonar-visualizer span:nth-child(5) {
+
+  height: 10px;
+
+  animation-delay: .4s;
+}
+
+@keyframes sonarVisualizerBounce {
+
+  0% {
+
+    transform: scaleY(.45);
+
+    opacity: .45;
+  }
+
+  50% {
+
+    transform: scaleY(1.25);
+
+    opacity: 1;
+  }
+
+  100% {
+
+    transform: scaleY(.55);
+
+    opacity: .55;
+  }
+}
+
+/* pausa visualizer cuando no reproduce */
+
+.sonar-player:not(.playing)
+.sonar-visualizer span {
+
+  animation-play-state: paused;
+
+  opacity: .35;
+}

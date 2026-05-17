@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let isPlaying      = false;
   let isMuted        = false;
   let lastTitle      = "";
-  let lastCover      = DEFAULT_COVER;
+  let lastSpotifyCover = null;   // última portada real de Spotify (null = no hay canción)
   let metaTimer      = null;
   let showTimer      = null;
   let toastTimer     = null;
@@ -86,25 +86,44 @@ document.addEventListener("DOMContentLoaded", () => {
   }
  
   // ── PORTADA ────────────────────────────────────────────────
+  // Aplica una URL a la portada visible y al fondo.
   function setCover(url) {
     if (!stationCover) return;
     const finalUrl = url
       ? url.replace("http://", "https://").split("?")[0]
       : DEFAULT_COVER;
  
-    const img     = new Image();
-    img.onload    = () => {
+    const img   = new Image();
+    img.onload  = () => {
       const withCache = finalUrl + "?v=" + Date.now();
       stationCover.src = withCache;
       updateBackground(withCache);
-      lastCover = withCache;
     };
-    img.onerror   = () => {
+    img.onerror = () => {
       stationCover.src = DEFAULT_COVER;
       updateBackground(DEFAULT_COVER);
-      lastCover = DEFAULT_COVER;
     };
     img.src = finalUrl;
+  }
+ 
+  // ── LÓGICA CENTRAL DE PORTADA ──────────────────────────────
+  // Decide qué imagen mostrar según el estado actual:
+  //   - Show en vivo Y sin portada de Spotify → imagen del programa
+  //   - Hay portada de Spotify (música sonando) → portada del álbum
+  //   - Sin show y sin Spotify → logo por defecto
+  function resolveAndSetCover() {
+    const showImg = getLiveShowImage();
+ 
+    if (lastSpotifyCover) {
+      // Hay música identificada → siempre muestra el álbum
+      setCover(lastSpotifyCover);
+    } else if (showImg) {
+      // Show en vivo con micrófono abierto (sin canción de Spotify)
+      setCover(showImg);
+    } else {
+      // Fuera de show y sin música identificada
+      setCover(DEFAULT_COVER);
+    }
   }
  
   // ── PROGRAMAS EN VIVO ──────────────────────────────────────
@@ -117,16 +136,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return null;
   }
  
-  function checkLiveShow() {
-    const showImg = getLiveShowImage();
-    player.classList.toggle("show-live", !!showImg);
-    if (showImg) setCover(showImg);
-  }
- 
   function startShowLoop() {
     stopShowLoop();
-    checkLiveShow();
-    showTimer = setInterval(checkLiveShow, SHOW_INTERVAL);
+    resolveAndSetCover();
+    showTimer = setInterval(resolveAndSetCover, SHOW_INTERVAL);
   }
  
   function stopShowLoop() {
@@ -223,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
  
       if (title === lastTitle) return;
  
-      // Guarda la canción anterior en historial
+      // Mueve la canción anterior al historial
       if (lastTitle) pushHistory(
         trackArtist?.textContent || DEFAULT_ARTIST,
         lastTitle
@@ -233,26 +246,26 @@ document.addEventListener("DOMContentLoaded", () => {
       if (trackInfo)   trackInfo.textContent   = title;
       if (trackArtist) trackArtist.textContent = artist;
  
-      // Solo actualiza portada si no hay show en vivo
-      if (!getLiveShowImage()) {
-        let cover = DEFAULT_COVER;
-        try {
-          const spotifyRes  = await fetch(
-            `${SPOTIFY_API}?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`
-          );
-          const spotifyData = await spotifyRes.json();
-          if (spotifyData?.cover) cover = spotifyData.cover;
-        } catch (e) {
-          console.warn("Spotify cover error:", e);
-        }
-        setCover(cover);
-        updateMediaSession(title, artist, cover);
-        sendSongNotification(artist, title, cover);
-      } else {
-        updateMediaSession(title, artist, lastCover);
-        sendSongNotification(artist, title, lastCover);
+      // Busca portada en Spotify
+      let spotifyCover = null;
+      try {
+        const spotifyRes  = await fetch(
+          `${SPOTIFY_API}?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`
+        );
+        const spotifyData = await spotifyRes.json();
+        if (spotifyData?.cover) spotifyCover = spotifyData.cover;
+      } catch (e) {
+        console.warn("Spotify cover error:", e);
       }
  
+      // Actualiza el estado de portada de Spotify y resuelve qué mostrar
+      lastSpotifyCover = spotifyCover;  // null si no encontró → mostrará show o default
+      resolveAndSetCover();
+ 
+      // Usa la portada correcta también en Media Session y notificación
+      const coverForSession = spotifyCover || getLiveShowImage() || DEFAULT_COVER;
+      updateMediaSession(title, artist, coverForSession);
+      sendSongNotification(artist, title, coverForSession);
       showToast(`${artist} - ${title}`);
  
     } catch (e) {
@@ -332,11 +345,6 @@ document.addEventListener("DOMContentLoaded", () => {
       setStatus("live");
       startMetaLoop();
       await requestNotifPermission();
-      updateMediaSession(
-        trackArtist?.textContent || DEFAULT_ARTIST,
-        trackInfo?.textContent   || DEFAULT_TRACK,
-        lastCover
-      );
  
     } catch (e) {
       console.warn("Play error:", e);
@@ -412,10 +420,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (trackInfo)   trackInfo.textContent   = DEFAULT_TRACK;
   if (trackArtist) trackArtist.textContent = DEFAULT_ARTIST;
  
-  setCover(DEFAULT_COVER);
   setStatus("ready");
-  startShowLoop();
+  startShowLoop();  // arranca el loop que decide qué portada mostrar
  
 });
- 
- 

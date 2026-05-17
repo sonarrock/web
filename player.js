@@ -65,11 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
  
   // ── FONDO DINÁMICO ─────────────────────────────────────────
   function updateBackground(imageUrl) {
-    document.body.style.backgroundImage    = `url('${imageUrl}')`;
-    document.body.style.backgroundSize     = "cover";
-    document.body.style.backgroundPosition = "center";
-    document.body.style.backgroundRepeat   = "no-repeat";
-    document.body.style.transition         = "background-image 0.6s ease-in-out";
+    // Actualiza la variable CSS del player, NO el body
+    player.style.setProperty("--dynamic-bg", `url('${imageUrl}')`);
   }
  
   // ── PORTADA ────────────────────────────────────────────────

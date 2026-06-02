@@ -150,44 +150,35 @@ function resolveAndSetCover() {
  
  
   // ── PROGRAMAS EN VIVO ──────────────────────────────────────
-  function getLiveShowImage() {
+function getLiveShowImage() {
 
-    const d    = new Date();
-    const day  = d.getDay();
-    const hour = d.getHours();
+  const now = new Date();
 
-    if (day === 3 && hour >= 21) {
-      return "/attached_assets/session.jpg";
-    }
+  const day = Number(
+    now.toLocaleDateString("en-US", {
+      weekday: "numeric",
+      timeZone: "America/Mexico_City"
+    })
+  );
 
-    if (day === 4 && hour >= 21) {
-      return "/attached_assets/ladoB.jpg";
-    }
+  const hour = Number(
+    now.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      hour12: false,
+      timeZone: "America/Mexico_City"
+    })
+  );
 
-    return null;
+  if (day === 3 && hour >= 21) {
+    return "/attached_assets/sessions.png";
   }
- 
-  function startShowLoop() {
 
-    stopShowLoop();
-
-    resolveAndSetCover();
-
-    showTimer = setInterval(
-      resolveAndSetCover,
-      SHOW_INTERVAL
-    );
+  if (day === 4 && hour >= 21) {
+    return "/attached_assets/ladob.jpeg";
   }
- 
-  function stopShowLoop() {
 
-    if (showTimer) {
-      clearInterval(showTimer);
-    }
-
-    showTimer = null;
-  }
- 
+  return null;
+} 
   // ── HISTORIAL ──────────────────────────────────────────────
   function pushHistory(artist, title) {
 

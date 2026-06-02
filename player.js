@@ -151,35 +151,10 @@ function resolveAndSetCover() {
  
   // ── PROGRAMAS EN VIVO ──────────────────────────────────────
 function getLiveShowImage() {
-
-  const now = new Date();
-
-  const day = Number(
-    now.toLocaleDateString("en-US", {
-      weekday: "numeric",
-      timeZone: "America/Mexico_City"
-    })
-  );
-
-  const hour = Number(
-    now.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      hour12: false,
-      timeZone: "America/Mexico_City"
-    })
-  );
-
-  if (day === 3 && hour >= 21) {
-    return "/attached_assets/sessions.png";
-  }
-
-  if (day === 4 && hour >= 21) {
-    return "/attached_assets/ladob.jpeg";
-  }
-
-  return null;
-} 
-  // ── HISTORIAL ──────────────────────────────────────────────
+  return "/attached_assets/sessions.png";
+}
+ 
+ // ── HISTORIAL ──────────────────────────────────────────────
   function pushHistory(artist, title) {
 
     if (!historyList) return;

@@ -149,9 +149,45 @@ function resolveAndSetCover() {
 }
  
  
-  // ── PROGRAMAS EN VIVO ──────────────────────────────────────
+ // ── PROGRAMAS EN VIVO ──────────────────────────────────────
 function getLiveShowImage() {
-  return "/attached_assets/sessions.png";
+
+  const d = new Date();
+  const day = d.getDay();
+  const hour = d.getHours();
+
+  // Miércoles 21:00+
+  if (day === 3 && hour >= 21) {
+    return "https://www.sonarrock.com/attached_assets/sessions.png";
+  }
+
+  // Jueves 21:00+
+  if (day === 4 && hour >= 21) {
+    return "https://www.sonarrock.com/attached_assets/ladob.jpeg";
+  }
+
+  return null;
+}
+
+function startShowLoop() {
+
+  stopShowLoop();
+
+  resolveAndSetCover();
+
+  showTimer = setInterval(
+    resolveAndSetCover,
+    SHOW_INTERVAL
+  );
+}
+
+function stopShowLoop() {
+
+  if (showTimer) {
+    clearInterval(showTimer);
+  }
+
+  showTimer = null;
 }
  
  // ── HISTORIAL ──────────────────────────────────────────────
@@ -323,128 +359,139 @@ function getLiveShowImage() {
     }
   }
  
-  // ── METADATA ───────────────────────────────────────────────
-  async function fetchMetadata() {
+ // ── METADATA ───────────────────────────────────────────────
+async function fetchMetadata() {
 
-    try {
+  try {
 
-      const res = await fetch(
-        API_URL + "?t=" + Date.now(),
-        {
-          cache: "no-store"
-        }
-      );
-
-      const data = await res.json();
- 
-      if (!data?.title || data.title === DEFAULT_TRACK) {
-        return;
+    const res = await fetch(
+      API_URL + "?t=" + Date.now(),
+      {
+        cache: "no-store"
       }
- 
-      const title  = data.title;
-      const artist = data.artist || DEFAULT_ARTIST;
- 
-      const coverFromApi =
-        data.cover &&
-        data.cover !== DEFAULT_COVER
-          ? data.cover
-          : null;
- 
-      // misma canción
-      if (title === lastTitle) {
+    );
 
-        if (coverFromApi !== lastSpotifyCover) {
+    const data = await res.json();
 
-          lastSpotifyCover = coverFromApi;
+    // SIN METADATA
+    if (!data?.title || data.title === DEFAULT_TRACK) {
 
-          resolveAndSetCover();
-        }
-
-        return;
-      }
- 
-      // nueva canción
-      if (lastTitle) {
-
-        pushHistory(
-          trackArtist?.textContent || DEFAULT_ARTIST,
-          lastTitle
-        );
-      }
-
-      lastTitle = title;
- 
-      if (trackInfo) {
-
-  trackInfo.textContent = title;
-
-  requestAnimationFrame(() => {
-
-    trackInfo.classList.remove("marquee-active");
-
-    if (
-      trackInfo.scrollWidth >
-      trackInfo.clientWidth
-    ) {
-
-      trackInfo.classList.add("marquee-active");
-    }
-  });
-}
-
-      if (trackArtist) {
-        trackArtist.textContent = artist;
-      }
- 
-      lastSpotifyCover = coverFromApi;
+      lastSpotifyCover = null;
 
       resolveAndSetCover();
- 
-      const coverForSession =
-        coverFromApi ||
-        getLiveShowImage() ||
-        DEFAULT_COVER;
 
-      updateMediaSession(
-        title,
-        artist,
-        coverForSession
-      );
-
-      sendSongNotification(
-        artist,
-        title,
-        coverForSession
-      );
-
-      showToast(`${artist} - ${title}`);
- 
-    } catch (e) {
-
-      console.warn("Metadata fetch error:", e);
+      return;
     }
-  }
- 
-  function startMetaLoop() {
 
-    stopMetaLoop();
+    const title  = data.title;
+    const artist = data.artist || DEFAULT_ARTIST;
 
-    fetchMetadata();
+    const coverFromApi =
+      data.cover &&
+      data.cover !== DEFAULT_COVER
+        ? data.cover
+        : null;
 
-    metaTimer = setInterval(
-      fetchMetadata,
-      META_INTERVAL
+    // misma canción
+    if (title === lastTitle) {
+
+      if (coverFromApi !== lastSpotifyCover) {
+
+        lastSpotifyCover = coverFromApi;
+
+        resolveAndSetCover();
+      }
+
+      return;
+    }
+
+    // nueva canción
+    if (lastTitle) {
+
+      pushHistory(
+        trackArtist?.textContent || DEFAULT_ARTIST,
+        lastTitle
+      );
+    }
+
+    lastTitle = title;
+
+    if (trackInfo) {
+
+      trackInfo.textContent = title;
+
+      requestAnimationFrame(() => {
+
+        trackInfo.classList.remove("marquee-active");
+
+        if (
+          trackInfo.scrollWidth >
+          trackInfo.clientWidth
+        ) {
+
+          trackInfo.classList.add("marquee-active");
+        }
+      });
+    }
+
+    if (trackArtist) {
+      trackArtist.textContent = artist;
+    }
+
+    lastSpotifyCover = coverFromApi;
+
+    resolveAndSetCover();
+
+    const coverForSession =
+      coverFromApi ||
+      getLiveShowImage() ||
+      DEFAULT_COVER;
+
+    updateMediaSession(
+      title,
+      artist,
+      coverForSession
     );
-  }
- 
-  function stopMetaLoop() {
 
-    if (metaTimer) {
-      clearInterval(metaTimer);
-    }
+    sendSongNotification(
+      artist,
+      title,
+      coverForSession
+    );
 
-    metaTimer = null;
+    showToast(`${artist} - ${title}`);
+
+  } catch (e) {
+
+    console.warn("Metadata fetch error:", e);
+
+    // Si falla la API, mostrar programación o logo
+    lastSpotifyCover = null;
+
+    resolveAndSetCover();
   }
+}
+
+function startMetaLoop() {
+
+  stopMetaLoop();
+
+  fetchMetadata();
+
+  metaTimer = setInterval(
+    fetchMetadata,
+    META_INTERVAL
+  );
+}
+
+function stopMetaLoop() {
+
+  if (metaTimer) {
+    clearInterval(metaTimer);
+  }
+
+  metaTimer = null;
+}
  
   // ── RECONEXIÓN AUTOMÁTICA ──────────────────────────────────
   function clearStallTimer() {

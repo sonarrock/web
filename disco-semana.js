@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const data = await res.json();
 
       title.textContent = data.titulo || "Disco de la Semana";
-      cover.src         = data.portada || "disco-semana/portada.jpeg";
+      cover.src         = data.portada || "disco-semana/portada.jpg";
 
       // Usar la URL tal como viene del JSON (debe ser absoluta si viene de GitHub)
      
